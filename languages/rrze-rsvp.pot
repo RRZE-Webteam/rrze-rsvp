@@ -1,0 +1,177 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Booking system\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-07 15:37+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.4.0; wp-5.4.2"
+
+#: includes/CPT.php:42
+msgid "Add New Booking"
+msgstr ""
+
+#: includes/CPT.php:109
+msgid "Add New Custom Service"
+msgstr ""
+
+#: includes/CPT.php:40
+msgctxt "add new on admin bar"
+msgid "Booking"
+msgstr ""
+
+#: includes/CPT.php:112
+msgid "Add or remove custom services"
+msgstr ""
+
+#: includes/CPT.php:39
+msgctxt "admin menu"
+msgid "Bookings"
+msgstr ""
+
+#: includes/CPT.php:46
+msgid "All Bookings"
+msgstr ""
+
+#: includes/CPT.php:104
+msgid "All Custom Services"
+msgstr ""
+
+#. Name of the plugin
+msgid "Booking system"
+msgstr ""
+
+#. Description of the plugin
+msgid "Booking system."
+msgstr ""
+
+#: includes/CPT.php:57
+msgid "Bookings"
+msgstr ""
+
+#: includes/Plugin.php:179
+#, php-format
+msgid "Call to undefined method %1$s::%2$s"
+msgstr ""
+
+#: includes/CPT.php:113
+msgid "Choose from the most used custom services"
+msgstr ""
+
+#: includes/CPT.php:101
+msgid "Custom Service"
+msgstr ""
+
+#: includes/CPT.php:100 includes/CPT.php:115
+msgid "Custom Services"
+msgstr ""
+
+#: includes/CPT.php:44
+msgid "Edit Booking"
+msgstr ""
+
+#: includes/CPT.php:107
+msgid "Edit Custom Service"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://blogs.fau.de/webworking/"
+msgstr ""
+
+#. URI of the plugin
+msgid "https://github.com/RRZE-Webteam/rrze-rsvp"
+msgstr ""
+
+#: includes/CPT.php:43
+msgid "New Booking"
+msgstr ""
+
+#: includes/CPT.php:110
+msgid "New Custom Service Name"
+msgstr ""
+
+#: includes/CPT.php:50
+msgid "No bookings found in Trash."
+msgstr ""
+
+#: includes/CPT.php:49
+msgid "No bookings found."
+msgstr ""
+
+#: includes/CPT.php:114
+msgid "No custom services found."
+msgstr ""
+
+#: includes/CPT.php:41
+msgctxt "notice"
+msgid "Add New"
+msgstr ""
+
+#: includes/CPT.php:48
+msgid "Parent Bookings:"
+msgstr ""
+
+#: rrze-rsvp.php:122
+#, php-format
+msgid "Plugins: %1$s: %2$s"
+msgstr ""
+
+#: includes/CPT.php:103
+msgid "Popular Custom Services"
+msgstr ""
+
+#: includes/CPT.php:37
+msgctxt "post type general name"
+msgid "Bookings"
+msgstr ""
+
+#: includes/CPT.php:38
+msgctxt "post type singular name"
+msgid "Booking"
+msgstr ""
+
+#. Author of the plugin
+msgid "RRZE-Webteam"
+msgstr ""
+
+#: includes/CPT.php:47
+msgid "Search Bookings"
+msgstr ""
+
+#: includes/CPT.php:102
+msgid "Search Custom Services"
+msgstr ""
+
+#: includes/CPT.php:111
+msgid "Separate custom services with commas"
+msgstr ""
+
+#: rrze-rsvp.php:64
+#, php-format
+msgid ""
+"The server is running PHP version %1$s. The Plugin requires at least PHP "
+"version %2$s."
+msgstr ""
+
+#: rrze-rsvp.php:66
+#, php-format
+msgid ""
+"The server is running WordPress version %1$s. The Plugin requires at least "
+"WordPress version %2$s."
+msgstr ""
+
+#: includes/CPT.php:108
+msgid "Update Custom Service"
+msgstr ""
+
+#: includes/CPT.php:45
+msgid "View Booking"
+msgstr ""
