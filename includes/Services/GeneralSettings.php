@@ -8,28 +8,36 @@ use RRZE\RSVP\CPT;
 use RRZE\RSVP\Settings;
 use RRZE\RSVP\Functions;
 
-class NewSettings extends Settings
+class GeneralSettings extends Settings
 {
-    protected $optionName = 'rrze_rsvp_services'; 
+    protected $optionName = 'rrze_rsvp_services';
+
+    protected $wpTerm;
 
     public function __construct()
     {
-        $this->settingsErrorTransient = 'rrze-rsvp-services-settings-new-error-';
-        $this->noticeTransient = 'rrze-rsvp-services-settings-new-notice-';
+        $this->settingsErrorTransient = 'rrze-rsvp-services-settings-edit-error-';
+        $this->noticeTransient = 'rrze-rsvp-services-settings-edit-notice-';
     }
 
     public function onLoaded()
     {
+        add_action('admin_init', [$this, 'getTerm']);
         add_action('admin_init', [$this, 'validateOptions']);
         add_action('admin_init', [$this, 'settings']);
         add_action('admin_notices', [$this, 'adminNotices']);
+    }
+
+    public function getTerm() {
+        $item = absint(Functions::requestVar('item'));
+        $this->wpTerm = get_term_by('id', $item, CPT::getTaxonomyServiceName());
     }
 
     public function validateOptions()
     {
         $optionPage = Functions::requestVar('option_page');
 
-        if ($optionPage == 'rrze-rsvp-services-new') {
+        if ($optionPage == 'rrze-rsvp-services-edit-general') {
             $this->validate();
         }
     }
@@ -39,7 +47,7 @@ class NewSettings extends Settings
         $input = (array) Functions::requestVar($this->optionName);
         $nonce = Functions::requestVar('_wpnonce');
 
-        if (!wp_verify_nonce($nonce, 'rrze-rsvp-services-new-options')) {
+        if (!wp_verify_nonce($nonce, 'rrze-rsvp-services-edit-general-options')) {
             wp_die(__('Something went wrong.', 'rrze-rsvp'));
         }
 
@@ -52,17 +60,18 @@ class NewSettings extends Settings
         $this->addSettingsError('service_description', $description, '', false);
 
         if (! $this->settingsErrors()) {
-            $term = wp_insert_term(
-                $title,
+            $term = wp_update_term(
+                $this->wpTerm->term_id,
                 CPT::getTaxonomyServiceName(),
                 [
+                    'name' => $title,
                     'description' => $description
                 ]
             );
             
             if (is_wp_error($term)) {
-                $this->addAdminNotice(__('The service could not be added.', 'rrze-rsvp'), 'error');
-                wp_redirect(Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'new']));
+                $this->addAdminNotice(__('The service could not be updated.', 'rrze-rsvp'), 'error');
+                wp_redirect(Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'edit', 'item' => $this->wpTerm->term_id,  'tab' => 'general']));
                 exit();
             }
         }  
@@ -73,44 +82,44 @@ class NewSettings extends Settings
                     $this->addAdminNotice($error['message'], 'error');
                 }
             }
-            wp_redirect(Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'new']));
+            wp_redirect(Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'edit', 'item' => $this->wpTerm->term_id,  'tab' => 'general']));
             exit();
         }
         
-        $this->addAdminNotice(__('The service has been added.', 'rrze-rspv'));
-        wp_redirect(Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'edit', 'item' => $term['term_id']]));
+        $this->addAdminNotice(__('The service has been updated.', 'rrze-rspv'));
+        wp_redirect(Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'edit', 'item' => $this->wpTerm->term_id,  'tab' => 'general']));
         exit();        
     }
 
     public function settings()
     {
         add_settings_section(
-            'rrze-rsvp-services-new-section',
+            'rrze-rsvp-services-edit-general-section',
             false,
             '__return_false',
-            'rrze-rsvp-services-new'
+            'rrze-rsvp-services-edit-general'
         );
 
         add_settings_field(
             'service_title',
             __('Title', 'rrze-ac'),
             [$this, 'serviceTitleField'],
-            'rrze-rsvp-services-new',
-            'rrze-rsvp-services-new-section'
+            'rrze-rsvp-services-edit-general',
+            'rrze-rsvp-services-edit-general-section'
         );
 
         add_settings_field(
             'service_description',
             __('Description', 'rrze-ac'),
             [$this, 'serviceDerscriptionField'],
-            'rrze-rsvp-services-new',
-            'rrze-rsvp-services-new-section'
-        );        
+            'rrze-rsvp-services-edit-general',
+            'rrze-rsvp-services-edit-general-section'
+        );  
     }
 
     public function serviceTitleField()
     {   $settingsErrors = $this->settingsErrors();
-        $title = isset($settingsErrors['service_title']['value']) ? esc_html($settingsErrors['service_title']['value']) : '';
+        $title = isset($settingsErrors['service_title']['value']) ? esc_html($settingsErrors['service_title']['value']) : $this->wpTerm->name;
         ?>
         <input type="text" value="<?php echo $title; ?>" name="<?php printf('%s[service_title]', $this->optionName); ?>" class="regular-text">
         <?php       
@@ -119,9 +128,10 @@ class NewSettings extends Settings
     public function serviceDerscriptionField()
     {
         $settingsErrors = $this->settingsErrors();
-        $description = isset($settingsErrors['service_description']['value']) ? esc_textarea($settingsErrors['service_description']['value']) : '';
+        $description = isset($settingsErrors['service_description']['value']) ? esc_textarea($settingsErrors['service_description']['value']) : $this->wpTerm->description;
         ?>
         <textarea id="description" cols="50" rows="3" name="<?php printf('%s[service_description]', $this->optionName); ?>"><?php echo $description; ?></textarea>
         <?php        
     }
+
 }

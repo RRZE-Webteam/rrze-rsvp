@@ -4,6 +4,7 @@ namespace RRZE\RSVP\Services;
 
 defined('ABSPATH') || exit;
 
+use RRZE\RSVP\CPT;
 use RRZE\RSVP\Functions;
 
 use function RRZE\RSVP\plugin;
@@ -12,7 +13,7 @@ class Menu
 {   
     protected $newSettings;
 
-    protected $editSettings;
+    protected $generalSettings;
 
     public function __construct()
     {
@@ -24,8 +25,8 @@ class Menu
         $this->newSettings = new NewSettings;
         $this->newSettings->onLoaded();
 
-        //$this->editSettings = new EditSettings;
-        //$this->editSettings->onLoaded();
+        $this->generalSettings = new GeneralSettings;
+        $this->generalSettings->onLoaded();
 
         add_action('admin_menu', [$this, 'adminMenu']);
 
@@ -77,7 +78,7 @@ class Menu
         </div>
         <?php
         $this->newSettings->deleteSettingsErrors();
-        //$this->editSettings->deleteSettingsErrors();
+        $this->generalSettings->deleteSettingsErrors();
     }
 
     protected function newPage()
@@ -95,6 +96,15 @@ class Menu
 
     protected function editPage()
     {   
+        $item = absint(Functions::requestVar('item'));
+        $wpTerm = get_term_by('id', $item, CPT::getTaxonomyServiceName());
+
+        if ($wpTerm === false) {
+            wp_die(__('Something went wrong.', 'rrze-rsvp'));
+        }
+
+        $termId = $wpTerm->term_id;
+
         $sections = [
             'general' => __('General', 'rrze-rsvp'),
             'exceptions' => __('Exceptions', 'rrze-rsvp'),
@@ -110,16 +120,17 @@ class Menu
             <?php 
             foreach ($sections as $tab => $tabName) {
                 $activeClass= ($activeTab == $tab) ? ' nav-tab-active' : '';
-                $href = Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'edit', 'tab' => $tab]);
+                $href = Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'edit', 'item' => $termId,  'tab' => $tab]);
                 printf('<a href="%s" class="nav-tab%s">%s</a>', $href, $activeClass, $tabName);
             }
             ?>
         </h2> 
-        <form action="<?php echo Functions::actionUrl(['action' => 'edit']); ?>" method="post">
+        <form action="<?php echo Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'edit', 'item' => $termId,  'tab' => $tab]); ?>" method="post">
             <?php
-            settings_fields('rrze-rsvp-services-edit');
-            do_settings_sections('rrze-rsvp-services-edit');
-            submit_button(__('Update Service', 'rrze-rsvp')); ?>
+            $optionGroup = 'rrze-rsvp-services-edit-' . $activeTab;
+            settings_fields($optionGroup);
+            do_settings_sections($optionGroup);
+            submit_button(__('Save Changes', 'rrze-rsvp')); ?>
         </form>
         <?php
     }

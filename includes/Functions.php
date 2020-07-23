@@ -17,13 +17,13 @@ class Functions
         if (isset($atts['action'])) {
             switch ($atts['action']) {
                 case 'add':
-                    $atts['nonce'] = wp_create_nonce('add');
+                    $atts['_wpnonce'] = wp_create_nonce('add');
                     break;
                 case 'edit':
-                    $atts['nonce'] = wp_create_nonce('edit');
+                    $atts['_wpnonce'] = wp_create_nonce('edit');
                     break;
                 case 'delete':
-                    $atts['nonce'] = wp_create_nonce('delete');
+                    $atts['_wpnonce'] = wp_create_nonce('delete');
                     break;
                 default:
                     break;
