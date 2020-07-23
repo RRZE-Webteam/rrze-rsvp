@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Booking system\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-07 15:37+0000\n"
+"POT-Creation-Date: 2020-07-23 15:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -15,34 +15,20 @@ msgstr ""
 "X-Generator: Loco https://localise.biz/\n"
 "X-Loco-Version: 2.4.0; wp-5.4.2"
 
-#: includes/CPT.php:42
-msgid "Add New Booking"
+#: includes/Services/Menu.php:135
+msgid "Add New"
 msgstr ""
 
-#: includes/CPT.php:109
-msgid "Add New Custom Service"
+#: includes/Services/Menu.php:86 includes/Services/Menu.php:91
+msgid "Add New Service"
 msgstr ""
 
-#: includes/CPT.php:40
-msgctxt "add new on admin bar"
-msgid "Booking"
+#: includes/Bookings/Menu.php:65 includes/Bookings/Menu.php:120
+msgid "Archive"
 msgstr ""
 
-#: includes/CPT.php:112
-msgid "Add or remove custom services"
-msgstr ""
-
-#: includes/CPT.php:39
-msgctxt "admin menu"
-msgid "Bookings"
-msgstr ""
-
-#: includes/CPT.php:46
-msgid "All Bookings"
-msgstr ""
-
-#: includes/CPT.php:104
-msgid "All Custom Services"
+#: includes/Bookings/ListTable.php:127
+msgid "Booked on"
 msgstr ""
 
 #. Name of the plugin
@@ -53,33 +39,65 @@ msgstr ""
 msgid "Booking system."
 msgstr ""
 
-#: includes/CPT.php:57
+#: includes/Bookings/Menu.php:42 includes/Bookings/Menu.php:43
+#: includes/Bookings/Menu.php:64 includes/Bookings/Menu.php:94
+#: includes/Services/Menu.php:44
 msgid "Bookings"
 msgstr ""
 
-#: includes/Plugin.php:179
+#: includes/Plugin.php:189
 #, php-format
 msgid "Call to undefined method %1$s::%2$s"
 msgstr ""
 
-#: includes/CPT.php:113
-msgid "Choose from the most used custom services"
+#: includes/Bookings/ListTable.php:149
+msgctxt "Cancel Booking"
+msgid "Cancel"
 msgstr ""
 
-#: includes/CPT.php:101
-msgid "Custom Service"
+#: includes/Bookings/ListTable.php:131 includes/Bookings/ListTable.php:136
+msgid "Canceled"
 msgstr ""
 
-#: includes/CPT.php:100 includes/CPT.php:115
-msgid "Custom Services"
+#: includes/Bookings/ListTable.php:153
+msgid "Confirm"
 msgstr ""
 
-#: includes/CPT.php:44
-msgid "Edit Booking"
+#: includes/Bookings/ListTable.php:142 includes/Bookings/ListTable.php:151
+msgid "Confirmed"
 msgstr ""
 
-#: includes/CPT.php:107
-msgid "Edit Custom Service"
+#: includes/Bookings/ListTable.php:32
+msgid "Date"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:145
+msgid "Delete"
+msgstr ""
+
+#: includes/Services/ListTable.php:29
+msgid "Description"
+msgstr ""
+
+#: includes/Services/Menu.php:108
+msgid "Edit Service"
+msgstr ""
+
+#: includes/Services/ListTable.php:85
+msgctxt "Edit service"
+msgid "Edit"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:36
+msgid "Email"
+msgstr ""
+
+#: includes/Services/Menu.php:100
+msgid "Exceptions"
+msgstr ""
+
+#: includes/Services/Menu.php:99
+msgid "General"
 msgstr ""
 
 #. Author URI of the plugin
@@ -90,88 +108,85 @@ msgstr ""
 msgid "https://github.com/RRZE-Webteam/rrze-rsvp"
 msgstr ""
 
-#: includes/CPT.php:43
+#: includes/Bookings/ListTable.php:35
+msgid "Name"
+msgstr ""
+
+#: includes/Bookings/Menu.php:137
 msgid "New Booking"
 msgstr ""
 
-#: includes/CPT.php:110
-msgid "New Custom Service Name"
+#: includes/Bookings/ListTable.php:139
+msgid "Not confirmed"
 msgstr ""
 
-#: includes/CPT.php:50
-msgid "No bookings found in Trash."
+#: includes/Bookings/Menu.php:53 includes/Bookings/Menu.php:74
+msgid "Number of bookings per page:"
 msgstr ""
 
-#: includes/CPT.php:49
-msgid "No bookings found."
+#: includes/Services/Menu.php:54
+msgid "Number of services per page:"
 msgstr ""
 
-#: includes/CPT.php:114
-msgid "No custom services found."
-msgstr ""
-
-#: includes/CPT.php:41
-msgctxt "notice"
-msgid "Add New"
-msgstr ""
-
-#: includes/CPT.php:48
-msgid "Parent Bookings:"
-msgstr ""
-
-#: rrze-rsvp.php:122
+#: rrze-rsvp.php:108
 #, php-format
 msgid "Plugins: %1$s: %2$s"
 msgstr ""
 
-#: includes/CPT.php:103
-msgid "Popular Custom Services"
-msgstr ""
-
-#: includes/CPT.php:37
-msgctxt "post type general name"
-msgid "Bookings"
-msgstr ""
-
-#: includes/CPT.php:38
-msgctxt "post type singular name"
-msgid "Booking"
+#: includes/Bookings/ListTable.php:132
+msgid "Restore"
 msgstr ""
 
 #. Author of the plugin
 msgid "RRZE-Webteam"
 msgstr ""
 
-#: includes/CPT.php:47
-msgid "Search Bookings"
+#: includes/Services/Menu.php:101
+msgid "Seats"
 msgstr ""
 
-#: includes/CPT.php:102
-msgid "Search Custom Services"
+#: includes/Bookings/ListTable.php:34 includes/Services/ListTable.php:27
+msgid "Service"
 msgstr ""
 
-#: includes/CPT.php:111
-msgid "Separate custom services with commas"
+#: includes/Services/Menu.php:45 includes/Services/Menu.php:134
+msgid "Services"
 msgstr ""
 
-#: rrze-rsvp.php:64
+#: includes/Bookings/ListTable.php:122 includes/Services/ListTable.php:79
+msgid "Show more"
+msgstr ""
+
+#: includes/Services/ListTable.php:28
+msgid "Slug"
+msgstr ""
+
+#: includes/Services/NewSettings.php:43
+msgid "Something went wrong."
+msgstr ""
+
+#: rrze-rsvp.php:50
 #, php-format
 msgid ""
 "The server is running PHP version %1$s. The Plugin requires at least PHP "
 "version %2$s."
 msgstr ""
 
-#: rrze-rsvp.php:66
+#: rrze-rsvp.php:52
 #, php-format
 msgid ""
 "The server is running WordPress version %1$s. The Plugin requires at least "
 "WordPress version %2$s."
 msgstr ""
 
-#: includes/CPT.php:108
-msgid "Update Custom Service"
+#: includes/Services/NewSettings.php:64
+msgid "The service could not be added."
 msgstr ""
 
-#: includes/CPT.php:45
-msgid "View Booking"
+#: includes/Bookings/ListTable.php:33
+msgid "Time"
+msgstr ""
+
+#: includes/Services/Menu.php:122
+msgid "Update Service"
 msgstr ""

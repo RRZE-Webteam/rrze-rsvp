@@ -1,0 +1,46 @@
+.rrze-rsvp table td {
+  vertical-align: middle;
+}
+
+.rrze-rsvp table.wp-list-table {
+  table-layout: auto;
+}
+
+.rrze-rsvp table.wp-list-table th {
+  padding: 8px 10px;
+  font-weight: 400;
+}
+
+.rrze-rsvp table.wp-list-table td.actions {
+  text-align: center;
+}
+
+.rrze-rsvp table.wp-list-table td.actions a, .rrze-rsvp table.wp-list-table td.actions button {
+  margin: 2px 4px;
+  min-width: calc(50% - 10px);
+  text-align: center;
+}
+
+.rrze-rsvp table.wp-list-table td.actions a.rrze-rsvp-confirmed[disabled], .rrze-rsvp table.wp-list-table td.actions button.rrze-rsvp-confirmed[disabled] {
+  background: #009900 !important;
+  color: white !important;
+  border-color: #009900 !important;
+}
+
+.rrze-rsvp table.wp-list-table td.actions a.delete {
+  color: #a00;
+}
+
+.rrze-rsvp table.wp-list-table td.actions .booking_date {
+  display: block;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.rrze-rsvp .selectvalues-input {
+  display: none;
+}
+
+.rrze-rsvp .table.widefat input:not([type=submit]):not([type=checkbox]) {
+  width: 100%;
+}

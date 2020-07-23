@@ -1,0 +1,149 @@
+<?php
+
+namespace RRZE\RSVP\Services;
+
+defined('ABSPATH') || exit;
+
+use RRZE\RSVP\Functions;
+
+use function RRZE\RSVP\plugin;
+
+class Menu
+{   
+    protected $newSettings;
+
+    protected $editSettings;
+
+    public function __construct()
+    {
+        //
+    }
+
+    public function onLoaded()
+    {
+        $this->newSettings = new NewSettings;
+        $this->newSettings->onLoaded();
+
+        //$this->editSettings = new EditSettings;
+        //$this->editSettings->onLoaded();
+
+        add_action('admin_menu', [$this, 'adminMenu']);
+
+        add_filter('set-screen-option', function ($status, $option, $value) {
+            if ('rrze_rsvp_services_per_page' == $option) {
+                return $value;
+            }
+            return $status;
+        }, 11, 3);
+    }
+
+    public function adminMenu()
+    {
+        $submenuPage = add_submenu_page(
+            plugin()->getSlug(),
+            __('Bookings', 'rrze-rsvp'),
+            __('Services', 'rrze-rsvp'),
+            'manage_options',
+            plugin()->getSlug() . '-services',
+            [$this, 'menuPage']
+        );
+
+        add_action("load-$submenuPage", function () {
+            $option = 'per_page';
+            $args = [
+                'label' => __('Number of services per page:', 'rrze-rsvp'),
+                'default' => 20,
+                'option' => 'rrze_rsvp_services_per_page'
+            ];
+
+            add_screen_option($option, $args);
+        });
+    }
+
+    public function menuPage()
+    {
+        $action = Functions::requestVar('action');
+        $OptionPage = Functions::requestVar('option_page');
+        ?>
+        <div class="rrze-rsvp wrap">           
+            <?php
+            if ($action == 'new') {
+                $this->newPage();
+            } elseif ($action == 'edit') {
+                $this->editPage();
+            } else {
+                $this->defaultPage();
+            } ?>
+        </div>
+        <?php
+        $this->newSettings->deleteSettingsErrors();
+        //$this->editSettings->deleteSettingsErrors();
+    }
+
+    protected function newPage()
+    {
+        ?>
+        <h2><?php echo esc_html(__('Add New Service', 'rrze-rsvp')); ?></h2>
+        <form action="<?php echo Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'new']); ?>" method="post">
+            <?php
+            settings_fields('rrze-rsvp-services-new');
+            do_settings_sections('rrze-rsvp-services-new');
+            submit_button(__('Add New Service', 'rrze-rsvp')); ?>
+        </form>
+        <?php
+    }
+
+    protected function editPage()
+    {   
+        $sections = [
+            'general' => __('General', 'rrze-rsvp'),
+            'exceptions' => __('Exceptions', 'rrze-rsvp'),
+            'seats' => __('Seats', 'rrze-rsvp')
+        ];
+        $activeTab = Functions::requestVar('tab');
+        if (!in_array($activeTab, array_keys($sections))) {
+            $activeTab = 'general';
+        }
+        ?>
+        <h1><?php echo esc_html(__('Edit Service', 'rrze-rsvp')); ?></h1>
+        <h2 class="nav-tab-wrapper">
+            <?php 
+            foreach ($sections as $tab => $tabName) {
+                $activeClass= ($activeTab == $tab) ? ' nav-tab-active' : '';
+                $href = Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'edit', 'tab' => $tab]);
+                printf('<a href="%s" class="nav-tab%s">%s</a>', $href, $activeClass, $tabName);
+            }
+            ?>
+        </h2> 
+        <form action="<?php echo Functions::actionUrl(['action' => 'edit']); ?>" method="post">
+            <?php
+            settings_fields('rrze-rsvp-services-edit');
+            do_settings_sections('rrze-rsvp-services-edit');
+            submit_button(__('Update Service', 'rrze-rsvp')); ?>
+        </form>
+        <?php
+    }
+
+    protected function defaultPage()
+    {
+        $search = '';
+        $table = new ListTable();
+        $table->prepare_items();
+        ?>
+        <h1>
+            <?php _e('Services', 'rrze-rsvp'); ?>
+            <a href="<?php echo Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'new']); ?>" class="add-new-h2"><?php _e("Add New", 'rrze-rsvp'); ?></a>
+        </h1>         
+        <form method="get">
+            <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>">
+            <?php $table->search_box(__('Search'), 's'); ?>
+        </form>
+
+        <form method="get">
+            <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>">
+            <input type="hidden" name="s" value="<?php echo $search ?>">
+            <?php $table->display(); ?>
+        </form>
+        <?php
+    }
+}

@@ -8,15 +8,48 @@ class Options
 {
     const OPTION_NAME = 'rrze_rsvp';
 
-    protected static function deafaultOptions()
+    protected static function defaultOptions()
     {
         return [
+            'weeks_in_advance' => 5,
+            'event_duration' => '01:00',
+            'event_gap' => '01:00',
+            'workdays' => [
+                [
+                    'start' => '09:00',
+                    'end' => '18:00'
+                ],
+                [
+                    'start' => '09:00',
+                    'end' => '18:00'
+                ],
+                [
+                    'start' => '09:00',
+                    'end' => '18:00'
+                ],
+                [
+                    'start' => '09:00',
+                    'end' => '18:00'
+                ],
+                [
+                    'start' => '09:00',
+                    'end' => '18:00'
+                ],
+                [
+                    'start' => '00:00',
+                    'end' => '00:00'
+                ],
+                [
+                    'start' => '00:00',
+                    'end' => '00:00'
+                ]
+            ]
         ];
     }
 
     public static function getOptions()
     {
-        $defaults = self::deafaultOptions();
+        $defaults = self::defaultOptions();
 
         $options = (array) get_option(static::OPTION_NAME);
         $options = wp_parse_args($options, $defaults);

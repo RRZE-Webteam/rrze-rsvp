@@ -116,7 +116,7 @@ class Plugin
 	 */
 	public function getPath(string $path = ''): string
 	{
-		return $this->directory . ltrim($path, DIRECTORY_SEPARATOR);
+		return $this->directory . ltrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 	}
 
 	/**
@@ -127,7 +127,7 @@ class Plugin
 	 */
 	public function getUrl(string $path = ''): string
 	{
-		return $this->url . ltrim($path, DIRECTORY_SEPARATOR);
+		return $this->url . ltrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 	}
 
 	/**
@@ -139,6 +139,16 @@ class Plugin
 	{
 		$this->url = rtrim(plugin_dir_url($this->pluginFile), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 		return $this;
+	}
+
+	/**
+	 * getSlug method
+	 * Get the slug of the plugin.
+	 * @return string The slug.
+	 */
+	public function getSlug(): string
+	{
+		return sanitize_title(dirname($this->basename));
 	}
 
 	/**

@@ -4,7 +4,7 @@
 Plugin Name:     Booking system
 Plugin URI:      https://github.com/RRZE-Webteam/rrze-rsvp
 Description:     Booking system.
-Version:         0.0.1
+Version:         0.0.2
 Author:          RRZE-Webteam
 Author URI:      https://blogs.fau.de/webworking/
 License:         GNU General Public License v2
@@ -19,24 +19,10 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Plugin;
 use RRZE\RSVP\Main;
+use RRZE\RSVP\CF\CustomField;
 
 // Autoloader (PSR-4)
-spl_autoload_register(function ($class) {
-    $prefix = __NAMESPACE__;
-    $base_dir = __DIR__ . '/includes/';
-
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        return;
-    }
-
-    $relativeClass = substr($class, $len);
-    $file = $base_dir . str_replace('\\', '/', $relativeClass) . '.php';
-
-    if (file_exists($file)) {
-        require $file;
-    }
-});
+require 'vendor/autoload.php';
 
 const RRZE_PHP_VERSION = '7.4';
 const RRZE_WP_VERSION = '5.4';
