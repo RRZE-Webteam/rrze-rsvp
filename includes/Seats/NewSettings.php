@@ -160,7 +160,7 @@ class NewSettings extends Settings
             <?php endforeach; ?>
             </select>
         <?php else: ?>
-            <p><?php _e('No services found.', 'rrze-rsvp'); ?></p>
+            <p><?php _e('No exceptions found.', 'rrze-rsvp'); ?></p>
         <?php endif; ?>
         <?php
     }    

@@ -4,6 +4,8 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
+use DateTime;
+
 class Functions
 {
     public static function actionUrl($atts = [])
@@ -49,8 +51,9 @@ class Functions
     {
         echo ($option['start'] == '00:00' && $option['end'] == '00:00') ? $string1 : $string2;
     }
-    
-    public static function getServices($args = []) {
+
+    public static function getServices($args = [])
+    {
 
         if (!isset($args['hide_empty'])) {
             $args['hide_empty'] = 0;
@@ -69,5 +72,31 @@ class Functions
         }
 
         return $services;
-    }  
+    }
+
+    public static function validateDate(string $date, string $format = 'Y-m-d\TH:i:s\Z')
+    {
+        $d = DateTime::createFromFormat($format, $date);
+        if ($d && $d->format($format) === $date) {
+            return $date;
+        } else {
+            return false;
+        }
+    }
+
+    public static function validateTime(string $time) : string
+    {
+        $time = trim($time);
+        if (preg_match("/^(2[0-3]|[01][0-9]):([0-5][0-9])$/", $time)) {
+            return $time;
+        } else if (preg_match("/^(2[0-3]|[01][0-9])$/", $time)) {
+            return $time . ':00';
+        } else if (preg_match("/^([0-9]):([0-5][0-9])$/", $time)) {
+            return '0' . $time;
+        } else if (preg_match("/^([0-9])$/", $time)) {
+            return '0' . $time . ':00';
+        } else {
+            return '00:00';
+        }
+    }
 }

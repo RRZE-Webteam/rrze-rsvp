@@ -56,14 +56,28 @@ class Main
 			return;
 		}
 
+		wp_enqueue_script('jquery-ui-core');
+		wp_enqueue_script('jquery-ui-datepicker');		
 		wp_enqueue_script('wp-color-picker');
 		wp_enqueue_script(
 			'rrze-rsvp-admin',
-			plugins_url('assets/js/admin.js', plugin()->getBasename()),
-			[],
+			plugins_url('assets/js/admin-min.js', plugin()->getBasename()),
+			['jquery'],
 			plugin()->getVersion()
 		);
+		wp_localize_script('rrze-rsvp-admin', 'RRZE_RSVP_ADMIN', array(
+			'dateformat' => get_option('date_format'),
+			'text_delete' => __('Do you want to delete?', 'rrze-rsvp'),
+			'text_cancelled' => __('Canceled', 'rrze-rsvp'),
+			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
+			'ajaxurl' => admin_url('admin-ajax.php')
+		));
 
+		wp_enqueue_style(
+			'jquery-ui-css',
+			plugins_url('assets/css/jquery-ui-min.css', plugin()->getBasename())
+		);
+		wp_enqueue_style('jquery-ui-datepicker');
 		wp_enqueue_style('wp-color-picker');
 		wp_enqueue_style(
 			'rrze-rsvp-admin',
@@ -125,17 +139,17 @@ class Main
 		];
 
 		$terms = [
-			'lesesaal-1' => [
-				'title' => 'Lesesaal 1',
-				'description' => '26 Sitzplätze'
+			'haupt-ub-og1' => [
+				'title' => 'Hauptbibliothek Obergeschoss 1',
+				'description' => '160 Sitzplätze'
 			],
-			'lesesaal-2' => [
-				'title' => 'Lesesaal 2',
-				'description' => '36 Sitzplätze'
+			'haupt-ub-og2' => [
+				'title' => 'Hauptbibliothek Obergeschoss 2',
+				'description' => '125 Sitzplätze'
 			],
-			'lesesaal-3' => [
-				'title' => 'Lesesaal 3',
-				'description' => '31 Sitzplätze'
+			'tnzb-ob' => [
+				'title' => 'TNZB Obergeschoss',
+				'description' => '80 Sitzplätze'
 			]			
 		];
 

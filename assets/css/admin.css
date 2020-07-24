@@ -44,3 +44,7 @@
 .rrze-rsvp .table.widefat input:not([type=submit]):not([type=checkbox]) {
   width: 100%;
 }
+
+.rrze-rsvp .rrze_rsvp_datepicker_value {
+  display: none !important;
+}

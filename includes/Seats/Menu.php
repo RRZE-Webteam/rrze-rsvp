@@ -4,7 +4,6 @@ namespace RRZE\RSVP\Seats;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\CPT;
 use RRZE\RSVP\Functions;
 
 use function RRZE\RSVP\plugin;
@@ -122,7 +121,7 @@ class Menu
         ?>
         <h1>
             <?php _e('Seats', 'rrze-rsvp'); ?>
-            <a href="<?php echo Functions::actionUrl(['page' => 'rrze-rsvp-seats', 'action' => 'new']); ?>" class="add-new-h2"><?php _e("Add New", 'rrze-rsvp'); ?></a>
+            <a href="<?php echo Functions::actionUrl(['page' => 'rrze-rsvp-seats', 'action' => 'new']); ?>" class="add-new-h2"><?php _e('Add New', 'rrze-rsvp'); ?></a>
         </h1>         
         <form method="get">
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>">

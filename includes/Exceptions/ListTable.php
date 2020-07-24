@@ -44,11 +44,11 @@ class ListTable extends WP_List_Table
             'post_status' => 'publish',
             'posts_per_page' => -1,
             'offset' => -1,
-            'meta_key' => 'rrze_rsvp_excpt_end',
+            'meta_key' => 'rrze_rsvp_exception_end',
             'orderby' => 'meta_value',
             'order' => 'ASC',
             'meta_query' => [
-                'key' => 'rrze_rsvp_excpt_end',
+                'key' => 'rrze_rsvp_exception_end',
                 'value' => current_time('mysql'),
                 'compare' => '>='
             ]
@@ -60,8 +60,8 @@ class ListTable extends WP_List_Table
         $prepItems = [];
 
         foreach ($posts as $post) {
-            $start = new Carbon(get_post_meta($post->ID, 'rrze_rsvp_excpt_start', true));
-            $end = new Carbon(get_post_meta($post->ID, 'rrze_rsvp_excpt_end', true));
+            $start = new Carbon(get_post_meta($post->ID, 'rrze_rsvp_exception_start', true));
+            $end = new Carbon(get_post_meta($post->ID, 'rrze_rsvp_exception_end', true));
 
             $startOutput = date_i18n(get_option('date_format'), $start->timestamp);
 
