@@ -117,8 +117,8 @@ class ListTable extends WP_List_Table
             case 'end':
                 return $item[$column_name];
             case 'actions':
-                $actionUrl = Functions::actionUrl(['page' => 'rrze-rsvp-exceptions', 'action' => 'edit', 'item' => $item['id']]);
-                return sprintf('<a href="%s" class="button" data-id="%s">%s</a>', $actionUrl, $item['id'], _x('Delete', 'Edit exception', 'rrze-rsvp'));
+                $actionUrl = Functions::actionUrl(['page' => 'rrze-rsvp-exceptions', 'action' => 'delete', 'item' => $item['id']]);
+                return sprintf('<a href="%s" class="button" data-id="%s">%s</a>', $actionUrl, $item['id'], _x('Delete', 'Delete exception', 'rrze-rsvp'));
             default:
                 return !empty($item[$column_name]) ? $item[$column_name] : '&mdash;';
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace RRZE\RSVP\Exceptions;
+namespace RRZE\RSVP\Seats;
 
 defined('ABSPATH') || exit;
 
@@ -25,7 +25,7 @@ class Menu
         add_action('admin_menu', [$this, 'add_admin_menu']);
 
         add_filter('set-screen-option', function($status, $option, $value) {
-            if ('rrze_rsvp_exceptions_per_page' == $option) {
+            if ('rrze_rsvp_seats_per_page' == $option) {
                 return $value;
             }
             return $status;
@@ -37,18 +37,18 @@ class Menu
         $submenuPage = add_submenu_page(
             plugin()->getSlug(), 
             __('Bookings', 'rrze-rsvp'),
-            __('Exceptions', 'rrze-rsvp'),
+            __('Seats', 'rrze-rsvp'),
             'manage_options',
-            plugin()->getSlug() . '-exceptions',
-            [$this, 'exceptionsPage']
+            plugin()->getSlug() . '-seats',
+            [$this, 'seatsPage']
         );
 
         add_action("load-$submenuPage", function() {
             $option = 'per_page';
             $args = [
-                'label' => __('Number of exceptions per page:', 'rrze-rsvp'),
+                'label' => __('Number of seats per page:', 'rrze-rsvp'),
                 'default' => 10,
-                'option' => 'rrze_rsvp_exceptions_per_page'
+                'option' => 'rrze_rsvp_seats_per_page'
             ];
 
             add_screen_option($option, $args);
@@ -56,7 +56,7 @@ class Menu
 
     }
     
-    public function exceptionsPage()
+    public function seatsPage()
     {
         $options = Options::getOptions();
         

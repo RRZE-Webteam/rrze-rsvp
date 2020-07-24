@@ -151,13 +151,13 @@ class ListTable extends WP_List_Table
 					}
 					return $button . $booking_date;
 				} else {
-					$deletebutton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=del&id=" . $item['id'] . "&_wpnonce=" . $nonce_action . "' class='button rrze-rsvp-delete' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . _x('Cancel', 'Cancel Booking', 'rrze-rsvp') . "</a>";
+					$deleteButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=del&id=" . $item['id'] . "&_wpnonce=" . $nonce_action . "' class='button rrze-rsvp-delete' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . _x('Cancel', 'Cancel Booking', 'rrze-rsvp') . "</a>";
 					if ($item['status'] == 'confirmed') {
-						$accbutton = "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
+						$actionButton = "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
 					} else {
-						$accbutton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=acc&id=" . $item['id'] . "&_wpnonce=" . $nonce_action . "' class='button button-primary rrze-rsvp-accept' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . __('Confirm', 'rrze-rsvp') . "</a>";
+						$actionButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=acc&id=" . $item['id'] . "&_wpnonce=" . $nonce_action . "' class='button button-primary rrze-rsvp-accept' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . __('Confirm', 'rrze-rsvp') . "</a>";
 					}
-					return $deletebutton . $accbutton . $booking_date;
+					return $deleteButton . $actionButton . $booking_date;
 				}
 			default:
 				return ! empty($item[$column_name]) ? $item[$column_name] : '&mdash;';
