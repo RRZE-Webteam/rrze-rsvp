@@ -22,15 +22,9 @@ class GeneralSettings extends Settings
 
     public function onLoaded()
     {
-        add_action('admin_init', [$this, 'getTerm']);
         add_action('admin_init', [$this, 'validateOptions']);
         add_action('admin_init', [$this, 'settings']);
         add_action('admin_notices', [$this, 'adminNotices']);
-    }
-
-    public function getTerm() {
-        $item = absint(Functions::requestVar('item'));
-        $this->wpTerm = get_term_by('id', $item, CPT::getTaxonomyServiceName());
     }
 
     public function validateOptions()
@@ -48,6 +42,12 @@ class GeneralSettings extends Settings
         $nonce = Functions::requestVar('_wpnonce');
 
         if (!wp_verify_nonce($nonce, 'rrze-rsvp-services-edit-general-options')) {
+            wp_die(__('Something went wrong.', 'rrze-rsvp'));
+        }
+
+        $item = absint(Functions::requestVar('item'));
+        $this->wpTerm = get_term_by('id', $item, CPT::getTaxonomyServiceName());
+        if ($this->wpTerm === false) {
             wp_die(__('Something went wrong.', 'rrze-rsvp'));
         }
 
@@ -93,6 +93,12 @@ class GeneralSettings extends Settings
 
     public function settings()
     {
+        $item = absint(Functions::requestVar('item'));
+        $this->wpTerm = get_term_by('id', $item, CPT::getTaxonomyServiceName());
+        if ($this->wpTerm === false) {
+            return;
+        }
+
         add_settings_section(
             'rrze-rsvp-services-edit-general-section',
             false,

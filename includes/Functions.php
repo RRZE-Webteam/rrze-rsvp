@@ -48,5 +48,26 @@ class Functions
     public static function isInactiveWorkday($option, $string1, $string2 = '')
     {
         echo ($option['start'] == '00:00' && $option['end'] == '00:00') ? $string1 : $string2;
-    }    
+    }
+    
+    public static function getServices($args = []) {
+
+        if (!isset($args['hide_empty'])) {
+            $args['hide_empty'] = 0;
+        }
+
+        $terms = get_terms(CPT::getTaxonomyServiceName(), $args);
+        if (is_wp_error($terms) || empty($terms)) {
+            return array();
+        }
+
+        $services = [];
+        foreach ($terms as $term) {
+            if ($service = get_term_by('id', $term->term_id, CPT::getTaxonomyServiceName())) {
+                $services[] = $service;
+            }
+        }
+
+        return $services;
+    }  
 }

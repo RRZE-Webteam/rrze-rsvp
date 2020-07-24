@@ -84,11 +84,13 @@ class ListTable extends WP_List_Table
 
         switch ($column_name) {
             case 'actions':
+                $actionUrl = Functions::actionUrl(['page' => 'rrze-rsvp-seats', 'action' => 'edit', 'item' => $item['id']]);
+                $editButton = sprintf('<a href="%s" class="button" data-id="%s">%s</a>', $actionUrl, $item['id'], _x('Edit', 'Edit seat', 'rrze-rsvp'));
                 $actionUrl = Functions::actionUrl(['page' => 'rrze-rsvp-seats', 'action' => 'cancel', 'item' => $item['id']]);
                 $cancelButton = sprintf('<a href="%s" class="button" data-id="%s">%s</a>', $actionUrl, $item['id'], _x('Cancel', 'Cancel seat', 'rrze-rsvp'));
                 $actionUrl = Functions::actionUrl(['page' => 'rrze-rsvp-seats', 'action' => 'delete', 'item' => $item['id']]);
                 $deleteButton = sprintf('<a href="%s" class="button" data-id="%s">%s</a>', $actionUrl, $item['id'], _x('Delete', 'Delete seat', 'rrze-rsvp'));
-                return $cancelButton . $deleteButton;
+                return $editButton . $deleteButton;
             default:
                 return !empty($item[$column_name]) ? $item[$column_name] : '&mdash;';
         }

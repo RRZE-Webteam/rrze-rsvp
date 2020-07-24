@@ -53,7 +53,7 @@ class Menu
             $option = 'per_page';
             $args = [
                 'label' => __('Number of services per page:', 'rrze-rsvp'),
-                'default' => 20,
+                'default' => 10,
                 'option' => 'rrze_rsvp_services_per_page'
             ];
 
