@@ -27,7 +27,7 @@ class ListTable extends WP_List_Table
         $columns = [
             'start' => __('Start', 'rrze-rsvp'),
             'end' => __('Duration', 'rrze-rsvp'),
-            'category' => __('Category', 'rrze-rsvp'),
+            'service' => __('Service', 'rrze-rsvp'),
             'description' => __('Description', 'rrze-rsvp'),
             'actions' => ''
         ];
@@ -80,12 +80,12 @@ class ListTable extends WP_List_Table
             }
 
             $categories = get_the_terms($post->ID, CPT::getTaxonomyServiceName());
-            $category = $categories[0]->name;
+            $service = $categories[0]->name;
 
             $prepItems[$post->ID]['id'] = $post->ID;
             $prepItems[$post->ID]['start'] = $startOutput;
             $prepItems[$post->ID]['end'] = $endOutput;
-            $prepItems[$post->ID]['category'] = $category;
+            $prepItems[$post->ID]['service'] = $service;
             $prepItems[$post->ID]['description'] = $post->post_content;
 
             $prepItems[$post->ID]['actions'] = '';

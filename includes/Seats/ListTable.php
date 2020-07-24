@@ -25,7 +25,7 @@ class ListTable extends WP_List_Table
     {
         $columns = [
             'seat' => __('Seat', 'rrze-rsvp'),
-            'category' => __('Category', 'rrze-rsvp'),
+            'service' => __('Service', 'rrze-rsvp'),
             'description' => __('Description', 'rrze-rsvp'),
             'actions' => ''
         ];
@@ -51,11 +51,11 @@ class ListTable extends WP_List_Table
 
         foreach ($posts as $post) {
             $categories = get_the_terms($post->ID, CPT::getTaxonomyServiceName());
-            $category = $categories[0]->name;
+            $service = $categories[0]->name;
 
             $prepItems[$post->ID]['id'] = $post->ID;
             $prepItems[$post->ID]['seat'] = $post->post_title;
-            $prepItems[$post->ID]['category'] = $category;
+            $prepItems[$post->ID]['service'] = $service;
             $prepItems[$post->ID]['description'] = $post->post_content;
 
             $prepItems[$post->ID]['actions'] = '';
