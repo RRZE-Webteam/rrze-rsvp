@@ -32,8 +32,10 @@ class ListTable extends WP_List_Table
 			'date' => __('Date', 'rrze-rsvp'),
 			'time' => __('Time', 'rrze-rsvp'),
 			'category' => __('Service', 'rrze-rsvp'),
+			'field_seat' => __('Seat', 'rrze-rsvp'),
 			'field_name' => __('Name', 'rrze-rsvp'),
-			'field_email' => __('Email', 'rrze-rsvp')
+			'field_email' => __('Email', 'rrze-rsvp'),
+			'field_phone' => __('Phone', 'rrze-rsvp')
 		];
 		$columns['actions'] = '';
 		return $columns;
@@ -91,8 +93,11 @@ class ListTable extends WP_List_Table
 			$prepItems[$post->ID]['booking_date'] = $booking_date;
 			$prepItems[$post->ID]['time'] = $time;
 
+			$prepItems[$post->ID]['field_seat'] = get_post_meta($post->ID, 'rrze_rsvp_seat', true);
+
 			$prepItems[$post->ID]['field_name'] = get_post_meta($post->ID, 'rrze_rsvp_user_name', true);
 			$prepItems[$post->ID]['field_email'] = get_post_meta($post->ID, 'rrze_rsvp_user_email', true);
+			$prepItems[$post->ID]['field_phone'] = get_post_meta($post->ID, 'rrze_rsvp_user_phone', true);
 
 			$prepItems[$post->ID]['actions'] = "";
 		}
@@ -155,7 +160,7 @@ class ListTable extends WP_List_Table
 					return $deletebutton . $accbutton . $booking_date;
 				}
 			default:
-				return $item[$column_name];
+				return ! empty($item[$column_name]) ? $item[$column_name] : '&mdash;';
 		}
 	}
 

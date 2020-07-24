@@ -6,6 +6,7 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Bookings\Main as Bookings;
 use RRZE\RSVP\Services\Main as Services;
+use RRZE\RSVP\Exceptions\Main as Exceptions;
 
 /**
  * [Main description]
@@ -34,6 +35,9 @@ class Main
 
 		$services = new Services;
 		$services->onLoaded();
+
+		$exceptions = new Exceptions;
+		$exceptions->onLoaded();		
 
 		if (defined('WP_DEBUG') && WP_DEBUG) {
 			add_action('admin_init', function() {
