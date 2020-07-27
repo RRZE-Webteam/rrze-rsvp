@@ -8,6 +8,7 @@ use RRZE\RSVP\Bookings\Main as Bookings;
 use RRZE\RSVP\Services\Main as Services;
 use RRZE\RSVP\Exceptions\Main as Exceptions;
 use RRZE\RSVP\Seats\Main as Seats;
+use RRZE\RSVP\Settings\Main as Settings;
 use RRZE\RSVP\Shortcodes\Shortcode as Shortcodes;
 
 /**
@@ -44,6 +45,9 @@ class Main
 		$seats = new Seats;
 		$seats->onLoaded();
 
+		$settings = new Settings;
+		$settings->onLoaded();
+				
 		$shortcodes = new Shortcodes;
 		$shortcodes->onLoaded();		
 	}

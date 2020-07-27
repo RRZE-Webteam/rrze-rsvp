@@ -155,7 +155,7 @@ class ListTable extends WP_List_Table
 					if ($item['status'] == 'confirmed') {
 						$actionButton = "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
 					} else {
-						$actionButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=acc&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='button button-primary rrze-rsvp-accept' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . __('Confirm', 'rrze-rsvp') . "</a>";
+						$actionButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=acc&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='button button-primary rrze-rsvp-confirm' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . __('Confirm', 'rrze-rsvp') . "</a>";
 					}
 					return $deleteButton . $actionButton . $booking_date;
 				}
@@ -166,6 +166,6 @@ class ListTable extends WP_List_Table
 
 	public function get_table_classes()
 	{
-		return ['widefat', 'fixed', 'striped'];
+		return ['rrze-rsvp-bookings', 'widefat', 'fixed', 'striped'];
 	}
 }

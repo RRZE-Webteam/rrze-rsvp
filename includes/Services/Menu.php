@@ -15,6 +15,8 @@ class Menu
 
     protected $generalSettings;
 
+    protected $timeslotsSettings;
+
     public function __construct()
     {
         //
@@ -30,9 +32,6 @@ class Menu
 
         $this->timeslotsSettings = new TimeslotsSettings;
         $this->timeslotsSettings->onLoaded();
-
-        $this->emailSettings = new EmailSettings;
-        $this->emailSettings->onLoaded();
 
         add_action('admin_menu', [$this, 'adminMenu']);
 
@@ -86,7 +85,6 @@ class Menu
         $this->newSettings->deleteSettingsErrors();
         $this->generalSettings->deleteSettingsErrors();
         $this->timeslotsSettings->deleteSettingsErrors();
-        $this->emailSettings->deleteSettingsErrors();
     }
 
     protected function newPage()
@@ -115,8 +113,7 @@ class Menu
 
         $sections = [
             'general' => __('General', 'rrze-rsvp'),
-            'timeslots' => __('Timeslots', 'rrze-rsvp'),
-            'email' => __('Email', 'rrze-rsvp')
+            'timeslots' => __('Timeslots', 'rrze-rsvp')
         ];
         $activeTab = Functions::requestVar('tab');
         if (!in_array($activeTab, array_keys($sections))) {

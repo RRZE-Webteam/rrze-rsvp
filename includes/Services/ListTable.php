@@ -90,6 +90,6 @@ class ListTable extends WP_List_Table
 
 	public function get_table_classes()
 	{
-		return ['widefat', 'fixed', 'striped'];
+		return ['rrze-rsvp-services', 'widefat', 'fixed', 'striped'];
 	}
 }

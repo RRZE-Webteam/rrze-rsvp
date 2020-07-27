@@ -123,4 +123,9 @@ class ListTable extends WP_List_Table
                 return !empty($item[$column_name]) ? $item[$column_name] : '&mdash;';
         }
     }
+
+	public function get_table_classes()
+	{
+		return ['rrze-rsvp-exceptions', 'widefat', 'fixed', 'striped'];
+	}    
 }
