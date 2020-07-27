@@ -40,7 +40,7 @@ class ListTable extends WP_List_Table
         $currentPage = $this->get_pagenum();
         $offset = ($currentPage - 1) * $perPage;
         $args = [
-            'post_type' => CPT::getCptExceptionsName(),
+            'post_type' => CPT::getExceptionName(),
             'post_status' => 'publish',
             'posts_per_page' => -1,
             'offset' => -1,
@@ -67,7 +67,7 @@ class ListTable extends WP_List_Table
 
             if ($start->isSameDay($end)) {
                 if ($start->format('H:i') == '00:00' && $end->format('H:i') == '00:00') {
-                    $endOutput = __('Full day', 'rrze-rsvp');
+                    $endOutput = __('All day', 'rrze-rsvp');
                 } else {
                     $endOutput = date_i18n(get_option('time_format'), $start->timestamp) . ' - ' . date_i18n(get_option('time_format'), $end->timestamp);
                 }

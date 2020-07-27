@@ -28,6 +28,12 @@ class Menu
         $this->generalSettings = new GeneralSettings;
         $this->generalSettings->onLoaded();
 
+        $this->timeslotsSettings = new TimeslotsSettings;
+        $this->timeslotsSettings->onLoaded();
+
+        $this->emailSettings = new EmailSettings;
+        $this->emailSettings->onLoaded();
+
         add_action('admin_menu', [$this, 'adminMenu']);
 
         add_filter('set-screen-option', function ($status, $option, $value) {
@@ -79,6 +85,8 @@ class Menu
         <?php
         $this->newSettings->deleteSettingsErrors();
         $this->generalSettings->deleteSettingsErrors();
+        $this->timeslotsSettings->deleteSettingsErrors();
+        $this->emailSettings->deleteSettingsErrors();
     }
 
     protected function newPage()
@@ -107,8 +115,8 @@ class Menu
 
         $sections = [
             'general' => __('General', 'rrze-rsvp'),
-            'exceptions' => __('Exceptions', 'rrze-rsvp'),
-            'seats' => __('Seats', 'rrze-rsvp')
+            'timeslots' => __('Timeslots', 'rrze-rsvp'),
+            'email' => __('Email', 'rrze-rsvp')
         ];
         $activeTab = Functions::requestVar('tab');
         if (!in_array($activeTab, array_keys($sections))) {
@@ -125,7 +133,7 @@ class Menu
             }
             ?>
         </h2> 
-        <form action="<?php echo Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'edit', 'item' => $termId,  'tab' => $tab]); ?>" method="post">
+        <form action="<?php echo Functions::actionUrl(['page' => 'rrze-rsvp-services', 'action' => 'edit', 'item' => $termId,  'tab' => $activeTab]); ?>" method="post">
             <?php
             $optionGroup = 'rrze-rsvp-services-edit-' . $activeTab;
             settings_fields($optionGroup);

@@ -26,5 +26,20 @@ jQuery(document).ready(function () {
         jQuery('.exception_hide').toggle();
     });
 
+    jQuery('.rrze_rsvp_check_weekdays_timeslots').click(function () {
+        var el = jQuery(this);
+        var i = el.attr("data-target");
+        var inputs = el.parent().parent().find('input[type=time]');
+
+        if (el.attr("checked")) {
+            inputs.attr('readonly', false);
+            inputs[0].value = '09:00';
+            inputs[1].value = '18:00';
+        } else {
+            inputs.attr('readonly', 'readonly');
+            inputs.attr('value', '00:00');
+        }
+    });
+
 });
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Booking system\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-23 15:42+0000\n"
+"POT-Creation-Date: 2020-07-27 06:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -14,156 +14,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Loco-Version: 2.4.0; wp-5.4.2"
-
-#: includes/Services/Menu.php:135
-msgid "Add New"
-msgstr ""
-
-#: includes/Services/Menu.php:86 includes/Services/Menu.php:91
-msgid "Add New Service"
-msgstr ""
-
-#: includes/Bookings/Menu.php:65 includes/Bookings/Menu.php:120
-msgid "Archive"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:127
-msgid "Booked on"
-msgstr ""
-
-#. Name of the plugin
-msgid "Booking system"
-msgstr ""
-
-#. Description of the plugin
-msgid "Booking system."
-msgstr ""
-
-#: includes/Bookings/Menu.php:42 includes/Bookings/Menu.php:43
-#: includes/Bookings/Menu.php:64 includes/Bookings/Menu.php:94
-#: includes/Services/Menu.php:44
-msgid "Bookings"
-msgstr ""
-
-#: includes/Plugin.php:189
-#, php-format
-msgid "Call to undefined method %1$s::%2$s"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:149
-msgctxt "Cancel Booking"
-msgid "Cancel"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:131 includes/Bookings/ListTable.php:136
-msgid "Canceled"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:153
-msgid "Confirm"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:142 includes/Bookings/ListTable.php:151
-msgid "Confirmed"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:32
-msgid "Date"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:145
-msgid "Delete"
-msgstr ""
-
-#: includes/Services/ListTable.php:29
-msgid "Description"
-msgstr ""
-
-#: includes/Services/Menu.php:108
-msgid "Edit Service"
-msgstr ""
-
-#: includes/Services/ListTable.php:85
-msgctxt "Edit service"
-msgid "Edit"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:36
-msgid "Email"
-msgstr ""
-
-#: includes/Services/Menu.php:100
-msgid "Exceptions"
-msgstr ""
-
-#: includes/Services/Menu.php:99
-msgid "General"
-msgstr ""
-
-#. Author URI of the plugin
-msgid "https://blogs.fau.de/webworking/"
-msgstr ""
-
-#. URI of the plugin
-msgid "https://github.com/RRZE-Webteam/rrze-rsvp"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:35
-msgid "Name"
-msgstr ""
-
-#: includes/Bookings/Menu.php:137
-msgid "New Booking"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:139
-msgid "Not confirmed"
-msgstr ""
-
-#: includes/Bookings/Menu.php:53 includes/Bookings/Menu.php:74
-msgid "Number of bookings per page:"
-msgstr ""
-
-#: includes/Services/Menu.php:54
-msgid "Number of services per page:"
-msgstr ""
-
-#: rrze-rsvp.php:108
-#, php-format
-msgid "Plugins: %1$s: %2$s"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:132
-msgid "Restore"
-msgstr ""
-
-#. Author of the plugin
-msgid "RRZE-Webteam"
-msgstr ""
-
-#: includes/Services/Menu.php:101
-msgid "Seats"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:34 includes/Services/ListTable.php:27
-msgid "Service"
-msgstr ""
-
-#: includes/Services/Menu.php:45 includes/Services/Menu.php:134
-msgid "Services"
-msgstr ""
-
-#: includes/Bookings/ListTable.php:122 includes/Services/ListTable.php:79
-msgid "Show more"
-msgstr ""
-
-#: includes/Services/ListTable.php:28
-msgid "Slug"
-msgstr ""
-
-#: includes/Services/NewSettings.php:43
-msgid "Something went wrong."
-msgstr ""
 
 #: rrze-rsvp.php:50
 #, php-format
@@ -179,14 +29,690 @@ msgid ""
 "WordPress version %2$s."
 msgstr ""
 
-#: includes/Services/NewSettings.php:64
-msgid "The service could not be added."
+#: rrze-rsvp.php:108
+#, php-format
+msgid "Plugins: %1$s: %2$s"
+msgstr ""
+
+#: includes/Main.php:64
+msgid "Do you want to delete?"
+msgstr ""
+
+#: includes/Main.php:65 includes/Bookings/ListTable.php:136
+#: includes/Bookings/ListTable.php:141
+msgid "Canceled"
+msgstr ""
+
+#: includes/Main.php:66 includes/Bookings/ListTable.php:147
+#: includes/Bookings/ListTable.php:156
+msgid "Confirmed"
+msgstr ""
+
+#: includes/Plugin.php:189
+#, php-format
+msgid "Call to undefined method %1$s::%2$s"
+msgstr ""
+
+#: includes/Options.php:58
+msgid "Thank you for booking"
+msgstr ""
+
+#: includes/Options.php:59
+msgid ""
+"We received your booking and we will notify you once it has been confirmed."
+msgstr ""
+
+#: includes/Options.php:60
+msgid "Your booking has been confirmed"
+msgstr ""
+
+#: includes/Options.php:61
+msgid "We are happy to inform you that your booking has been confirmed."
+msgstr ""
+
+#: includes/Options.php:62
+msgid "Your booking has been cancelled"
+msgstr ""
+
+#: includes/Options.php:63
+msgid "Unfortunately we have to cancel your booking on {{=date}} at {{=time}}."
+msgstr ""
+
+#: includes/API.php:108 includes/API.php:127 includes/API.php:145
+#: includes/API.php:163
+msgid "message"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:15
+msgid "Text Input"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:16
+msgid "Text input description."
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:17
+msgid "Text Input placeholder"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:26
+msgid "Number Input"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:27
+msgid "Number input description."
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:40
+msgid "Textarea Input"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:41
+msgid "Textarea description"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:42
+msgid "Textarea placeholder"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:49
+msgid "Checkbox"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:50
+msgid "Checkbox description"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:57
+msgid "Multiple checkbox"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:58
+msgid "Multiple checkbox description."
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:65
+msgid "One"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:66
+msgid "Two"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:67
+msgid "Three"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:68
+msgid "Four"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:75
+msgid "Radio Button"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:76
+msgid "Radio button description."
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:79 _TMP/Fieldsets/Fields.php:92
+msgid "Yes"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:80 _TMP/Fieldsets/Fields.php:93
+msgid "No"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:87
+msgid "Dropdown"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:88
+msgid "Dropdown description."
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:100
+msgid "Color"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:101
+msgid "Color description."
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:109
+msgid "File"
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:110
+msgid "File description."
+msgstr ""
+
+#: _TMP/Fieldsets/Fields.php:114
+msgid "Choose an Image"
+msgstr ""
+
+#: _TMP/Fieldsets/ListTable.php:27
+msgid "Fieldset"
+msgstr ""
+
+#: _TMP/Fieldsets/ListTable.php:28 includes/Bookings/ListTable.php:34
+#: includes/Seats/ListTable.php:28 includes/Seats/NewSettings.php:115
+#: includes/Seats/EditSettings.php:166 includes/Exceptions/ListTable.php:30
+#: includes/Exceptions/NewSettings.php:163 includes/Services/ListTable.php:27
+msgid "Service"
+msgstr ""
+
+#: _TMP/Fieldsets/ListTable.php:29 _TMP/Fieldsets/NewSettings.php:111
+#: _TMP/Fieldsets/EditSettings.php:141 includes/Seats/ListTable.php:29
+#: includes/Exceptions/ListTable.php:31 includes/Exceptions/NewSettings.php:155
+#: includes/Services/ListTable.php:29 includes/Services/GeneralSettings.php:142
+#: includes/Services/NewSettings.php:104
+msgid "Description"
+msgstr ""
+
+#: _TMP/Fieldsets/ListTable.php:88
+msgctxt "Edit fieldset"
+msgid "Edit"
+msgstr ""
+
+#: _TMP/Fieldsets/ListTable.php:90
+msgctxt "Cancel fieldset"
+msgid "Cancel"
+msgstr ""
+
+#: _TMP/Fieldsets/ListTable.php:92
+msgctxt "Delete fieldset"
+msgid "Delete"
+msgstr ""
+
+#: _TMP/Fieldsets/Menu.php:44 includes/Bookings/Menu.php:42
+#: includes/Bookings/Menu.php:43 includes/Bookings/Menu.php:64
+#: includes/Bookings/Menu.php:94 includes/Seats/Menu.php:44
+#: includes/Exceptions/Menu.php:39 includes/Services/Menu.php:51
+msgid "Bookings"
+msgstr ""
+
+#: _TMP/Fieldsets/Menu.php:45 _TMP/Fieldsets/Menu.php:123
+msgid "Fieldsets"
+msgstr ""
+
+#: _TMP/Fieldsets/Menu.php:54
+msgid "Number of fieldsets per page:"
+msgstr ""
+
+#: _TMP/Fieldsets/Menu.php:85 _TMP/Fieldsets/Menu.php:90
+msgid "Add New Fieldset"
+msgstr ""
+
+#: _TMP/Fieldsets/Menu.php:101 _TMP/Fieldsets/NewSettings.php:43
+#: _TMP/Fieldsets/EditSettings.php:47 _TMP/Fieldsets/EditSettings.php:53
+#: _TMP/Fieldsets/EditSettings.php:57 includes/Seats/Menu.php:101
+#: includes/Seats/NewSettings.php:43 includes/Seats/EditSettings.php:48
+#: includes/Seats/EditSettings.php:54 includes/Seats/EditSettings.php:58
+#: includes/Exceptions/NewSettings.php:43
+#: includes/Services/TimeslotsSettings.php:48
+#: includes/Services/TimeslotsSettings.php:54
+#: includes/Services/EmailSettings.php:48
+#: includes/Services/EmailSettings.php:54
+#: includes/Services/GeneralSettings.php:48
+#: includes/Services/GeneralSettings.php:54 includes/Services/Menu.php:111
+#: includes/Services/NewSettings.php:43
+msgid "Something went wrong."
+msgstr ""
+
+#: _TMP/Fieldsets/Menu.php:106
+msgid "Edit Fieldset"
+msgstr ""
+
+#: _TMP/Fieldsets/Menu.php:111 includes/Seats/Menu.php:111
+#: includes/Services/Menu.php:141
+msgid "Save Changes"
+msgstr ""
+
+#: _TMP/Fieldsets/Menu.php:124 includes/Seats/Menu.php:124
+#: includes/Exceptions/Menu.php:95 includes/Services/Menu.php:154
+msgid "Add New"
+msgstr ""
+
+#: _TMP/Fieldsets/NewSettings.php:48 _TMP/Fieldsets/EditSettings.php:62
+#: includes/Seats/NewSettings.php:48 includes/Seats/EditSettings.php:63
+msgid "The number is required."
+msgstr ""
+
+#: _TMP/Fieldsets/NewSettings.php:71
+msgid "The fieldset could not be added."
+msgstr ""
+
+#: _TMP/Fieldsets/NewSettings.php:103 includes/Bookings/ListTable.php:36
+#: includes/Seats/EditSettings.php:224
+msgid "Name"
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:72 includes/Seats/NewSettings.php:55
+#: includes/Seats/EditSettings.php:89 includes/Exceptions/NewSettings.php:75
+msgid "The service is required."
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:91
+msgid "The fieldset could not be updated."
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:133 includes/Seats/NewSettings.php:107
+#: includes/Seats/EditSettings.php:158
+msgid "Number"
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:149
+msgid "Fields"
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:182
+msgid "Label"
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:183
+msgid "Field type"
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:184
+msgid "Required"
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:203
+msgid "E-Mail"
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:207 _TMP/Fieldsets/EditSettings.php:240
+#: includes/Services/EmailSettings.php:190
+#: includes/Services/EmailSettings.php:213
+#: includes/Services/EmailSettings.php:236
+msgid "Text"
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:208 _TMP/Fieldsets/EditSettings.php:241
+msgid "Phone number"
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:209 _TMP/Fieldsets/EditSettings.php:242
+msgid "Select field"
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:222
+msgid "Remove"
+msgstr ""
+
+#: _TMP/Fieldsets/EditSettings.php:249 includes/Seats/EditSettings.php:265
+msgid "Add"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:32
+msgid "Date"
 msgstr ""
 
 #: includes/Bookings/ListTable.php:33
 msgid "Time"
 msgstr ""
 
-#: includes/Services/Menu.php:122
-msgid "Update Service"
+#: includes/Bookings/ListTable.php:35 includes/Seats/ListTable.php:27
+msgid "Seat"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:37 includes/Services/Menu.php:119
+msgid "Email"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:38
+msgid "Phone"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:127 includes/Services/ListTable.php:79
+msgid "Show more"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:132
+msgid "Booked on"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:137
+msgid "Restore"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:144
+msgid "Not confirmed"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:150 includes/Seats/EditSettings.php:250
+msgid "Delete"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:154
+msgctxt "Cancel Booking"
+msgid "Cancel"
+msgstr ""
+
+#: includes/Bookings/ListTable.php:158
+msgid "Confirm"
+msgstr ""
+
+#: includes/Bookings/Menu.php:53 includes/Bookings/Menu.php:74
+msgid "Number of bookings per page:"
+msgstr ""
+
+#: includes/Bookings/Menu.php:65 includes/Bookings/Menu.php:120
+msgid "Archive"
+msgstr ""
+
+#: includes/Bookings/Menu.php:137
+msgid "New Booking"
+msgstr ""
+
+#: includes/Seats/ListTable.php:88
+msgctxt "Edit seat"
+msgid "Edit"
+msgstr ""
+
+#: includes/Seats/ListTable.php:90
+msgctxt "Cancel seat"
+msgid "Cancel"
+msgstr ""
+
+#: includes/Seats/ListTable.php:92
+msgctxt "Delete seat"
+msgid "Delete"
+msgstr ""
+
+#: includes/Seats/Menu.php:45 includes/Seats/Menu.php:123
+msgid "Seats"
+msgstr ""
+
+#: includes/Seats/Menu.php:54
+msgid "Number of seats per page:"
+msgstr ""
+
+#: includes/Seats/Menu.php:85 includes/Seats/Menu.php:90
+msgid "Add New Seat"
+msgstr ""
+
+#: includes/Seats/Menu.php:106
+msgid "Edit Seat"
+msgstr ""
+
+#: includes/Seats/NewSettings.php:75
+msgid "The seat could not be added."
+msgstr ""
+
+#: includes/Seats/NewSettings.php:137 includes/Seats/EditSettings.php:199
+#: includes/Exceptions/NewSettings.php:213
+msgid "&mdash; Please select &mdash;"
+msgstr ""
+
+#: includes/Seats/NewSettings.php:143
+msgid "No seats found."
+msgstr ""
+
+#: includes/Seats/EditSettings.php:108
+msgid "The seat could not be updated."
+msgstr ""
+
+#: includes/Seats/EditSettings.php:174
+msgid "Equipment"
+msgstr ""
+
+#: includes/Seats/EditSettings.php:205
+msgid "No services found."
+msgstr ""
+
+#: includes/Seats/EditSettings.php:225 includes/Services/ListTable.php:28
+msgid "Slug"
+msgstr ""
+
+#: includes/Seats/EditSettings.php:226
+msgid "Active"
+msgstr ""
+
+#: includes/Seats/EditSettings.php:247
+msgid "Edit"
+msgstr ""
+
+#: includes/Exceptions/ListTable.php:28 includes/Exceptions/NewSettings.php:139
+#: includes/Services/TimeslotsSettings.php:145
+msgid "Start"
+msgstr ""
+
+#: includes/Exceptions/ListTable.php:29
+msgid "Duration"
+msgstr ""
+
+#: includes/Exceptions/ListTable.php:70
+msgid "All day"
+msgstr ""
+
+#: includes/Exceptions/ListTable.php:121
+msgctxt "Delete exception"
+msgid "Delete"
+msgstr ""
+
+#: includes/Exceptions/Menu.php:40 includes/Exceptions/Menu.php:94
+msgid "Exceptions"
+msgstr ""
+
+#: includes/Exceptions/Menu.php:49
+msgid "Number of exceptions per page:"
+msgstr ""
+
+#: includes/Exceptions/Menu.php:77 includes/Exceptions/Menu.php:82
+msgid "Add New Exception"
+msgstr ""
+
+#: includes/Exceptions/NewSettings.php:51
+msgid "The start date is required."
+msgstr ""
+
+#: includes/Exceptions/NewSettings.php:58
+msgid "The end date is required."
+msgstr ""
+
+#: includes/Exceptions/NewSettings.php:99
+msgid "The exception could not be added."
+msgstr ""
+
+#: includes/Exceptions/NewSettings.php:131
+msgid "All Day"
+msgstr ""
+
+#: includes/Exceptions/NewSettings.php:147
+#: includes/Services/TimeslotsSettings.php:146
+msgid "End"
+msgstr ""
+
+#: includes/Exceptions/NewSettings.php:219
+msgid "No exceptions found."
+msgstr ""
+
+#: includes/Services/TimeslotsSettings.php:104
+msgid "Week days timeslots"
+msgstr ""
+
+#: includes/Services/TimeslotsSettings.php:112
+msgid "Duration of an event (hh:mm)"
+msgstr ""
+
+#: includes/Services/TimeslotsSettings.php:120
+msgid "Break between events (hh:mm)"
+msgstr ""
+
+#: includes/Services/TimeslotsSettings.php:133
+msgid "Monday"
+msgstr ""
+
+#: includes/Services/TimeslotsSettings.php:134
+msgid "Tuesday"
+msgstr ""
+
+#: includes/Services/TimeslotsSettings.php:135
+msgid "Wednesday"
+msgstr ""
+
+#: includes/Services/TimeslotsSettings.php:136
+msgid "Thursday"
+msgstr ""
+
+#: includes/Services/TimeslotsSettings.php:137
+msgid "Friday"
+msgstr ""
+
+#: includes/Services/TimeslotsSettings.php:138
+msgid "Saturday"
+msgstr ""
+
+#: includes/Services/TimeslotsSettings.php:139
+msgid "Sunday"
+msgstr ""
+
+#: includes/Services/ListTable.php:85
+msgctxt "Edit service"
+msgid "Edit"
+msgstr ""
+
+#: includes/Services/EmailSettings.php:61
+msgid "The sender name is required."
+msgstr ""
+
+#: includes/Services/EmailSettings.php:69
+msgid "The sender email address is not valid."
+msgstr ""
+
+#: includes/Services/EmailSettings.php:77
+msgid "The receiver subject is required."
+msgstr ""
+
+#: includes/Services/EmailSettings.php:85
+msgid "The receiver text is required."
+msgstr ""
+
+#: includes/Services/EmailSettings.php:93
+msgid "The confirm subject is required."
+msgstr ""
+
+#: includes/Services/EmailSettings.php:101
+msgid "The confirm text is required."
+msgstr ""
+
+#: includes/Services/EmailSettings.php:109
+msgid "The cancel subject is required."
+msgstr ""
+
+#: includes/Services/EmailSettings.php:117
+msgid "The cancel text is required."
+msgstr ""
+
+#: includes/Services/EmailSettings.php:152
+msgid "Sender information"
+msgstr ""
+
+#: includes/Services/EmailSettings.php:159
+msgid "Sender name"
+msgstr ""
+
+#: includes/Services/EmailSettings.php:167
+msgid "Sender email address"
+msgstr ""
+
+#: includes/Services/EmailSettings.php:175
+msgid "Receiver notification"
+msgstr ""
+
+#: includes/Services/EmailSettings.php:182
+#: includes/Services/EmailSettings.php:205
+#: includes/Services/EmailSettings.php:228
+msgid "Subject"
+msgstr ""
+
+#: includes/Services/EmailSettings.php:198
+msgid "Confirm notification"
+msgstr ""
+
+#: includes/Services/EmailSettings.php:221
+msgid "Cancel notification"
+msgstr ""
+
+#: includes/Services/GeneralSettings.php:61
+msgid "The service name is required."
+msgstr ""
+
+#: includes/Services/GeneralSettings.php:69
+msgid "The email address for notifications is not valid."
+msgstr ""
+
+#: includes/Services/GeneralSettings.php:93
+msgid "The service could not be updated."
+msgstr ""
+
+#: includes/Services/GeneralSettings.php:134
+#: includes/Services/NewSettings.php:96
+msgid "Title"
+msgstr ""
+
+#: includes/Services/GeneralSettings.php:150
+msgid "Email address for notifications"
+msgstr ""
+
+#: includes/Services/GeneralSettings.php:158
+msgid "Available weeks in advance"
+msgstr ""
+
+#: includes/Services/GeneralSettings.php:166
+msgid "Automatic confirmation"
+msgstr ""
+
+#: includes/Services/Menu.php:52 includes/Services/Menu.php:153
+msgid "Services"
+msgstr ""
+
+#: includes/Services/Menu.php:61
+msgid "Number of services per page:"
+msgstr ""
+
+#: includes/Services/Menu.php:95 includes/Services/Menu.php:100
+msgid "Add New Service"
+msgstr ""
+
+#: includes/Services/Menu.php:117
+msgid "General"
+msgstr ""
+
+#: includes/Services/Menu.php:118
+msgid "Timeslots"
+msgstr ""
+
+#: includes/Services/Menu.php:126
+msgid "Edit Service"
+msgstr ""
+
+#: includes/Services/NewSettings.php:48
+msgid "The title is required."
+msgstr ""
+
+#: includes/Services/NewSettings.php:64
+msgid "The service could not be added."
+msgstr ""
+
+#. Name of the plugin
+msgid "Booking system"
+msgstr ""
+
+#. Description of the plugin
+msgid "Booking system."
+msgstr ""
+
+#. URI of the plugin
+msgid "https://github.com/RRZE-Webteam/rrze-rsvp"
+msgstr ""
+
+#. Author of the plugin
+msgid "RRZE-Webteam"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://blogs.fau.de/webworking/"
 msgstr ""

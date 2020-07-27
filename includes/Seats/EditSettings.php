@@ -7,6 +7,7 @@ defined('ABSPATH') || exit;
 use RRZE\RSVP\CPT;
 use RRZE\RSVP\Settings;
 use RRZE\RSVP\Functions;
+use WP_Term_Query;
 
 class EditSettings extends Settings
 {
@@ -26,7 +27,7 @@ class EditSettings extends Settings
     {
         add_action('admin_init', [$this, 'validateOptions']);
         add_action('admin_init', [$this, 'settings']);
-        add_action('admin_notices', [$this, 'adminNotices']); 
+        add_action('admin_notices', [$this, 'adminNotices']);
     }
 
     public function validateOptions()
@@ -59,40 +60,64 @@ class EditSettings extends Settings
 
         $number = isset($input['seat_number']) ? trim($input['seat_number']) : '';
         if (empty($number)) {
-            $this->addSettingsError('seat_number', '', __('The number is required.', 'rsvp'));
+            $this->addSettingsError('seat_number', '', __('The number is required.', 'rrze-rsvp'));
         } else {
             $this->addSettingsError('seat_number', $number, '', false);
         }
 
-        $description = isset($input['seat_description']) ? sanitize_text_field($input['seat_description']) : '';
-        $this->addSettingsError('seat_description', $description, '', false);
+        $equipmentNameNew = isset($input['equipment_name_new']) ? sanitize_text_field($input['equipment_name_new']) : '';
+        $this->addSettingsError('equipment_name_new', $description, '', false);
+
+        $equipmentActives = (isset($input['equipment_active']) && is_array($input['equipment_active'])) ? array_keys($input['equipment_active']) : [];      
+        $args = [
+			'taxonomy' => CPT::getTaxonomySeatEquipmentName(),
+			'hide_empty' => false
+		];
+		$query = new WP_Term_Query();
+        $terms = $query->query($args);
+        $allTermsIds = wp_list_pluck($terms, 'term_id');
+        foreach ($allTermsIds as $termId) {
+            if (! in_array($termId, $equipmentActives)) {
+                wp_remove_object_terms($this->wpPost->ID, $termId, CPT::getTaxonomySeatEquipmentName());
+            } else {
+                wp_set_object_terms($this->wpPost->ID, $termId, CPT::getTaxonomySeatEquipmentName(), true);
+            }
+        }
 
         $service = isset($input['seat_service']) ? absint($input['seat_service']) : '';
-        if (! get_term_by('id', $service, CPT::getTaxonomyServiceName())) {
-            $this->addSettingsError('seat_service', '', __('The service is required.', 'rsvp'));
+        if (!get_term_by('id', $service, CPT::getTaxonomyServiceName())) {
+            $this->addSettingsError('seat_service', '', __('The service is required.', 'rrze-rsvp'));
         } else {
             $this->addSettingsError('seat_service', $service, '', false);
         }
 
-        if (! $this->settingsErrors()) {
+        if (!$this->settingsErrors()) {
             $post = wp_update_post(
                 [
                     'ID' => $this->wpPost->ID,
                     'post_title' => $number,
-                    'post_conntent' => $description,
+                    'post_content' => '',
                     'tax_input' => [
                         'rrze_rsvp_service' => [$service]
-                    ]                    
+                    ]
                 ],
                 true
             );
-            
+
             if (is_wp_error($post)) {
                 $this->addAdminNotice(__('The seat could not be updated.', 'rrze-rsvp'), 'error');
                 wp_redirect(Functions::actionUrl(['page' => 'rrze-rsvp-seats', 'action' => 'edit', 'item' => $this->wpPost->ID]));
                 exit();
             }
-        }  
+
+            wp_insert_term(
+                $equipmentNameNew,
+                CPT::getTaxonomySeatEquipmentName(),
+                [
+                    'description' => ''
+                ]
+            );
+        }
 
         if ($this->settingsErrors()) {
             foreach ($this->settingsErrors() as $error) {
@@ -103,10 +128,10 @@ class EditSettings extends Settings
             wp_redirect(Functions::actionUrl(['page' => 'rrze-rsvp-seats', 'action' => 'edit', 'item' => $this->wpPost->ID]));
             exit();
         }
-        
+
         $this->addAdminNotice(__('The seat has been updated.', 'rrze-rspv'));
         wp_redirect(Functions::actionUrl(['page' => 'rrze-rsvp-seats', 'action' => 'edit', 'item' => $this->wpPost->ID]));
-        exit();        
+        exit();
     }
 
     public function settings()
@@ -130,47 +155,40 @@ class EditSettings extends Settings
 
         add_settings_field(
             'seat_number',
-            __('Number', 'rrze-ac'),
+            __('Number', 'rrze-rsvp'),
             [$this, 'numberField'],
             'rrze-rsvp-seats-edit',
             'rrze-rsvp-seats-edit-section'
         );
 
         add_settings_field(
-            'seat_description',
-            __('Description', 'rrze-ac'),
-            [$this, 'descriptionField'],
-            'rrze-rsvp-seats-edit',
-            'rrze-rsvp-seats-edit-section'
-        );
-        
-        add_settings_field(
             'seat_service',
-            __('Service', 'rrze-ac'),
+            __('Service', 'rrze-rsvp'),
             [$this, 'serviceField'],
             'rrze-rsvp-seats-edit',
             'rrze-rsvp-seats-edit-section'
-        );  
+        );
+
+        add_settings_field(
+            'equipment',
+            __('Equipment', 'rrze-rsvp'),
+            [$this, 'equipmentField'],
+            'rrze-rsvp-seats-edit',
+            'rrze-rsvp-seats-edit-section'
+        );        
     }
 
     public function numberField()
-    {   $settingsErrors = $this->settingsErrors();
+    {
+        $settingsErrors = $this->settingsErrors();
         $number = isset($settingsErrors['seat_number']['value']) ? esc_html($settingsErrors['seat_number']['value']) : $this->wpPost->post_title;
         ?>
         <input type="text" value="<?php echo $number; ?>" name="<?php printf('%s[seat_number]', $this->optionName); ?>" class="regular-text">
-        <?php       
+        <?php
     }
 
-    public function descriptionField()
+    public function serviceField()
     {
-        $settingsErrors = $this->settingsErrors();
-        $description = isset($settingsErrors['seat_description']['value']) ? esc_textarea($settingsErrors['seat_description']['value']) : $this->wpPost->post_content;
-        ?>
-        <textarea id="description" cols="50" rows="3" name="<?php printf('%s[seat_description]', $this->optionName); ?>"><?php echo $description; ?></textarea>
-        <?php        
-    }
-
-    public function serviceField() {
         $dataService = $this->wpTerms[0];
         $services = Functions::getServices();
         $settingsErrors = $this->settingsErrors();
@@ -179,13 +197,79 @@ class EditSettings extends Settings
         <?php if ($services) : ?>
             <select name="<?php printf('%s[seat_service]', $this->optionName); ?>">
                 <option value="0"><?php _e('&mdash; Please select &mdash;', 'rrze-rsvp'); ?></option>
-            <?php foreach ($services as $service) : ?>
-                <option value="<?php echo $service->term_id; ?>" <?php $settingsService ? selected($service->term_id, $settingsService) : ''; ?>><?php echo $service->name; ?></option>
-            <?php endforeach; ?>
+                <?php foreach ($services as $service) : ?>
+                    <option value="<?php echo $service->term_id; ?>" <?php $settingsService ? selected($service->term_id, $settingsService) : ''; ?>><?php echo $service->name; ?></option>
+                <?php endforeach; ?>
             </select>
-        <?php else: ?>
+        <?php else : ?>
             <p><?php _e('No services found.', 'rrze-rsvp'); ?></p>
         <?php endif; ?>
+        <?php
+    }
+
+    function equipmentField()
+    {
+		$args = [
+			'taxonomy' => CPT::getTaxonomySeatEquipmentName(),
+			'hide_empty' => false
+		];
+		$query = new WP_Term_Query();
+        $terms = $query->query($args);
+        ?>
+        <form action="<?php echo Functions::actionUrl(['page' => 'rrze-rsvp-seats', 'action' => 'edit', 'item' => $this->wpPost->ID]); ?>" method="post">
+        <div class="rrze_rsvp_seat_equipment">
+            <table class="wp-list-table widefat fixed striped">
+                <thead>
+                    <tr>
+                        <th><?php _e('Name', 'rrze-rsvp'); ?></th>
+                        <th><?php _e('Slug', 'rrze-rsvp'); ?></th>
+                        <th><?php _e('Active', 'rrze-rsvp'); ?></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="rrze_rsvp_seat_equipment_items">
+                    <?php
+                    foreach ($terms as $term) {
+                        $checked = (is_object_in_term($this->wpPost->ID, CPT::getTaxonomySeatEquipmentName(), $term->term_id) === true) ? true : false;
+                        ?>
+                        <tr>
+                            <td>
+                                <?php echo $term->name; ?>
+                            </td>
+                            <td>
+                                <?php echo $term->slug; ?>
+                            </td>                            
+                            <td>
+                                <input type="checkbox" name="<?php printf('%s[equipment_active][%s]', $this->optionName, $term->term_id); ?>" <?php checked($checked); ?>>
+                            </td>
+                            <td>
+                                <button id="rrze_rsvp_seat_equipment_button_edit" class="button" type="button"><?php _e('Edit', 'rrze-rsvp'); ?></button>
+                            </td>
+                            <td>
+                                <button id="rrze_rsvp_seat_equipment_button_delete" class="button" type="button"><?php _e('Delete', 'rrze-rsvp'); ?></button>
+                            </td>                                                      
+                        </tr>
+                        <?php
+                    }
+                    ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                            <input type="text" value="" name="<?php printf('%s[equipment_name_new]', $this->optionName); ?>" class="regular-text">
+                        </td>
+                        <td></td>               
+                        <td></td>
+                        <td>
+                            <button id="rrze_rsvp_equipment_add" class="button" type="submit"><?php _e('Add', 'rrze-rsvp'); ?></button>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        </form>
         <?php
     }
 }

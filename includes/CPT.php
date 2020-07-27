@@ -8,11 +8,13 @@ class CPT
 {
     const CPT_BOOKING_NAME = 'rrze_rsvp_booking';
 
-    const CPT_EXCEPTIONS_NAME = 'rrze_rsvp_exceptions';
+    const CPT_EXCEPTION_NAME = 'rrze_rsvp_exception';
 
-    const CPT_SEATS_NAME = 'rrze_rsvp_seats';
+    const CPT_SEAT_NAME = 'rrze_rsvp_seat';
 
     const TAXONOMY_SERVICE_NAME = 'rrze_rsvp_service';
+
+    const TAXONOMY_SEAT_EQUIPMENT_NAME = 'rrze_rsvp_seat_equipment';    
 
     public function __construct()
     {
@@ -22,23 +24,28 @@ class CPT
     public function onLoaded()
     {
         add_action('init', [$this, 'registerCPT']);
-        add_action('init', [$this, 'registerServiceTaxonomy']);
+        add_action('init', [$this, 'registerTaxonomy']);
     }
 
-    public static function getCptBookingName()
+    public static function getBookingName()
     {
         return static::CPT_BOOKING_NAME;
     }
 
-    public static function getCptExceptionsName()
+    public static function getExceptionName()
     {
-        return static::CPT_EXCEPTIONS_NAME;
+        return static::CPT_EXCEPTION_NAME;
     }
 
-    public static function getCptSeatsName()
+    public static function getSeatName()
     {
-        return static::CPT_SEATS_NAME;
+        return static::CPT_SEAT_NAME;
     }
+
+    public static function getTaxonomySeatEquipmentName()
+    {
+        return static::TAXONOMY_SEAT_EQUIPMENT_NAME;
+    }    
 
     public static function getTaxonomyServiceName()
     {
@@ -78,17 +85,17 @@ class CPT
         ];
 
         register_post_type(static::CPT_BOOKING_NAME, $args);
-        register_post_type(static::CPT_EXCEPTIONS_NAME, $args);   
-        register_post_type(static::CPT_SEATS_NAME, $args);     
+        register_post_type(static::CPT_EXCEPTION_NAME, $args);   
+        register_post_type(static::CPT_SEAT_NAME, $args); 
     }
 
-    public function registerServiceTaxonomy()
+    public function registerTaxonomy()
     {
         $args = [
             //'description'           => '',
             //'public'                => true,
             //'publicly_queryable'    => true,
-            'hierarchical'          => true,
+            'hierarchical'          => false,
             'show_ui'               => true,
             //'show_in_menu'          => true,
             //'show_in_nav_menus'     => true,
@@ -110,10 +117,18 @@ class CPT
             static::TAXONOMY_SERVICE_NAME, 
             [
                 static::CPT_BOOKING_NAME, 
-                static::CPT_EXCEPTIONS_NAME,
-                static::CPT_SEATS_NAME
+                static::CPT_EXCEPTION_NAME,
+                static::CPT_SEAT_NAME
             ], 
             $args
         );
+
+        register_taxonomy(
+            static::TAXONOMY_SEAT_EQUIPMENT_NAME, 
+            [
+                static::CPT_SEAT_NAME
+            ], 
+            $args
+        );        
     }
 }

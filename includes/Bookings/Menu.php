@@ -137,7 +137,7 @@ class Menu
         $title = __('New Booking', 'rrze-rsvp');
 
         $args = [
-            'post_type' => CPT::getCptBookingName(),
+            'post_type' => CPT::getBookingName(),
             'post_status' => 'publish',
             'nopaging' => true,
             'meta_query' => [

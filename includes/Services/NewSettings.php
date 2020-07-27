@@ -45,7 +45,7 @@ class NewSettings extends Settings
 
         $title = isset($input['service_title']) ? trim($input['service_title']) : '';
         if (empty($title)) {
-            $this->addSettingsError('service_title', '', __('The title is required.', 'rsvp'));
+            $this->addSettingsError('service_title', '', __('The title is required.', 'rrze-rsvp'));
         }
 
         $description = isset($input['service_description']) ? sanitize_text_field($input['service_description']) : '';
@@ -93,7 +93,7 @@ class NewSettings extends Settings
 
         add_settings_field(
             'service_title',
-            __('Title', 'rrze-ac'),
+            __('Title', 'rrze-rsvp'),
             [$this, 'serviceTitleField'],
             'rrze-rsvp-services-new',
             'rrze-rsvp-services-new-section'
@@ -101,7 +101,7 @@ class NewSettings extends Settings
 
         add_settings_field(
             'service_description',
-            __('Description', 'rrze-ac'),
+            __('Description', 'rrze-rsvp'),
             [$this, 'serviceDerscriptionField'],
             'rrze-rsvp-services-new',
             'rrze-rsvp-services-new-section'

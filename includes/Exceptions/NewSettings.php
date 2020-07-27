@@ -48,14 +48,14 @@ class NewSettings extends Settings
         $start = isset($input['exception_start']) ? trim($input['exception_start']) : '';
         $start = $this->validateDate($start, 'Y-m-d');
         if (!$start) {
-            $this->addSettingsError('exception_start', '', __('The start date is required.', 'rsvp'));
+            $this->addSettingsError('exception_start', '', __('The start date is required.', 'rrze-rsvp'));
         }
         $startTime = isset($input['exception_start_time']) ? trim($input['exception_start_time']) : '00:00';
 
         $end = isset($input['exception_end']) ? trim($input['exception_end']) : '';
         $end = $this->validateDate($end, 'Y-m-d');
         if (!$end) {
-            $this->addSettingsError('exception_end', '', __('The end date is required.', 'rsvp'));
+            $this->addSettingsError('exception_end', '', __('The end date is required.', 'rrze-rsvp'));
         }
         $endTime = isset($input['exception_end_time']) ? trim($input['exception_end_time']) : '00:00';
 
@@ -72,14 +72,14 @@ class NewSettings extends Settings
 
         $service = isset($input['exception_service']) ? absint($input['exception_service']) : '';
         if (!get_term_by('id', $service, CPT::getTaxonomyServiceName())) {
-            $this->addSettingsError('exception_service', '', __('The service is required.', 'rsvp'));
+            $this->addSettingsError('exception_service', '', __('The service is required.', 'rrze-rsvp'));
         } else {
             $this->addSettingsError('exception_service', $service, '', false);
         }
 
         if (!$this->settingsErrors()) {
             $args = [
-                'post_type' => CPT::getCptExceptionsName(),
+                'post_type' => CPT::getExceptionName(),
                 'post_title' => bin2hex(random_bytes(8)),
                 'post_content' => $description,
                 'post_status' => 'publish',
@@ -128,7 +128,7 @@ class NewSettings extends Settings
 
         add_settings_field(
             'exception_allday',
-            __('All Day', 'rrze-ac'),
+            __('All Day', 'rrze-rsvp'),
             [$this, 'allDayField'],
             'rrze-rsvp-exceptions-new',
             'rrze-rsvp-exceptions-new-section'
@@ -136,7 +136,7 @@ class NewSettings extends Settings
 
         add_settings_field(
             'exception_start',
-            __('Start', 'rrze-ac'),
+            __('Start', 'rrze-rsvp'),
             [$this, 'startField'],
             'rrze-rsvp-exceptions-new',
             'rrze-rsvp-exceptions-new-section'
@@ -144,7 +144,7 @@ class NewSettings extends Settings
 
         add_settings_field(
             'exception_end',
-            __('End', 'rrze-ac'),
+            __('End', 'rrze-rsvp'),
             [$this, 'endField'],
             'rrze-rsvp-exceptions-new',
             'rrze-rsvp-exceptions-new-section'
@@ -152,7 +152,7 @@ class NewSettings extends Settings
 
         add_settings_field(
             'exception_description',
-            __('Description', 'rrze-ac'),
+            __('Description', 'rrze-rsvp'),
             [$this, 'descriptionField'],
             'rrze-rsvp-exceptions-new',
             'rrze-rsvp-exceptions-new-section'
@@ -160,7 +160,7 @@ class NewSettings extends Settings
 
         add_settings_field(
             'exception_service',
-            __('Service', 'rrze-ac'),
+            __('Service', 'rrze-rsvp'),
             [$this, 'serviceField'],
             'rrze-rsvp-exceptions-new',
             'rrze-rsvp-exceptions-new-section'

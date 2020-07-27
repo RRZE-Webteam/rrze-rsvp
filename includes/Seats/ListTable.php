@@ -38,7 +38,7 @@ class ListTable extends WP_List_Table
         $currentPage = $this->get_pagenum();
         $offset = ($currentPage - 1) * $perPage;
         $args = [
-            'post_type' => CPT::getCptSeatsName(),
+            'post_type' => CPT::getSeatName(),
             'post_status' => 'publish',
             'posts_per_page' => -1,
             'offset' => -1

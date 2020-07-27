@@ -45,26 +45,23 @@ class NewSettings extends Settings
 
         $number = isset($input['seat_number']) ? trim($input['seat_number']) : '';
         if (empty($number)) {
-            $this->addSettingsError('seat_number', '', __('The number is required.', 'rsvp'));
+            $this->addSettingsError('seat_number', '', __('The number is required.', 'rrze-rsvp'));
         } else {
             $this->addSettingsError('seat_number', $number, '', false);
         }
 
-        $description = isset($input['seat_description']) ? sanitize_text_field($input['seat_description']) : '';
-        $this->addSettingsError('seat_description', $description, '', false);
-
         $service = isset($input['seat_service']) ? absint($input['seat_service']) : '';
         if (! get_term_by('id', $service, CPT::getTaxonomyServiceName())) {
-            $this->addSettingsError('seat_service', '', __('The service is required.', 'rsvp'));
+            $this->addSettingsError('seat_service', '', __('The service is required.', 'rrze-rsvp'));
         } else {
             $this->addSettingsError('seat_service', $service, '', false);
         }
         
         if (! $this->settingsErrors()) {
 			$args = [
-				'post_type' => CPT::getCptSeatsName(),
+				'post_type' => CPT::getSeatName(),
 				'post_title' => $number,
-				'post_content' => $description,
+				'post_content' => '',
 				'post_status' => 'publish',
 				'post_author' => 1,
 				'tax_input' => [
@@ -107,23 +104,15 @@ class NewSettings extends Settings
 
         add_settings_field(
             'seat_number',
-            __('Number', 'rrze-ac'),
+            __('Number', 'rrze-rsvp'),
             [$this, 'numberField'],
-            'rrze-rsvp-seats-new',
-            'rrze-rsvp-seats-new-section'
-        );
-
-        add_settings_field(
-            'seat_description',
-            __('Description', 'rrze-ac'),
-            [$this, 'descriptionField'],
             'rrze-rsvp-seats-new',
             'rrze-rsvp-seats-new-section'
         );
         
         add_settings_field(
             'seat_service',
-            __('Service', 'rrze-ac'),
+            __('Service', 'rrze-rsvp'),
             [$this, 'serviceField'],
             'rrze-rsvp-seats-new',
             'rrze-rsvp-seats-new-section'
@@ -136,15 +125,6 @@ class NewSettings extends Settings
         ?>
         <input type="text" value="<?php echo $number; ?>" name="<?php printf('%s[seat_number]', $this->optionName); ?>" class="regular-text">
         <?php       
-    }
-
-    public function descriptionField()
-    {
-        $settingsErrors = $this->settingsErrors();
-        $description = isset($settingsErrors['seat_description']['value']) ? esc_textarea($settingsErrors['seat_description']['value']) : '';
-        ?>
-        <textarea id="description" cols="50" rows="3" name="<?php printf('%s[seat_description]', $this->optionName); ?>"><?php echo $description; ?></textarea>
-        <?php        
     }
 
     public function serviceField() {
@@ -160,7 +140,7 @@ class NewSettings extends Settings
             <?php endforeach; ?>
             </select>
         <?php else: ?>
-            <p><?php _e('No exceptions found.', 'rrze-rsvp'); ?></p>
+            <p><?php _e('No seats found.', 'rrze-rsvp'); ?></p>
         <?php endif; ?>
         <?php
     }    

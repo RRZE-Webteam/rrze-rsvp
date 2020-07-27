@@ -84,7 +84,7 @@ class Functions
         }
     }
 
-    public static function validateTime(string $time) : string
+    public static function validateTime(string $time): string
     {
         $time = trim($time);
         if (preg_match("/^(2[0-3]|[01][0-9]):([0-5][0-9])$/", $time)) {

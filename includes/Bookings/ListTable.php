@@ -40,14 +40,19 @@ class ListTable extends WP_List_Table
 		$columns['actions'] = '';
 		return $columns;
 	}
-
+		
 	public function prepare_items()
 	{
+        $columns = $this->get_columns();
+        $hidden = [];
+        $sortable = $this->get_sortable_columns();
+		$this->_column_headers = [$columns, $hidden, $sortable];
+				
 		$perPage = $this->get_items_per_page('rrze_rsvp_bookings_per_page', 10);
 		$currentPage = $this->get_pagenum();
 		$offset = ($currentPage - 1) * $perPage;
 		$args = [
-			'post_type' => CPT::getCptBookingName(),
+			'post_type' => CPT::getBookingName(),
 			'post_status' => 'publish',
 			'posts_per_page' => -1,
 			'offset' => -1,
@@ -102,11 +107,6 @@ class ListTable extends WP_List_Table
 			$prepItems[$post->ID]['actions'] = "";
 		}
 
-		$columns = $this->get_columns();
-		$hidden = [];
-		$sortable = [];
-		$this->_column_headers = [$columns, $hidden, $sortable];
-
 		$totalItems = count($prepItems);
 		$this->items = array_slice($prepItems, $offset, $perPage);
 
@@ -121,7 +121,7 @@ class ListTable extends WP_List_Table
 
 	public function column_default($item, $column_name)
 	{
-		$nonce_action = wp_create_nonce('action');
+		$nonceAction = wp_create_nonce('action');
 
 		if (substr($column_name, 0, 6) == 'field_' && strlen($item[$column_name]) > 40) {
 			return mb_substr($item[$column_name], 0, 30) . '... <a href="#" class="rrze-rsvp-show" data-show="' . nl2br($item[$column_name]) . '">' . __('Show more', 'rrze-rsvp') . '</a>';
@@ -134,7 +134,7 @@ class ListTable extends WP_List_Table
 					$start = new Carbon($item['date_raw']);
 					if ($item['status'] == 'canceled' && $start->endOfDay()->gt(new Carbon('now'))) {
 						$button = "<button class='button rrzs-rsvp-delete' disabled>" . __('Canceled', 'rrze-rsvp') . "</button>
-						<a href='admin.php?page=" . plugin()->getSlug() . "&action=rec&id=" . $item['id'] . "&_wpnonce=" . $nonce_action . "' class='button'>" . __('Restore', 'rrze-rsvp') . "</a>";
+						<a href='admin.php?page=" . plugin()->getSlug() . "&action=rec&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='button'>" . __('Restore', 'rrze-rsvp') . "</a>";
 					} else {
 						switch ($item['status']) {
 							case 'canceled':
@@ -147,15 +147,15 @@ class ListTable extends WP_List_Table
 								$button = __('Confirmed', 'rrze-rsvp');
 								break;
 						}
-						$button .= "<a href='admin.php?page=" . plugin()->getSlug() . "&action=del_permanent&id=" . $item['id'] . "&_wpnonce=" . $nonce_action . "' class='delete'>" . __('Delete', 'rrze-rsvp') . "</a>";
+						$button .= "<a href='admin.php?page=" . plugin()->getSlug() . "&action=del_permanent&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='delete'>" . __('Delete', 'rrze-rsvp') . "</a>";
 					}
 					return $button . $booking_date;
 				} else {
-					$deleteButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=del&id=" . $item['id'] . "&_wpnonce=" . $nonce_action . "' class='button rrze-rsvp-delete' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . _x('Cancel', 'Cancel Booking', 'rrze-rsvp') . "</a>";
+					$deleteButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=del&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='button rrze-rsvp-delete' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . _x('Cancel', 'Cancel Booking', 'rrze-rsvp') . "</a>";
 					if ($item['status'] == 'confirmed') {
 						$actionButton = "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
 					} else {
-						$actionButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=acc&id=" . $item['id'] . "&_wpnonce=" . $nonce_action . "' class='button button-primary rrze-rsvp-accept' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . __('Confirm', 'rrze-rsvp') . "</a>";
+						$actionButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=acc&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='button button-primary rrze-rsvp-accept' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . __('Confirm', 'rrze-rsvp') . "</a>";
 					}
 					return $deleteButton . $actionButton . $booking_date;
 				}
@@ -166,6 +166,6 @@ class ListTable extends WP_List_Table
 
 	public function get_table_classes()
 	{
-		return array('widefat', 'fixed', 'striped');
+		return ['widefat', 'fixed', 'striped'];
 	}
 }
