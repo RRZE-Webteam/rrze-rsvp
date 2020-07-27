@@ -8,6 +8,7 @@ use RRZE\RSVP\Bookings\Main as Bookings;
 use RRZE\RSVP\Services\Main as Services;
 use RRZE\RSVP\Exceptions\Main as Exceptions;
 use RRZE\RSVP\Seats\Main as Seats;
+use RRZE\RSVP\Shortcodes\Shortcode as Shortcodes;
 
 /**
  * [Main description]
@@ -42,6 +43,9 @@ class Main
 
 		$seats = new Seats;
 		$seats->onLoaded();
+
+		$shortcodes = new Shortcodes;
+		$shortcodes->onLoaded();		
 	}
 
 	public function adminEnqueueScripts($hook)
@@ -59,7 +63,7 @@ class Main
 			['jquery'],
 			plugin()->getVersion()
 		);
-		wp_localize_script('rrze-rsvp-admin', 'RRZE_RSVP_ADMIN', array(
+		wp_localize_script('rrze-rsvp-admin', 'rrze_rsvp_admin', array(
 			'dateformat' => get_option('date_format'),
 			'text_delete' => __('Do you want to delete?', 'rrze-rsvp'),
 			'text_cancelled' => __('Canceled', 'rrze-rsvp'),
