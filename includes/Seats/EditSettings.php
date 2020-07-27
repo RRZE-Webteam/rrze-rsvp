@@ -66,7 +66,7 @@ class EditSettings extends Settings
         }
 
         $equipmentNameNew = isset($input['equipment_name_new']) ? sanitize_text_field($input['equipment_name_new']) : '';
-        $this->addSettingsError('equipment_name_new', $description, '', false);
+        $this->addSettingsError('equipment_name_new', $equipmentNameNew, '', false);
 
         $equipmentActives = (isset($input['equipment_active']) && is_array($input['equipment_active'])) ? array_keys($input['equipment_active']) : [];      
         $args = [
