@@ -186,12 +186,16 @@ class Shortcode extends Settings
 
     public function shortcodeBooking($shortcode_atts) {
         $location = sanitize_title($shortcode_atts['location']);
-        $locationTerm = get_term_by('slug', $location, CPT::getTaxonomyServiceName());
-        if ($locationTerm === false) {
-            return __('Location specified in shortcode does not exist.','rrze-rsvp');
+        if ($location != '' && $location != 'select') {
+            $locationTerm = get_term_by('slug', $location, CPT::getTaxonomyServiceName());
+            $location =  $locationTerm->term_id;
+            if ($locationTerm === false) {
+                return __('Location specified in shortcode does not exist.','rrze-rsvp');
+            }
+            $locationsOptions = Options::getServiceOptions($locationTerm->term_id);
         }
-        $location =  $locationTerm->term_id;         
-        $locationsOptions = Options::getServiceOptions($locationTerm->term_id);
+
+
         
         $days = (int)$shortcode_atts['days'];
 
@@ -200,7 +204,25 @@ class Shortcode extends Settings
         $output .= '<form action="#" id="rsvp_by_location">'
             . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
 
-        $output .= '<div><input type="hidden" value="'.$location.'" id="rsvp_location"></div>';
+        if ($location == 'select') {
+            $dropdown = wp_dropdown_categories([
+                'taxonomy' => 'rrze-rsvp-services',
+                'hide_empty' => true,
+                'show_option_none' => __('-- Please select --', 'rrze-rsvp'),
+                'orderby' => 'name',
+                //'hierarchical' => true,
+                'id' => 'rsvp_location',
+                'echo' => false,
+            ]);
+//            $dropdown = \RRZE\RSVP\Seats\NewSettings::serviceField();
+//            var_dump($dropdown);
+//            exit;
+            $output .= '<div class="form-group">'
+                . '<label for="rsvp_location" class="h3">Location/Room</label>'
+                . $dropdown . '</div>';
+        } else {
+            $output .= '<div><input type="hidden" value="'.$location.'" id="rsvp_location"></div>';
+        }
 
         $output .= '<div class="rsvp-datetime-container form-group clearfix"><legend>' . __('Select date and time', 'rrze-rsvp') . '</legend>'
             . '<div class="rsvp-date-container">';
