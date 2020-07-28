@@ -1,10 +1,8 @@
 {
 	"require": {
-		"nesbot/carbon": "^2.16",
-		"cmb2/cmb2": "dev-master"
+		"nesbot/carbon": "^2.16"
 	},
 	"autoload": {
-		"files": ["vendor/cmb2/cmb2/init.php"],
 		"psr-4": {
 			"RRZE\\RSVP\\": "includes/"
 		}
