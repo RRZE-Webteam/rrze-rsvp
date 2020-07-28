@@ -133,8 +133,15 @@ class ListTable extends WP_List_Table
 				if ($this->archive) {
 					$start = new Carbon($item['date_raw']);
 					if ($item['status'] == 'canceled' && $start->endOfDay()->gt(new Carbon('now'))) {
-						$button = "<button class='button rrzs-rsvp-delete' disabled>" . __('Canceled', 'rrze-rsvp') . "</button>
-						<a href='admin.php?page=" . plugin()->getSlug() . "&action=rec&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='button'>" . __('Restore', 'rrze-rsvp') . "</a>";
+						$canceledButton = '<button class="button rrzs-rsvp-cancel" disabled>' . __('Canceled', 'rrze-rsvp') . '</button>';
+						$restoreButton = sprintf(
+							'<a href="admin.php?page=%1$s&action=restore&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>', 
+							plugin()->getSlug(),
+							$item['id'],
+							$nonceAction,
+							__('Restore', 'rrze-rsvp')
+						);
+						$button = $canceledButton . $restoreButton;
 					} else {
 						switch ($item['status']) {
 							case 'canceled':
@@ -147,17 +154,35 @@ class ListTable extends WP_List_Table
 								$button = __('Confirmed', 'rrze-rsvp');
 								break;
 						}
-						$button .= "<a href='admin.php?page=" . plugin()->getSlug() . "&action=del_permanent&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='delete'>" . __('Delete', 'rrze-rsvp') . "</a>";
+						$button = sprintf(
+							'<a href="admin.php?page=%1$s&action=delete&id=%2$d&_wpnonce=%3$s" class="delete">%4$s</a>', 
+							plugin()->getSlug(),
+							$item['id'],
+							$nonceAction,
+							__('Delete', 'rrze-rsvp')
+						);						
 					}
 					return $button . $bookingDate;
 				} else {
-					$deleteButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=del&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='button rrze-rsvp-delete' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . _x('Cancel', 'Cancel Booking', 'rrze-rsvp') . "</a>";
-					if ($item['status'] == 'confirmed') {
-						$actionButton = "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
+					$cancelButton = sprintf(
+						'<a href="admin.php?page=%1$s&action=delete&id=%2$d&_wpnonce=%3$s" class="button rrze-rsvp-cancel" data-id="%2$d">%4$s</a>', 
+						plugin()->getSlug(),
+						$item['id'],
+						$nonceAction,
+						__('Cancel', 'rrze-rsvp')
+					);					
+					if ($item['status'] == 'confirmed') {						
+						$confirmButton = "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
 					} else {
-						$actionButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=acc&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='button button-primary rrze-rsvp-confirm' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . __('Confirm', 'rrze-rsvp') . "</a>";
+						$confirmButton = sprintf(
+							'<a href="admin.php?page=%1$s&action=confirm&id=%2$d&_wpnonce=%3$s" class="button button-primary rrze-rsvp-confirm" data-id="%2$d">%4$s</a>', 
+							plugin()->getSlug(),
+							$item['id'],
+							$nonceAction,
+							__('Confirm', 'rrze-rsvp')
+						);						
 					}
-					return $deleteButton . $actionButton . $bookingDate;
+					return $cancelButton . $confirmButton . $bookingDate;
 				}
 			default:
 				return ! empty($item[$column_name]) ? $item[$column_name] : '&mdash;';
