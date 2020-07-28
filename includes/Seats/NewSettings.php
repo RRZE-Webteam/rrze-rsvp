@@ -51,7 +51,7 @@ class NewSettings extends Settings
         }
 
         $service = isset($input['seat_service']) ? absint($input['seat_service']) : '';
-        if (! get_term_by('id', $service, CPT::getTaxonomyServiceName())) {
+        if (! $serviceTerm = get_term_by('id', $service, CPT::getTaxonomyServiceName())) {
             $this->addSettingsError('seat_service', '', __('The service is required.', 'rrze-rsvp'));
         } else {
             $this->addSettingsError('seat_service', $service, '', false);
@@ -65,7 +65,7 @@ class NewSettings extends Settings
 				'post_status' => 'publish',
 				'post_author' => 1,
 				'tax_input' => [
-					'rrze_rsvp_service' => $service
+					CPT::getTaxonomyServiceName() => [$serviceTerm->term_id]
 				]
 			];
 
