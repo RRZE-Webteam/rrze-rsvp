@@ -4,6 +4,8 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
+use RRZE\RSVP\CPT;
+use Carbon\Carbon;
 use DateTime;
 
 class Functions
@@ -98,5 +100,47 @@ class Functions
         } else {
             return '00:00';
         }
+    }
+
+    public static function getBooking(int $bookingId): array
+    {
+        $data = [];
+
+        $post = get_post($bookingId);
+        if (!$post) {
+            return $data;
+        }
+
+        $start = new Carbon(get_post_meta($post->ID, 'rrze_rsvp_start', true));
+        $end = new Carbon(get_post_meta($post->ID, 'rrze_rsvp_end', true));
+        $date = date_i18n(get_option('date_format'), $start->timestamp);
+        $time = date_i18n(get_option('time_format'), $start->timestamp) . " - " . date_i18n(get_option('time_format'), $end->timestamp);
+
+        $bookingDate = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
+
+        $categories = get_the_terms($post->ID, CPT::getTaxonomyServiceName());
+        $serviceName = $categories[0]->name;
+
+        $data['id'] = $post->ID;
+        $data['status'] = get_post_meta($post->ID, 'rrze_rsvp_status', true);
+        $data['date'] = $date;
+        $data['service_name'] = $serviceName;
+        $data['date_raw'] = get_post_meta($post->ID, 'rrze_rsvp_start', true);
+        $data['booking_date'] = $bookingDate;
+        $data['time'] = $time;
+
+        $data['field_seat'] = get_post_meta($post->ID, 'rrze_rsvp_seat', true);
+
+        $data['field_name'] = get_post_meta($post->ID, 'rrze_rsvp_user_name', true);
+        $data['field_email'] = get_post_meta($post->ID, 'rrze_rsvp_user_email', true);
+        $data['field_phone'] = get_post_meta($post->ID, 'rrze_rsvp_user_phone', true);
+
+        return $data;
+    }
+
+    public static function bookingReplyUrl(string $action, string $bookingDate, int $id): string
+    {
+        $hash = password_hash($bookingDate, PASSWORD_DEFAULT);
+        return get_site_url() . "/?rrze-rsvp-booking-reply=" . $hash . "&id=" . $id . "&action=" . $action;
     }
 }

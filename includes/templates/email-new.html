@@ -1,0 +1,37 @@
+<p>{{=text))</p>
+
+<p class="date">
+    {{=date}}
+    {{=time}}
+</p>
+
+<p class="service" style="line-height: 24px;">
+    {{=service_name}}
+</p>
+
+<p class="user-info" style="line-height: 24px;">
+    {{=user_info}}
+</p>
+
+<p>
+    {{=action_text}}
+</p>
+
+<table border="0" cellspacing="20" cellpadding="0" width="100%">
+    <tr>
+        <td align="center" style="border-radius: 3px;" bgcolor="#009900">
+            <a href="{{=confirm_url}}"
+                style="color: #ffffff; text-decoration: none; border: 1px solid #009900; padding: 10px 15px; display: inline-block;"
+                bgcolor="#009900">
+                {{=confirm_link_text}}
+            </a>
+        </td>
+        <td align="center" style="border-radius: 3px;" bgcolor="#aa1818">
+            <a href="{{=cancel_url}}"
+                style="color: #ffffff; text-decoration: none; border: 1px solid #aa1818; padding: 10px 15px; display: inline-block;"
+                bgcolor="#aa1818">
+                {{=cancel_link_text}}
+            </a>
+        </td>
+    </tr>
+</table>

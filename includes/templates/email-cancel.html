@@ -1,0 +1,22 @@
+<p>{{=text}}</p>
+
+<p class="date">
+    {{=date}}
+    {{=time}}
+</p>
+
+<p class="service" style="line-height: 24px;">
+    {{=service_name}}
+</p>
+
+{{site_url}}
+<table border="0" cellspacing="20" cellpadding="0" width="100%">
+    <tr>
+        <td align="center">
+            <a href="{{=site_url}}" style="text-decoration: none; padding: 10px 15px; display: inline-block;">
+                {{=site_url_text}}
+            </a>
+        </td>
+    </tr>
+</table>
+{{/site_url}}

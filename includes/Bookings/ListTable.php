@@ -85,7 +85,7 @@ class ListTable extends WP_List_Table
 			$date = date_i18n(get_option('date_format'), $start->timestamp);
 			$time = date_i18n(get_option('time_format'), $start->timestamp) . " - " . date_i18n(get_option('time_format'), $end->timestamp);
 
-			$booking_date = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
+			$bookingDate = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
 
 			$categories = get_the_terms($post->ID, CPT::getTaxonomyServiceName());
 			$category = $categories[0]->name;
@@ -95,7 +95,7 @@ class ListTable extends WP_List_Table
 			$prepItems[$post->ID]['date'] = $date;
 			$prepItems[$post->ID]['category'] = $category;
 			$prepItems[$post->ID]['date_raw'] = get_post_meta($post->ID, 'rrze_rsvp_start', true);
-			$prepItems[$post->ID]['booking_date'] = $booking_date;
+			$prepItems[$post->ID]['booking_date'] = $bookingDate;
 			$prepItems[$post->ID]['time'] = $time;
 
 			$prepItems[$post->ID]['field_seat'] = get_post_meta($post->ID, 'rrze_rsvp_seat', true);
@@ -129,7 +129,7 @@ class ListTable extends WP_List_Table
 
 		switch ($column_name) {
 			case 'actions':
-				$booking_date = '<span class="booking_date">' . __('Booked on', 'rrze-rsvp') . ' ' . $item['booking_date'] . '</span>';
+				$bookingDate = '<span class="booking_date">' . __('Booked on', 'rrze-rsvp') . ' ' . $item['booking_date'] . '</span>';
 				if ($this->archive) {
 					$start = new Carbon($item['date_raw']);
 					if ($item['status'] == 'canceled' && $start->endOfDay()->gt(new Carbon('now'))) {
@@ -149,7 +149,7 @@ class ListTable extends WP_List_Table
 						}
 						$button .= "<a href='admin.php?page=" . plugin()->getSlug() . "&action=del_permanent&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='delete'>" . __('Delete', 'rrze-rsvp') . "</a>";
 					}
-					return $button . $booking_date;
+					return $button . $bookingDate;
 				} else {
 					$deleteButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=del&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='button rrze-rsvp-delete' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . _x('Cancel', 'Cancel Booking', 'rrze-rsvp') . "</a>";
 					if ($item['status'] == 'confirmed') {
@@ -157,7 +157,7 @@ class ListTable extends WP_List_Table
 					} else {
 						$actionButton = "<a href='admin.php?page=" . plugin()->getSlug() . "&action=acc&id=" . $item['id'] . "&_wpnonce=" . $nonceAction . "' class='button button-primary rrze-rsvp-confirm' data-id='" . $item['id'] . "' data-email='" . $item['field_email'] . "'>" . __('Confirm', 'rrze-rsvp') . "</a>";
 					}
-					return $deleteButton . $actionButton . $booking_date;
+					return $deleteButton . $actionButton . $bookingDate;
 				}
 			default:
 				return ! empty($item[$column_name]) ? $item[$column_name] : '&mdash;';
