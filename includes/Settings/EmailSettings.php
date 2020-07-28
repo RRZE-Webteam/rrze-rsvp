@@ -59,6 +59,15 @@ class EmailSettings extends Settings
             $this->serviceOptions->notification_email = $notificationEmail;
         }
 
+        $notificationIfNew = empty($input['notification_if_new']) ? 0 : 1;
+        $this->addSettingsError('notification_if_new', $notificationIfNew, '', false);
+        $this->options->notification_if_new = $notificationIfNew;
+
+        $notificationIfCancel = empty($input['notification_if_cancel']) ? 0 : 1;
+        $this->addSettingsError('notification_if_cancel', $notificationIfCancel, '', false);
+        $this->options->notification_if_cancel = $notificationIfCancel;
+
+
         $senderName = isset($input['sender_name']) ? trim($input['sender_name']) : '';
         if (empty($senderName)) {
             $this->addSettingsError('sender_name', '', __('The sender name is required.', 'rrze-rsvp'));
@@ -158,6 +167,22 @@ class EmailSettings extends Settings
         );
 
         add_settings_field(
+            'notification_if_new',
+            __('New booking notification', 'rrze-rsvp'),
+            [$this, 'notificationIfNewField'],
+            'rrze-rsvp-settings-email',
+            'rrze-rsvp-settings-email-sender-section'
+        );
+
+        add_settings_field( 
+            'notification_if_cancel',
+            __('Notification of booking cancellation', 'rrze-rsvp'),
+            [$this, 'notificationIfCancelField'],
+            'rrze-rsvp-settings-email',
+            'rrze-rsvp-settings-email-sender-section'
+        );
+
+        add_settings_field(
             'sender_name',
             __('Sender name', 'rrze-rsvp'),
             [$this, 'senderNameField'],
@@ -249,7 +274,27 @@ class EmailSettings extends Settings
         $notificationEmail = isset($settingsErrors['notification_email']['value']) ? esc_html($settingsErrors['notification_email']['value']) : $this->options->notification_email;
         ?>
         <input type="text" name="<?php printf('%s[notification_email]', $this->optionName); ?>" value="<?php echo $notificationEmail; ?>" id="rrze_rsvp_notification_email" class="regular-text">
-        <p class="description"><?php _e('Notifications are sent to this email address when a new booking is made. If the field is left empty, no notifications will be sent.'); ?></p>
+        <p class="description"><?php _e('Notifications are sent to this email address when a new booking is made or a booking is canceled.'); ?></p>
+        <?php 
+    }
+
+    public function notificationIfNewField()
+    {
+        $settingsErrors = $this->settingsErrors();
+        $notificationIfNew = isset($settingsErrors['notification_if_new']['value']) ? esc_html($settingsErrors['notification_if_new']['value']) : $this->options->notification_if_new;
+        ?>
+        <input type="checkbox" name="<?php printf('%s[notification_if_new]', $this->optionName); ?>" value="1" id="rrze_rsvp_notification_if_new" <?php checked($notificationIfNew); ?>>
+        <?php _e('Send notification if a new booking is made.'); ?>
+        <?php 
+    }
+
+    public function notificationIfCancelField()
+    {
+        $settingsErrors = $this->settingsErrors();
+        $notificationIfCancel = isset($settingsErrors['notification_if_cancel']['value']) ? esc_html($settingsErrors['notification_if_cancel']['value']) : $this->options->notification_if_cancel;
+        ?>
+        <input type="checkbox" name="<?php printf('%s[notification_if_cancel]', $this->optionName); ?>" value="1" id="rrze_rsvp_notification_if_cancel" <?php checked($notificationIfCancel); ?>>
+        <?php _e('Send notification if a booking is canceled.'); ?>
         <?php 
     }
 

@@ -14,6 +14,8 @@ class Options
     {
         return [
             'notification_email' => '',
+            'notification_if_new' => 1,
+            'notification_if_cancel' => 1,
             'sender_name' => '',
             'sender_email' => '',
             'received_subject' => __('Thank you for booking', 'rrze-rsvp'),
