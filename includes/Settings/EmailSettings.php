@@ -51,6 +51,14 @@ class EmailSettings extends Settings
             wp_die(__('Something went wrong.', 'rrze-rsvp'));
         }
 
+        $notificationEmail = isset($input['notification_email']) ? trim($input['notification_email']) : '';
+        if (! filter_var($notificationEmail, FILTER_VALIDATE_EMAIL)) {
+            $this->addSettingsError('notification_email', '', __('The email address for notifications is not valid.', 'rrze-rsvp'));
+        } else {
+            $this->addSettingsError('notification_email', $this->serviceOptions->notification_email, '', false);
+            $this->serviceOptions->notification_email = $notificationEmail;
+        }
+
         $senderName = isset($input['sender_name']) ? trim($input['sender_name']) : '';
         if (empty($senderName)) {
             $this->addSettingsError('sender_name', '', __('The sender name is required.', 'rrze-rsvp'));
@@ -67,20 +75,20 @@ class EmailSettings extends Settings
             $this->options->sender_email = $senderEmail;
         }
 
-        $receiverSubject = isset($input['receiver_subject']) ? trim($input['receiver_subject']) : '';
-        if (empty($receiverSubject)) {
-            $this->addSettingsError('receiver_subject', '', __('The receiver subject is required.', 'rrze-rsvp'));
+        $receivedSubject = isset($input['received_subject']) ? trim($input['received_subject']) : '';
+        if (empty($receivedSubject)) {
+            $this->addSettingsError('received_subject', '', __('The received subject is required.', 'rrze-rsvp'));
         } else {
-            $this->addSettingsError('receiver_subject', $receiverSubject, '', false);
-            $this->options->receiver_subject = $receiverSubject;
+            $this->addSettingsError('received_subject', $receivedSubject, '', false);
+            $this->options->received_subject = $receivedSubject;
         }
 
-        $receiverText = isset($input['receiver_text']) ? sanitize_text_field($input['receiver_text']) : '';
-        if (empty($receiverText)) {
-            $this->addSettingsError('receiver_text', '', __('The receiver text is required.', 'rrze-rsvp'));
+        $receivedText = isset($input['received_text']) ? sanitize_text_field($input['received_text']) : '';
+        if (empty($receivedText)) {
+            $this->addSettingsError('received_text', '', __('The received text is required.', 'rrze-rsvp'));
         } else {
-            $this->addSettingsError('receiver_text', $receiverText, '', false);
-            $this->options->receiver_text = $receiverText;
+            $this->addSettingsError('received_text', $receivedText, '', false);
+            $this->options->received_text = $receivedText;
         }
 
         $confirmSubject = isset($input['confirm_subject']) ? trim($input['confirm_subject']) : '';
@@ -142,6 +150,14 @@ class EmailSettings extends Settings
         );
 
         add_settings_field(
+            'notification_email',
+            __('Email address for notifications', 'rrze-rsvp'),
+            [$this, 'notificationEmailField'],
+            'rrze-rsvp-settings-email',
+            'rrze-rsvp-settings-email-sender-section'
+        );
+
+        add_settings_field(
             'sender_name',
             __('Sender name', 'rrze-rsvp'),
             [$this, 'senderNameField'],
@@ -158,26 +174,26 @@ class EmailSettings extends Settings
         );
 
         add_settings_section(
-            'rrze-rsvp-settings-email-receiver-section',
+            'rrze-rsvp-settings-email-received-section',
             __('Receiver notification', 'rrze-rsvp'),
             '__return_false',
             'rrze-rsvp-settings-email'
         );
 
         add_settings_field(
-            'receiver_subject',
+            'received_subject',
             __('Subject', 'rrze-rsvp'),
-            [$this, 'receiverSubjectField'],
+            [$this, 'receivedSubjectField'],
             'rrze-rsvp-settings-email',
-            'rrze-rsvp-settings-email-receiver-section'
+            'rrze-rsvp-settings-email-received-section'
         );
 
         add_settings_field(
-            'receiver_text',
+            'received_text',
             __('Text', 'rrze-rsvp'),
-            [$this, 'receiverTextField'],
+            [$this, 'receivedTextField'],
             'rrze-rsvp-settings-email',
-            'rrze-rsvp-settings-email-receiver-section'
+            'rrze-rsvp-settings-email-received-section'
         );
 
         add_settings_section(
@@ -227,6 +243,16 @@ class EmailSettings extends Settings
         );
     }
 
+    public function notificationEmailField()
+    {
+        $settingsErrors = $this->settingsErrors();
+        $notificationEmail = isset($settingsErrors['notification_email']['value']) ? esc_html($settingsErrors['notification_email']['value']) : $this->options->notification_email;
+        ?>
+        <input type="text" name="<?php printf('%s[notification_email]', $this->optionName); ?>" value="<?php echo $notificationEmail; ?>" id="rrze_rsvp_notification_email" class="regular-text">
+        <p class="description"><?php _e('Notifications are sent to this email address when a new booking is made. If the field is left empty, no notifications will be sent.'); ?></p>
+        <?php 
+    }
+
     public function senderNameField()
     {
         $settingsErrors = $this->settingsErrors();
@@ -239,27 +265,27 @@ class EmailSettings extends Settings
     public function senderEmailField()
     {
         $settingsErrors = $this->settingsErrors();
-        $notificationEmail = isset($settingsErrors['sender_email']['value']) ? esc_html($settingsErrors['sender_email']['value']) : $this->options->sender_email;
-    ?>
-        <input type="text" name="<?php printf('%s[sender_email]', $this->optionName); ?>" value="<?php echo $notificationEmail; ?>" id="rrze_rsvp_sender_email" class="regular-text">
+        $senderEmail = isset($settingsErrors['sender_email']['value']) ? esc_html($settingsErrors['sender_email']['value']) : $this->options->sender_email;
+        ?>
+        <input type="text" name="<?php printf('%s[sender_email]', $this->optionName); ?>" value="<?php echo $senderEmail; ?>" id="rrze_rsvp_sender_email" class="regular-text">
     <?php
     }
 
-    public function receiverSubjectField()
+    public function receivedSubjectField()
     {
         $settingsErrors = $this->settingsErrors();
-        $receiverSubject = isset($settingsErrors['receiver_subject']['value']) ? esc_html($settingsErrors['receiver_subject']['value']) : $this->options->receiver_subject;
+        $receivedSubject = isset($settingsErrors['received_subject']['value']) ? esc_html($settingsErrors['received_subject']['value']) : $this->options->received_subject;
         ?>
-        <input type="text" name="<?php printf('%s[receiver_subject]', $this->optionName); ?>" value="<?php echo $receiverSubject; ?>" id="rrze_rsvp_receiver_subject" class="regular-text">
+        <input type="text" name="<?php printf('%s[received_subject]', $this->optionName); ?>" value="<?php echo $receivedSubject; ?>" id="rrze_rsvp_received_subject" class="regular-text">
     <?php
     }
 
-    public function receiverTextField()
+    public function receivedTextField()
     {
         $settingsErrors = $this->settingsErrors();
-        $receiverText = isset($settingsErrors['receiver_text']['value']) ? esc_textarea($settingsErrors['receiver_text']['value']) : $this->options->receiver_text;
+        $receivedText = isset($settingsErrors['received_text']['value']) ? esc_textarea($settingsErrors['received_text']['value']) : $this->options->received_text;
         ?>
-        <textarea cols="50" rows="5" name="<?php printf('%s[receiver_text]', $this->optionName); ?>" id="rrze_rsvp_receiver_text"><?php echo $receiverText; ?></textarea>
+        <textarea cols="50" rows="5" name="<?php printf('%s[received_text]', $this->optionName); ?>" id="rrze_rsvp_received_text"><?php echo $receivedText; ?></textarea>
     <?php
     }
 

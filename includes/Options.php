@@ -13,21 +13,21 @@ class Options
     protected static function defaultOptions()
     {
         return [
+            'notification_email' => '',
             'sender_name' => '',
             'sender_email' => '',
-            'receiver_subject' => __('Thank you for booking', 'rrze-rsvp'),
-            'receiver_text' => __('We received your booking and we will notify you once it has been confirmed.', 'rrze-rsvp'),
+            'received_subject' => __('Thank you for booking', 'rrze-rsvp'),
+            'received_text' => __('We received your booking and we will notify you once it has been confirmed.', 'rrze-rsvp'),
             'confirm_subject' => __('Your booking has been confirmed', 'rrze-rsvp'),
             'confirm_text' => __('We are happy to inform you that your booking has been confirmed.', 'rrze-rsvp'),
             'cancel_subject' => __('Your booking has been cancelled', 'rrze-rsvp'),
-            'cancel_text' => __('Unfortunately we have to cancel your booking on {{=date}} at {{=time}}.', 'rrze-rsvp')
+            'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp')
         ];
     }
 
     protected static function defaultServiceOptions()
     {
         return [
-            'notification_email' => '',
             'weeks_in_advance' => 4,
             'auto_confirmation' => 1,
             'event_duration' => '01:00',

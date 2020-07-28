@@ -64,14 +64,6 @@ class GeneralSettings extends Settings
         $serviceDescription = isset($input['service_description']) ? sanitize_text_field($input['service_description']) : '';
         $this->addSettingsError('service_description', $serviceDescription, '', false);
 
-        $notificationEmail = isset($input['notification_email']) ? trim($input['notification_email']) : '';
-        if (! filter_var($notificationEmail, FILTER_VALIDATE_EMAIL)) {
-            $this->addSettingsError('notification_email', '', __('The email address for notifications is not valid.', 'rrze-rsvp'));
-        } else {
-            $this->addSettingsError('notification_email', $this->serviceOptions->notification_email, '', false);
-            $this->serviceOptions->notification_email = $notificationEmail;
-        }
-
         $weeksInAdvance = isset($input['weeks_in_advance']) ? absint($input['weeks_in_advance']) : $this->serviceOptions->weeks_in_advance;
         $this->serviceOptions->weeks_in_advance = !$weeksInAdvance ? 1 : $weeksInAdvance;
         $this->addSettingsError('weeks_in_advance', $this->serviceOptions->weeks_in_advance, '', false);
@@ -144,14 +136,6 @@ class GeneralSettings extends Settings
             'rrze-rsvp-services-edit-general',
             'rrze-rsvp-services-edit-general-section'
         );
-
-        add_settings_field(
-            'notification_email',
-            __('Email address for notifications', 'rrze-rsvp'),
-            [$this, 'notificationEmailField'],
-            'rrze-rsvp-services-edit-general',
-            'rrze-rsvp-services-edit-general-section'
-        );
         
         add_settings_field(
             'weeks_in_advance',
@@ -173,9 +157,9 @@ class GeneralSettings extends Settings
     public function serviceNameField()
     {   
         $settingsErrors = $this->settingsErrors();
-        $title = isset($settingsErrors['service_name']['value']) ? esc_html($settingsErrors['service_name']['value']) : $this->wpTerm->name;
+        $serviceName = isset($settingsErrors['service_name']['value']) ? esc_html($settingsErrors['service_name']['value']) : $this->wpTerm->name;
         ?>
-        <input type="text" name="<?php printf('%s[service_name]', $this->optionName); ?>" value="<?php echo $title; ?>" id="rrze_rsvp_service_name" class="regular-text">
+        <input type="text" name="<?php printf('%s[service_name]', $this->optionName); ?>" value="<?php echo $serviceName; ?>" id="rrze_rsvp_service_name" class="regular-text">
         <?php       
     }
 
@@ -188,22 +172,12 @@ class GeneralSettings extends Settings
         <?php        
     }
 
-    public function notificationEmailField()
-    {
-        $settingsErrors = $this->settingsErrors();
-        $notificationEmail = isset($settingsErrors['notification_email']['value']) ? esc_html($settingsErrors['notification_email']['value']) : $this->serviceOptions->notification_email;
-        ?>
-        <input type="text" name="<?php printf('%s[notification_email]', $this->optionName); ?>" value="<?php echo $notificationEmail; ?>" id="rrze_rsvp_notification_email" class="regular-text">
-        <p class="description"><?php _e('Notifications are sent to this email address when a new booking is made. If the field is left empty, no notifications will be sent.'); ?></p>
-        <?php 
-    }
-
     public function weeksInAdvance()
     {
         $settingsErrors = $this->settingsErrors();
-        $notificationEmail = isset($settingsErrors['weeks_in_advance']['value']) ? esc_html($settingsErrors['weeks_in_advance']['value']) : $this->serviceOptions->weeks_in_advance;
+        $weeksInAdvance = isset($settingsErrors['weeks_in_advance']['value']) ? esc_html($settingsErrors['weeks_in_advance']['value']) : $this->serviceOptions->weeks_in_advance;
         ?>
-        <input type="number" name="<?php printf('%s[weeks_in_advance]', $this->optionName); ?>" value="<?php echo $notificationEmail; ?>" id="rrze_rsvp_weeks_in_advance" min="1" class="regular-text">
+        <input type="number" name="<?php printf('%s[weeks_in_advance]', $this->optionName); ?>" value="<?php echo $weeksInAdvance; ?>" id="rrze_rsvp_weeks_in_advance" min="1" class="regular-text">
         <p class="description"><?php _e('The number of weeks for which bookings are availiable in advance.'); ?></p>
         <?php 
     }

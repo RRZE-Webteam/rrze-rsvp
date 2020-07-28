@@ -31,7 +31,7 @@ class IdM
         //
     }
 
-    public function isLoggedIn()
+    public function tryLogIn()
     {
         $this->simplesamlAuth();
 
