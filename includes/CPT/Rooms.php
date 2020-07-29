@@ -4,7 +4,7 @@
  * Custom Post Type Room
  * ------------------------------------------------------------------------- */
 
-namespace RRZE\RSVP\Taxonomy;
+namespace RRZE\RSVP\CPT;
 
 class Rooms {
 
@@ -13,29 +13,15 @@ class Rooms {
     public function __construct($pluginFile, $settings) {
         $this->pluginFile = $pluginFile;
         $this->settings = $settings;
-
-        $fauthemes = array(
-            'FAU-Einrichtungen',
-            'FAU-Einrichtungen-BETA',
-            'FAU-Medfak',
-            'FAU-RWFak',
-            'FAU-Philfak',
-            'FAU-Techfak',
-            'FAU-Natfak',
-            'FAU-Blog'
-        );
-        $theme = wp_get_theme();
-        $this->isFauTheme = in_array($theme->Name, $fauthemes);
-        $this->isFauTheme = true;
     }
 
     public function onLoaded() {
         require_once(plugin_dir_path($this->pluginFile) . 'vendor/cmb2/init.php');
         add_action('init', [$this, 'room_post_type'], 0);
-		add_action('cmb2_admin_init', [$this, 'room_metaboxes']);
-		add_filter( 'single_template', [$this, 'include_single_template'] );
+	add_action('cmb2_admin_init', [$this, 'room_metaboxes']);
+	add_filter( 'single_template', [$this, 'include_single_template'] );
         add_filter( 'archive_template', [$this, 'include_archive_template'] );
-	}
+    }
 
 	// Register Custom Post Type
 	public function room_post_type() {
@@ -220,7 +206,7 @@ class Rooms {
     }
 
     public function include_single_template() {
-        if ($this->isFauTheme) {
+        if (Helper::isFauTheme()) {
             return dirname($this->pluginFile) . '/includes/templates/single-room-fau-theme.php';
         } else {
             return dirname($this->pluginFile) . '/includes/templates/single-room.php';

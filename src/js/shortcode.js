@@ -11,7 +11,7 @@ jQuery(document).ready(function($){
         });
 
     $('div.rsvp-datetime-container').on('click', 'input', updateForm);
-    $('select#rsvp_location').change(updateForm);
+    $('select#rsvp_room').change(updateForm);
 
     $('div.rsvp-service-container').on('click', 'input', function(){
         var id = $(this).val();
@@ -31,7 +31,7 @@ jQuery(document).ready(function($){
         var monthCurrent = $('table.rsvp_calendar').data('period');
         var endDate = $('table.rsvp_calendar').data('end');
         var direction = $(this).data('direction');
-        var location = $('#rsvp_location').val();
+        var room = $('#rsvp_room').val();
         $('table.rsvp_calendar').remove();
         $('div.rsvp-time-select').remove();
         $('div.rsvp-service-select').remove();
@@ -41,7 +41,7 @@ jQuery(document).ready(function($){
             month: monthCurrent ,                  //data
             end: endDate,
             direction: direction,
-            location: location,
+            room: room,
         }, function(result) {                 //callback
             $('div.rsvp-date-container').html(result);
         });
@@ -50,10 +50,10 @@ jQuery(document).ready(function($){
 });
 
 function updateForm() {
-    var location = jQuery('#rsvp_location').val();
+    var room = jQuery('#rsvp_room').val();
     var date = jQuery('table.rsvp_calendar input[name="rsvp_date"]:checked').val();
     var time = jQuery('div.rsvp-time-container input[name="rsvp_time"]:checked').val();
-    //console.log(location);
+    // console.log(room);
     // console.log(date);
     // console.log(time);
     jQuery('div.rsvp-time-select').remove();
@@ -61,7 +61,7 @@ function updateForm() {
     jQuery.post(rsvp_ajax.ajax_url, {         //POST request
         _ajax_nonce: rsvp_ajax.nonce,     //nonce
         action: "UpdateForm",            //action
-        location: location,                  //data
+        room: room,                  //data
         date: date,          //data
         time: time,          //data
     }, function(result) {                 //callback

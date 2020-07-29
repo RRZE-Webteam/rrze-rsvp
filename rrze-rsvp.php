@@ -21,6 +21,10 @@ use RRZE\RSVP\Plugin;
 use RRZE\RSVP\Main;
 use RRZE\RSVP\CF\CustomField;
 
+
+// Laden der Konfigurationsdatei
+require_once __DIR__ . '/config/config.php';
+
 // Autoloader (PSR-4)
 require 'vendor/autoload.php';
 

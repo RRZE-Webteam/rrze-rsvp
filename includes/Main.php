@@ -4,14 +4,14 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Taxonomy\Taxonomy;
+use RRZE\RSVP\CPT\CPT;
 
 // use RRZE\RSVP\Bookings\Main as Bookings;
 // use RRZE\RSVP\Services\Main as Services;
 use RRZE\RSVP\Exceptions\Main as Exceptions;
 // use RRZE\RSVP\Seats\Main as Seats;
 use RRZE\RSVP\Settings\Main as Settings;
-use RRZE\RSVP\Shortcodes\Shortcode as Shortcodes;
+use RRZE\RSVP\Shortcodes\Shortcodes;
 
 /**
  * [Main description]
@@ -41,10 +41,10 @@ class Main{
 	    $settings->onLoaded();
 	
 	    	// Posttypes 
-	    $taxonomies = new Taxonomy($this->pluginFile, $settings);
+	    $taxonomies = new CPT($this->pluginFile, $settings);
 	    $taxonomies->onLoaded();
 	
-	#
+	// Old:
 	//	$cpt = new CPT;
 	//	$cpt->onLoaded();
 
@@ -67,12 +67,11 @@ class Main{
 		$seats->onLoaded();
 */
 	
-	/*
+	
 
-		$shortcodes = new Shortcodes;
+		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();
-		
-		*/
+	
 	}
 
 	public function adminEnqueueScripts($hook)

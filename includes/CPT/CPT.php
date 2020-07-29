@@ -1,18 +1,18 @@
 <?php
 
-namespace RRZE\RSVP\Taxonomy;
+namespace RRZE\RSVP\CPT;
 
 defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Main;
-use RRZE\RSVP\Taxonomy\Bookings;
-use RRZE\RSVP\Taxonomy\Rooms;
-use RRZE\RSVP\Taxonomy\Seats;
+use RRZE\RSVP\CPT\Bookings;
+use RRZE\RSVP\CPT\Rooms;
+use RRZE\RSVP\CPT\Seats;
 
 /**
  * Laden und definieren der Posttypes
  */
-class Taxonomy extends Main {
+class CPT extends Main {
     protected $pluginFile;
     protected $settings;
     

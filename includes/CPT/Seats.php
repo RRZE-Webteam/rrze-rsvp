@@ -4,7 +4,7 @@
  * Custom Post Type Seat
  * ------------------------------------------------------------------------- */
 
-namespace RRZE\RSVP\Taxonomy;
+namespace RRZE\RSVP\CPT;
 
 class Seats {
 

@@ -4,7 +4,7 @@
  * Custom Post Type Booking
  * ------------------------------------------------------------------------- */
 
-namespace RRZE\RSVP\Taxonomy;
+namespace RRZE\RSVP\CPT;
 
 class Bookings {
 
