@@ -137,25 +137,25 @@ class Bookings {
 
         $cmb->add_field( array(
             'name'    => __('Last name', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-lastname',
+            'id'      => 'rrze-rsvp-booking-guest-lastname',
             'type'    => 'text',
         ) );
 
         $cmb->add_field( array(
             'name'    => __('First name', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-firstname',
+            'id'      => 'rrze-rsvp-booking-guest-firstname',
             'type'    => 'text',
         ) );
 
         $cmb->add_field( array(
             'name'    => __('Email', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-email',
+            'id'      => 'rrze-rsvp-booking-guest-email',
             'type'    => 'text_email',
         ) );
 
         $cmb->add_field( array(
             'name'    => __('Phone', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-phone',
+            'id'      => 'rrze-rsvp-booking-guest-phone',
             'type'    => 'text_medium',
             'attributes' => array(
                 'type' => 'tel',
@@ -179,9 +179,9 @@ class Bookings {
         ]);
         $options = [];
         foreach ($seats as $seat) {
-            $location = get_post_meta($seat->ID, 'rrze-rsvp-seat-location', true);
-            $location_title = get_the_title($location);
-            $options[$seat->ID] = $location_title . ' – '. $seat->post_title;
+            $room = get_post_meta($seat->ID, 'rrze-rsvp-seat-room', true);
+            $room_title = get_the_title($room);
+            $options[$seat->ID] = $room_title . ' – '. $seat->post_title;
         }
         return $options;
     }
@@ -194,7 +194,7 @@ class Bookings {
     function booking_filter_posts_columns( $columns ) {
         $columns['bookingdate'] = __( 'Date', 'rrze-rsvp' );
         $columns['time'] = __( 'Time', 'rrze-rsvp' );
-        $columns['location'] = __( 'Location', 'rrze-rsvp' );
+        $columns['room'] = __( 'Room', 'rrze-rsvp' );
         $columns['seat'] = __( 'Seat', 'rrze-rsvp' );
         $columns['name'] = __( 'Name', 'rrze-rsvp' );
         $columns['email'] = __('Email', 'rrze-rsvp');
@@ -208,7 +208,7 @@ class Bookings {
             'cb' => $columns['cb'],
             'bookingdate' => __( 'Date', 'rrze-rsvp' ),
             'time' => __( 'Time', 'rrze-rsvp' ),
-            'location' => __( 'Location', 'rrze-rsvp' ),
+            'room' => __( 'Room', 'rrze-rsvp' ),
             'seat' => __( 'Seat', 'rrze-rsvp' ),
             'name' => __( 'Name', 'rrze-rsvp' ),
             'email' => __('Email', 'rrze-rsvp'),
@@ -220,7 +220,7 @@ class Bookings {
 
     function booking_column($column, $post_id) {
         $seat = get_post_meta($post_id, 'rrze-rsvp-booking-seat', true) ;
-        $location = get_post_meta($seat, 'rrze-rsvp-seat-location', true) ;
+        $room = get_post_meta($seat, 'rrze-rsvp-seat-room', true) ;
         if ('bookingdate' === $column) {
             echo get_post_meta($post_id, 'rrze-rsvp-booking-date', true) ;
         }
@@ -229,27 +229,27 @@ class Bookings {
             $end = get_post_meta($post_id, 'rrze-rsvp-booking-endtime', true) ;
             echo $start . ' - ' . $end;
         }
-        if ( 'location' === $column ) {
-            echo get_the_title($location);
+        if ( 'room' === $column ) {
+            echo get_the_title($room);
         }
         if ( 'seat' === $column ) {
             echo get_the_title($seat);
         }
         if ('name' === $column) {
-            echo get_post_meta($post_id, 'rrze-rsvp-booking-firstname', true) . ' ' . get_post_meta($post_id, 'lastname', true);
+            echo get_post_meta($post_id, 'rrze-rsvp-booking-guest-firstname', true) . ' ' . get_post_meta($post_id, 'rrze-rsvp-booking-guest-lastname', true);
         }
         if ('email' === $column) {
-            echo get_post_meta($post_id, 'rrze-rsvp-booking-email', true) ;
+            echo get_post_meta($post_id, 'rrze-rsvp-booking-guest-email', true) ;
         }
         if ('phone' === $column) {
-            echo get_post_meta($post_id, 'rrze-rsvp-booking-phone', true) ;
+            echo get_post_meta($post_id, 'rrze-rsvp-booking-guest-phone', true) ;
         }
         if ('status' === $column) {
             $status = get_post_meta($post_id, 'rrze-rsvp-booking-status', true) ;
             echo $status . '<br />';
-            if ($status == 'booked') {
+            //if ($status == 'booked') {
                 echo '<button class="button button-primary button-small">Confirm</button> <button class="button button-secondary button-small">Cancel</button>';
-            }
+            //}
         }
     }
 
@@ -257,7 +257,7 @@ class Bookings {
         $columns = array(
             'bookingdate' => __( 'Date', 'rrze-rsvp' ),
             'time' => __( 'Time', 'rrze-rsvp' ),
-            'location' => __( 'Location', 'rrze-rsvp' ),
+            'room' => __( 'Room', 'rrze-rsvp' ),
             'seat' => __( 'Seat', 'rrze-rsvp' ),
             'name' => __( 'Name', 'rrze-rsvp' ),
         );

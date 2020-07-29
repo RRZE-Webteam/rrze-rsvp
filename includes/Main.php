@@ -6,11 +6,9 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\CPT\CPT;
 
-// use RRZE\RSVP\Bookings\Main as Bookings;
-// use RRZE\RSVP\Services\Main as Services;
-use RRZE\RSVP\Exceptions\Main as Exceptions;
-// use RRZE\RSVP\Seats\Main as Seats;
-use RRZE\RSVP\Settings\Main as Settings;
+// use RRZE\RSVP\Exceptions\Main as Exceptions;
+use RRZE\RSVP\Settings;
+use RRZE\RSVP\EmailSettings\EmailSettings;
 use RRZE\RSVP\Shortcodes\Shortcodes;
 
 /**
@@ -41,8 +39,8 @@ class Main{
 	    $settings->onLoaded();
 	
 	    	// Posttypes 
-	    $taxonomies = new CPT($this->pluginFile, $settings);
-	    $taxonomies->onLoaded();
+	    $cpt = new CPT($this->pluginFile, $settings);
+	    $cpt->onLoaded();
 	
 	// Old:
 	//	$cpt = new CPT;
@@ -51,23 +49,13 @@ class Main{
 		$actions = new Actions;
 		$actions->onLoaded();
 
-
-	
-		/*
-		$bookings = new Bookings;
-		$bookings->onLoaded();
-
-		$services = new Services;
-		$services->onLoaded();
-*/
+/*
+ * Erstmal noch nicht, werden umbenannt in Blocking Time:
+ 
 		$exceptions = new Exceptions;
 		$exceptions->onLoaded();
-/*
-		$seats = new Seats;
-		$seats->onLoaded();
-*/
-	
-	
+
+	*/
 
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();

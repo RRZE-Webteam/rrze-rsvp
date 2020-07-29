@@ -1,6 +1,6 @@
 <?php
 
-namespace RRZE\RSVP\Settings;
+namespace RRZE\RSVP\EmailSettings;
 
 defined('ABSPATH') || exit;
 
@@ -8,8 +8,7 @@ use RRZE\RSVP\Functions;
 
 use function RRZE\RSVP\plugin;
 
-class Menu
-{   
+class Menu {   
     protected $emailSettings;
 
     public function __construct()

@@ -1,11 +1,10 @@
 <?php
 
-namespace RRZE\RSVP\Settings;
+namespace RRZE\RSVP\EmailSettings;
 
 defined('ABSPATH') || exit;
 
-class Main
-{
+class EmailSettings {
     public function __construct()
     {
         //

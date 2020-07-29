@@ -1,6 +1,6 @@
 <?php
 
-namespace RRZE\RSVP\Settings;
+namespace RRZE\RSVP\EmailSettings;
 
 defined('ABSPATH') || exit;
 
@@ -9,8 +9,7 @@ use RRZE\RSVP\Options;
 use RRZE\RSVP\Settings;
 use RRZE\RSVP\Functions;
 
-class EmailSettings extends Settings
-{
+class EMail extends EmailSettings {
     protected $options;
 
     protected $optionName;
