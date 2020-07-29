@@ -59,10 +59,10 @@ class Main{
 
 		$services = new Services;
 		$services->onLoaded();
-
+*/
 		$exceptions = new Exceptions;
 		$exceptions->onLoaded();
-
+/*
 		$seats = new Seats;
 		$seats->onLoaded();
 */
