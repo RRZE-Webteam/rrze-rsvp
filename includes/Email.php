@@ -10,7 +10,7 @@ class Email
 
     protected $template;
 
-    public function __construct(int $serviceId)
+    public function __construct()
     {
         $this->options = Options::getOptions();
         $this->template = new Template();
@@ -52,7 +52,7 @@ class Email
     public function bookingNew(string $to, string $subject, int $bookingId)
     {
         $bookingData = Functions::getBooking($bookingId);
-        if (empty($booking)) {
+        if (empty($bookingData)) {
             return;
         }
 
@@ -73,13 +73,13 @@ class Email
     public function bookingCancelNotification(int $bookingId)
     {
         $bookingData = Functions::getBooking($bookingId);
-        if (empty($booking)) {
+        if (empty($bookingData)) {
             return;
         }
 
         $to = $this->options->notification_email;
 
-        $bookingData['booking_info'] = $this->dataToHtml($bookingData);
+        $bookingData['booking_info'] = Functions::dataToStr($bookingData);
 
         $subject = __('Booking has been cancelled', 'rrze-rsvp');
         $text = sprintf(__('A booking on %s has been cancelled by the customer.', 'rrze-rsvp'), get_bloginfo('name'));
@@ -100,7 +100,7 @@ class Email
     public function bookingReceived(int $bookingId)
     {
         $bookingData = Functions::getBooking($bookingId);
-        if (empty($booking)) {
+        if (empty($bookingData)) {
             return;
         }
 
@@ -123,10 +123,10 @@ class Email
         $this->send($bookingData['field_email'], $subject, $message);
     }
 
-    public function bookingConfirm(int $bookingId)
+    public function bookingConfirmed(int $bookingId)
     {
         $bookingData = Functions::getBooking($bookingId);
-        if (empty($booking)) {
+        if (empty($bookingData)) {
             return;
         }
 
@@ -149,10 +149,10 @@ class Email
         $this->send($bookingData['field_email'], $subject, $message);
     }
 
-    public function bookingCancel(int $bookingId)
+    public function bookingCanceled(int $bookingId)
     {
         $bookingData = Functions::getBooking($bookingId);
-        if (empty($booking)) {
+        if (empty($bookingData)) {
             return;
         }
 
@@ -181,15 +181,4 @@ class Email
         return $text;
     }
 
-    public function dataToHtml(array $data, string $delimiter = '<br>'): string
-    {
-        $output = '';
-
-        foreach ($data as $key => $value) {
-            $value = sanitize_text_field($value) ? sanitize_text_field($value) : '-';
-            $output .= $key . ': ' . $value . $delimiter;
-        }
-
-        return $output;
-    }
 }

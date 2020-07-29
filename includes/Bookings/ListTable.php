@@ -63,7 +63,7 @@ class ListTable extends WP_List_Table
 				'relation' => $this->archive ? 'OR' : 'AND',
 				'status_clause' => [
 					'key' => 'rrze_rsvp_status',
-					'value' => 'notconfirmed',
+					'value' => 'canceled',
 					'compare' => $this->archive ? '=' : '!='
 				],
 				'status_start' => [

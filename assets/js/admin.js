@@ -2,12 +2,12 @@
 
 jQuery(document).ready(function () {
     var DATE_FORMAT = rrze_rsvp_admin.dateformat,
-        TEXT_DELETE = rrze_rsvp_admin.text_delete,
+        TEXT_CANCEL = rrze_rsvp_admin.text_cancel,
         TEXT_CANCELLED = rrze_rsvp_admin.text_cancelled,
         TEXT_CONFIRMED = rrze_rsvp_admin.text_confirmed,
         API_AJAXURL = rrze_rsvp_admin.ajaxurl;
 
-	function executeAction(type, button) {
+	function bookingAction(type, button) {
 		var id = button.attr('data-id'),
 			href = button.attr('href');
 
@@ -15,7 +15,7 @@ jQuery(document).ready(function () {
 			type: "POST",
 			url: API_AJAXURL,
 			data: {
-				action: 'execute_action',
+				action: 'booking_action',
 				id: id,
 				type: type
 			}
@@ -42,14 +42,14 @@ jQuery(document).ready(function () {
 
     jQuery('.rrze-rsvp-bookings .rrze-rsvp-confirm').click(function(e) {
         e.preventDefault();
-        executeAction('confirm', jQuery(this));
+        bookingAction('confirm', jQuery(this));
         return false;
     });
 
     jQuery('.rrze-rsvp-bookings .rrze-rsvp-cancel').click(function(e) {
         e.preventDefault();
-        if (confirm(TEXT_DELETE)) {
-            executeAction('cancel', jQuery(this));
+        if (confirm(TEXT_CANCEL)) {
+            bookingAction('cancel', jQuery(this));
         }
         return false;
     });

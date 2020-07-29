@@ -3,8 +3,8 @@
 /*
 Plugin Name:     RRZE-RSVP
 Plugin URI:      https://github.com/RRZE-Webteam/rrze-rsvp
-Description:     Platzbuchungssystem der FAU
-Version:         0.0.10
+Description:     Booking system.
+Version:         0.0.11
 Author:          RRZE-Webteam
 Author URI:      https://blogs.fau.de/webworking/
 License:         GNU General Public License v2
