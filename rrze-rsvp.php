@@ -1,9 +1,9 @@
 <?php
 
 /*
-Plugin Name:     Booking system
+Plugin Name:     RRZE-RSVP
 Plugin URI:      https://github.com/RRZE-Webteam/rrze-rsvp
-Description:     Booking system.
+Description:     Platzbuchungssystem der FAU
 Version:         0.0.10
 Author:          RRZE-Webteam
 Author URI:      https://blogs.fau.de/webworking/
