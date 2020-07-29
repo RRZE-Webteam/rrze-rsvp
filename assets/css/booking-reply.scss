@@ -1,0 +1,74 @@
+.rrze-rsvp-booking-reply {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	display: flex;
+	flex-flow: column;
+	justify-content: center;
+	background-color: #f3f3f3;
+	text-align: center;
+	word-wrap: break-word;
+	z-index: 99998;
+
+	.container {
+		width: 100%;
+		max-width: 600px;
+		padding: 60px 30px;
+		background-color: white;
+		box-shadow: 0px 0px 4px #BBB;
+		margin: 30px auto;
+		box-sizing: border-box;
+
+		h1 {
+			margin: 0 0 30px;
+		}
+
+		a {
+			color: black;
+		}
+
+		.date {
+			font-size: 2em;
+			line-height: 1.2em;
+			font-weight: 300;
+			margin: 1em 0 .5em 0;
+			border-top: 1px solid #ddd;
+			padding-top: 1em;
+
+			&.canceled {
+				text-decoration: line-through;
+			}
+		}
+
+		.button {
+			color: white;
+			padding: 10px 15px;
+			text-decoration: none;
+			margin: 10px 5px 5px;
+			border: none;
+			font-size: 1rem;
+			border-radius: 3px;
+			display: inline-block;
+
+			&.button-accept {
+				background-color: #009900;
+			}
+
+			&.button-delete {
+				background-color: #aa1818;
+			}
+		}
+
+	}
+
+	a.backlink {
+		display: block;
+		color: #bbbbbb;
+		text-decoration: none;
+		margin-bottom: 30px;
+	}
+}

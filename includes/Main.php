@@ -33,6 +33,9 @@ class Main
 		$cpt = new CPT;
 		$cpt->onLoaded();
 
+		$actions = new Actions;
+		$actions->onLoaded();
+
 		$bookings = new Bookings;
 		$bookings->onLoaded();
 
@@ -47,9 +50,9 @@ class Main
 
 		$settings = new Settings;
 		$settings->onLoaded();
-				
+
 		$shortcodes = new Shortcodes;
-		$shortcodes->onLoaded();		
+		$shortcodes->onLoaded();
 	}
 
 	public function adminEnqueueScripts($hook)
@@ -63,13 +66,14 @@ class Main
 		wp_enqueue_script('wp-color-picker');
 		wp_enqueue_script(
 			'rrze-rsvp-admin',
-			plugins_url('assets/js/admin-min.js', plugin()->getBasename()),
+			plugins_url('assets/js/admin.js', plugin()->getBasename()),
 			['jquery'],
 			plugin()->getVersion()
 		);
+		$nonce = wp_create_nonce('rrze-rsvp-ajax-nonce');
 		wp_localize_script('rrze-rsvp-admin', 'rrze_rsvp_admin', array(
 			'dateformat' => get_option('date_format'),
-			'text_delete' => __('Do you want to delete?', 'rrze-rsvp'),
+			'text_cancel' => __('Do you want to cancel?', 'rrze-rsvp'),
 			'text_cancelled' => __('Canceled', 'rrze-rsvp'),
 			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
 			'ajaxurl' => admin_url('admin-ajax.php')
@@ -88,4 +92,5 @@ class Main
 			plugin()->getVersion()
 		);
 	}
+
 }

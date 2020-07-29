@@ -102,6 +102,16 @@ class Functions
         }
     }
 
+    public static function dateFormat($date)
+    {
+        return date_i18n(get_option('date_format'), strtotime($date));
+    }
+
+    public static function timeFormat($time)
+    {
+        return date_i18n(get_option('time_format'), strtotime($time));
+    }
+
     public static function getBooking(int $bookingId): array
     {
         $data = [];
@@ -111,23 +121,19 @@ class Functions
             return $data;
         }
 
-        $start = new Carbon(get_post_meta($post->ID, 'rrze_rsvp_start', true));
-        $end = new Carbon(get_post_meta($post->ID, 'rrze_rsvp_end', true));
-        $date = date_i18n(get_option('date_format'), $start->timestamp);
-        $time = date_i18n(get_option('time_format'), $start->timestamp) . " - " . date_i18n(get_option('time_format'), $end->timestamp);
-
         $bookingDate = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
 
-        $categories = get_the_terms($post->ID, CPT::getTaxonomyServiceName());
-        $serviceName = $categories[0]->name;
+        $serviceTerms = get_the_terms($post->ID, CPT::getTaxonomyServiceName());
+        $serviceName = $serviceTerms[0]->name;
 
         $data['id'] = $post->ID;
         $data['status'] = get_post_meta($post->ID, 'rrze_rsvp_status', true);
-        $data['date'] = $date;
-        $data['service_name'] = $serviceName;
-        $data['date_raw'] = get_post_meta($post->ID, 'rrze_rsvp_start', true);
+        $data['start'] = get_post_meta($post->ID, 'rrze_rsvp_start', true);
+        $data['end'] = get_post_meta($post->ID, 'rrze_rsvp_end', true);
+        $data['date'] = Functions::dateFormat($data['start']);
+        $data['time'] = Functions::timeFormat($data['start']) . ' - ' . Functions::timeFormat($data['end']);
         $data['booking_date'] = $bookingDate;
-        $data['time'] = $time;
+        $data['service_name'] = $serviceName;
 
         $data['field_seat'] = get_post_meta($post->ID, 'rrze_rsvp_seat', true);
 
@@ -136,6 +142,30 @@ class Functions
         $data['field_phone'] = get_post_meta($post->ID, 'rrze_rsvp_user_phone', true);
 
         return $data;
+    }
+
+    public static function getBookingFields(int $bookingId): array
+    {
+        $data = [];
+        $metaAry = get_post_meta($bookingId);
+        foreach($metaAry as $key => $value) {
+            if(strpos($key, 'field_') == 0) {
+                $data[$key] = $value;
+            }
+        }
+        return $data;
+    }
+
+    public static function dataToStr(array $data, string $delimiter = '<br>'): string
+    {
+        $output = '';
+
+        foreach ($data as $key => $value) {
+            $value = sanitize_text_field($value) ? sanitize_text_field($value) : '-';
+            $output .= $key . ': ' . $value . $delimiter;
+        }
+
+        return $output;
     }
 
     public static function bookingReplyUrl(string $action, string $bookingDate, int $id): string
