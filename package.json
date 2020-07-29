@@ -8,10 +8,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "jsdir": "./assets/js/",
-  "cssdir":  "./assets/css/",
+  "cssdir": "./assets/css/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RRZE-Webteam/rrze-rsvp",
+    "url": "git+https://github.com/RRZE-Webteam/rrze-rsvp.git",
     "issues": "https://github.com/RRZE-Webteam/rrze-rsvp/issues",
     "clone": "git+https://github.com/RRZE-Webteam/rrze-rsvp.git"
   },
@@ -22,11 +22,8 @@
   "supports": {
     "email": "webmaster@fau.de"
   },
-  "author": {
-    "name": "RRZE-Webteam <webmaster@fau.de>",
-    "url": "https://www.wordpress.rrze.fau.de/person/webmaster"
-  },
-  "license": "GNU General Public License v3",
+  "author": "RRZE-Webteam <webmaster@fau.de> (https://www.wordpress.rrze.fau.de/person/webmaster)",
+  "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
@@ -42,5 +39,9 @@
     "gulp-uglify": "^3.0.2",
     "gulp-wp-pot": "^2.3.6",
     "semver": "^6.3.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/RRZE-Webteam/rrze-rsvp/issues"
+  },
+  "homepage": "https://github.com/RRZE-Webteam/rrze-rsvp#readme"
 }
