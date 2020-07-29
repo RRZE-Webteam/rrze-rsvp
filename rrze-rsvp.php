@@ -115,6 +115,6 @@ function loaded()
         return;
     }
 
-    $main = new Main();
+    $main = new Main(__FILE__);
     $main->onLoaded();
 }

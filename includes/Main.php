@@ -4,38 +4,56 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Bookings\Main as Bookings;
-use RRZE\RSVP\Services\Main as Services;
+use RRZE\RSVP\Taxonomy\Taxonomy;
+
+// use RRZE\RSVP\Bookings\Main as Bookings;
+// use RRZE\RSVP\Services\Main as Services;
 use RRZE\RSVP\Exceptions\Main as Exceptions;
-use RRZE\RSVP\Seats\Main as Seats;
+// use RRZE\RSVP\Seats\Main as Seats;
 use RRZE\RSVP\Settings\Main as Settings;
 use RRZE\RSVP\Shortcodes\Shortcode as Shortcodes;
 
 /**
  * [Main description]
  */
-class Main
-{
+class Main{
+    
+    protected $pluginFile;
+    private $settings = '';
+
+
 	/**
 	 * [__construct description]
 	 */
-	public function __construct()
-	{
-		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
+	public function __construct($pluginFile)	{
+
+	     $this->pluginFile = $pluginFile;
+	    add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
 		add_action('rest_api_init', function () {
 			//$api = new API;
 			//$api->register_routes();
 		});
 	}
 
-	public function onLoaded()
-	{
-		$cpt = new CPT;
-		$cpt->onLoaded();
+	public function onLoaded() {
+	    
+	    $settings = new Settings($this->pluginFile);
+	    $settings->onLoaded();
+	
+	    	// Posttypes 
+	    $taxonomies = new Taxonomy($this->pluginFile, $settings);
+	    $taxonomies->onLoaded();
+	
+	#
+	//	$cpt = new CPT;
+	//	$cpt->onLoaded();
 
 		$actions = new Actions;
 		$actions->onLoaded();
 
+
+	
+		/*
 		$bookings = new Bookings;
 		$bookings->onLoaded();
 
@@ -47,12 +65,14 @@ class Main
 
 		$seats = new Seats;
 		$seats->onLoaded();
-
-		$settings = new Settings;
-		$settings->onLoaded();
+*/
+	
+	/*
 
 		$shortcodes = new Shortcodes;
 		$shortcodes->onLoaded();
+		
+		*/
 	}
 
 	public function adminEnqueueScripts($hook)
@@ -61,9 +81,16 @@ class Main
 			return;
 		}
 
+		// wozu?
 		wp_enqueue_script('jquery-ui-core');
+		// wird?
+		
 		wp_enqueue_script('jquery-ui-datepicker');
+		// dies?
+		
 		wp_enqueue_script('wp-color-picker');
+		// gebraucht??!?!?!=!?=!?!!!
+		    
 		wp_enqueue_script(
 			'rrze-rsvp-admin',
 			plugins_url('assets/js/admin.js', plugin()->getBasename()),
