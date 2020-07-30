@@ -1,93 +1,34 @@
 <?php
 
 namespace RRZE\RSVP;
+use function RRZE\RSVP\Config\defaultServiceOptions;
+use function RRZE\RSVP\Config\defaultOptions;
+use function RRZE\RSVP\Config\getOptionName;
 
 defined('ABSPATH') || exit;
 
+// Obsolet, cause of Settings.php ?
 class Options
 {
-    const OPTION_NAME = 'rrze_rsvp';
 
-    const SERVICE_OPTION_NAME = 'rrze_rsvp';
-
-    protected static function defaultOptions()
-    {
-        return [
-            'notification_email' => '',
-            'notification_if_new' => 1,
-            'notification_if_cancel' => 1,
-            'sender_name' => '',
-            'sender_email' => '',
-            'received_subject' => __('Thank you for booking', 'rrze-rsvp'),
-            'received_text' => __('We received your booking and we will notify you once it has been confirmed.', 'rrze-rsvp'),
-            'confirm_subject' => __('Your booking has been confirmed', 'rrze-rsvp'),
-            'confirm_text' => __('We are happy to inform you that your booking has been confirmed.', 'rrze-rsvp'),
-            'cancel_subject' => __('Your booking has been cancelled', 'rrze-rsvp'),
-            'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp')
-        ];
-    }
-
-    protected static function defaultServiceOptions()
-    {
-        return [
-            'weeks_in_advance' => 4,
-            'auto_confirmation' => 1,
-            'event_duration' => '01:00',
-            'event_gap' => '01:00',
-            'weekdays_timeslots' => [
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '00:00',
-                    'end' => '00:00'
-                ]
-            ]
-        ];
-    }
 
     public static function getOptions()
     {
-        $defaults = self::defaultOptions();
+        $defaults = defaultOptions();
 
-        $options = (array) get_option(static::OPTION_NAME);
+        $options = (array) get_option(getOptionName());
         $options = wp_parse_args($options, $defaults);
         $options = array_intersect_key($options, $defaults);
 
         return (object) $options;
     }
 
-    public static function getOptionName()
-    {
-        return static::OPTION_NAME;
-    }
-
+ 
     public static function getServiceOptions(int $termId): object
     {
-        $defaults = self::defaultServiceOptions();
+        $defaults = defaultServiceOptions();
 
-        $options = get_term_meta($termId, static::SERVICE_OPTION_NAME, true);
+        $options = get_term_meta($termId, getOptionName(), true);
         if ($options === false) {
             $options = $defaults;
         }
@@ -97,10 +38,7 @@ class Options
         return (object) $options;
     }
 
-    public static function getServiceOptionName()
-    {
-        return static::SERVICE_OPTION_NAME;
-    }
+
 
     protected static function parseArgs(&$options, $defaults)
     {

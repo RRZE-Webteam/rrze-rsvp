@@ -156,8 +156,7 @@ class Settings
      * Gibt die Standardeinstellungen zurück.
      * @return array
      */
-    protected function defaultOptions()
-    {
+    protected function defaultOptions()  {
         $options = [];
 
         foreach ($this->settingsFields as $section => $field) {

@@ -4,8 +4,6 @@ namespace RRZE\RSVP\EmailSettings;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\CPT;
-use RRZE\RSVP\Options;
 use RRZE\RSVP\Settings;
 use RRZE\RSVP\Functions;
 

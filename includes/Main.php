@@ -42,10 +42,6 @@ class Main{
 	    $cpt = new CPT($this->pluginFile, $settings);
 	    $cpt->onLoaded();
 	
-	// Old:
-	//	$cpt = new CPT;
-	//	$cpt->onLoaded();
-
 		$actions = new Actions;
 		$actions->onLoaded();
 
@@ -75,8 +71,6 @@ class Main{
 		wp_enqueue_script('jquery-ui-datepicker');
 		// dies?
 		
-		wp_enqueue_script('wp-color-picker');
-		// gebraucht??!?!?!=!?=!?!!!
 		    
 		wp_enqueue_script(
 			'rrze-rsvp-admin',
@@ -98,7 +92,6 @@ class Main{
 			plugins_url('assets/css/jquery-ui-min.css', plugin()->getBasename())
 		);
 		wp_enqueue_style('jquery-ui-datepicker');
-		wp_enqueue_style('wp-color-picker');
 		wp_enqueue_style(
 			'rrze-rsvp-admin',
 			plugins_url('assets/css/admin.css', plugin()->getBasename()),

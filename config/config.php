@@ -8,8 +8,7 @@ defined('ABSPATH') || exit;
  * Gibt der Name der Option zurück.
  * @return array [description]
  */
-function getOptionName()
-{
+function getOptionName() {
     return 'rrze_rsvp';
 }
 
@@ -20,7 +19,6 @@ function getOptionName()
 function getConstants() {
         $options = array(
 	    
-
 	    'fauthemes' => [
 		'FAU-Einrichtungen', 
 		'FAU-Philfak',
@@ -38,6 +36,61 @@ function getConstants() {
         return $options; // Standard-Array für zukünftige Optionen
     }
 
+    
+ function  defaultOptions()  {
+        return [
+            'notification_email' => '',
+            'notification_if_new' => 1,
+            'notification_if_cancel' => 1,
+            'sender_name' => '',
+            'sender_email' => '',
+            'received_subject' => __('Thank you for booking', 'rrze-rsvp'),
+            'received_text' => __('We received your booking and we will notify you once it has been confirmed.', 'rrze-rsvp'),
+            'confirm_subject' => __('Your booking has been confirmed', 'rrze-rsvp'),
+            'confirm_text' => __('We are happy to inform you that your booking has been confirmed.', 'rrze-rsvp'),
+            'cancel_subject' => __('Your booking has been cancelled', 'rrze-rsvp'),
+            'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp')
+        ];
+    }
+
+ function defaultServiceOptions() {
+        return [
+            'weeks_in_advance' => 4,
+            'auto_confirmation' => 1,
+            'event_duration' => '01:00',
+            'event_gap' => '01:00',
+            'weekdays_timeslots' => [
+                [
+                    'start' => '09:00',
+                    'end' => '18:00'
+                ],
+                [
+                    'start' => '09:00',
+                    'end' => '18:00'
+                ],
+                [
+                    'start' => '09:00',
+                    'end' => '18:00'
+                ],
+                [
+                    'start' => '09:00',
+                    'end' => '18:00'
+                ],
+                [
+                    'start' => '09:00',
+                    'end' => '18:00'
+                ],
+                [
+                    'start' => '09:00',
+                    'end' => '18:00'
+                ],
+                [
+                    'start' => '00:00',
+                    'end' => '00:00'
+                ]
+            ]
+        ];
+    }
     
 /**
  * Gibt die Einstellungen des Menus zurück.
