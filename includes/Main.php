@@ -62,14 +62,6 @@ class Main{
 		if (strpos($hook, 'rrze-rsvp') === false) {
 			return;
 		}
-
-		// wozu?
-		wp_enqueue_script('jquery-ui-core');
-		// wird?
-		
-		wp_enqueue_script('jquery-ui-datepicker');
-		// dies?
-		
 		    
 		wp_enqueue_script(
 			'rrze-rsvp-admin',
@@ -90,7 +82,6 @@ class Main{
 			'jquery-ui-css',
 			plugins_url('assets/css/jquery-ui-min.css', plugin()->getBasename())
 		);
-		wp_enqueue_style('jquery-ui-datepicker');
 		wp_enqueue_style(
 			'rrze-rsvp-admin',
 			plugins_url('assets/css/admin.css', plugin()->getBasename()),
