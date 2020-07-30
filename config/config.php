@@ -246,10 +246,10 @@ function getShortcodeSettings(){
                 'label' => __( 'Datumsauswahl', 'rrze-rsvp' ),
                 'type' => 'string' // Variablentyp des auswählbaren Werts
             ],
-            'location' => [
+            'room' => [
                 'default' => '',
                 'field_type' => 'text', // Art des Feldes im Gutenberg Editor
-                'label' => __( 'Location', 'rrze-rsvp' ),
+                'label' => __( 'Room', 'rrze-rsvp' ),
                 'type' => 'text' // Variablentyp der Eingabe
             ],
         ],

@@ -108,9 +108,9 @@ class Seats {
 	
 	
         $cmb->add_field( array(
-            'name'             => __('Location', 'rrze-rsvp'),
+            'name'             => __('Room', 'rrze-rsvp'),
             //'desc'             => 'Select an option',
-            'id'               => 'rrze-rsvp-seat-location',
+            'id'               => 'rrze-rsvp-seat-room',
             'type'             => 'select',
             'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
             'default'          => 'custom',
@@ -121,7 +121,7 @@ class Seats {
 	public function seats_metaboxes_save($post_id) {}
 
     public function post_select_options( $field ) {
-        $locations = get_posts([
+        $rooms = get_posts([
             'post_type' => 'room',
             'post_statue' => 'publish',
             'nopaging' => true,
@@ -129,8 +129,8 @@ class Seats {
             'order' => 'ASC',
         ]);
         $options = [];
-        foreach ($locations as $location) {
-            $options[$location->ID] = $location->post_title;
+        foreach ($rooms as $room) {
+            $options[$room->ID] = $room->post_title;
         }
         return $options;
     }

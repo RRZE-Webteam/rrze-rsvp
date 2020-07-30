@@ -23,8 +23,8 @@ class CPT extends Main {
     }
 
     public function onLoaded() {
-        $locations = new Rooms($this->pluginFile, $this->settings);
-        $locations->onLoaded();
+        $rooms = new Rooms($this->pluginFile, $this->settings);
+        $rooms->onLoaded();
 
         $seats = new Seats($this->pluginFile, $this->settings);
         $seats->onLoaded();
