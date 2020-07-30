@@ -4,8 +4,6 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\CPT;
-use Carbon\Carbon;
 use DateTime;
 
 class Functions
@@ -54,32 +52,10 @@ class Functions
         echo ($option['start'] == '00:00' && $option['end'] == '00:00') ? $string1 : $string2;
     }
 
-    public static function getServices($args = [])
-    {
-
-        if (!isset($args['hide_empty'])) {
-            $args['hide_empty'] = 0;
-        }
-
-        $terms = get_terms(CPT::getTaxonomyServiceName(), $args);
-        if (is_wp_error($terms) || empty($terms)) {
-            return array();
-        }
-
-        $services = [];
-        foreach ($terms as $term) {
-            if ($service = get_term_by('id', $term->term_id, CPT::getTaxonomyServiceName())) {
-                $services[] = $service;
-            }
-        }
-
-        return $services;
-    }
-
     public static function validateDate(string $date, string $format = 'Y-m-d\TH:i:s\Z')
     {
-        $d = DateTime::createFromFormat($format, $date);
-        if ($d && $d->format($format) === $date) {
+        $dateTime = DateTime::createFromFormat($format, $date);
+        if ($dateTime && $dateTime->format($format) === $date) {
             return $date;
         } else {
             return false;
@@ -121,25 +97,24 @@ class Functions
             return $data;
         }
 
-        $bookingDate = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
-
-        $serviceTerms = get_the_terms($post->ID, CPT::getTaxonomyServiceName());
-        $serviceName = $serviceTerms[0]->name;
-
         $data['id'] = $post->ID;
-        $data['status'] = get_post_meta($post->ID, 'rrze_rsvp_status', true);
-        $data['start'] = get_post_meta($post->ID, 'rrze_rsvp_start', true);
-        $data['end'] = get_post_meta($post->ID, 'rrze_rsvp_end', true);
+        $data['status'] = get_post_meta($post->ID, 'rrze-rsvp-booking-status', true);
+        $data['start'] = get_post_meta($post->ID, 'rrze-rsvp-booking-start', true);
+        $data['end'] = get_post_meta($post->ID, 'rrze-rsvp-booking-end', true);
         $data['date'] = Functions::dateFormat($data['start']);
         $data['time'] = Functions::timeFormat($data['start']) . ' - ' . Functions::timeFormat($data['end']);
-        $data['booking_date'] = $bookingDate;
-        $data['service_name'] = $serviceName;
 
-        $data['field_seat'] = get_post_meta($post->ID, 'rrze_rsvp_seat', true);
+        $data['booking_date'] = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
 
-        $data['field_name'] = get_post_meta($post->ID, 'rrze_rsvp_user_name', true);
-        $data['field_email'] = get_post_meta($post->ID, 'rrze_rsvp_user_email', true);
-        $data['field_phone'] = get_post_meta($post->ID, 'rrze_rsvp_user_phone', true);
+        $data['seat'] = get_post_meta($post->ID, 'rrze-rsvp-booking-seat', true);
+        $data['room'] = get_post_meta($data['seat'], 'rrze-rsvp-seat-room', true);
+
+        $data['notes'] = get_post_meta($post->ID, 'rrze-rsvp-booking-notes', true);
+
+        $data['guest_firstname'] = get_post_meta($post->ID, 'rrze-rsvp-booking-guest-firstname', true);
+        $data['guest_lastname'] = get_post_meta($post->ID, 'rrze-rsvp-booking-guest-lastname', true);
+        $data['guest_email'] = get_post_meta($post->ID, 'rrze-rsvp-booking-guest-email', true);
+        $data['guest_phone'] = get_post_meta($post->ID, 'rrze-rsvp-booking-guest-phone', true);
 
         return $data;
     }
