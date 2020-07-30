@@ -52,45 +52,6 @@ function getConstants() {
             'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp')
         ];
     }
-
- function defaultServiceOptions() {
-        return [
-            'weeks_in_advance' => 4,
-            'auto_confirmation' => 1,
-            'event_duration' => '01:00',
-            'event_gap' => '01:00',
-            'weekdays_timeslots' => [
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '09:00',
-                    'end' => '18:00'
-                ],
-                [
-                    'start' => '00:00',
-                    'end' => '00:00'
-                ]
-            ]
-        ];
-    }
     
 /**
  * Gibt die Einstellungen des Menus zurück.
