@@ -29,10 +29,10 @@ class Actions
 		$type = sanitize_text_field($_POST['type']);
 
 		if ($type == 'confirm') {
-			update_post_meta($bookingId, 'rrze_rsvp_status', 'confirmed');
+			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 			//$this->email->bookingConfirmed($id);
 		} else if ($type == 'cancel') {
-			update_post_meta($bookingId, 'rrze_rsvp_status', 'canceled');
+			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'canceled');
 			//$this->email->bookingCanceled($id);
 		}
 
@@ -49,13 +49,13 @@ class Actions
 			$bookingId = absint($_GET['id']);
 			$action = sanitize_text_field($_GET['action']);
 			if ($action == 'confirm') {
-				update_post_meta($bookingId, 'rrze_rsvp_status', 'confirmed');
+				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 			} elseif ($action == 'cancel') {
-				update_post_meta($bookingId, 'rrze_rsvp_status', 'canceled');
+				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'canceled');
 			} elseif ($action == 'delete') {
 				wp_delete_post($bookingId, true);
 			} elseif ($action == 'restore') {
-				update_post_meta($bookingId, 'rrze_rsvp_status', 'notconfirmed');
+				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'notconfirmed');
 			}
 			
 			$exceptionId = absint($_GET['id']);
@@ -82,7 +82,7 @@ class Actions
 		if ($hash !== false && $bookingId !== false && $action !== false) {
 			$bookingData = Functions::getBooking($bookingId);
 
-			if ($action == 'confirm' && $bookingData && password_verify($bookingData['booking_date'] . '_user', $hash)) {
+			if ($action == 'confirm' && $bookingData && password_verify($bookingData['booking_date'] . '_guest', $hash)) {
 				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/booking-reply.css', plugin()->getBasename(), [], plugin()->getVersion()));
 				$template = $this->loadBookingReplyTemplate('booking-reply-user', true);
 				return $template;
