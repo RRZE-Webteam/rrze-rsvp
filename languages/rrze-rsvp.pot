@@ -206,7 +206,7 @@ msgstr ""
 msgid "Datumsauswahl"
 msgstr ""
 
-#: config/config.php:252, includes/CPT/Seats.php:104, includes/Shortcodes/Settings-Rolf.php:51, includes/Shortcodes/Shortcode-Rolf.php:504
+#: config/config.php:252, includes/CPT/Seats.php:111, includes/Shortcodes/Settings-Rolf.php:51, includes/Shortcodes/Shortcode-Rolf.php:504
 msgid "Location"
 msgstr ""
 
@@ -294,7 +294,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: includes/Bookings/ListTable.php:35, includes/CPT/Bookings.php:130, includes/CPT/Bookings.php:198, includes/CPT/Bookings.php:212, includes/CPT/Bookings.php:261, includes/Seats/ListTable.php:27
+#: includes/Bookings/ListTable.php:35, includes/CPT/Bookings.php:130, includes/CPT/Bookings.php:198, includes/CPT/Bookings.php:212, includes/CPT/Bookings.php:261, includes/CPT/Seats.php:56, includes/Seats/ListTable.php:27
 msgid "Seat"
 msgstr ""
 
@@ -318,11 +318,11 @@ msgstr ""
 msgid "Booked on"
 msgstr ""
 
-#: includes/Bookings/ListTable.php:172
+#: includes/Bookings/ListTable.php:172, includes/CPT/Bookings.php:251
 msgid "Cancel"
 msgstr ""
 
-#: includes/Bookings/ListTable.php:182
+#: includes/Bookings/ListTable.php:182, includes/CPT/Bookings.php:251
 msgid "Confirm"
 msgstr ""
 
@@ -374,7 +374,7 @@ msgctxt "Add New on Toolbar"
 msgid "Booking"
 msgstr ""
 
-#: includes/CPT/Bookings.php:35, includes/CPT/Rooms.php:33, includes/Exceptions/Menu.php:95, includes/Seats/Menu.php:124, includes/Services/Menu.php:151
+#: includes/CPT/Bookings.php:35, includes/CPT/Rooms.php:33, includes/CPT/Seats.php:34, includes/Exceptions/Menu.php:95, includes/Seats/Menu.php:124, includes/Services/Menu.php:151
 msgid "Add New"
 msgstr ""
 
@@ -468,7 +468,7 @@ msgstr ""
 msgid "Add and edit Booking informations"
 msgstr ""
 
-#: includes/CPT/Bookings.php:87, includes/CPT/Rooms.php:136, includes/CPT/Seats.php:94
+#: includes/CPT/Bookings.php:87, includes/CPT/Rooms.php:136, includes/CPT/Seats.php:97
 msgid "Details"
 msgstr ""
 
@@ -484,7 +484,7 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: includes/CPT/Bookings.php:120, includes/CPT/Bookings.php:133, includes/CPT/Seats.php:108
+#: includes/CPT/Bookings.php:120, includes/CPT/Bookings.php:133, includes/CPT/Seats.php:115
 msgid "Please select"
 msgstr ""
 
@@ -508,7 +508,7 @@ msgstr ""
 msgid "Notes"
 msgstr ""
 
-#: includes/CPT/Bookings.php:197, includes/CPT/Bookings.php:211, includes/CPT/Bookings.php:260, includes/CPT/Rooms.php:55, includes/Shortcodes/Bookings.php:135, includes/Shortcodes/Bookings.php:438
+#: includes/CPT/Bookings.php:197, includes/CPT/Bookings.php:211, includes/CPT/Bookings.php:260, includes/CPT/Rooms.php:55, includes/Shortcodes/Bookings.php:134, includes/Shortcodes/Bookings.php:437
 msgid "Room"
 msgstr ""
 
@@ -682,6 +682,10 @@ msgstr ""
 msgid "Available days in advance"
 msgstr ""
 
+#: includes/CPT/Rooms.php:165
+msgid "Number of days for which bookings are available in advance."
+msgstr ""
+
 #: includes/CPT/Rooms.php:176, includes/Services/GeneralSettings.php:150
 msgid "Automatic confirmation"
 msgstr ""
@@ -692,6 +696,116 @@ msgstr ""
 
 #: includes/CPT/Rooms.php:183
 msgid "Floor plan"
+msgstr ""
+
+#: includes/CPT/Seats.php:30
+msgctxt "Post type general name"
+msgid "Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:31
+msgctxt "Post type singular name"
+msgid "Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:32
+msgctxt "Admin Menu text"
+msgid "Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:33
+msgctxt "Add New on Toolbar"
+msgid "Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:35, includes/Seats/Menu.php:85, includes/Seats/Menu.php:90
+msgid "Add New Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:36
+msgid "New Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:37, includes/Seats/Menu.php:106
+msgid "Edit Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:38
+msgid "View Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:39
+msgid "All Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:40
+msgid "Search Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:41
+msgid "Parent Seats:"
+msgstr ""
+
+#: includes/CPT/Seats.php:42
+msgid "No Seats found."
+msgstr ""
+
+#: includes/CPT/Seats.php:43
+msgid "No Seats found in Trash."
+msgstr ""
+
+#: includes/CPT/Seats.php:44
+msgctxt "Overrides the “Featured Image” phrase for this post type. Added in 4.3"
+msgid "Seat Image"
+msgstr ""
+
+#: includes/CPT/Seats.php:45
+msgctxt "Overrides the “Set featured image” phrase for this post type. Added in 4.3"
+msgid "Set seat image"
+msgstr ""
+
+#: includes/CPT/Seats.php:46
+msgctxt "Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
+msgid "Remove seat image"
+msgstr ""
+
+#: includes/CPT/Seats.php:47
+msgctxt "Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
+msgid "Use as Seat image"
+msgstr ""
+
+#: includes/CPT/Seats.php:48
+msgctxt "The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4"
+msgid "Seat archives"
+msgstr ""
+
+#: includes/CPT/Seats.php:49
+msgctxt "Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4"
+msgid "Insert into Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:50
+msgctxt "Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4"
+msgid "Uploaded to this Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:51
+msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+msgid "Filter Seats list"
+msgstr ""
+
+#: includes/CPT/Seats.php:52
+msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+msgid "Seats list navigation"
+msgstr ""
+
+#: includes/CPT/Seats.php:53
+msgctxt "Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4"
+msgid "Seats list"
+msgstr ""
+
+#: includes/CPT/Seats.php:57
+msgid "Add and edit seat informations"
 msgstr ""
 
 #: includes/EmailSettings/EMail.php:50, includes/Exceptions/NewSettings.php:43, includes/Seats/EditSettings.php:48, includes/Seats/EditSettings.php:54, includes/Seats/EditSettings.php:58, includes/Seats/Menu.php:101, includes/Seats/NewSettings.php:43, includes/Services/GeneralSettings.php:48, includes/Services/GeneralSettings.php:54, includes/Services/Menu.php:109, includes/Services/NewSettings.php:43, includes/Services/TimeslotsSettings.php:48, includes/Services/TimeslotsSettings.php:54
@@ -863,7 +977,7 @@ msgstr ""
 msgid "Number"
 msgstr ""
 
-#: includes/Seats/EditSettings.php:174, includes/Shortcodes/Bookings.php:434, includes/Shortcodes/Shortcode-Rolf.php:500
+#: includes/Seats/EditSettings.php:174, includes/Shortcodes/Bookings.php:433, includes/Shortcodes/Shortcode-Rolf.php:500
 msgid "Equipment"
 msgstr ""
 
@@ -908,14 +1022,6 @@ msgstr ""
 
 #: includes/Seats/Menu.php:54
 msgid "Number of seats per page:"
-msgstr ""
-
-#: includes/Seats/Menu.php:85, includes/Seats/Menu.php:90
-msgid "Add New Seat"
-msgstr ""
-
-#: includes/Seats/Menu.php:106
-msgid "Edit Seat"
 msgstr ""
 
 #: includes/Seats/NewSettings.php:75
@@ -987,55 +1093,63 @@ msgstr ""
 msgid "Break between events (hh:mm)"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:40
+#: includes/Shortcodes/Bookings.php:39
 msgid "Room specified in shortcode does not exist."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:139
+#: includes/Shortcodes/Bookings.php:138
 msgid "Book a seat in: "
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:143, includes/Shortcodes/Shortcode-Rolf.php:227
+#: includes/Shortcodes/Bookings.php:142, includes/Shortcodes/Shortcode-Rolf.php:227
 msgid "Select date and time"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:156, includes/Shortcodes/Shortcode-Rolf.php:240
+#: includes/Shortcodes/Bookings.php:155, includes/Shortcodes/Shortcode-Rolf.php:240
 msgid "Available time slots:"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:157, includes/Shortcodes/Bookings.php:343, includes/Shortcodes/Shortcode-Rolf.php:241, includes/Shortcodes/Shortcode-Rolf.php:430
+#: includes/Shortcodes/Bookings.php:156, includes/Shortcodes/Bookings.php:342, includes/Shortcodes/Shortcode-Rolf.php:241, includes/Shortcodes/Shortcode-Rolf.php:430
 msgid "Please select a date."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:164, includes/Shortcodes/Shortcode-Rolf.php:248
+#: includes/Shortcodes/Bookings.php:163, includes/Shortcodes/Shortcode-Rolf.php:248
 msgid "Phone Number"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:260
+#: includes/Shortcodes/Bookings.php:166
+msgid "Submit"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:259
 msgid "Not bookable (soldout)"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:275, includes/Shortcodes/Bookings.php:266, includes/Shortcodes/Shortcode-Rolf.php:363
+#: includes/Shortcodes/Bookings.php:274, includes/Shortcodes/Bookings.php:265, includes/Shortcodes/Shortcode-Rolf.php:363
 msgid "Seats available"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:256, includes/Shortcodes/Shortcode-Rolf.php:357
+#: includes/Shortcodes/Bookings.php:255, includes/Shortcodes/Shortcode-Rolf.php:357
 msgid "Not bookable (outside booking period)"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:346, includes/Shortcodes/Bookings.php:404, includes/Shortcodes/Shortcode-Rolf.php:433, includes/Shortcodes/Shortcode-Rolf.php:470
+#: includes/Shortcodes/Bookings.php:317
+msgid "More"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:345, includes/Shortcodes/Bookings.php:403, includes/Shortcodes/Shortcode-Rolf.php:433, includes/Shortcodes/Shortcode-Rolf.php:470
 msgid "Please select a date and a time slot."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:379, includes/Shortcodes/Shortcode-Rolf.php:454
+#: includes/Shortcodes/Bookings.php:378, includes/Shortcodes/Shortcode-Rolf.php:454
 msgid "No time slots available."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:408, includes/Shortcodes/Shortcode-Rolf.php:474
+#: includes/Shortcodes/Bookings.php:407, includes/Shortcodes/Shortcode-Rolf.php:474
 msgid "Available items:"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:440
+#: includes/Shortcodes/Bookings.php:439
 msgid "Open room info in new window."
 msgstr ""
 

@@ -18,16 +18,16 @@ class Bookings {
     public function onLoaded() {
         require_once(plugin_dir_path($this->pluginFile) . 'vendor/cmb2/init.php');
         add_action('init', [$this, 'booking_post_type'], 0);
-		add_action('cmb2_admin_init', [$this, 'booking_metaboxes']);
+	add_action('cmb2_admin_init', [$this, 'booking_metaboxes']);
         //add_filter( 'manage_edit-booking_columns', [$this, 'booking_filter_posts_columns'] );
         add_filter( 'manage_booking_posts_columns', [$this, 'booking_columns'] );
         add_action( 'manage_booking_posts_custom_column', [$this, 'booking_column'], 10, 2);
         add_filter( 'manage_edit-booking_sortable_columns', [$this, 'booking_sortable_columns']);
-	}
+    }
 
 	// Register Custom Post Type
-	public function booking_post_type() {
-		$labels = array(
+    public function booking_post_type() {
+	$labels = array(
 			'name'					=> _x( 'Bookings', 'Post type general name', 'rrze-rsvp' ),
 			'singular_name'			=> _x( 'Booking', 'Post type singular name', 'rrze-rsvp' ),
 			'menu_name'				=> _x( 'Bookings', 'Admin Menu text', 'rrze-rsvp' ),
@@ -82,91 +82,91 @@ class Bookings {
 	}
 
 	public function booking_metaboxes() {
-        $cmb = new_cmb2_box( array(
-            'id'            => 'rrze-rsvp-booking-details',
-            'title'         => __( 'Details', 'rrze-rsvp' ),
-            'object_types'  => array( 'booking', ), // Post type
-            'context'       => 'normal',
-            'priority'      => 'high',
-            'show_names'    => true, // Show field names on the left
-            // 'cmb_styles' => false, // false to disable the CMB stylesheet
-            // 'closed'     => true, // Keep the metabox closed by default
-        ) );
+	    $cmb = new_cmb2_box( array(
+		'id'            => 'rrze-rsvp-booking-details',
+		'title'         => __( 'Details', 'rrze-rsvp' ),
+		'object_types'  => array( 'booking', ), // Post type
+		'context'       => 'normal',
+		'priority'      => 'high',
+		'show_names'    => true, // Show field names on the left
+		// 'cmb_styles' => false, // false to disable the CMB stylesheet
+		// 'closed'     => true, // Keep the metabox closed by default
+	    ) );
 
-        $cmb->add_field( array(
-            'name'             => __('Date', 'rrze-rsvp'),
-            'id'               => 'rrze-rsvp-booking-date',
-            'type' => 'text_date_timestamp',
-             'date_format' => 'd.m.Y',
-        ) );
-        $cmb->add_field( array(
-            'name' => __( 'Start time', 'rrze-rsvp' ),
-            'id' => 'rrze-rsvp-booking-starttime',
-            'type' => 'text_time',
-            'time_format' => 'H:i',
-        ) );
+	    $cmb->add_field( array(
+		'name'             => __('Date', 'rrze-rsvp'),
+		'id'               => 'rrze-rsvp-booking-date',
+		'type' => 'text_date_timestamp',
+		 'date_format' => 'd.m.Y',
+	    ) );
+	    $cmb->add_field( array(
+		'name' => __( 'Start time', 'rrze-rsvp' ),
+		'id' => 'rrze-rsvp-booking-starttime',
+		'type' => 'text_time',
+		'time_format' => 'H:i',
+	    ) );
 
-        $cmb->add_field( array(
-            'name' => __( 'End time', 'rrze-rsvp' ),
-            'id' => 'rrze-rsvp-booking-endtime',
-            'type' => 'text_time',
-            'time_format' => 'H:i',
-        ) );
+	    $cmb->add_field( array(
+		'name' => __( 'End time', 'rrze-rsvp' ),
+		'id' => 'rrze-rsvp-booking-endtime',
+		'type' => 'text_time',
+		'time_format' => 'H:i',
+	    ) );
 
-        $cmb->add_field( array(
-            'name'             => __('Status', 'rrze-rsvp'),
-            'id'               => 'rrze-rsvp-booking-status',
-            'type'             => 'select',
-            'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
-            'default'          => 'custom',
-            'options'          => array(
-                'booked' => __( 'Booked', 'rrze-rsvp' ),
-                'confirmed'   => __( 'Confirmed', 'rrze-rsvp' ),
-                'cancelled'     => __( 'Cancelled', 'rrze-rsvp' ),
-            ),
-        ) );
+	    $cmb->add_field( array(
+		'name'             => __('Status', 'rrze-rsvp'),
+		'id'               => 'rrze-rsvp-booking-status',
+		'type'             => 'select',
+		'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
+		'default'          => 'custom',
+		'options'          => array(
+		    'booked' => __( 'Booked', 'rrze-rsvp' ),
+		    'confirmed'   => __( 'Confirmed', 'rrze-rsvp' ),
+		    'cancelled'     => __( 'Cancelled', 'rrze-rsvp' ),
+		),
+	    ) );
 
-        $cmb->add_field( array(
-            'name'             => __('Seat', 'rrze-rsvp'),
-            'id'               => 'rrze-rsvp-booking-seat',
-            'type'             => 'select',
-            'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
-            'default'          => 'custom',
-            'options_cb'       => [$this, 'post_select_options'],
-        ) );
+	    $cmb->add_field( array(
+		'name'             => __('Seat', 'rrze-rsvp'),
+		'id'               => 'rrze-rsvp-booking-seat',
+		'type'             => 'select',
+		'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
+		'default'          => 'custom',
+		'options_cb'       => [$this, 'post_select_options'],
+	    ) );
 
-        $cmb->add_field( array(
-            'name'    => __('Last name', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-guest-lastname',
-            'type'    => 'text',
-        ) );
+	    $cmb->add_field( array(
+		'name'    => __('Last name', 'rrze-rsvp'),
+		'id'      => 'rrze-rsvp-booking-guest-lastname',
+		'type'    => 'text',
+	    ) );
 
-        $cmb->add_field( array(
-            'name'    => __('First name', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-guest-firstname',
-            'type'    => 'text',
-        ) );
+	    $cmb->add_field( array(
+		'name'    => __('First name', 'rrze-rsvp'),
+		'id'      => 'rrze-rsvp-booking-guest-firstname',
+		'type'    => 'text',
+	    ) );
 
-        $cmb->add_field( array(
-            'name'    => __('Email', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-guest-email',
-            'type'    => 'text_email',
-        ) );
+	    $cmb->add_field( array(
+		'name'    => __('Email', 'rrze-rsvp'),
+		'id'      => 'rrze-rsvp-booking-guest-email',
+		'type'    => 'text_email',
+	    ) );
 
-        $cmb->add_field( array(
-            'name'    => __('Phone', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-guest-phone',
-            'type'    => 'text_medium',
-            'attributes' => array(
-                'type' => 'tel',
-            ),
-        ) );
+	    $cmb->add_field( array(
+		'name'    => __('Phone', 'rrze-rsvp'),
+		'id'      => 'rrze-rsvp-booking-guest-phone',
+		'type'    => 'text_medium',
+		'attributes' => array(
+		    'type' => 'tel',
+		),
+	    ) );
 
-        $cmb->add_field( array(
-            'name' => __('Notes', 'rrze-rsvp'),
-            'id' => 'rrze-rsvp-booking-notes',
-            'type' => 'textarea'
-        ) );
+	    $cmb->add_field( array(
+		'name' => __('Notes', 'rrze-rsvp'),
+		'id' => 'rrze-rsvp-booking-notes',
+		'type' => 'textarea'
+	    ) );
 	}
 
     public function post_select_options( $field ) {
@@ -248,7 +248,7 @@ class Bookings {
             $status = get_post_meta($post_id, 'rrze-rsvp-booking-status', true) ;
             echo $status . '<br />';
             //if ($status == 'booked') {
-                echo '<button class="button button-primary button-small">Confirm</button> <button class="button button-secondary button-small">Cancel</button>';
+                echo '<button class="button button-primary button-small">'.__('Confirm','rrze-rsvp').'</button> <button class="button button-secondary button-small">'.__('Cancel','rrze-rsvp').'</button>';
             //}
         }
     }

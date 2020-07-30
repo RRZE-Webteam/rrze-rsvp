@@ -59,8 +59,8 @@ class Rooms {
 			'hierarchical' 				=> false,
 			'public' 					=> true,
 			'show_ui' 					=> true,
-			'show_in_menu' 				=> true,
-			'show_in_nav_menus' 		=> true,
+			'show_in_menu' 				=>  'edit.php?post_type=bookins',
+			'show_in_nav_menus' 		=> false,
 			'show_in_admin_bar' 		=> true,
 			'menu_position' 			=> 5,
 			'menu_icon' 				=> 'dashicons-building',
@@ -162,7 +162,7 @@ class Rooms {
 
         $cmb_general->add_field( array(
             'name' => __( 'Available days in advance', 'rrze-rsvp' ),
-            'desc' => __( 'Number of days for which bookings are available in advance.', 'msft-newscenter' ),
+            'desc' => __( 'Number of days for which bookings are available in advance.', 'rrze-rsvp' ),
             'id'   => 'rrze-rsvp-room-days-in-advance',
             'type' => 'text',
             'attributes' => array(

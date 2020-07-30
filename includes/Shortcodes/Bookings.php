@@ -12,8 +12,7 @@ defined('ABSPATH') || exit;
 /**
  * Define Shortcode Bookings
  */
-class Booking extends Shortcodes
-{
+class Bookings extends Shortcodes {
     protected $pluginFile;
     private $settings = '';
     private $shortcodesettings = '';
@@ -164,7 +163,7 @@ class Booking extends Shortcodes
         $output .= '<div class="form-group"><label for="rrze_rsvp_user_phone">' . __('Phone Number', 'rrze-rsvp') . ' *</label>'
             . '<input type="tel" name="rrze_rsvp_user_phone" id="rrze_rsvp_user_phone" required aria-required="true">';
 
-        $output .= '<button type="submit" class="btn btn-primary">Submit</button>
+        $output .= '<button type="submit" class="btn btn-primary">'.__('Submit','rrze-rsvp').'</button>
                 </form>
             </div>';
 
@@ -315,7 +314,7 @@ class Booking extends Shortcodes
             $output .= '';
             $output .= '</div>';
         }
-        $output .= '<button class="show-more btn btn-default btn-block">&hellip;weitere anzeigen&hellip;</button>';
+        $output .= '<button class="show-more btn btn-default btn-block">&hellip;'.__('More','rrze-rsvp').'&hellip;</button>';
 
         return $output;
     }

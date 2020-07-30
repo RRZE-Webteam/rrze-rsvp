@@ -98,7 +98,7 @@ class Shortcodes {
         add_action( 'wp_ajax_UpdateForm', [$this, 'ajaxUpdateForm'] );
         add_action( 'wp_ajax_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );
 
-        $bookings_shortcode = new Booking($this->pluginFile,  $this->settings);
+        $bookings_shortcode = new Bookings($this->pluginFile,  $this->settings);
         $bookings_shortcode->onLoaded();
 
         $availability_shortcode = new Availability($this->pluginFile,  $this->settings);
