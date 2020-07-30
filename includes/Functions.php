@@ -168,6 +168,7 @@ class Functions
             'meta_value' => $room,
         ]);
         $seat_ids = [];
+        $seats_booked = [];
         foreach ($seats as $seat) {
             $seat_ids[] = $seat->ID;
             $bookings = get_posts([
@@ -216,6 +217,9 @@ class Functions
                     $key = array_search( $seat_booked, $room_availability[ $timestamp ] );
                     if ( $key !== false ) {
                         unset( $room_availability[ $timestamp ][ $key ] );
+                    }
+                    if ( empty($room_availability[ $timestamp ]) ) {
+                        unset( $room_availability[ $timestamp ] );
                     }
                 }
             }

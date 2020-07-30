@@ -2,9 +2,10 @@
 
 namespace RRZE\RSVP\Shortcodes;
 
+use RRZE\RSVP\Functions;
 use function RRZE\RSVP\Config\getShortcodeSettings;
 use function RRZE\RSVP\Config\getShortcodeDefaults;
-
+use function RRZE\RSVP\getSeatAvailability;
 
 
 defined('ABSPATH') || exit;
@@ -27,6 +28,9 @@ class Bookings extends Shortcodes {
     public function onLoaded()
     {
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
+        add_action( 'wp_ajax_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
+        add_action( 'wp_ajax_UpdateForm', [$this, 'ajaxUpdateForm'] );
+        add_action( 'wp_ajax_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
@@ -44,71 +48,6 @@ class Bookings extends Shortcodes {
         if (isset($post_room)) {
             $today = date('Y-m-d');
             $endday = date('Y-m-d', strtotime($today. ' + ' . $days . ' days'));
-
-            // Array aus verfügbaren Timeslots des Raumes erstellen
-            $timeslots = get_post_meta($room, 'rrze-rsvp-room-timeslots');
-            $timeslots = $timeslots[0];
-            foreach($timeslots as $timeslot) {
-                foreach ($timeslot['rrze-rsvp-room-weekday'] as $weekday) {
-                    $slots[$weekday][] = $timeslot['rrze-rsvp-room-starttime'];
-                }
-            }
-
-            // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
-            $seats = get_posts([
-                'post_type' => 'seat',
-                'post_status' => 'publish',
-                'nopaging' => true,
-                'meta_key' => 'rrze-rsvp-seat-room',
-                'meta_value' => $room,
-            ]);
-            $seat_ids = [];
-            foreach ($seats as $seat) {
-                $seat_ids[] = $seat->ID;
-                $bookings = get_posts([
-                    'post_type' => 'booking',
-                    'post_status' => 'publish',
-                    'nopaging' => true,
-                    'meta_query' => [
-                        [
-                            'key' => 'rrze-rsvp-booking-seat',
-                            'value'   => $seat->ID,
-                        ],
-                        [
-                            'key'     => 'rrze-rsvp-booking-date',
-                            'value' => array( strtotime($today), strtotime($endday) ),
-                            'compare' => 'BETWEEN',
-                            'type' => 'numeric'
-                        ],
-                    ],
-                    'meta_key' => 'rrze-rsvp-booking-seat',
-                    'meta_value' => $seat->ID,
-                ]);
-                foreach ($bookings as $booking) {
-                    $booking_meta = get_post_meta($booking->ID);
-                    $booking_date = $booking_meta['rrze-rsvp-booking-date'][0];
-                    $booking_time = $booking_meta['rrze-rsvp-booking-starttime'][0];
-                    //$seats_booked[$seat->ID][date('Y-m-d', $booking_date)] = $booking_time;
-                    $seats_booked[date('Y-m-d', $booking_date)][$booking_time][] = $seat->ID;
-                }
-            }
-            print "<pre>"; var_dump($seats_booked); print "</pre>";
-
-            // Tageweise durch den Zeitraum loopen, um die Verfügbarkeit je Wochentag zu ermitteln
-            $loopstart = strtotime($today);
-            $loopend = strtotime($endday);
-            while ($loopstart <= $loopend) {
-                $weekday = date('w', $loopstart) + 1;
-                foreach ($slots[$weekday] as $time) {
-                    //$this->availability[date('Y-m-d', $loopstart)] = $slots[$weekday];
-                    $this->availability[date('Y-m-d', $loopstart)][$time] = $seat_ids;
-                }
-                $loopstart = strtotime("+1 day", $loopstart);
-            }
-//print "<pre>"; var_dump($this->availability); print "</pre>";
-//$test = $this->array_multi_diff($seats_booked, $seats_booked);
-//print "<pre>"; var_dump($test); print "</pre>";
-
         }
 
         $output = '';
@@ -135,7 +74,7 @@ class Bookings extends Shortcodes {
                 . $dropdown . '</div>';
         } else {
             $output .= '<p><input type="hidden" value="'.$room.'" id="rsvp_room">'
-                . __('Book a seat in: ', 'rrze-rsvp') . '<strong>' . get_the_title($room) . '</strong>'
+                . __('Book a seat at: ', 'rrze-rsvp') . '<strong>' . get_the_title($room) . '</strong>'
                 . '</p>';
         }
 
@@ -147,7 +86,8 @@ class Bookings extends Shortcodes {
         $start = date_create();
         $end = date_create();
         date_modify($end, '+'.$days.' days');
-        $output .= $this->buildCalendar($month,$year, $start, $end, $room);
+//        $output .= $this->buildCalendar($month,$year, $start, $end, $room);
+        $output .= $this->buildCalendar('8',$year, $start, $end, $room);
 //        $output .= $this->buildDateBoxes($days);
         $output .= '</div>'; //.rsvp-date-container
 
@@ -209,6 +149,8 @@ class Bookings extends Shortcodes {
         $startDate = date_format($bookingDaysStart, 'Y-m-d');
         $link_next = '<a href="#" class="cal-skip cal-next" data-direction="next">&gt;&gt;</a>';
         $link_prev = '<a href="#" class="cal-skip cal-prev" data-direction="prev">&lt;&lt;</a>';
+        $availability = Functions::getSeatAvailability($room, $startDate, $endDate);
+
         // Create the table tag opener and day headers
         $calendar = '<table class="rsvp_calendar" data-period="'.date_i18n('Y-m', $firstDayOfMonth).'" data-end="'.$endDate.'">';
         $calendar .= "<caption>";
@@ -249,30 +191,23 @@ class Bookings extends Shortcodes {
             $class = '';
             $title = '';
             $active = true;
-            //var_dump($bookingDaysStart, $bookingDaysEnd);
             if ($currentDate < $bookingDaysStart || $currentDate > $bookingDaysEnd) {
                 $active = false;
                 $title = __('Not bookable (outside booking period)','rrze-rsvp');
             } else {
                 $active = false;
                 $class = 'soldout';
-                $title = __('Not bookable (soldout)','rrze-rsvp');
+                $title = __('Not bookable (soldout or room blocked)','rrze-rsvp');
                 if ($room == '') {
-                    foreach ($this->tmp_availability as $id => $service) {
-                        if (array_key_exists($date, $service['availablity'])) {
-                            $active = true;
-                            $class = 'available';
-                            $title = __('Seats available','rrze-rsvp');
-                            break;
-                        }
-                    }
+
                 } else {
-                    foreach ($this->tmp_availability as $id => $service) {
-                        if ($service['room'] == $room && array_key_exists($date, $service['availablity'])) {
-                            $active = true;
-                            $class = 'available';
-                            $title = __('Seats available','rrze-rsvp');
-                            break;
+                    if (isset($availability[$date])) {
+                        foreach ( $availability[ $date ] as $timeslot ) {
+                            if ( !empty( $timeslot ) ) {
+                                $active = true;
+                                $class = 'available';
+                                $title = __( 'Seats available', 'rrze-rsvp' );
+                            }
                         }
                     }
                 }
@@ -349,25 +284,9 @@ class Bookings extends Shortcodes {
         if ($date) {
             $slots = [];
             if ($room == '') {
-                foreach ($this->tmp_availability as $sid => $service) {
-                    if (array_key_exists($date, $service['availablity'])) {
-                        foreach ($service['availablity'][$date] as $slot) {
-                            if (!in_array($slot, $slots, true)) {
-                                array_push($slots, $slot);
-                            }
-                        }
-                    }
-                }
             } else {
-                foreach ($this->tmp_availability as $sid => $service) {
-                    if ($service['room'] == $room && array_key_exists($date, $service['availablity'])) {
-                        foreach ($service['availablity'][$date] as $slot) {
-                            if (!in_array($slot, $slots, true)) {
-                                array_push($slots, $slot);
-                            }
-                        }
-                    }
-                }
+                $availability = Functions::getSeatAvailability($room, $date, date('Y-m-d', strtotime($date. ' +1 days')));
+                $slots = array_keys($availability[$date]);
             }
             foreach ($slots as $slot) {
                 $id = 'rsvp_time_' . sanitize_title($slot);
@@ -451,25 +370,4 @@ class Bookings extends Shortcodes {
         echo $output;
         wp_die();
     }
-
-    /*public function array_multi_diff( $array1, $array2 ) {
-        $result = array();
-        foreach( $array1 as $key => $a1 ) {
-            if( !array_key_exists( $key, $array2 ) ) {
-                $result[ $key ] = $a1;
-                continue;
-            }
-            $a2 = $array2[ $key ];
-            if( is_array( $a1 ) ) {
-                $recc_array = $this->array_multi_diff( $a1, $a2 );
-                if( !empty( $recc_array ) ) {
-                    $result[ $key ] = $recc_array;
-                }
-            }
-            else if( $a1 != $a2 ) {
-                $result[ $key ] = $a1;
-            }
-        }
-        return $result;
-    }*/
 }

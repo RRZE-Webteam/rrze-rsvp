@@ -94,9 +94,6 @@ class Shortcodes {
 
     public function onLoaded() {
         add_action('wp_enqueue_scripts', [$this, 'enqueueScripts']);
-        add_action( 'wp_ajax_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
-        add_action( 'wp_ajax_UpdateForm', [$this, 'ajaxUpdateForm'] );
-        add_action( 'wp_ajax_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );
 
         $bookings_shortcode = new Bookings($this->pluginFile,  $this->settings);
         $bookings_shortcode->onLoaded();
