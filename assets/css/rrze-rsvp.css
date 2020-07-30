@@ -1,13 +1,13 @@
 /*
 RRZE RSVP Frontend CSS
 */
-.rsvp form {
+.rrze-rsvp form {
   position: relative; }
-  .rsvp form legend {
+  .rrze-rsvp form legend {
     padding-bottom: 5px;
     margin-bottom: 10px; }
 
-.rsvp #loading {
+.rrze-rsvp #loading {
   display: none;
   position: fixed;
   top: 0;
@@ -16,107 +16,107 @@ RRZE RSVP Frontend CSS
   bottom: 0;
   z-index: 1000;
   background: rgba(255, 255, 255, 0.7); }
-  .rsvp #loading .fa-spin {
+  .rrze-rsvp #loading .fa-spin {
     color: #036;
     position: relative;
     top: 50%;
     left: 50%; }
 
-.rsvp .rsvp-datetime-container {
+.rrze-rsvp .rsvp-datetime-container {
   margin-bottom: 1em; }
   @media (min-width: 480px) {
-    .rsvp .rsvp-datetime-container {
+    .rrze-rsvp .rsvp-datetime-container {
       display: flex;
       flex-wrap: wrap;
       justify-content: flex-start; } }
-  .rsvp .rsvp-datetime-container h3 {
+  .rrze-rsvp .rsvp-datetime-container h3 {
     flex-basis: 100%;
     flex-shrink: 0; }
 
 @media (min-width: 480px) {
-  .rsvp .rsvp-date-container {
+  .rrze-rsvp .rsvp-date-container {
     margin-right: 30px; } }
 
-.rsvp .rsvp-date-container .table-wrapper {
+.rrze-rsvp .rsvp-date-container .table-wrapper {
   border-right-color: transparent; }
 
-.rsvp .rsvp-datebox {
+.rrze-rsvp .rsvp-datebox {
   min-width: 100px;
   float: left;
   background: #e9edf2;
   font-size: .9em;
   margin: 5px;
   padding: 5px 7px; }
-  .rsvp .rsvp-datebox label {
+  .rrze-rsvp .rsvp-datebox label {
     min-width: 0;
     font-size: inherit;
     padding: 0;
     margin: 0; }
-    .rsvp .rsvp-datebox label.disabled {
+    .rrze-rsvp .rsvp-datebox label.disabled {
       opacity: 0.6;
       cursor: not-allowed; }
 
-.rsvp table.rsvp_calendar {
+.rrze-rsvp table.rsvp_calendar {
   width: auto;
   float: left;
   margin: 0; }
-  .rsvp table.rsvp_calendar .cal-next {
+  .rrze-rsvp table.rsvp_calendar .cal-next {
     display: inline-block;
     float: right; }
-  .rsvp table.rsvp_calendar .cal-prev {
+  .rrze-rsvp table.rsvp_calendar .cal-prev {
     display: inline-block;
     float: left; }
-  .rsvp table.rsvp_calendar th {
+  .rrze-rsvp table.rsvp_calendar th {
     padding: 5px 10px; }
-  .rsvp table.rsvp_calendar td {
+  .rrze-rsvp table.rsvp_calendar td {
     padding: 0;
     text-align: center; }
-    .rsvp table.rsvp_calendar td input {
+    .rrze-rsvp table.rsvp_calendar td input {
       position: absolute;
       left: -100vw; }
-    .rsvp table.rsvp_calendar td input:checked ~ label {
+    .rrze-rsvp table.rsvp_calendar td input:checked ~ label {
       background: #036;
       color: #fff; }
-    .rsvp table.rsvp_calendar td label {
+    .rrze-rsvp table.rsvp_calendar td label {
       display: block;
       min-width: 0;
       margin: 0;
       padding: 5px 10px;
       font-size: inherit;
       line-height: inherit; }
-      .rsvp table.rsvp_calendar td label:hover, .rsvp table.rsvp_calendar td label:focus, .rsvp table.rsvp_calendar td label:active {
+      .rrze-rsvp table.rsvp_calendar td label:hover, .rrze-rsvp table.rsvp_calendar td label:focus, .rrze-rsvp table.rsvp_calendar td label:active {
         background: #dfe6ec;
         color: #000; }
-    .rsvp table.rsvp_calendar td.day.current label {
+    .rrze-rsvp table.rsvp_calendar td.day.current label {
       /*background: #dfe6ec;*/
       font-weight: bold;
       border: 1px solid #666; }
-    .rsvp table.rsvp_calendar td.available label {
+    .rrze-rsvp table.rsvp_calendar td.available label {
       background: #dff0d8;
       color: #3c763d;
       font-weight: bold; }
-    .rsvp table.rsvp_calendar td.soldout span {
+    .rrze-rsvp table.rsvp_calendar td.soldout span {
       background: #f2dede;
       color: #a94442; }
-  .rsvp table.rsvp_calendar span.inactive {
+  .rrze-rsvp table.rsvp_calendar span.inactive {
     display: block;
     padding: 5px 10px;
     opacity: 0.4;
     cursor: not-allowed; }
 
-.rsvp .rsvp-time-select label {
+.rrze-rsvp .rsvp-time-select label {
   min-width: 0; }
 
-.rsvp .rsvp-service-select {
+.rrze-rsvp .rsvp-service-select {
   margin-bottom: 1em; }
   @media (min-width: 480px) {
-    .rsvp .rsvp-service-select {
+    .rrze-rsvp .rsvp-service-select {
       display: flex;
       flex-wrap: wrap; } }
-  .rsvp .rsvp-service-select label {
+  .rrze-rsvp .rsvp-service-select label {
     min-width: 0; }
 
-.rsvp .rsvp-item-info {
+.rrze-rsvp .rsvp-item-info {
   border: 1px solid #dde5f0;
   padding: 10px;
   margin-bottom: 1em; }

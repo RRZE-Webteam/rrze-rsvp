@@ -16,28 +16,29 @@ class Availability extends Shortcodes {
     protected $pluginFile;
     private $settings = '';
     private $shortcodesettings = '';
-    
+
     public function __construct($pluginFile, $settings) {
-	$this->pluginFile = $pluginFile;
-	$this->settings = $settings;	
-	$this->shortcodesettings = getShortcodeSettings();
+        $this->pluginFile = $pluginFile;
+        $this->settings = $settings;
+        $this->shortcodesettings = getShortcodeSettings();
     }
 
 
-    public function onLoaded() {	
+    public function onLoaded() {
 
-	add_shortcode('rsvp-booking', [$this, 'shortcodeOutput'], 10, 2);
+        add_shortcode('rsvp-availability', [$this, 'shortcodeAvailability'], 10, 2);
 
     }
-   
-  
-   public function shortcodeAvailability($shortcode_atts) {
+
+
+    public function shortcodeAvailability($atts, $content = '', $tag) {
+        $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
         $output = '';
         $days = sanitize_text_field($shortcode_atts['days']); // kann today, tomorrow oder eine Zahl sein (kommende X Tage)
-        $seats = explode(',', sanitize_text_field($shortcode_atts['seat']));
+        $seats = isset($shortcode_atts['seat']) ? explode(',', sanitize_text_field($shortcode_atts['seat'])) : [];
         $seats = array_map('trim', $seats);
         $seats = array_map('sanitize_title', $seats);
-        $services = explode(',', sanitize_text_field($shortcode_atts['service']));
+        $services = isset($shortcode_atts['service']) ? explode(',', sanitize_text_field($shortcode_atts['service'])) : [];
         $services = array_map('trim', $services);
         $services = array_map('sanitize_title', $services);
 //var_dump($seats, $services);
@@ -49,6 +50,5 @@ class Availability extends Shortcodes {
         return $output;
     }
 
-   
-}
 
+}

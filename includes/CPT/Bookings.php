@@ -96,7 +96,7 @@ class Bookings {
         $cmb->add_field( array(
             'name'             => __('Date', 'rrze-rsvp'),
             'id'               => 'rrze-rsvp-booking-date',
-            'type' => 'text_date',
+            'type' => 'text_date_timestamp',
              'date_format' => 'd.m.Y',
         ) );
         $cmb->add_field( array(

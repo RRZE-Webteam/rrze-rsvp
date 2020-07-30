@@ -36,7 +36,7 @@ function cssdev() {
 }
 
 function js() {
-    return src('./src/js/*.js')
+    return src(['./src/js/*.js','!./src/js/**/*.min.js'])
 	.pipe(babel({
             presets: ['@babel/env']
 	}))
@@ -65,7 +65,7 @@ function prereleasePackageVersion() {
 };
 
 function updatepot()  {
-  return src("**/*.php")
+  return src(['**/*.php', '!vendor/**/*.php'])
   .pipe(
       wpPot({
         domain: info.textdomain,
