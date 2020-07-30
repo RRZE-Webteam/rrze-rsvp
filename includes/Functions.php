@@ -148,4 +148,84 @@ class Functions
         $hash = password_hash($bookingDate, PASSWORD_DEFAULT);
         return get_site_url() . "/?rrze-rsvp-booking-reply=" . $hash . "&id=" . $id . "&action=" . $action;
     }
+
+    public static function getSeatAvailability ($room, $start, $end) {
+        // Array aus verfügbaren Timeslots des Raumes erstellen
+        $timeslots = get_post_meta($room, 'rrze-rsvp-room-timeslots');
+        $timeslots = $timeslots[0];
+        foreach($timeslots as $timeslot) {
+            foreach ($timeslot['rrze-rsvp-room-weekday'] as $weekday) {
+                $slots[$weekday][] = $timeslot['rrze-rsvp-room-starttime'];
+            }
+        }
+
+        // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
+        $seats = get_posts([
+            'post_type' => 'seat',
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'meta_key' => 'rrze-rsvp-seat-room',
+            'meta_value' => $room,
+        ]);
+        $seat_ids = [];
+        foreach ($seats as $seat) {
+            $seat_ids[] = $seat->ID;
+            $bookings = get_posts([
+                'post_type' => 'booking',
+                'post_status' => 'publish',
+                'nopaging' => true,
+                'meta_query' => [
+                    [
+                        'key' => 'rrze-rsvp-booking-seat',
+                        'value'   => $seat->ID,
+                    ],
+                    [
+                        'key'     => 'rrze-rsvp-booking-start',
+                        'value' => array( strtotime($start), strtotime($end) ),
+                        'compare' => 'BETWEEN',
+                        'type' => 'numeric'
+                    ],
+                ],
+            ]);
+            foreach ($bookings as $booking) {
+                $booking_meta = get_post_meta($booking->ID);
+                $booking_start = $booking_meta['rrze-rsvp-booking-start'][0];
+                //$seats_booked[$seat->ID][date('Y-m-d', $booking_date)] = $booking_time;
+                $seats_booked[$booking_start][] = $seat->ID;
+            }
+        }
+
+        // Tageweise durch den Zeitraum loopen, um die Verfügbarkeit je Wochentag zu ermitteln
+        $loopstart = strtotime($start);
+        $loopend = strtotime($end);
+        while ($loopstart <= $loopend) {
+            $weekday = date('w', $loopstart);
+            if (isset($slots[$weekday])) {
+                foreach ( $slots[ $weekday ] as $time ) {
+                    $hours = explode( ':', $time )[ 0 ];
+                    $room_availability[ strtotime( '+' . $hours . ' hours', $loopstart ) ] = $seat_ids;
+                }
+            }
+            $loopstart = strtotime("+1 day", $loopstart);
+        }
+
+        // Bereits gebuchte Plätze aus Array $room_availability entfernen
+        foreach ($seats_booked as $timestamp => $v) {
+            foreach ( $v as $k => $seat_booked ) {
+                if (isset($room_availability[ $timestamp ])) {
+                    $key = array_search( $seat_booked, $room_availability[ $timestamp ] );
+                    if ( $key !== false ) {
+                        unset( $room_availability[ $timestamp ][ $key ] );
+                    }
+                }
+            }
+        }
+
+        // Für Kalender aus Array-Ebene Timestamp zwei Ebenen (Tag / Zeit) machen
+        foreach ($room_availability as $timestamp => $v) {
+            $availability[date('Y-m-d', $timestamp)][date('H:i', $timestamp)] = $v;
+        }
+
+        return $availability;
+    }
 }
