@@ -10,9 +10,11 @@ class Email
 
     protected $template;
 
-    public function __construct()
-    {
-        $this->options = Options::getOptions();
+    public function __construct($pluginFile, $settings) {
+	    $this->pluginFile = $pluginFile;
+	    $this->settings = $settings;
+	    
+        $this->options = $settings->options;
         $this->template = new Template();
     }
 

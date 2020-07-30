@@ -8,7 +8,6 @@ use RRZE\RSVP\CPT\CPT;
 
 // use RRZE\RSVP\Exceptions\Main as Exceptions;
 use RRZE\RSVP\Settings;
-use RRZE\RSVP\EmailSettings\EmailSettings;
 use RRZE\RSVP\Shortcodes\Shortcodes;
 
 /**
@@ -42,8 +41,8 @@ class Main{
 	    $cpt = new CPT($this->pluginFile, $settings);
 	    $cpt->onLoaded();
 	
-		$actions = new Actions;
-		$actions->onLoaded();
+	    $actions = new Actions($this->pluginFile, $settings);
+	    $actions->onLoaded();
 
 /*
  * Erstmal noch nicht, werden umbenannt in Blocking Time:

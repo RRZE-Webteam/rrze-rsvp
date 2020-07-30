@@ -10,9 +10,10 @@ class Actions
 {
 	protected $email;
 
-	public function __construct()
-	{
-		$this->email = new Email;
+	public function __construct($pluginFile, $settings) {
+	    $this->pluginFile = $pluginFile;
+	    $this->settings = $settings;
+	    $this->email = new Email($pluginFile,$settings);
 	}
 
 	public function onLoaded()

@@ -132,13 +132,13 @@ function getHelpTab()
 function getSections()
 {
     return [
-        [
+/*       [
             'id'    => 'basic',
             'title' => __('Basic Settings', 'rrze-rsvp')
-        ],
+        ], */
         [
-            'id'    => 'advanced',
-            'title' => __('Advanced Settings', 'rrze-rsvp')
+            'id'    => 'email',
+            'title' => __('E-Mail Settings', 'rrze-rsvp')
         ]
     ];
 }
@@ -147,10 +147,11 @@ function getSections()
  * Gibt die Einstellungen der Optionsfelder zurück.
  * @return array [description]
  */
-function getFields()
-{
+function getFields(){
+    $defaults = defaultOptions(); 
+    
     return [
-        'basic' => [
+/*	'basic' => [
             [
                 'name'              => 'text_input',
                 'label'             => __('Text Input', 'rrze-rsvp'),
@@ -223,38 +224,98 @@ function getFields()
                 ]
             ]
         ],
-        'advanced' => [
+ */
+        'email' => [
             [
-                'name'    => 'color',
-                'label'   => __('Color', 'rrze-rsvp'),
-                'desc'    => __('Color description.', 'rrze-rsvp'),
-                'type'    => 'color',
-                'default' => ''
+                'name'    => 'notification_email',
+                'label'   => __('Notification email', 'rrze-rsvp'),
+                'desc'    => __('Email address for notifications.', 'rrze-rsvp'),
+                'type'    => 'email',
+                'default' => $defaults['notification_email'],
+		'sanitize_callback' => 'sanitize_email'
             ],
             [
-                'name'    => 'password',
-                'label'   => __('Password', 'rrze-rsvp'),
-                'desc'    => __('Password description.', 'rrze-rsvp'),
-                'type'    => 'password',
-                'default' => ''
-            ],
-            [
-                'name'    => 'wysiwyg',
-                'label'   => __('Advanced Editor', 'rrze-rsvp'),
-                'desc'    => __('Advanced Editor description.', 'rrze-rsvp'),
-                'type'    => 'wysiwyg',
-                'default' => ''
-            ],
-            [
-                'name'    => 'file',
-                'label'   => __('File', 'rrze-rsvp'),
-                'desc'    => __('File description.', 'rrze-rsvp'),
-                'type'    => 'file',
-                'default' => '',
+                'name'    => 'notification_if_new',
+                'label'   => __('Booking Notification', 'rrze-rsvp'),
+                'desc'    => __('New booking notification.', 'rrze-rsvp'),
+                'type'    => 'radio',
                 'options' => [
-                    'button_label' => __('Choose an Image', 'rrze-rsvp')
-                ]
+                    'yes' => __('Yes', 'rrze-rsvp'),
+                    'no'  => __('No', 'rrze-rsvp')
+                ],
+		'default'   => $defaults['notification_if_new'],
+            ],
+	    [
+                'name'    => 'notification_if_cancel',
+                'label'   => __('Cancel Notification', 'rrze-rsvp'),
+                'desc'    => __('Notification of booking cancellation.', 'rrze-rsvp'),
+                'type'    => 'radio',
+                'options' => [
+                    'yes' => __('Yes', 'rrze-rsvp'),
+                    'no'  => __('No', 'rrze-rsvp')
+                ],
+		'default'   => $defaults['notification_if_cancel'],
+            ],
+	    [
+                'name'              => 'sender_name',
+                'label'             => __('Sender name', 'rrze-rsvp'),
+                'desc'              => __('Name for Sender for the booking system.', 'rrze-rsvp'),
+                'placeholder'       => __('Sender name', 'rrze-rsvp'),
+                'type'              => 'text',
+                'default'           =>  $defaults['sender_name'],
+                'sanitize_callback' => 'sanitize_text_field'
+            ],
+	    [
+                'name'    => 'sender_email',
+                'label'   => __('Sender email', 'rrze-rsvp'),
+                'desc'    => __('Email address of sender.', 'rrze-rsvp'),
+                'type'    => 'email',
+                'default' =>  $defaults['sender_email'],
+		'sanitize_callback' => 'sanitize_email'
+            ],
+	     [
+                'name'              => 'received_subject',
+                'label'             => __('Subject', 'rrze-rsvp'),
+                'desc'              => __('Subject for mails', 'rrze-rsvp'),
+                'type'              => 'text',
+                'default'           =>  $defaults['received_subject'],
+                'sanitize_callback' => 'sanitize_text_field'
+            ],
+	     [
+                'name'              => 'received_text',
+                'label'             => __('Text', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           => $defaults['received_text'],
+            ],
+	      [
+                'name'              => 'confirm_subject',
+                'label'             => __('Subject Confirmation', 'rrze-rsvp'),
+                'desc'              => __('Subject for confirmation mails', 'rrze-rsvp'),
+                'type'              => 'text',
+                'default'           => $defaults['confirm_subject'],
+                'sanitize_callback' => 'sanitize_text_field'
+            ],
+	     [
+                'name'              => 'confirm_text',
+                'label'             => __('Confirmation Text', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           => $defaults['confirm_text'],
+            ],
+	        [
+                'name'              => 'cancel_subject',
+                'label'             => __('Subject Canceling', 'rrze-rsvp'),
+                'desc'              => __('Subject for canceling mails', 'rrze-rsvp'),
+                'type'              => 'text',
+                'default'           =>  $defaults['cancel_subject'],
+                'sanitize_callback' => 'sanitize_text_field'
+            ],
+	     [
+                'name'              => 'cancel_text',
+                'label'             => __('Cancel Text', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           => $defaults['cancel_text'],
             ]
+           
         ]
     ];
 }

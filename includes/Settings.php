@@ -31,7 +31,7 @@ class Settings
      * Einstellungsoptionen
      * @var array
      */
-    protected $options;
+    public $options;
 
     /**
      * Settings-Menü
@@ -438,7 +438,7 @@ class Settings
      */
     public function adminEnqueueScripts()
     {
-        wp_register_script('wp-color-picker-settings', plugins_url('assets/js/wp-color-picker.js', plugin_basename($this->pluginFile)));
+//        wp_register_script('wp-color-picker-settings', plugins_url('assets/js/wp-color-picker.js', plugin_basename($this->pluginFile)));
         wp_register_script('wp-media-settings', plugins_url('assets/js/wp-media.js', plugin_basename($this->pluginFile)));
     }
 
@@ -448,9 +448,9 @@ class Settings
      */
     public function colorEnqueueScripts()
     {
-        wp_enqueue_style('wp-color-picker');
-        wp_enqueue_script('wp-color-picker');
-        wp_enqueue_script('wp-color-picker-settings');
+    //    wp_enqueue_style('wp-color-picker');
+    //    wp_enqueue_script('wp-color-picker');
+    //    wp_enqueue_script('wp-color-picker-settings');
         wp_enqueue_script('jquery');
     }
 
@@ -489,6 +489,33 @@ class Settings
         $value = esc_attr($this->getOption($args['section'], $args['id'], $args['default']));
         $size = isset($args['size']) && !is_null($args['size']) ? $args['size'] : 'regular';
         $type = isset($args['type']) ? $args['type'] : 'text';
+        $placeholder = empty($args['placeholder']) ? '' : ' placeholder="' . $args['placeholder'] . '"';
+
+        $html = sprintf(
+            '<input type="%1$s" class="%2$s-text" id="%4$s-%5$s" name="%3$s[%4$s_%5$s]" value="%6$s"%7$s>',
+            $type,
+            $size,
+            $this->optionName,
+            $args['section'],
+            $args['id'],
+            $value,
+            $placeholder
+        );
+        $html .= $this->getFieldDescription($args);
+
+        echo $html;
+    }
+    
+ /**
+     * Zeigt ein Textfeld für EMailaddressen für ein Einstellungsfeld an.
+     * @param array   $args Argumente des Einstellungsfelds
+     */
+    
+    public function callbackEMail($args)
+    {
+        $value = esc_attr($this->getOption($args['section'], $args['id'], $args['default']));
+        $size = isset($args['size']) && !is_null($args['size']) ? $args['size'] : 'regular';
+        $type = isset($args['type']) ? $args['type'] : 'email';
         $placeholder = empty($args['placeholder']) ? '' : ' placeholder="' . $args['placeholder'] . '"';
 
         $html = sprintf(
