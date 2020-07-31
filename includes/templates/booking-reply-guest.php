@@ -4,6 +4,7 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
+use RRZE\RSVP\Email;
 use RRZE\RSVP\Functions;
 
 $email = new Email;
@@ -18,14 +19,14 @@ if (!$bookingData || !password_verify($bookingData['booking_date'], $_GET['rrze-
 	exit;
 }
 
-$bookingCanceled = ($bookingData['status'] === 'canceled');
+$bookingCancelled = ($bookingData['status'] === 'cancelled');
 
 $replyUrl = Functions::bookingReplyUrl($action, $bookingData['date'], $bookingId);
 
-if (!$bookingCanceled && $action == 'cancel') {
-	update_post_meta($bookingId, 'rrze_rsvp_status', 'canceled');
-	$email->bookingCanceled($bookingId);
-	$bookingCanceled = true;
+if (!$bookingCancelled && $action == 'cancel') {
+	update_post_meta($bookingId, 'rrze_rsvp_status', 'cancelled');
+	$email->bookingCancelled($bookingId);
+	$bookingCancelled = true;
 }
 
 get_header();
@@ -35,11 +36,11 @@ get_header();
 	<div class="container">
 		<h1><?php _e('Booking', 'rrze-rsvp'); ?></h1>
 
-		<?php if (!$bookingCanceled) { ?>
+		<?php if (!$bookingCancelled) { ?>
 
 			<p><?php _e('Do you really want to cancel your booking?', 'rrze-rsvp'); ?></p>
 
-			<p class="date <?php if ($_GET['action'] == "cancel") echo 'canceled'; ?>">
+			<p class="date <?php if ($_GET['action'] == "cancel") echo 'cancelled'; ?>">
 				<?php echo ($bookingData['serviceName']) ? $bookingData['serviceName'] . '<br>' : ''; ?>
 				<?php echo $bookingData['date']; ?><br />
 				<?php echo $bookingData['time']; ?>
