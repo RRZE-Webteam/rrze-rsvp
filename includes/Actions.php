@@ -29,10 +29,10 @@ class Actions
 
 		if ($type == 'confirm') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
-			$this->email->bookingConfirmed($bookingId);
+			$this->email->bookingConfirmedCustomer($bookingId);
 		} else if ($type == 'cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
-			$this->email->bookingCancelled($bookingId);
+			$this->email->bookingCancelledCustomer($bookingId);
 		}
 
 		echo json_encode([
@@ -71,9 +71,9 @@ class Actions
 		if ($hash !== false && $bookingId !== false && $action !== false) {
 			$booking = Functions::getBooking($bookingId);
 			
-			if ($action == 'confirm' && $booking && password_verify($booking['booking_date'] . '_guest', $hash)) {				
+			if ($action == 'cancel' && $booking && password_verify($booking['booking_date'] . '-customer', $hash)) {				
 				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
-				$template = $this->loadBookingReplyTemplate('booking-reply-guest', true);
+				$template = $this->loadBookingReplyTemplate('booking-reply-customer', true);
 				return $template;
 			} elseif (($action == 'confirm' || $action == 'cancel') && $booking && password_verify($booking['booking_date'], $hash)) {
 				if (isset($_GET['ics'])) {
