@@ -83,6 +83,14 @@ class Settings
     {
         $this->pluginFile = $pluginFile;
         $this->settingsPrefix = dirname(plugin_basename($this->pluginFile)) . '-';
+
+        $this->setMenu();
+        $this->setSections();
+        $this->setFields();
+        $this->setTabs();
+
+        $this->optionName = getOptionName();
+        $this->options = $this->getOptions();
     }
 
     /**
@@ -91,14 +99,6 @@ class Settings
      */
     public function onLoaded()
     {
-        $this->setMenu();
-        $this->setSections();
-        $this->setFields();
-        $this->setTabs();
-
-        $this->optionName = getOptionName();
-        $this->options = $this->getOptions();
-
         add_action('admin_init', [$this, 'adminInit']);
         add_action('admin_menu', [$this, 'adminMenu']);
         add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
