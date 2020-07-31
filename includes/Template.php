@@ -51,7 +51,7 @@ class Template
      */
     protected function getTemplate($template)
     {
-        $templateFile = sprintf('%1$stemplates' . DIRECTORY_SEPARATOR . '%2$s.html', plugin()->getDirectory(), $template);
+        $templateFile = sprintf('%1$sincludes%3$stemplates%3$s%2$s.html', plugin()->getDirectory(), $template, DIRECTORY_SEPARATOR);
         return is_readable($templateFile) ? $templateFile : '';
     }
 }
