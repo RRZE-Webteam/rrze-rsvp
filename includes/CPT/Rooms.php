@@ -6,6 +6,8 @@
 
 namespace RRZE\RSVP\CPT;
 
+use RRZE\RSVP\Helper;
+
 class Rooms {
 
 	protected $options;
@@ -206,10 +208,6 @@ class Rooms {
     }
 
     public function include_single_template() {
-        if (Helper::isFauTheme()) {
-            return dirname($this->pluginFile) . '/includes/templates/single-room-fau-theme.php';
-        } else {
-            return dirname($this->pluginFile) . '/includes/templates/single-room.php';
-        }
+        return dirname($this->pluginFile) . '/includes/templates/single-room.php';
     }
 }

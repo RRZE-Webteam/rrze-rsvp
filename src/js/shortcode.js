@@ -21,7 +21,6 @@ jQuery(document).ready(function($){
             action: "ShowItemInfo",            //action
             id: id,
         }, function(result) {                 //callback
-            //console.log(result);
             $('div.rsvp-service-select').after(result);
         });
     });
