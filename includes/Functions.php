@@ -107,7 +107,10 @@ class Functions
         $data['booking_date'] = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
 
         $data['seat'] = get_post_meta($post->ID, 'rrze-rsvp-booking-seat', true);
+        $data['seat_name'] = ! empty($data['seat']) ? get_the_title($data['seat']) : '';
+
         $data['room'] = get_post_meta($data['seat'], 'rrze-rsvp-seat-room', true);
+        $data['room_name'] = get_the_title($data['room']);
 
         $data['notes'] = get_post_meta($post->ID, 'rrze-rsvp-booking-notes', true);
 
@@ -131,9 +134,9 @@ class Functions
         return $output;
     }
 
-    public static function bookingReplyUrl(string $action, string $bookingDate, int $id): string
+    public static function bookingReplyUrl(string $action, string $password, int $id): string
     {
-        $hash = password_hash($bookingDate, PASSWORD_DEFAULT);
+        $hash = password_hash($password, PASSWORD_DEFAULT);
         return get_site_url() . "/?rrze-rsvp-booking-reply=" . $hash . "&id=" . $id . "&action=" . $action;
     }
 
