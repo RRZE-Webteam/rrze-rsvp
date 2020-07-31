@@ -14,7 +14,7 @@ $hash = isset($_GET['rrze-rsvp-booking-reply']) ? sanitize_text_field($_GET['rrz
 
 $booking = Functions::getBooking($bookingId);
 
-if (!$booking || ! password_verify($booking['booking_date'] . '_guest', $hash)) {
+if (!$booking || ! password_verify($booking['booking_date'] . '-customer', $hash)) {
 	header('HTTP/1.0 403 Forbidden');
 	wp_redirect(get_site_url());
 	exit;
@@ -22,11 +22,11 @@ if (!$booking || ! password_verify($booking['booking_date'] . '_guest', $hash)) 
 
 $bookingCancelled = ($booking['status'] === 'cancelled');
 
-$replyUrl = Functions::bookingReplyUrl($action, $booking['booking_date'] . '_guest', $bookingId);
+$replyUrl = Functions::bookingReplyUrl($action, $booking['booking_date'] . '-customer', $bookingId);
 
 if (! $bookingCancelled && $action == 'cancel') {
 	update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
-	$email->bookingCancelled($bookingId);
+	$email->bookingCancelledCustomer($bookingId);
 	$bookingCancelled = true;
 }
 
