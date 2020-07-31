@@ -13,38 +13,35 @@ use RRZE\RSVP\Shortcodes\Shortcodes;
 /**
  * [Main description]
  */
-class Main{
-    
-    protected $pluginFile;
-    private $settings = '';
+class Main
+{
+
+	protected $pluginFile;
+	private $settings = '';
 
 
 	/**
 	 * [__construct description]
 	 */
-	public function __construct($pluginFile)	{
-
-	     $this->pluginFile = $pluginFile;
-	    add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
-		add_action('rest_api_init', function () {
-			//$api = new API;
-			//$api->register_routes();
-		});
+	public function __construct($pluginFile)
+	{
+		$this->pluginFile = $pluginFile;
 	}
 
-	public function onLoaded() {
-	    
-	    $settings = new Settings($this->pluginFile);
-	    $settings->onLoaded();
-	
-	    	// Posttypes 
-	    $cpt = new CPT($this->pluginFile, $settings);
-	    $cpt->onLoaded();
-	
-	    $actions = new Actions($this->pluginFile, $settings);
-	    $actions->onLoaded();
+	public function onLoaded()
+	{
 
-/*
+		$settings = new Settings($this->pluginFile);
+		$settings->onLoaded();
+
+		// Posttypes 
+		$cpt = new CPT($this->pluginFile, $settings);
+		$cpt->onLoaded();
+
+		$actions = new Actions;
+		$actions->onLoaded();
+
+		/*
  * Erstmal noch nicht, werden umbenannt in Blocking Time:
  
 		$exceptions = new Exceptions;
@@ -54,40 +51,43 @@ class Main{
 
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();
-	
+
+		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
+
+		add_action('rest_api_init', function () {
+			//$api = new API;
+			//$api->register_routes();
+		});		
 	}
 
 	public function adminEnqueueScripts($hook)
 	{
-		if (strpos($hook, 'rrze-rsvp') === false) {
+		global $post_type;
+
+		if ($hook != 'edit.php' || !in_array($post_type, ['booking', 'room', 'seat'])) {
 			return;
 		}
-		    
+
 		wp_enqueue_script(
 			'rrze-rsvp-admin',
-			plugins_url('assets/js/admin.js', plugin()->getBasename()),
+			plugins_url('assets/js/rrze-rsvp-admin.js', plugin()->getBasename()),
 			['jquery'],
 			plugin()->getVersion()
 		);
-		$nonce = wp_create_nonce('rrze-rsvp-ajax-nonce');
+
 		wp_localize_script('rrze-rsvp-admin', 'rrze_rsvp_admin', array(
 			'dateformat' => get_option('date_format'),
 			'text_cancel' => __('Do you want to cancel?', 'rrze-rsvp'),
-			'text_cancelled' => __('Canceled', 'rrze-rsvp'),
+			'text_cancelled' => __('Cancelled', 'rrze-rsvp'),
 			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
 			'ajaxurl' => admin_url('admin-ajax.php')
 		));
 
 		wp_enqueue_style(
-			'jquery-ui-css',
-			plugins_url('assets/css/jquery-ui-min.css', plugin()->getBasename())
-		);
-		wp_enqueue_style(
 			'rrze-rsvp-admin',
-			plugins_url('assets/css/admin.css', plugin()->getBasename()),
+			plugins_url('assets/css/rrze-rsvp-admin.css', plugin()->getBasename()),
 			[],
 			plugin()->getVersion()
 		);
 	}
-
 }

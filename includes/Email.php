@@ -10,12 +10,10 @@ class Email
 
     protected $template;
 
-    public function __construct($pluginFile, $settings) {
-	    $this->pluginFile = $pluginFile;
-	    $this->settings = $settings;
-	    
-        $this->options = $settings->options;
-        $this->template = new Template();
+    public function __construct() {
+        $settings = new Settings(plugin()->getFile());
+        $this->options = (object) $settings->getOptions();
+        $this->template = new Template;
     }
 
     public function send(string $to, string $subject, string $message)
@@ -146,12 +144,12 @@ class Email
         $cancelUrl = '';
         $bookingData['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl) . '</p>';
 
-        $message = $this->template->getContent('email-canceled', $bookingData);
+        $message = $this->template->getContent('email-cancelled', $bookingData);
 
         $this->send($bookingData['field_email'], $subject, $message);
     }
 
-    public function bookingCanceled(int $bookingId)
+    public function bookingCancelled(int $bookingId)
     {
         $bookingData = Functions::getBooking($bookingId);
         if (empty($bookingData)) {
