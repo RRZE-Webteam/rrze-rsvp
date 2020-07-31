@@ -6,6 +6,11 @@
 
 namespace RRZE\RSVP\CPT;
 
+defined('ABSPATH') || exit;
+
+use RRZE\RSVP\Functions;
+use Carbon\Carbon;
+
 class Bookings {
 
 	protected $options;
@@ -230,37 +235,92 @@ class Bookings {
     }
 
     function booking_column($column, $post_id) {
-        $seat = get_post_meta($post_id, 'rrze-rsvp-booking-seat', true) ;
-        $room = get_post_meta($seat, 'rrze-rsvp-seat-room', true) ;
-        $start = get_post_meta($post_id, 'rrze-rsvp-booking-start', true) ;
-        $end = get_post_meta($post_id, 'rrze-rsvp-booking-end', true) ;
+        $booking = Functions::getBooking($post_id);
+        $date = date_i18n(get_option('date_format'), $booking['start']);
+        $time = date_i18n(get_option('time_format'), $booking['start']) . ' - ' . date_i18n(get_option('time_format'), $booking['end']);
+
         if ('bookingdate' === $column) {
-            echo date('d.m.Y', $start);
+            echo $date;
         }
         if ( 'time' === $column ) {
-            echo date('H:i', $start) . ' - ' . date('H:i', $end);
+            echo $time;
         }
         if ( 'room' === $column ) {
-            echo get_the_title($room);
+            echo get_the_title($booking['room']);
         }
         if ( 'seat' === $column ) {
-            echo get_the_title($seat);
+            echo get_the_title($booking['seat']);
         }
         if ('name' === $column) {
-            echo get_post_meta($post_id, 'rrze-rsvp-booking-guest-firstname', true) . ' ' . get_post_meta($post_id, 'rrze-rsvp-booking-guest-lastname', true);
+            echo $booking['guest_firstname'] . ' ' . $booking['guest_lastname'];
         }
         if ('email' === $column) {
-            echo get_post_meta($post_id, 'rrze-rsvp-booking-guest-email', true) ;
+            echo $booking['guest_email'];
         }
         if ('phone' === $column) {
-            echo get_post_meta($post_id, 'rrze-rsvp-booking-guest-phone', true) ;
+            echo $booking['guest_phone'];
         }
         if ('status' === $column) {
-            $status = get_post_meta($post_id, 'rrze-rsvp-booking-status', true) ;
-            echo $status . '<br />';
-            //if ($status == 'booked') {
-                echo '<button class="button button-primary button-small">'.__('Confirm','rrze-rsvp').'</button> <button class="button button-secondary button-small">'.__('Cancel','rrze-rsvp').'</button>';
-            //}
+            $status = $booking['status'];
+            $start = $booking['start'];
+            $bookingDate = '<span class="booking_date">' . __('Booked on', 'rrze-rsvp') . ' ' . $booking['booking_date'] . '</span>';
+            $archive = ($status == 'cancelled') || ($start < current_time('timestamp'));       
+            $_wpnonce = wp_create_nonce('status');
+
+            if ($archive) {
+                $start = new Carbon(date('Y-m-d H:i:s', $booking['start']));
+                if ($booking['status'] == 'cancelled' && $start->endOfDay()->gt(new Carbon('now'))) {
+                    $cancelledButton = '<button class="button rrzs-rsvp-cancel" disabled>' . __('Cancelled', 'rrze-rsvp') . '</button>';
+                    $restoreButton = sprintf(
+                        '<a href="edit.php?post_type=%1$s&action=restore&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>', 
+                        'booking',
+                        $booking['id'],
+                        $_wpnonce,
+                        __('Restore', 'rrze-rsvp')
+                    );
+                    $button = $cancelledButton . $restoreButton;
+                } else {
+                    switch ($booking['status']) {
+                        case 'cancelled':
+                            $button = __('Cancelled', 'rrze-rsvp');
+                            break;
+                        case 'booked':
+                            $button = __('Booked', 'rrze-rsvp');
+                            break;
+                        case 'confirmed':
+                            $button = __('Confirmed', 'rrze-rsvp');
+                            break;
+                    }
+                    $button = sprintf(
+                        '<a href="edit.php?post_type=%1$s&action=delete&id=%2$d&_wpnonce=%3$s" class="delete">%4$s</a>', 
+                        'booking',
+                        $booking['id'],
+                        $_wpnonce,
+                        __('Delete', 'rrze-rsvp')
+                    );						
+                }
+                echo $button . $bookingDate;
+            } else {
+                $cancelButton = sprintf(
+                    '<a href="edit.php?post_type=%1$s&action=cancel&id=%2$d&_wpnonce=%3$s" class="button rrze-rsvp-cancel" data-id="%2$d">%4$s</a>', 
+                    'booking',
+                    $booking['id'],
+                    $_wpnonce,
+                    __('Cancel', 'rrze-rsvp')
+                );					
+                if ($booking['status'] == 'confirmed') {						
+                    $confirmButton = "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
+                } else {
+                    $confirmButton = sprintf(
+                        '<a href="edit.php?post_type=%1$s&action=confirm&id=%2$d&_wpnonce=%3$s" class="button button-primary rrze-rsvp-confirm" data-id="%2$d">%4$s</a>', 
+                        'booking',
+                        $booking['id'],
+                        $_wpnonce,
+                        __('Confirm', 'rrze-rsvp')
+                    );						
+                }
+                echo $cancelButton . $confirmButton . $bookingDate;
+            }
         }
     }
 

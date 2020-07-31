@@ -10,10 +10,9 @@ class Actions
 {
 	protected $email;
 
-	public function __construct($pluginFile, $settings) {
-	    $this->pluginFile = $pluginFile;
-	    $this->settings = $settings;
-	    $this->email = new Email($pluginFile,$settings);
+	public function __construct()
+	{
+		$this->email = new Email;
 	}
 
 	public function onLoaded()
@@ -32,8 +31,8 @@ class Actions
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 			//$this->email->bookingConfirmed($id);
 		} else if ($type == 'cancel') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'canceled');
-			//$this->email->bookingCanceled($id);
+			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
+			//$this->email->bookingCancelled($id);
 		}
 
 		echo json_encode([
@@ -44,33 +43,23 @@ class Actions
 	}
 
 	public function handleActions()
-	{
-		if (isset($_GET['action']) && isset($_GET['id']) && wp_verify_nonce($_REQUEST['_wpnonce'], 'action')) {
+	{	
+		if (isset($_GET['action']) && isset($_GET['id']) && wp_verify_nonce($_REQUEST['_wpnonce'], 'status')) {	
 			$bookingId = absint($_GET['id']);
 			$action = sanitize_text_field($_GET['action']);
 			if ($action == 'confirm') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 			} elseif ($action == 'cancel') {
-				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'canceled');
+				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 			} elseif ($action == 'delete') {
 				wp_delete_post($bookingId, true);
 			} elseif ($action == 'restore') {
-				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'notconfirmed');
-			}
-			
-			$exceptionId = absint($_GET['id']);
-			if ($action == 'delete_exception') {
-				wp_delete_post($exceptionId, true);
-			}
-			
-			$timeslotId = absint($_GET['id']);
-			if ($action == 'delete_timeslot') {
-				wp_delete_post($timeslotId, true);
+				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
 			}
 
-			wp_redirect(get_admin_url() . 'admin.php?page=' . sanitize_text_field($_GET['page']));
+			wp_redirect(get_admin_url() . 'edit.php?post_type=booking');
+			exit;
 		}
-
 	}
 
 	public function bookingReplyTemplate($template)
@@ -112,7 +101,8 @@ class Actions
 		return $template;
 	}
 
-	protected function loadBookingReplyTemplate($filename) {
+	protected function loadBookingReplyTemplate($filename)
+	{
 		$templatePath = plugin()->getPath('includes/templates') . $filename . '.php';
 		if (!file_exists($templatePath)) {
 			$templatePath = false;
