@@ -27,12 +27,16 @@ class Actions
 		$bookingId = absint($_POST['id']);
 		$type = sanitize_text_field($_POST['type']);
 
+		$booking = Functions::getBooking($bookingId);
+		$replyUrl = Functions::bookingReplyUrl('confirm', $booking['booking_date'], $bookingId);
+		//\RRZE\Dev\dLog($replyUrl);
+
 		if ($type == 'confirm') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
-			//$this->email->bookingConfirmed($id);
+			//update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
+			$this->email->bookingConfirmed($bookingId);
 		} else if ($type == 'cancel') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
-			//$this->email->bookingCancelled($id);
+			//update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
+			$this->email->bookingCancelled($bookingId);
 		}
 
 		echo json_encode([
@@ -64,20 +68,20 @@ class Actions
 
 	public function bookingReplyTemplate($template)
 	{
-		$hash = isset($_GET['rrze-rsvp-booking-reply']) ? sanitize_text_field($_GET['rrze-rsvp-booking-reply']) : false;
+		$bookingId = isset($_GET['id']) ? absint($_GET['id']) : false;
 		$action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : false;
-		$bookingId = isset($_GET['id']) ? intval($_GET['id']) : false;
+		$hash = isset($_GET['rrze-rsvp-booking-reply']) ? sanitize_text_field($_GET['rrze-rsvp-booking-reply']) : false;
 
 		if ($hash !== false && $bookingId !== false && $action !== false) {
-			$bookingData = Functions::getBooking($bookingId);
+			$booking = Functions::getBooking($bookingId);
 
-			if ($action == 'confirm' && $bookingData && password_verify($bookingData['booking_date'] . '_guest', $hash)) {
-				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/booking-reply.css', plugin()->getBasename(), [], plugin()->getVersion()));
+			if ($action == 'confirm' && $booking && password_verify($booking['booking_date'] . '_guest', $hash)) {
+				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
 				$template = $this->loadBookingReplyTemplate('booking-reply-user', true);
 				return $template;
-			} elseif (($action == 'confirm' || $action == 'cancel') && $bookingData && password_verify($bookingData['booking_date'], $hash)) {
+			} elseif (($action == 'confirm' || $action == 'cancel') && $booking && password_verify($booking['booking_date'], $hash)) {
 				if (isset($_GET['ics'])) {
-					$filename = 'booking_' . date('Y-m-d-H-i', strtotime($bookingData['start'])) . '.ics';
+					$filename = 'booking_' . date('Y-m-d-H-i', strtotime($booking['start'])) . '.ics';
 					header('Content-type: text/calendar; charset=utf-8');
 					header('Content-Disposition: attachment; filename=' . $filename);
 					echo "BEGIN:VCALENDAR\r\n";
@@ -88,7 +92,7 @@ class Actions
 					die();
 				}
 
-				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/booking-reply.css', plugin()->getBasename(), [], plugin()->getVersion()));
+				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
 				$template = $this->loadBookingReplyTemplate('booking-reply-admin', true);
 				return $template;
 			}
@@ -112,8 +116,8 @@ class Actions
 
 	protected function generateBookingIcs(int $bookingId)
 	{
-		$bookingData = Functions::getBooking($bookingId);
-		if (empty($bookingData)) {
+		$booking = Functions::getBooking($bookingId);
+		if (empty($booking)) {
 			return;
 		}
 
@@ -121,20 +125,20 @@ class Actions
 		$dtstamp = date("Ymd\THis");
 		$dtstampReadable = Functions::dateFormat('now') . ' ' . Functions::timeFormat('now');
 
-		$timestamp = date('ymdHi', strtotime($bookingData['start']));
+		$timestamp = date('ymdHi', strtotime($booking['start']));
 		$uid = md5($timestamp . date('ymdHi')) . "@rrze-rsvp";
 		$dtstamp = date("Ymd\THis");
-		$dtstart = date("Ymd\THis", strtotime($bookingData['start']));
-		$dtend = date("Ymd\THis", strtotime($bookingData['end']));
+		$dtstart = date("Ymd\THis", strtotime($booking['start']));
+		$dtend = date("Ymd\THis", strtotime($booking['end']));
 
-		$summary = $bookingData['service_name'];
-		if ($bookingData['confirmed'] == 'confirmed') $summary .= ' [' . __('Confirmed', 'rrze-rsvp') . ']';
+		$summary = $booking['service_name'];
+		if ($booking['confirmed'] == 'confirmed') $summary .= ' [' . __('Confirmed', 'rrze-rsvp') . ']';
 
-		$confirmUrl = Functions::bookingReplyUrl('confirm', $bookingData['booking_date'], $bookingData['id']);
-		$cancelUrl = Functions::bookingReplyUrl('cancel', $bookingData['booking_date'], $bookingData['id']);
+		$confirmUrl = Functions::bookingReplyUrl('confirm', $booking['booking_date'], $booking['id']);
+		$cancelUrl = Functions::bookingReplyUrl('cancel', $booking['booking_date'], $booking['id']);
 
-		$description = Functions::dataToStr($bookingData['fields'], '\\n');
-		if ($bookingData['status'] != 'confirmed') $description .= "\\n\\n" . __('Confirm Booking', 'rrze-rsvp') . ':\\n' . $confirmUrl;
+		$description = Functions::dataToStr($booking['fields'], '\\n');
+		if ($booking['status'] != 'confirmed') $description .= "\\n\\n" . __('Confirm Booking', 'rrze-rsvp') . ':\\n' . $confirmUrl;
 		$description .= "\\n\\n" . __('Cancel Booking', 'rrze-rsvp') . ':\\n' . $cancelUrl;
 		$description .= "\\n\\n" . __('Generated', 'rrze-rsvp') . ': ' . $dtstampReadable;
 
