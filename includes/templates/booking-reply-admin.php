@@ -7,31 +7,32 @@ defined('ABSPATH') || exit;
 use RRZE\RSVP\Functions;
 
 $email = new Email;
-$bookingId = intval($_GET['id']);
+$bookingId = absint($_GET['id']);
 $action = sanitize_text_field($_GET['action']);
+$hash = isset($_GET['rrze-rsvp-booking-reply']) ? sanitize_text_field($_GET['rrze-rsvp-booking-reply']) : false;
 
-$bookingData = Functions::getBooking($bookingId);
+$booking = Functions::getBooking($bookingId);
 
-if (!$bookingData || !password_verify($bookingData['booking_date'], $_GET['rrze-rsvp-booking-reply'])) {
+if (! $booking || ! password_verify($booking['booking_date'], $hash)) {
 	header('HTTP/1.0 403 Forbidden');
 	wp_redirect(get_site_url());
 	exit;
 }
 
-if ($bookingData['status'] == 'notconfirmed') {
-	if ($_GET['action'] == "confirm") {
-		update_post_meta($bookingId, 'rrze_rsvp_status', 'confirmed');
+if ($booking['status'] == 'booked') {
+	if ($_GET['action'] == 'confirm') {
+		//update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 		$action = __('confirmed', 'rrze-rsvp');
 		$email->bookingCancelled($bookingId);
-	} else if ($_GET['action'] == "cancel") {
-		update_post_meta($bookingId, 'rrze_rsvp_status', 'cancelled');
+	} else if ($_GET['action'] == 'cancel') {
+		//update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 		$action = __('cancelled', 'rrze-rsvp');
 		$email->bookingCancelled($bookingId);
 	}
 	$bookingProcessed = false;
 } else {
 	$bookingProcessed = true;
-	$action = ($bookingData['status'] == 'confirmed') ? __('confirmed', 'rrze-rsvp') : __('cancelled', 'rrze-rsvp');
+	$action = ($booking['status'] == 'confirmed') ? __('confirmed', 'rrze-rsvp') : __('cancelled', 'rrze-rsvp');
 }
 
 get_header();
@@ -50,24 +51,25 @@ get_header();
 			<p><?php echo sprintf(__('The booking has been %s.', 'rrze-rsvp'), $action); ?></p>
 
 			<p>
-				<?php _e('Your customer has received an e-mail confirmation', 'rrze-rsvp'); ?>
+				<?php _e('Your customer has received an email confirmation.', 'rrze-rsvp'); ?>
 			</p>
 
-			<p class="date <?php if ($_GET['action'] == "cancel") echo 'cancelled'; ?>">
-				<?php echo ($bookingData['serviceName']) ? $bookingData['serviceName'] . '<br>' : ''; ?>
-				<?php echo $bookingData['date']; ?><br />
-				<?php echo $bookingData['time']; ?>
+			<p class="date <?php if ($_GET['action'] == 'cancel') echo 'cancelled'; ?>">
+				<?php echo get_the_title($booking['room']); ?><br>
+				<?php echo $booking['date']; ?><br />
+				<?php echo $booking['time']; ?>
 			</p>
 			<p class="user-info">
 				<?php
-				$bookingFields = Functions::getBookingFields($bookingId);
-				echo Functions::dataToStr($bookingFields);
+				printf('%s: %s %s<br>', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
+				printf('%s: %s<br>', __('Email', 'rrze-rsvp'), $booking['guest_email']);
+				printf('%s: %s<br>', __('Phone', 'rrze-rsvp'), $booking['guest_phone']);
 				?>
 			</p>
 
-			<?php if ($_GET['action'] == "confirm") { ?>
+			<?php if ($_GET['action'] == 'confirm') { ?>
 				<form>
-					<input type="hidden" name="rrze-rsvp-booking-reply" value="<?php echo esc_attr($_GET['rrze-rsvp-booking-reply']); ?>" />
+					<input type="hidden" name="rrze-rsvp-booking-reply" value="<?php echo esc_attr($hash); ?>" />
 					<input type="hidden" name="id" value="<?php echo esc_attr($bookingId); ?>" />
 					<input type="hidden" name="action" value="<?php echo esc_attr($_GET['action']); ?>" />
 					<input type="hidden" name="ics" value="true" />

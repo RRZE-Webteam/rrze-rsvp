@@ -8,23 +8,24 @@ use RRZE\RSVP\Email;
 use RRZE\RSVP\Functions;
 
 $email = new Email;
-$bookingId = intval($_GET['id']);
+$bookingId = absint($_GET['id']);
 $action = sanitize_text_field($_GET['action']);
+$hash = isset($_GET['rrze-rsvp-booking-reply']) ? sanitize_text_field($_GET['rrze-rsvp-booking-reply']) : false;
 
-$bookingData = Functions::getBooking($bookingId);
+$booking = Functions::getBooking($bookingId);
 
-if (!$bookingData || !password_verify($bookingData['booking_date'], $_GET['rrze-rsvp-booking-reply'])) {
+if (!$booking || ! password_verify($booking['booking_date'] . '_guest', $hash)) {
 	header('HTTP/1.0 403 Forbidden');
 	wp_redirect(get_site_url());
 	exit;
 }
 
-$bookingCancelled = ($bookingData['status'] === 'cancelled');
+$bookingCancelled = ($booking['status'] === 'cancelled');
 
-$replyUrl = Functions::bookingReplyUrl($action, $bookingData['date'], $bookingId);
+$replyUrl = Functions::bookingReplyUrl($action, $booking['booking_date'] . '_guest', $bookingId);
 
-if (!$bookingCancelled && $action == 'cancel') {
-	update_post_meta($bookingId, 'rrze_rsvp_status', 'cancelled');
+if (! $bookingCancelled && $action == 'cancel') {
+	update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 	$email->bookingCancelled($bookingId);
 	$bookingCancelled = true;
 }
@@ -41,9 +42,9 @@ get_header();
 			<p><?php _e('Do you really want to cancel your booking?', 'rrze-rsvp'); ?></p>
 
 			<p class="date <?php if ($_GET['action'] == "cancel") echo 'cancelled'; ?>">
-				<?php echo ($bookingData['serviceName']) ? $bookingData['serviceName'] . '<br>' : ''; ?>
-				<?php echo $bookingData['date']; ?><br />
-				<?php echo $bookingData['time']; ?>
+				<?php echo get_the_title($booking['room']); ?><br>
+				<?php echo $booking['date']; ?><br>
+				<?php echo $booking['time']; ?>
 			</p>
 
 			<a href="<?php echo $replyUrl; ?>" class="button button-delete"><?php _e('Cancel booking', 'rrze-rsvp'); ?></a>
