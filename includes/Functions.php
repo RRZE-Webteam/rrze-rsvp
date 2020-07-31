@@ -119,25 +119,13 @@ class Functions
         return $data;
     }
 
-    public static function getBookingFields(int $bookingId): array
-    {
-        $data = [];
-        $metaAry = get_post_meta($bookingId);
-        foreach($metaAry as $key => $value) {
-            if(strpos($key, 'field_') == 0) {
-                $data[$key] = $value;
-            }
-        }
-        return $data;
-    }
-
     public static function dataToStr(array $data, string $delimiter = '<br>'): string
     {
         $output = '';
 
         foreach ($data as $key => $value) {
             $value = sanitize_text_field($value) ? sanitize_text_field($value) : '-';
-            $output .= $key . ': ' . $value . $delimiter;
+            $output .= $value . $delimiter;
         }
 
         return $output;
