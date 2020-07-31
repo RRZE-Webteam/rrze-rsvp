@@ -206,10 +206,6 @@ class Rooms {
     }
 
     public function include_single_template() {
-        if (Helper::isFauTheme()) {
-            return dirname($this->pluginFile) . '/includes/templates/single-room-fau-theme.php';
-        } else {
-            return dirname($this->pluginFile) . '/includes/templates/single-room.php';
-        }
+        return dirname($this->pluginFile) . '/includes/templates/single-room.php';
     }
 }
