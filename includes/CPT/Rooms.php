@@ -18,9 +18,7 @@ class Rooms {
     public function onLoaded() {
         require_once(plugin_dir_path($this->pluginFile) . 'vendor/cmb2/init.php');
         add_action('init', [$this, 'room_post_type'], 0);
-	add_action('cmb2_admin_init', [$this, 'room_metaboxes']);
-	add_filter( 'single_template', [$this, 'include_single_template'] );
-        add_filter( 'archive_template', [$this, 'include_archive_template'] );
+        add_action('cmb2_admin_init', [$this, 'room_metaboxes']);
     }
 
 	// Register Custom Post Type
@@ -203,9 +201,5 @@ class Rooms {
             ),
             'preview_size' => 'large', // Image size to use when previewing in the admin.
         ) );
-    }
-
-    public function include_single_template() {
-        return dirname($this->pluginFile) . '/includes/templates/single-room.php';
     }
 }

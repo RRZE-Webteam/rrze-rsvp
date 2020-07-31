@@ -11,7 +11,7 @@ if (Helper::isFauTheme()) {
             <div class="row">
                 <div class="col-xs-12">
                     <main id="droppoint">
-                        <h1 class="screen-reader-text">Beispiel-Seite</h1>
+                        <h1 class="screen-reader-text">' . get_the_title() . '</h1>
                         <div class="inline-box">
                             <div class="content-inline">';
     $div_close = '</div>
@@ -25,15 +25,17 @@ if (Helper::isFauTheme()) {
     $div_open = '<div id="content">
         <div class="container">
             <div class="row">
-                <div class="col-xs-12">';
+                <div class="col-xs-12">
+                <h1 class="entry-title">' . get_the_title() . '</h1>';
     $div_close = '</div>
             </div>
         </div>
     </div>';
 }
 
+echo $div_open;
+
 while ( have_posts() ) : the_post();
-    echo $div_open;
 
     $meta = get_post_meta(get_the_ID());
     if (has_post_thumbnail()) {
