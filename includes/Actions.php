@@ -27,15 +27,11 @@ class Actions
 		$bookingId = absint($_POST['id']);
 		$type = sanitize_text_field($_POST['type']);
 
-		$booking = Functions::getBooking($bookingId);
-		$replyUrl = Functions::bookingReplyUrl('confirm', $booking['booking_date'], $bookingId);
-		//\RRZE\Dev\dLog($replyUrl);
-
 		if ($type == 'confirm') {
-			//update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
+			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 			$this->email->bookingConfirmed($bookingId);
 		} else if ($type == 'cancel') {
-			//update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
+			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 			$this->email->bookingCancelled($bookingId);
 		}
 

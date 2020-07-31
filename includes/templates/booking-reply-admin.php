@@ -21,11 +21,11 @@ if (! $booking || ! password_verify($booking['booking_date'], $hash)) {
 
 if ($booking['status'] == 'booked') {
 	if ($_GET['action'] == 'confirm') {
-		//update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
+		update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 		$action = __('confirmed', 'rrze-rsvp');
 		$email->bookingCancelled($bookingId);
 	} else if ($_GET['action'] == 'cancel') {
-		//update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
+		update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 		$action = __('cancelled', 'rrze-rsvp');
 		$email->bookingCancelled($bookingId);
 	}
