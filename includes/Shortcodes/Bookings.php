@@ -101,9 +101,11 @@ class Bookings extends Shortcodes {
         $output .= '<div class="rsvp-service-container"></div>';
 
         $output .= '<div class="form-group"><label for="rrze_rsvp_user_phone">' . __('Phone Number', 'rrze-rsvp') . ' *</label>'
-            . '<input type="tel" name="rrze_rsvp_user_phone" id="rrze_rsvp_user_phone" required aria-required="true">';
+            . '<input type="tel" name="rrze_rsvp_user_phone" id="rrze_rsvp_user_phone" required aria-required="true">'
+            . '<p class="description">' . __('Um die Konkakt-Nachverfolgbarkeit im Rahmen der Corona-Bekämpfungsverordnung zu gewährleisten, benötigen wir Ihre Telefonnummer.', 'rrze-rsvp') . '</p>'
+            . '</div>';
 
-        $output .= '<button type="submit" class="btn btn-primary">'.__('Submit','rrze-rsvp').'</button>
+        $output .= '<button type="submit" class="btn btn-primary">'.__('Submit booking','rrze-rsvp').'</button>
                 </form>
             </div>';
 
@@ -298,25 +300,13 @@ class Bookings extends Shortcodes {
             }
             $response['time'] = '<div class="rsvp-time-select">' . $timeSelects . '</div>';
             if ($time) {
-                foreach ($this->tmp_availability as $sid => $service) {
-                    $id = 'rsvp_service_' . $sid;
-                    if ($room == '') {
-                        if (array_key_exists($date, $service['availablity']) && in_array($time, $service['availablity'][$date])) {
-                            $post = get_post($sid);
-                            $serviceSelects .= "<div class='form-group'>"
-                                . "<input type='radio' id='$id' value='$sid' name='rsvp_service'>"
-                                . "<label for='$id'>$post->post_title</label>"
-                                . "</div>";
-                        }
-                    } else {
-                        if ($service['room'] == $room && array_key_exists($date, $service['availablity']) && in_array($time, $service['availablity'][$date])) {
-                            $post = get_post($sid);
-                            $serviceSelects .= "<div class='form-group'>"
-                                . "<input type='radio' id='$id' value='$sid' name='rsvp_service'>"
-                                . "<label for='$id'>$post->post_title</label>"
-                                . "</div>";
-                        }
-                    }
+                $seats = (isset($availability[$date][$time])) ? $availability[$date][$time] : [];
+                foreach ($seats as $seat) {
+                    $seatname = get_the_title($seat);
+                    $serviceSelects .= "<div class='form-group'>"
+                        . "<input type='radio' id='$id' value='$seat' name='rsvp_service'>"
+                        . "<label for='$id'>$seatname</label>"
+                        . "</div>";
                 }
                 if ($serviceSelects == '') {
                     $serviceSelects = '<div class="rsvp-service-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
@@ -336,37 +326,34 @@ class Bookings extends Shortcodes {
         }
         $id = (int)$_POST['id'];
         $output = '';
+        $seat_name = get_the_title($id);
         $equipment = get_the_terms($id, 'rrze-rsvp-equipment');
-        $room = get_the_terms($id, 'rrze-rsvp-services');
+        $room_id = get_post_meta($id, 'rrze-rsvp-seat-room', true);
+        if ($room_id)
+            $room = get_post($room_id);
         if ($equipment === false && $room === false) {
-            //echo '<div class="rsvp-item-info">' . __('No additional information available.','rrze-rsvp') . '</div>';
+//            echo '<div class="rsvp-item-info">' . __('No additional information available.','rrze-rsvp') . '</div>';
             echo '';
             wp_die();
         }
         $output .= '<div class="rsvp-item-info">';
         if ($equipment !== false) {
-            $output .= '<div class="rsvp-item-equipment">';
+            $output .= '<div class="rsvp-item-equipment"><h5 class="small">' . sprintf(__('Seat %s', 'rrze-rsvp'), $seat_name) . '</h5>';
             foreach  ($equipment as $e) {
                 $e_arr[] = $e->name;
             }
             $output .= '<p><strong>' . __('Equipment','rrze-rsvp') . '</strong>: ' . implode(', ', $e_arr) . '</p>';
             $output .= '</div>';
         }
-        if ($room !== false) {
+        if ($room_id) {
             $output .= '<div class="rsvp-item-room"><p><strong>' . __('Room','rrze-rsvp') . ':</strong> ';
-            foreach  ($room as $l) {
-                $output .= '<a href="'.get_term_link($l->term_id, 'rsvp_rooms').'" target="_blank" title="'.__('Open room info in new window.','rrze-rsvp').'">';
-                if ($l->parent != 0) {
-                    $parent = get_term($l->parent, 'rsvp_rooms');
-                    $output .= $parent->name . ', ';
-                }
-                $output .= $l->name;
-                $output .= '</a></p>';
-            }
+            $output .= '<a href="'.get_permalink($room->ID).'" target="_blank" title="'.__('Open room info in new window.','rrze-rsvp').'">';
+            $output .= $room->post_title;
+            $output .= '</a></p>';
+
             $output .= '</div>';
         }
         $output .= '</div>';
-        //wp_send_json($room);
         echo $output;
         wp_die();
     }
