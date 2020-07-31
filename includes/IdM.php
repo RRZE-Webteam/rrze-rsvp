@@ -55,6 +55,20 @@ class IdM
         return $this->personAttributes;
     }
 
+    public function getGuestData()
+    {
+        $displayName = $this->displayName;
+        $displayNameAry = explode(' ', $displayName);
+        $guestFirstname = array_shift($displayNameAry);
+        $guestLastname = implode(' ', $displayNameAry);
+
+        return [
+            'guest_firstname' => $guestFirstname,
+            'guest_lastname' => $guestLastname,
+            'guest_email' => $this->mail
+        ];
+    }
+
     protected function simplesamlAuth()
     {
         if (!$this->isPluginActive($this->webssoPlugin)) {
