@@ -22,16 +22,16 @@ if ($bookingData['status'] == 'notconfirmed') {
 	if ($_GET['action'] == "confirm") {
 		update_post_meta($bookingId, 'rrze_rsvp_status', 'confirmed');
 		$action = __('confirmed', 'rrze-rsvp');
-		$email->bookingCanceled($bookingId);
+		$email->bookingCancelled($bookingId);
 	} else if ($_GET['action'] == "cancel") {
-		update_post_meta($bookingId, 'rrze_rsvp_status', 'canceled');
-		$action = __('canceled', 'rrze-rsvp');
-		$email->bookingCanceled($bookingId);
+		update_post_meta($bookingId, 'rrze_rsvp_status', 'cancelled');
+		$action = __('cancelled', 'rrze-rsvp');
+		$email->bookingCancelled($bookingId);
 	}
 	$bookingProcessed = false;
 } else {
 	$bookingProcessed = true;
-	$action = ($bookingData['status'] == 'confirmed') ? __('confirmed', 'rrze-rsvp') : __('canceled', 'rrze-rsvp');
+	$action = ($bookingData['status'] == 'confirmed') ? __('confirmed', 'rrze-rsvp') : __('cancelled', 'rrze-rsvp');
 }
 
 get_header();
@@ -53,7 +53,7 @@ get_header();
 				<?php _e('Your customer has received an e-mail confirmation', 'rrze-rsvp'); ?>
 			</p>
 
-			<p class="date <?php if ($_GET['action'] == "cancel") echo 'canceled'; ?>">
+			<p class="date <?php if ($_GET['action'] == "cancel") echo 'cancelled'; ?>">
 				<?php echo ($bookingData['serviceName']) ? $bookingData['serviceName'] . '<br>' : ''; ?>
 				<?php echo $bookingData['date']; ?><br />
 				<?php echo $bookingData['time']; ?>
