@@ -1,6 +1,11 @@
 <?php
 
 use RRZE\RSVP\Helper;
+use RRZE\RSVP\Settings;
+use function RRZE\RSVP\plugin;
+
+$settings = new Settings(plugin()->getFile());
+$options = (object) $settings->getOptions();
 
 get_header();
 
@@ -55,23 +60,28 @@ while ( have_posts() ) : the_post();
             6 => __('Saturday', 'rrze-rsvp'),
             7 => __('Sunday', 'rrze-rsvp')
         ];
-        echo "<table>";
         foreach ($timeslots[0] as $timeslot) {
-            echo "<tr>";
-            echo "<td>";
-            $days = [];
             foreach ($timeslot['rrze-rsvp-room-weekday'] as $day) {
-                $days[] = $weekdays[$day];
+                $schedule[$weekdays[$day]][] = $timeslot['rrze-rsvp-room-starttime'] . ' - ' . $timeslot['rrze-rsvp-room-endtime'];
             }
-            echo implode(', ', $days );
-            echo "</td>";
-            echo "<td>" . $timeslot['rrze-rsvp-room-starttime'] . ' - ' . $timeslot['rrze-rsvp-room-endtime'] . "</td>";
-            echo "</tr>";
-//                                            print "<pre>";
-//                                            var_dump($timeslot);
-//                                            print "</pre>";
+        }
+        echo '<table>';
+        foreach ($schedule as $weekday => $daily_slots) {
+            echo '<tr>';
+            echo '<td>' . $weekday . '</td>';
+            echo '<td>' . implode('<br />', $daily_slots) . '</td>';
+            echo '</tr>';
         }
         echo "</table>";
+    }
+
+    if ($options->general_single_room_availability_table != 'no') {
+        $booking_link = '';
+        if ($options->general_single_room_availability_table == 'yes_link') {
+            $booking_link = 'booking_link=true';
+        }
+        echo '<h3>' . __('Availability', 'rrze-rsvp') . '</h3>';
+        echo do_shortcode('[rsvp-availability room=2226046 days=10 '.$booking_link.']');
     }
 
     if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id'] != '') {

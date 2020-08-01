@@ -1,1 +1,33 @@
-table td{vertical-align:middle}table.wp-list-table{table-layout:auto}table.wp-list-table th{padding:8px 10px;font-weight:400}table.wp-list-table td.status{text-align:center}table.wp-list-table td.status a,table.wp-list-table td.status button{margin:2px 4px;min-width:calc(50% - 10px);text-align:center}table.wp-list-table td.status a.rrze-rsvp-confirmed[disabled],table.wp-list-table td.status button.rrze-rsvp-confirmed[disabled]{background:#090!important;color:#fff!important;border-color:#090!important}table.wp-list-table td.status a.delete{color:#a00}table.wp-list-table td.status .booking_date{display:block;text-align:center;opacity:.6}.selectvalues-input{display:none}.table.widefat input:not([type=submit]):not([type=checkbox]){width:100%}
+/*
+Admin CSS
+*/
+table td {
+  vertical-align: middle; }
+
+table.wp-list-table {
+  table-layout: auto; }
+  table.wp-list-table th {
+    padding: 8px 10px;
+    font-weight: 400; }
+  table.wp-list-table td.status {
+    text-align: center; }
+    table.wp-list-table td.status a, table.wp-list-table td.status button {
+      margin: 2px 4px;
+      min-width: calc(50% - 10px);
+      text-align: center; }
+      table.wp-list-table td.status a.rrze-rsvp-confirmed[disabled], table.wp-list-table td.status button.rrze-rsvp-confirmed[disabled] {
+        background: #009900 !important;
+        color: white !important;
+        border-color: #009900 !important; }
+    table.wp-list-table td.status a.delete {
+      color: #a00; }
+    table.wp-list-table td.status .booking_date {
+      display: block;
+      text-align: center;
+      opacity: 0.6; }
+
+.selectvalues-input {
+  display: none; }
+
+.table.widefat input:not([type=submit]):not([type=checkbox]) {
+  width: 100%; }

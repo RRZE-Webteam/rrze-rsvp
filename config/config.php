@@ -2,6 +2,8 @@
 
 namespace RRZE\RSVP\Config;
 
+use RRZE\RSVP\Functions;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -49,7 +51,8 @@ function getConstants() {
             'confirm_subject' => __('Your booking has been confirmed', 'rrze-rsvp'),
             'confirm_text' => __('We are happy to inform you that your booking has been confirmed.', 'rrze-rsvp'),
             'cancel_subject' => __('Your booking has been cancelled', 'rrze-rsvp'),
-            'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp')
+            'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp'),
+            'single_room_availability_table' => 'yes_link',
         ];
     }
     
@@ -98,6 +101,10 @@ function getSections()
             'title' => __('Basic Settings', 'rrze-rsvp')
         ], */
         [
+            'id'    => 'general',
+            'title' => __('General Settings', 'rrze-rsvp')
+        ],
+        [
             'id'    => 'email',
             'title' => __('E-Mail Settings', 'rrze-rsvp')
         ]
@@ -109,7 +116,7 @@ function getSections()
  * @return array [description]
  */
 function getFields(){
-    $defaults = defaultOptions(); 
+    $defaults = defaultOptions();
     
     return [
 /*	'basic' => [
@@ -186,6 +193,26 @@ function getFields(){
             ]
         ],
  */
+        'general' => [
+            [
+                'name'    => 'booking_page',
+                'label'   => __('Booking Page', 'rrze-rsvp'),
+                'desc'    => __('Select the page that contains your booking form shortcode.', 'rrze-rsvp'),
+                'type'    => 'select',
+                'options' => Functions::getPagesDropdownOptions(['show_option_none'=> '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;']),
+            ],
+            [
+                'name'    => 'single_room_availability_table',
+                'label'   => __('Show Availability table on Room page.', 'rrze-rsvp'),
+                'desc'    => __('If \'Yes (with link)\' you need to specify the booking page (see above).', 'rrze-rsvp'),
+                'type'    => 'radio',
+                'options' => [
+                    'yes_link' => __('Yes (with seats linked to booking form)', 'rrze-rsvp'),
+                    'yes' => __('Yes (no link)', 'rrze-rsvp'),
+                    'no'  => __('No', 'rrze-rsvp')
+                ]
+            ],
+        ],
         'email' => [
             [
                 'name'    => 'notification_email',
@@ -344,18 +371,25 @@ function getShortcodeSettings(){
                 'label' => __( 'Days in advance', 'rrze-rsvp' ),
                 'type' => 'number' // Variablentyp der Eingabe
             ],
+            'room' => [
+                'default' => '',
+                'field_type' => 'text', // Art des Feldes im Gutenberg Editor
+                'label' => __( 'Room(s)', 'rrze-rsvp' ),
+                'type' => 'text' // Variablentyp der Eingabe
+            ],
             'seat' => [
                 'default' => '',
                 'field_type' => 'text', // Art des Feldes im Gutenberg Editor
                 'label' => __( 'Seat(s)', 'rrze-rsvp' ),
                 'type' => 'text' // Variablentyp der Eingabe
             ],
-            'service' => [
-                'default' => '',
-                'field_type' => 'text', // Art des Feldes im Gutenberg Editor
-                'label' => __( 'Service', 'rrze-rsvp' ),
-                'type' => 'text' // Variablentyp der Eingabe
+            'booking_link' => [
+                'field_type' => 'toggle',
+                'label' => __( 'Show booking link', 'rrze-rsvp' ),
+                'type' => 'boolean',
+                'default'   => false
             ],
+
         ],
 
     ];

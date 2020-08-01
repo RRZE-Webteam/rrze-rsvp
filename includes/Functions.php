@@ -140,7 +140,7 @@ class Functions
         return get_site_url() . "/?rrze-rsvp-booking-reply=" . $hash . "&id=" . $id . "&action=" . $action;
     }
 
-    public static function getSeatAvailability ($room, $start, $end) {
+    public static function getRoomAvailability ($room, $start, $end) {
         // Array aus verfügbaren Timeslots des Raumes erstellen
         $timeslots = get_post_meta($room, 'rrze-rsvp-room-timeslots');
         $timeslots = $timeslots[0];
@@ -222,5 +222,33 @@ class Functions
         }
 
         return $availability;
+    }
+
+    public static function getPagesDropdownOptions($args = '')
+    {
+        $defaults = array(
+            'depth' => 0,
+            'child_of' => 0,
+            'show_option_none' => '',
+            'show_option_no_change' => '',
+            'option_none_value' => '',
+            'sort_column' => 'post_title',
+        );
+        $parsed_args = wp_parse_args($args, $defaults);
+        $pages = get_pages($parsed_args);
+
+        $output = [];
+        if (!empty($pages)) {
+            if ($parsed_args['show_option_no_change']) {
+                $output['-1'] = $parsed_args['show_option_no_change'];
+            }
+            if ($parsed_args['show_option_none']) {
+                $output[esc_attr($parsed_args['option_none_value'])] = $parsed_args['show_option_none'];
+            }
+            foreach ($pages as $page) {
+                $output[$page->ID] = $page->post_title;
+            }
+        }
+        return $output;
     }
 }

@@ -5,7 +5,7 @@ namespace RRZE\RSVP\Shortcodes;
 use RRZE\RSVP\Functions;
 use function RRZE\RSVP\Config\getShortcodeSettings;
 use function RRZE\RSVP\Config\getShortcodeDefaults;
-use function RRZE\RSVP\getSeatAvailability;
+use function RRZE\RSVP\getRoomAvailability;
 
 
 defined('ABSPATH') || exit;
@@ -151,7 +151,7 @@ class Bookings extends Shortcodes {
         $startDate = date_format($bookingDaysStart, 'Y-m-d');
         $link_next = '<a href="#" class="cal-skip cal-next" data-direction="next">&gt;&gt;</a>';
         $link_prev = '<a href="#" class="cal-skip cal-prev" data-direction="prev">&lt;&lt;</a>';
-        $availability = Functions::getSeatAvailability($room, $startDate, $endDate);
+        $availability = Functions::getRoomAvailability($room, $startDate, $endDate);
 
         // Create the table tag opener and day headers
         $calendar = '<table class="rsvp_calendar" data-period="'.date_i18n('Y-m', $firstDayOfMonth).'" data-end="'.$endDate.'">';
@@ -287,7 +287,7 @@ class Bookings extends Shortcodes {
             $slots = [];
             if ($room == '') {
             } else {
-                $availability = Functions::getSeatAvailability($room, $date, date('Y-m-d', strtotime($date. ' +1 days')));
+                $availability = Functions::getRoomAvailability($room, $date, date('Y-m-d', strtotime($date. ' +1 days')));
                 $slots = array_keys($availability[$date]);
             }
             foreach ($slots as $slot) {
