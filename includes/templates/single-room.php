@@ -6,6 +6,7 @@ use function RRZE\RSVP\plugin;
 
 $settings = new Settings(plugin()->getFile());
 $options = (object) $settings->getOptions();
+global $post;
 
 get_header();
 
@@ -81,7 +82,7 @@ while ( have_posts() ) : the_post();
             $booking_link = 'booking_link=true';
         }
         echo '<h3>' . __('Availability', 'rrze-rsvp') . '</h3>';
-        echo do_shortcode('[rsvp-availability room=2226046 days=10 '.$booking_link.']');
+        echo do_shortcode('[rsvp-availability room=' . $post->ID . ' days=10 '.$booking_link.']');
     }
 
     if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id'] != '') {

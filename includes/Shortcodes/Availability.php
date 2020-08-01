@@ -79,7 +79,7 @@ class Availability extends Shortcodes {
                     $booking_link_close = '';
                     if ($booking_link && $this->options->general_booking_page != '') {
                         $permalink = get_permalink($this->options->general_booking_page);
-                        $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&timeslot=$time\" title='" . __('Book this seat/timeslot now','rrze-rsvp') . "'>";
+                        $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$time\" title='" . __('Book this seat/timeslot now','rrze-rsvp') . "'>";
                         $booking_link_close = '</a>';
                     }
                     $seat_names[] = $booking_link_open . $seat_name . $booking_link_close;
