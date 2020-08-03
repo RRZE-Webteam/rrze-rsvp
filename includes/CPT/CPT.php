@@ -80,16 +80,12 @@ class CPT extends Main
         foreach ($cpts as $cpt) {
             if ($current_screen->post_type == $cpt) {
 
-                if ($pagenow == 'edit.php') {
-                    $submenu_file = 'edit.php?post_type=' . $current_screen->post_type;
-                }                
-
                 if ($pagenow == 'post.php') {
                     $submenu_file = 'edit.php?post_type=' . $current_screen->post_type;
                 }
 
                 if ($pagenow == 'post-new.php') {
-                    $submenu_file = 'edit.php?post_type=' . $current_screen->post_type;
+                    $submenu_file = 'post-new.php?post_type=' . $current_screen->post_type;
                 }
 
                 $parent_file = 'edit.php?post_type=booking';
