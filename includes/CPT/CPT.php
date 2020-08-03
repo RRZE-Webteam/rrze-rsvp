@@ -5,50 +5,102 @@ namespace RRZE\RSVP\CPT;
 defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Main;
-use RRZE\RSVP\CPT\Bookings;
-use RRZE\RSVP\CPT\Rooms;
-use RRZE\RSVP\CPT\Seats;
+use RRZE\RSVP\Capabilities;
 
 /**
  * Laden und definieren der Posttypes
  */
-class CPT extends Main {
+class CPT extends Main
+{
     protected $pluginFile;
     protected $settings;
-    
-    public function __construct($pluginFile, $settings) {
+
+    public function __construct($pluginFile, $settings)
+    {
         $this->pluginFile = $pluginFile;
-	$this->settings = $settings;
-	
+        $this->settings = $settings;
     }
 
-    public function onLoaded() {
+    public function onLoaded()
+    {
+        $bookings = new Bookings($this->pluginFile, $this->settings);
+        $bookings->onLoaded();
+
         $rooms = new Rooms($this->pluginFile, $this->settings);
         $rooms->onLoaded();
 
         $seats = new Seats($this->pluginFile, $this->settings);
         $seats->onLoaded();
 
-        $bookings = new Bookings($this->pluginFile, $this->settings);
-        $bookings->onLoaded();
-
-	 add_action( 'admin_menu' , array( $this, 'cpt_admin_submenu' )); 
-
+        add_action('admin_menu', [$this, 'bookingMenu']);
+        add_filter('parent_file', [$this, 'filterParentMenu']);
     }
-    public function cpt_admin_submenu(){
-	$cpts = array('room', 'seat');
 
-	foreach ($cpts as $cpt) {
-	    $cpt_obj = get_post_type_object( $cpt );
+    public function bookingMenu()
+    {
+        $cpts = array_keys(Capabilities::getCurrentCptArgs());
 
-	    add_submenu_page(
-		'edit.php?post_type=booking',      // parent slug
-		$cpt_obj->labels->name,            // page title
-		$cpt_obj->labels->menu_name,       // menu title
-		$cpt_obj->cap->edit_posts,         // capability
-		'edit.php?post_type=' . $cpt       // menu slug
-	    );
-	}
+        foreach ($cpts as $cpt) {
+            $cpt_obj = get_post_type_object($cpt);
+            add_submenu_page(
+                'edit.php?post_type=booking',      // parent slug
+                $cpt_obj->labels->name,            // page title
+                $cpt_obj->labels->menu_name,       // menu title
+                $cpt_obj->cap->edit_posts,         // capability
+                'edit.php?post_type=' . $cpt       // menu slug
+            );
+
+            add_submenu_page(
+                'edit.php?post_type=booking',
+                $cpt_obj->labels->name,
+                $cpt_obj->labels->add_new_item,
+                $cpt_obj->cap->edit_posts,
+                'post-new.php?post_type=' . $cpt
+            );            
+        }
+
+        add_submenu_page(
+            'edit.php?post_type=booking',
+            __('Equipment', 'rrze-rsvp'),
+            __('Equipment', 'rrze-rsvp'),
+            'edit_seats',
+            'edit-tags.php?taxonomy=rrze-rsvp-equipment&post_type=seat'
+        );
+
+        remove_submenu_page('edit.php?post_type=booking', 'edit.php?post_type=booking');
+        remove_submenu_page('edit.php?post_type=booking', 'post-new.php?post_type=booking');
     }
-    
+
+    public function filterParentMenu($parent_file)
+    {
+        global $submenu_file, $current_screen, $pagenow;
+
+        $parent_file = 'edit.php?post_type=booking';
+        $cpts = array_keys(Capabilities::getCurrentCptArgs());
+
+        foreach ($cpts as $cpt) {
+            if ($current_screen->post_type == $cpt) {
+
+                if ($pagenow == 'post.php') {
+                    $submenu_file = 'edit.php?post_type=' . $current_screen->post_type;
+                }
+
+                if ($pagenow == 'post-new.php') {
+                    $submenu_file = 'edit.php?post_type=' . $current_screen->post_type;
+                }
+            }
+        }
+
+        if ($current_screen->post_type == 'seat') {
+            if ($pagenow == 'edit-tags.php') {
+                $submenu_file = 'edit-tags.php?taxonomy=rrze-rsvp-equipment&post_type=seat';
+            }
+
+            if ($pagenow == 'term.php') {
+                $submenu_file = 'edit-tags.php?taxonomy=rrze-rsvp-equipment&post_type=seat';
+            }
+        }
+
+        return $parent_file;
+    }
 }
