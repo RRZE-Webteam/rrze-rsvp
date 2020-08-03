@@ -75,11 +75,14 @@ class CPT extends Main
     {
         global $submenu_file, $current_screen, $pagenow;
 
-        $parent_file = 'edit.php?post_type=booking';
         $cpts = array_keys(Capabilities::getCurrentCptArgs());
 
         foreach ($cpts as $cpt) {
             if ($current_screen->post_type == $cpt) {
+
+                if ($pagenow == 'edit.php') {
+                    $submenu_file = 'edit.php?post_type=' . $current_screen->post_type;
+                }                
 
                 if ($pagenow == 'post.php') {
                     $submenu_file = 'edit.php?post_type=' . $current_screen->post_type;
@@ -88,6 +91,8 @@ class CPT extends Main
                 if ($pagenow == 'post-new.php') {
                     $submenu_file = 'edit.php?post_type=' . $current_screen->post_type;
                 }
+
+                $parent_file = 'edit.php?post_type=booking';
             }
         }
 
@@ -99,6 +104,8 @@ class CPT extends Main
             if ($pagenow == 'term.php') {
                 $submenu_file = 'edit-tags.php?taxonomy=rrze-rsvp-equipment&post_type=seat';
             }
+            
+            $parent_file = 'edit.php?post_type=booking';
         }
 
         return $parent_file;
