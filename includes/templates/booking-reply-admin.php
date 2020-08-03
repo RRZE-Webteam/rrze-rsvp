@@ -13,7 +13,7 @@ $hash = isset($_GET['rrze-rsvp-booking-reply']) ? sanitize_text_field($_GET['rrz
 
 $booking = Functions::getBooking($bookingId);
 
-if (! $booking || ! password_verify($booking['booking_date'], $hash)) {
+if (! $booking || ! Functions::decrypt($hash)) {
 	header('HTTP/1.0 403 Forbidden');
 	wp_redirect(get_site_url());
 	exit;

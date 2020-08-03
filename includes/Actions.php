@@ -70,7 +70,7 @@ class Actions
 
 		if ($hash !== false && $bookingId !== false && $action !== false) {
 			$booking = Functions::getBooking($bookingId);
-			if (($action == 'cancel' || $action == 'ics') && $booking && password_verify(sprintf('%s-%s-customer', $bookingId, $booking['start']), $hash)) {				
+			if (($action == 'cancel' || $action == 'ics') && $booking && Functions::decrypt($hash)) {				
 				
 				if ($action == 'ics') {
 					ICS::generate($bookingId);
@@ -79,7 +79,7 @@ class Actions
 				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
 				$template = $this->loadBookingReplyTemplate('booking-reply-customer', true);
 				return $template;
-			} elseif (($action == 'confirm' || $action == 'cancel') && $booking && password_verify(sprintf('%s-%s', $bookingId, $booking['start']), $hash)) {				
+			} elseif (($action == 'confirm' || $action == 'cancel') && $booking && Functions::decrypt($hash)) {				
 				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
 				$template = $this->loadBookingReplyTemplate('booking-reply-admin', true);
 				return $template;

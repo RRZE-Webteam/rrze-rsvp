@@ -136,8 +136,33 @@ class Functions
 
     public static function bookingReplyUrl(string $action, string $password, int $id): string
     {
-        $hash = password_hash($password, PASSWORD_DEFAULT);
+        //$hash = password_hash($password, PASSWORD_DEFAULT);
+        $hash = self::crypt($password);
         return get_site_url() . "/?rrze-rsvp-booking-reply=" . $hash . "&id=" . $id . "&action=" . $action;
+    }
+
+    protected static function crypt(string $string, string $action = 'encrypt')
+    {
+        $secretKey = AUTH_KEY;
+        $secretSalt = AUTH_SALT;
+
+        $output = false;
+        $encryptMethod = 'AES-256-CBC';
+        $key = hash('sha256', $secretKey);
+        $salt = substr(hash('sha256', $secretSalt), 0, 16);
+
+        if ($action == 'encrypt') {
+            $output = base64_encode(openssl_encrypt($string, $encryptMethod, $key, 0, $salt));
+        } else if ($action == 'decrypt') {
+            $output = openssl_decrypt(base64_decode($string), $encryptMethod, $key, 0, $salt);
+        }
+
+        return $output;
+    }
+
+    public static function decrypt(string $string)
+    {
+        return self::crypt($string, 'decrypt');
     }
 
     public static function getRoomAvailability ($room, $start, $end) {
