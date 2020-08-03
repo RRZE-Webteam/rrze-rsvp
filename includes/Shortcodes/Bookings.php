@@ -34,80 +34,150 @@ class Bookings extends Shortcodes {
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
-        $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
-        $days = (int)$shortcode_atts['days'];
-        $input_room = sanitize_title($shortcode_atts['room']);
-        if (is_numeric($input_room)) {
-            $post_room = get_post( $input_room );
-            if ( !$post_room ) {
-                return __( 'Room specified in shortcode does not exist.', 'rrze-rsvp' );
-            }
-        }
-        $room = $input_room;
-
-        if (isset($post_room)) {
-            $today = date('Y-m-d');
-            $endday = date('Y-m-d', strtotime($today. ' + ' . $days . ' days'));
-        }
-
         $output = '';
-        $output .= '<div class="rsvp">';
-        $output .= '<form action="#" id="rsvp_by_room">'
-            . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
+        if (isset($_POST['rrze_rsvp_post_nonce_field']) && wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
 
-        if ($room == 'select') {
-            $rooms = get_posts([
-                'post_type' => 'room',
-                'post_statue' => 'publish',
+            array_walk_recursive(
+                    $_POST, function ( &$value ) {
+                    if ( is_string( $value ) ) {
+                        $value = wp_strip_all_tags( trim( $value ) );
+                    }
+                }
+            );
+            $posted_data = $_POST;
+            var_dump($posted_data);
+            $booking_timestamp = strtotime($posted_data['rsvp_date'] . ' ' . $posted_data['rsvp_time']);
+
+            // Überprüfen ob bereits eine Bewerbung mit gleicher E-Mail-Adresse zur gleichen Zeit vorliegt
+            $check_args = [
+                'post_type' => 'booking',
+                'meta_query' => [
+                    'relation' => 'AND',
+                    [
+                        'key' => 'rrze-rsvp-booking-guest-email',
+                        'value' => $posted_data['rsvp_email']
+                    ],
+                    [
+                        'key' => 'rrze-rsvp-booking-start',
+                        'value' => $booking_timestamp
+                    ],
+                    [
+                        'key' => 'rrze-rsvp-booking-status',
+                        'value' => ['confirmed', 'checked-in'],
+                        'compare' => 'IN',
+                    ]
+                ],
                 'nopaging' => true,
-                'orderby' => 'title',
-                'order' => 'ASC',
-            ]);
-            $dropdown = '<select name="rsvp_room" id="rsvp_room" class="postform">
-                <option value="0">— Please select —</option>';
-            foreach ($rooms as $room) {
-                $dropdown .= sprintf('<option value="%s">%s</option>', $room->ID, $room->post_title);
+            ];
+            $check_bookings = get_posts($check_args);
+            if ($check_bookings !== false && !empty($check_bookings)) {
+                return '<h2>Mehrfache Buchung</h2>'
+                    . '<p>Sie haben für den angegebenen Zeitraum bereits einen Sitzplatz gebucht. Wenn Sie Ihre Buchung ändern möchten, stornieren Sie bitte zuerst die bestehende Buchung. Den Link dazu finden Sie in der Bestätigungsmail.</p>';
             }
-            $dropdown .= '</select>';
-            $output .= '<div class="form-group">'
-                . '<label for="rsvp_room" class="h3">' . __('Room', 'rrze-rsvp') . '</label>'
-                . $dropdown . '</div>';
+
+            $room_id = get_post_meta((int)$posted_data['rsvp_seat'], 'rrze-rsvp-seat-room', true);
+            $room_autoconfirmation = get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true);
+
+            //Buchung speichern
+            $newdraft = [
+                'post_status' => 'publish',
+                'post_type' => 'booking',
+            ];
+            if ($newpostid = wp_insert_post($newdraft)) {
+                update_post_meta($newpostid, 'rrze-rsvp-booking-start', (int)$booking_timestamp);
+                update_post_meta($newpostid, 'rrze-rsvp-booking-end', strtotime( '+4  hours', (int)$booking_timestamp) ); //TODO: aus Room-Meta holen
+                update_post_meta($newpostid, 'rrze-rsvp-booking-seat', (int)$posted_data['rsvp_seat']);
+                update_post_meta($newpostid, 'rrze-rsvp-booking-guest-lastname', sanitize_text_field($posted_data['rsvp_lastname']));
+                update_post_meta($newpostid, 'rrze-rsvp-booking-guest-firstname', sanitize_text_field($posted_data['rsvp_firstname']));
+                update_post_meta($newpostid, 'rrze-rsvp-booking-guest-email', sanitize_text_field($posted_data['rsvp_email']));
+                update_post_meta($newpostid, 'rrze-rsvp-booking-guest-phone', sanitize_text_field($posted_data['rsvp_phone']));
+                if ($room_autoconfirmation == 'on') {
+                    update_post_meta( $newpostid, 'rrze-rsvp-booking-status', 'confirmed' );
+                } else {
+                    update_post_meta( $newpostid, 'rrze-rsvp-booking-status', 'booked' );
+                }
+
+            } else {
+                $errors['wp_insert_post'] = 'Fehler beim Speichern der Buchung.';
+            }
+
+                // TODO: Mail verschicken
+
+            $output .= "<h2>Die Daten wurden erfolgreich übertragen. Vielen Dank!</h2>";
         } else {
-            $output .= '<p><input type="hidden" value="'.$room.'" id="rsvp_room">'
-                . __('Book a seat at: ', 'rrze-rsvp') . '<strong>' . get_the_title($room) . '</strong>'
+
+            $shortcode_atts = parent::shortcodeAtts( $atts, $tag, $this->shortcodesettings );
+            $date_selected = '';
+//        var_dump($_GET);
+            if ( isset( $_GET[ 'bookingdate' ] ) ) {
+                $date_selected = sanitize_text_field( $_GET[ 'bookingdate' ] );
+            }
+            $days = (int)$shortcode_atts[ 'days' ];
+            $input_room = sanitize_title( $shortcode_atts[ 'room' ] );
+            if ( is_numeric( $input_room ) ) {
+                $post_room = get_post( $input_room );
+                if ( !$post_room ) {
+                    return __( 'Room specified in shortcode does not exist.', 'rrze-rsvp' );
+                }
+            }
+            $room = $input_room;
+
+            if ( isset( $post_room ) ) {
+                $today = date( 'Y-m-d' );
+                $endday = date( 'Y-m-d', strtotime( $today . ' + ' . $days . ' days' ) );
+            }
+
+            $output .= '<div class="rsvp">';
+            $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room">'
+                . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
+
+            $output .= '<p><input type="hidden" value="' . $room . '" id="rsvp_room">'
+                . wp_nonce_field('post_nonce', 'rrze_rsvp_post_nonce_field')
+                . __( 'Book a seat at: ', 'rrze-rsvp' ) . '<strong>' . get_the_title( $room ) . '</strong>'
                 . '</p>';
-        }
 
-        $output .= '<div class="rsvp-datetime-container form-group clearfix"><legend>' . __('Select date and time', 'rrze-rsvp') . '</legend>'
-            . '<div class="rsvp-date-container">';
-        $dateComponents = getdate();
-        $month = $dateComponents['mon'];
-        $year = $dateComponents['year'];
-        $start = date_create();
-        $end = date_create();
-        date_modify($end, '+'.$days.' days');
-//        $output .= $this->buildCalendar($month,$year, $start, $end, $room);
-        $output .= $this->buildCalendar('8',$year, $start, $end, $room);
+            $output .= '<div class="rsvp-datetime-container form-group clearfix"><legend>' . __( 'Select date and time', 'rrze-rsvp' ) . '</legend>'
+                . '<div class="rsvp-date-container">';
+            $dateComponents = getdate();
+            $month = $dateComponents[ 'mon' ];
+            $year = $dateComponents[ 'year' ];
+            $start = date_create();
+            $end = date_create();
+            date_modify( $end, '+' . $days . ' days' );
+            $output .= $this->buildCalendar( $month, $year, $start, $end, $room, $date_selected );
 //        $output .= $this->buildDateBoxes($days);
-        $output .= '</div>'; //.rsvp-date-container
+            $output .= '</div>'; //.rsvp-date-container
 
-        $output .= '<div class="rsvp-time-container">'
-            . '<h4>' . __('Available time slots:', 'rrze-rsvp') . '</h4>'
-            . '<div class="rsvp-time-select error">'.__('Please select a date.', 'rrze-rsvp').'</div>'
-            . '</div>'; //.rsvp-time-container
+            $output .= '<div class="rsvp-time-container">'
+                . '<h4>' . __( 'Available time slots:', 'rrze-rsvp' ) . '</h4>'
+                . '<div class="rsvp-time-select error">' . __( 'Please select a date.', 'rrze-rsvp' ) . '</div>'
+                . '</div>'; //.rsvp-time-container
 
-        $output .= '</div>'; //.rsvp-datetime-container
+            $output .= '</div>'; //.rsvp-datetime-container
 
-        $output .= '<div class="rsvp-service-container"></div>';
+            $output .= '<div class="rsvp-service-container"></div>';
 
-        $output .= '<div class="form-group"><label for="rrze_rsvp_user_phone">' . __('Phone Number', 'rrze-rsvp') . ' *</label>'
-            . '<input type="tel" name="rrze_rsvp_user_phone" id="rrze_rsvp_user_phone" required aria-required="true">'
-            . '<p class="description">' . __('Um die Konkakt-Nachverfolgbarkeit im Rahmen der Corona-Bekämpfungsverordnung zu gewährleisten, benötigen wir Ihre Telefonnummer.', 'rrze-rsvp') . '</p>'
-            . '</div>';
+            $output .= '<div class="form-group"><label for="rsvp_lastname">' . __( 'Last name', 'rrze-rsvp' ) . ' *</label>'
+                . '<input type="text" name="rsvp_lastname" id="rsvp_lastname" required aria-required="true">'
+                . '</div>';
 
-        $output .= '<button type="submit" class="btn btn-primary">'.__('Submit booking','rrze-rsvp').'</button>
+            $output .= '<div class="form-group"><label for="rsvp_firstname">' . __( 'First name', 'rrze-rsvp' ) . ' *</label>'
+                . '<input type="tel" name="rsvp_firstname" id="rsvp_firstname" required aria-required="true">'
+                . '</div>';
+
+            $output .= '<div class="form-group"><label for="rsvp_email">' . __( 'Email', 'rrze-rsvp' ) . ' *</label>'
+                . '<input type="tel" name="rsvp_email" id="rsvp_email" required aria-required="true">'
+                . '</div>';
+
+            $output .= '<div class="form-group"><label for="rsvp_phone">' . __( 'Phone Number', 'rrze-rsvp' ) . ' *</label>'
+                . '<input type="tel" name="rsvp_phone" id="rsvp_phone" required aria-required="true">'
+                . '<p class="description">' . __( 'Um die Konkakt-Nachverfolgbarkeit im Rahmen der Corona-Bekämpfungsverordnung zu gewährleisten, benötigen wir Ihre Telefonnummer.', 'rrze-rsvp' ) . '</p>'
+                . '</div>';
+
+            $output .= '<button type="submit" class="btn btn-primary">' . __( 'Submit booking', 'rrze-rsvp' ) . '</button>
                 </form>
             </div>';
+        }
 
         wp_enqueue_style('rrze-rsvp-shortcode');
         wp_enqueue_script('rrze-rsvp-shortcode');
@@ -119,7 +189,7 @@ class Bookings extends Shortcodes {
      * Inspirationsquelle:
      * https://css-tricks.com/snippets/php/build-a-calendar-table/
      */
-    public function buildCalendar($month, $year, $start = '', $end = '', $room = '') {
+    public function buildCalendar($month, $year, $start = '', $end = '', $room = '', $bookingdate_selected = '') {
         if ($start == '')
             $start = date_create();
         if (!is_object($end))
@@ -218,7 +288,8 @@ class Bookings extends Shortcodes {
             $input_open = '<span class="inactive">';
             $input_close = '</span>';
             if ($active) {
-                $input_open = "<input type=\"radio\" id=\"rsvp_date_$date\" value=\"$date\" name=\"rsvp_date\"><label for=\"rsvp_date_$date\">";
+                $selected = $bookingdate_selected == $date ? 'checked="checked"' : '';
+                $input_open = "<input type=\"radio\" id=\"rsvp_date_$date\" value=\"$date\" name=\"rsvp_date\" $selected><label for=\"rsvp_date_$date\">";
                 $input_close = '</label>';
             }
             $calendar .= "<td class='day $class' rel='$date' title='$title'>" . $input_open.$currentDay.$input_close . "</td>";
@@ -282,7 +353,7 @@ class Bookings extends Shortcodes {
             $response['service'] = '<div class="rsvp-service-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
         }
         $timeSelects = '';
-        $serviceSelects = '';
+        $seatSelects = '';
         if ($date) {
             $slots = [];
             if ($room == '') {
@@ -303,17 +374,18 @@ class Bookings extends Shortcodes {
                 $seats = (isset($availability[$date][$time])) ? $availability[$date][$time] : [];
                 foreach ($seats as $seat) {
                     $seatname = get_the_title($seat);
-                    $serviceSelects .= "<div class='form-group'>"
-                        . "<input type='radio' id='$id' value='$seat' name='rsvp_service'>"
+                    $id = 'rsvp_seat_' . sanitize_title($seat);
+                    $seatSelects .= "<div class='form-group'>"
+                        . "<input type='radio' id='$id' value='$seat' name='rsvp_seat'>"
                         . "<label for='$id'>$seatname</label>"
                         . "</div>";
                 }
-                if ($serviceSelects == '') {
-                    $serviceSelects = '<div class="rsvp-service-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
+                if ($seatSelects == '') {
+                    $seatSelects = '<div class="rsvp-service-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
                 } else {
-                    $serviceSelects = '<div class="rsvp-service-select">' . $serviceSelects . '</div>';
+                    $seatSelects = '<div class="rsvp-service-select">' . $seatSelects . '</div>';
                 }
-                $response['service'] = '<h4>' . __('Available items:', 'rrze-rsvp') . '</h4>' . $serviceSelects;
+                $response['service'] = '<h4>' . __('Available items:', 'rrze-rsvp') . '</h4>' . $seatSelects;
             }
         }
         wp_send_json($response);
@@ -359,4 +431,13 @@ class Bookings extends Shortcodes {
         echo $output;
         wp_die();
     }
+
+    private function buildTimeslotSelect($timeslots = []) {
+
+    }
+
+    private function buildSeatSelect() {
+
+    }
+
 }
