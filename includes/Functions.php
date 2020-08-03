@@ -141,7 +141,7 @@ class Functions
         return get_site_url() . "/?rrze-rsvp-booking-reply=" . $hash . "&id=" . $id . "&action=" . $action;
     }
 
-    protected static function crypt(string $string, string $action = 'encrypt')
+    public static function crypt(string $string, string $action = 'encrypt')
     {
         $secretKey = AUTH_KEY;
         $secretSalt = AUTH_SALT;
