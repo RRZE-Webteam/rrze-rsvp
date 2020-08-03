@@ -39,11 +39,9 @@ class ICS
 		$summary = get_the_title($booking['room']);
 		if ($booking['confirmed'] == 'confirmed') $summary .= ' [' . __('Confirmed', 'rrze-rsvp') . ']';
 
-		$confirmUrl = Functions::bookingReplyUrl('confirm', $booking['booking_date'], $booking['id']);
 		$cancelUrl = Functions::bookingReplyUrl('cancel', $booking['booking_date'], $booking['id']);
 
 		$description = Functions::dataToStr($booking['fields'], '\\n');
-		if ($booking['status'] != 'confirmed') $description .= "\\n\\n" . __('Confirm Booking', 'rrze-rsvp') . ':\\n' . $confirmUrl;
 		$description .= "\\n\\n" . __('Cancel Booking', 'rrze-rsvp') . ':\\n' . $cancelUrl;
 		$description .= "\\n\\n" . __('Generated', 'rrze-rsvp') . ': ' . $dtstampFormat;
 
