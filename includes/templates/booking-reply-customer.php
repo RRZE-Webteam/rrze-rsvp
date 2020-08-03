@@ -22,7 +22,7 @@ if (!$booking || ! password_verify($booking['booking_date'] . '-customer', $hash
 
 $bookingCancelled = ($booking['status'] === 'cancelled');
 
-$replyUrl = Functions::bookingReplyUrl($action, $booking['booking_date'] . '-customer', $bookingId);
+$replyUrl = Functions::bookingReplyUrl($action, sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
 
 if (! $bookingCancelled && $action == 'cancel') {
 	update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');

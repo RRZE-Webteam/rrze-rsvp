@@ -100,8 +100,8 @@ class Email
             return;
         }
 
-        $confirmUrl = Functions::bookingReplyUrl('confirm', $booking['booking_date'], $bookingId);
-        $cancelUrl = Functions::bookingReplyUrl('cancel', $booking['booking_date'], $bookingId);
+        $confirmUrl = Functions::bookingReplyUrl('confirm', sprintf('%s-%s', $bookingId, $booking['start']), $bookingId);
+        $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s%-s', $bookingId, $booking['start']), $bookingId);
 
         $booking['text'] = sprintf(__('You received a new request for a booking on %s.', 'rrze-rsvp'), get_bloginfo('name'));
 
@@ -167,7 +167,7 @@ class Email
         $subject = $this->placeholderParser($subject, $booking);
         $booking['text'] = $this->placeholderParser($text, $booking);
 
-        $cancelUrl = Functions::bookingReplyUrl('cancel', $booking['booking_date'] . '-customer', $bookingId);
+        $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
         $booking['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl) . '</p>';
 
         $message = $this->template->getContent('email/booking-requested-customer', $booking);
@@ -195,7 +195,10 @@ class Email
         $subject = $this->placeholderParser($subject, $booking);
         $booking['text'] = $this->placeholderParser($text, $booking);
 
-        $cancelUrl = Functions::bookingReplyUrl('cancel', $booking['booking_date'] . '-customer', $bookingId);
+        $icsUrl = Functions::bookingReplyUrl('ics', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
+        $booking['ics_download'] = sprintf(__('<a href="%s">Add the booking to your calendar</a>.', 'rzze-rsvp'), $icsUrl) . '</p>';
+
+        $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
         $booking['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl) . '</p>';
 
         $message = $this->template->getContent('email/booking-confirmed-customer', $booking);
