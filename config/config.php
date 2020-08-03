@@ -53,6 +53,9 @@ function getConstants() {
             'cancel_subject' => __('Your booking has been cancelled', 'rrze-rsvp'),
             'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp'),
             'single_room_availability_table' => 'yes_link',
+            'logo' => 'fau',
+            'instructions_de' => __('Scan the QR code for booking.', 'rrze-rsvp'),
+            'instructions_en' => __('Scan the QR code for booking.', 'rrze-rsvp'),
         ];
     }
     
@@ -107,6 +110,10 @@ function getSections()
         [
             'id'    => 'email',
             'title' => __('E-Mail Settings', 'rrze-rsvp')
+        ],
+        [
+            'id'    => 'qr',
+            'title' => __('QR PDF Settings', 'rrze-rsvp')
         ]
     ];
 }
@@ -304,6 +311,63 @@ function getFields(){
                 'default'           => $defaults['cancel_text'],
             ]
            
+        ],
+        'qr' => [
+            [
+                'name'    => 'logo',
+                'label'   => __('Logo', 'rrze-rsvp'),
+                'desc'    => __('Show logo in upper right corner of PDF', 'rrze-rsvp'),
+                'type'    => 'select',
+                'default' => $defaults['logo'],
+                'options' => [
+                    'none' => __('none', 'rrze-rsvp'),
+                    'fau' => __('FAU logo', 'rrze-rsvp'),
+                    'website' => __('Website logo', 'rrze-rsvp'),
+                ]
+            ],
+            [
+                'name'              => 'instructions_de',
+                'label'             => __('Instructions in German', 'rrze-rsvp'),
+                'desc'              => __('This text will be shown above the QR code.', 'rrze-rsvp'),
+                'placeholder'       => __('Instructions in German', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           => $defaults['instructions_de'],
+                'sanitize_callback' => 'sanitize_text_field'
+            ],
+            [
+                'name'              => 'instructions_en',
+                'label'             => __('Instructions in English', 'rrze-rsvp'),
+                'desc'              => __('This text will be shown above the QR code.', 'rrze-rsvp'),
+                'placeholder'       => __('Instructions in English', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           => $defaults['instructions_en'],
+                'sanitize_callback' => 'sanitize_text_field'
+            ],
+            [
+                'name'  => 'room_text',
+                'label' => __('Print room\'s text', 'rrze-rsvp'),
+                'type'  => 'checkbox'
+            ],
+            [
+                'name'  => 'room_image',
+                'label' => __('Print room\'s image', 'rrze-rsvp'),
+                'type'  => 'checkbox'
+            ],
+            [
+                'name'  => 'room_address',
+                'label' => __('Print room\'s address', 'rrze-rsvp'),
+                'type'  => 'checkbox'
+            ],
+            [
+                'name'  => 'room_floorplan',
+                'label' => __('Print floor plan', 'rrze-rsvp'),
+                'type'  => 'checkbox'
+            ],
+            [
+                'name'  => 'seat_equipment',
+                'label' => __('Print seats\' equipment', 'rrze-rsvp'),
+                'type'  => 'checkbox'
+            ],
         ]
     ];
 }
