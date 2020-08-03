@@ -14,7 +14,7 @@ class ICS
             return;
         }
 
-        $filename = 'booking_' . date('Y-m-d-H-i', strtotime($booking['start'])) . '.ics';
+        $filename = 'booking_' . date('Y-m-d-H-i', $booking['start']) . '.ics';
         header('Content-type: text/calendar; charset=utf-8');
         header('Content-Disposition: attachment; filename=' . $filename);
         echo "BEGIN:VCALENDAR\r\n";
@@ -28,20 +28,20 @@ class ICS
 	{
 		$timezoneString = get_option('timezone_string');
 		$dtstamp = date('Ymd\THis');
-		$dtstampFormat = Functions::dateFormat('now') . ' ' . Functions::timeFormat('now');
+		$dtstampFormat = Functions::dateFormat(current_time('timestamp')) . ' ' . Functions::timeFormat(current_time('timestamp'));
 
-		$timestamp = date('ymdHi', strtotime($booking['start']));
+		$timestamp = date('ymdHi', $booking['start']);
 		$uid = md5($timestamp . date('ymdHi')) . "@rrze-rsvp";
-		$dtstamp = date("Ymd\THis");
-		$dtstart = date("Ymd\THis", strtotime($booking['start']));
-		$dtend = date("Ymd\THis", strtotime($booking['end']));
+		$dtstamp = date('Ymd\THis');
+		$dtstart = date('Ymd\THis', $booking['start']);
+		$dtend = date('Ymd\THis', $booking['end']);
 
 		$summary = get_the_title($booking['room']);
-		if ($booking['confirmed'] == 'confirmed') $summary .= ' [' . __('Confirmed', 'rrze-rsvp') . ']';
 
-		$cancelUrl = Functions::bookingReplyUrl('cancel', $booking['booking_date'], $booking['id']);
+		$cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $booking['id'], $booking['start']), $booking['id']);
 
-		$description = Functions::dataToStr($booking['fields'], '\\n');
+		$description = $booking['room_name'] . ':\\n';
+		$description .= ! empty($booking['seat_name']) ? $booking['seat_name'] . ':\\n' : '';
 		$description .= "\\n\\n" . __('Cancel Booking', 'rrze-rsvp') . ':\\n' . $cancelUrl;
 		$description .= "\\n\\n" . __('Generated', 'rrze-rsvp') . ': ' . $dtstampFormat;
 

@@ -136,8 +136,33 @@ class Functions
 
     public static function bookingReplyUrl(string $action, string $password, int $id): string
     {
-        $hash = password_hash($password, PASSWORD_DEFAULT);
+        //$hash = password_hash($password, PASSWORD_DEFAULT);
+        $hash = self::crypt($password);
         return get_site_url() . "/?rrze-rsvp-booking-reply=" . $hash . "&id=" . $id . "&action=" . $action;
+    }
+
+    public static function crypt(string $string, string $action = 'encrypt')
+    {
+        $secretKey = AUTH_KEY;
+        $secretSalt = AUTH_SALT;
+
+        $output = false;
+        $encryptMethod = 'AES-256-CBC';
+        $key = hash('sha256', $secretKey);
+        $salt = substr(hash('sha256', $secretSalt), 0, 16);
+
+        if ($action == 'encrypt') {
+            $output = base64_encode(openssl_encrypt($string, $encryptMethod, $key, 0, $salt));
+        } else if ($action == 'decrypt') {
+            $output = openssl_decrypt(base64_decode($string), $encryptMethod, $key, 0, $salt);
+        }
+
+        return $output;
+    }
+
+    public static function decrypt(string $string)
+    {
+        return self::crypt($string, 'decrypt');
     }
 
     public static function getRoomAvailability ($room, $start, $end) {
@@ -224,6 +249,86 @@ class Functions
         return $availability;
     }
 
+    /**
+     * getSeatAvailability
+     * Returns an array of dates/timeslots where the seat is available, for a defined period.
+     * Array structure: date => timeslot
+     * @param string $room the room's post id
+     * @param string $start start date of the period (format 'Y-m-d')
+     * @param string $end end date of the period (format 'Y-m-d')
+     * @return array
+     */
+    public static function getSeatAvailability($seat, $start, $end) {
+        $availability = [];
+        $seat_availability = [];
+
+        // Array aus verfügbaren Timeslots des Raumes erstellen
+        $room_id = get_post_meta($seat, 'rrze-rsvp-seat-room', true);
+        $timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots');
+        $timeslots = $timeslots[0];
+        foreach($timeslots as $timeslot) {
+            foreach ($timeslot['rrze-rsvp-room-weekday'] as $weekday) {
+                $slots[$weekday][] = $timeslot['rrze-rsvp-room-starttime'];
+            }
+        }
+
+        // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
+        $bookings = get_posts([
+            'post_type' => 'booking',
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'meta_query' => [
+                [
+                    'key' => 'rrze-rsvp-booking-seat',
+                    'value'   => $seat,
+                ],
+                [
+                    'key'     => 'rrze-rsvp-booking-start',
+                    'value' => array( strtotime($start), strtotime($end) ),
+                    'compare' => 'BETWEEN',
+                    'type' => 'numeric'
+                ],
+            ],
+        ]);
+
+        foreach ($bookings as $booking) {
+            $booking_meta = get_post_meta($booking->ID);
+            $booking_start = $booking_meta['rrze-rsvp-booking-start'][0];
+            $timeslots_booked[] = $booking_start;
+        }
+
+        // Tageweise durch den Zeitraum loopen, um die Verfügbarkeit je Wochentag zu ermitteln
+        $loopstart = strtotime($start);
+        $loopend = strtotime($end);
+        while ($loopstart <= $loopend) {
+            $weekday = date('w', $loopstart);
+            if (isset($slots[$weekday])) {
+                foreach ( $slots[ $weekday ] as $time ) {
+                    $hours = explode( ':', $time )[ 0 ];
+                    $timestamp = strtotime( '+' . $hours . ' hours', $loopstart );
+                    if (!in_array($timestamp, $timeslots_booked)) {
+                        $seat_availability[] = $timestamp;
+                    }
+                }
+            }
+            $loopstart = strtotime("+1 day", $loopstart);
+        }
+
+        // Für Ausgabe Timestamp zwei Ebenen (Tag / Zeit) machen
+        foreach ($seat_availability as $timestamp) {
+            $availability[date('Y-m-d', $timestamp)][] = date('H:i', $timestamp);
+        }
+
+        return $availability;
+    }
+
+    /**
+     * getPagesDropdownOptions
+     * Returns an array of post_id => post_title that can be used by settings select callback.
+     * Reduced version of wp_dropdown_pages()
+     * @param array $args
+     * @return array
+     */
     public static function getPagesDropdownOptions($args = '')
     {
         $defaults = array(

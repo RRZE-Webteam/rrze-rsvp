@@ -13,7 +13,7 @@ $hash = isset($_GET['rrze-rsvp-booking-reply']) ? sanitize_text_field($_GET['rrz
 
 $booking = Functions::getBooking($bookingId);
 
-if (! $booking || ! password_verify($booking['booking_date'], $hash)) {
+if (! $booking || ! Functions::decrypt($hash)) {
 	header('HTTP/1.0 403 Forbidden');
 	wp_redirect(get_site_url());
 	exit;
@@ -66,16 +66,6 @@ get_header();
 				printf('%s: %s<br>', __('Phone', 'rrze-rsvp'), $booking['guest_phone']);
 				?>
 			</p>
-
-			<?php if ($_GET['action'] == 'confirm') { ?>
-				<form>
-					<input type="hidden" name="rrze-rsvp-booking-reply" value="<?php echo esc_attr($hash); ?>" />
-					<input type="hidden" name="id" value="<?php echo esc_attr($bookingId); ?>" />
-					<input type="hidden" name="action" value="<?php echo esc_attr($_GET['action']); ?>" />
-					<input type="hidden" name="ics" value="true" />
-					<input type="submit" class="button button-accept" value="<?php _e('Download Calendar (ics) File', 'rrze-rsvp'); ?>">
-				</form>
-			<?php } ?>
 
 		<?php } ?>
 
