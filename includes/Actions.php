@@ -75,11 +75,7 @@ class Actions
 				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
 				$template = $this->loadBookingReplyTemplate('booking-reply-customer', true);
 				return $template;
-			} elseif (($action == 'confirm' || $action == 'cancel') && $booking && password_verify($booking['booking_date'], $hash)) {
-				if (isset($_GET['ics'])) {
-					ICS::generate($bookingId);
-					exit;
-				}				
+			} elseif (($action == 'confirm' || $action == 'cancel') && $booking && password_verify($booking['booking_date'], $hash)) {				
 				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
 				$template = $this->loadBookingReplyTemplate('booking-reply-admin', true);
 				return $template;
