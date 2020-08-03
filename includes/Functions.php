@@ -136,19 +136,35 @@ class Functions
 
     public static function bookingReplyUrl(string $action, string $password, int $id): string
     {
-        $hash = password_hash($password, PASSWORD_DEFAULT);
+        //$hash = password_hash($password, PASSWORD_DEFAULT);
+        $hash = self::crypt($password);
         return get_site_url() . "/?rrze-rsvp-booking-reply=" . $hash . "&id=" . $id . "&action=" . $action;
     }
 
-    /**
-     * getRoomAvailability
-     * Returns an array of the available seats in a room for a defined period.
-     * Array structure: date => timeslot => available seats
-     * @param string $room the room's post id
-     * @param string $start start date of the period (format 'Y-m-d')
-     * @param string $end end date of the period (format 'Y-m-d')
-     * @return array
-     */
+    protected static function crypt(string $string, string $action = 'encrypt')
+    {
+        $secretKey = AUTH_KEY;
+        $secretSalt = AUTH_SALT;
+
+        $output = false;
+        $encryptMethod = 'AES-256-CBC';
+        $key = hash('sha256', $secretKey);
+        $salt = substr(hash('sha256', $secretSalt), 0, 16);
+
+        if ($action == 'encrypt') {
+            $output = base64_encode(openssl_encrypt($string, $encryptMethod, $key, 0, $salt));
+        } else if ($action == 'decrypt') {
+            $output = openssl_decrypt(base64_decode($string), $encryptMethod, $key, 0, $salt);
+        }
+
+        return $output;
+    }
+
+    public static function decrypt(string $string)
+    {
+        return self::crypt($string, 'decrypt');
+    }
+
     public static function getRoomAvailability ($room, $start, $end) {
         // Array aus verfügbaren Timeslots des Raumes erstellen
         $timeslots = get_post_meta($room, 'rrze-rsvp-room-timeslots');
