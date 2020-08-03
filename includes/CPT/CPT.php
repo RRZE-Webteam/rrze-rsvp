@@ -45,6 +45,7 @@ class CPT extends Main
     public function bookingMenu()
     {
         $cpts = array_keys(Capabilities::getCurrentCptArgs());
+        $hiddenTitle = 'rrze-rsvp-submenu-hidden';
 
         foreach ($cpts as $cpt) {
             $cpt_obj = get_post_type_object($cpt);
@@ -59,10 +60,10 @@ class CPT extends Main
             add_submenu_page(
                 'edit.php?post_type=booking',
                 $cpt_obj->labels->name,
-                $cpt_obj->labels->add_new_item,
+                $hiddenTitle,
                 $cpt_obj->cap->edit_posts,
                 'post-new.php?post_type=' . $cpt
-            );            
+            );
         }
 
         add_submenu_page(
@@ -75,6 +76,16 @@ class CPT extends Main
 
         remove_submenu_page('edit.php?post_type=booking', 'edit.php?post_type=booking');
         remove_submenu_page('edit.php?post_type=booking', 'post-new.php?post_type=booking');
+
+        global $submenu;
+        $hiddenClass = $hiddenTitle;
+        if (isset($submenu['edit.php?post_type=booking'])) {
+            foreach ($submenu['edit.php?post_type=booking'] as $key => $menu) {
+                if ($menu[0] == $hiddenTitle) {
+                    $submenu['edit.php?post_type=booking'][$key][4] = $hiddenClass;
+                }
+            }
+        }
     }
 
     public function filterParentMenu($parent_file)
@@ -91,7 +102,7 @@ class CPT extends Main
                 }
 
                 if ($pagenow == 'post-new.php') {
-                    $submenu_file = 'post-new.php?post_type=' . $current_screen->post_type;
+                    $submenu_file = 'edit.php?post_type=' . $current_screen->post_type;
                 }
 
                 $parent_file = 'edit.php?post_type=booking';
@@ -106,13 +117,12 @@ class CPT extends Main
             if ($pagenow == 'term.php') {
                 $submenu_file = 'edit-tags.php?taxonomy=rrze-rsvp-equipment&post_type=seat';
             }
-            
+
             $parent_file = 'edit.php?post_type=booking';
         }
 
         return $parent_file;
     }
-
 
     public function add_bulk_actions($bulk_actions) {
         $bulk_actions['print-qr'] = __( 'Print QR code', 'rrze-rsvp');
