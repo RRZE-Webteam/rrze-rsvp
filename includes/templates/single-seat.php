@@ -73,11 +73,10 @@ while ( have_posts() ) : the_post();
 
     <p><button class="btn btn-success btn-lg btn-block"><?php _e('Check in', 'rrze-rsvp');?></button></p>
     <p><button class="btn btn-danger btn-lg btn-block"><?php _e('Check out', 'rrze-rsvp');?></button></p>
-    <p><a class="btn btn-primary btn-lg btn-block" role="button" href="../../rsvp?room_id=<?php echo $room_id; ?>&seat_id=<?php echo $id; ?>"><?php _e('Book this seat', 'rrze-rsvp');?></a></p>
 
 <?php
 
-    echo '<h3>' . __('Availability', 'rrze-rsvp') . '</h3>';
+    echo '<h3>' . __('Book this seat', 'rrze-rsvp') . '</h3>';
     echo do_shortcode('[rsvp-availability seat=' . $id . ' days=14 booking_link=true]');
 
 endwhile;
