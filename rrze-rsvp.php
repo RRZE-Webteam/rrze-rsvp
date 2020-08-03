@@ -69,6 +69,9 @@ function activation()
         deactivate_plugins(plugin_basename(__FILE__));
         wp_die(sprintf(__('Plugins: %1$s: %2$s', 'rrze-log'), plugin_basename(__FILE__), $error));
     }
+
+    Users::addRoleCaps();
+    Users::createBookingRole();
 }
 
 /**
@@ -76,7 +79,8 @@ function activation()
  */
 function deactivation()
 {
-    //
+    Users::removeRoleCaps();
+    Users::removeBookingRole();
 }
 
 /**
