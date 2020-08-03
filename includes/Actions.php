@@ -51,6 +51,8 @@ class Actions
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 			} elseif ($action == 'cancel') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
+			} elseif ($action == 'delete') {
+				wp_delete_post($bookingId);
 			} elseif ($action == 'restore') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
 			}
