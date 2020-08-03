@@ -337,8 +337,10 @@ class Bookings extends Shortcodes {
             wp_die();
         }
         $output .= '<div class="rsvp-item-info">';
+        if ($equipment !== false || $room_id !== false) {
+            $output .= '<div class="rsvp-item-equipment"><h5 class="small">' . sprintf( __( 'Seat %s', 'rrze-rsvp' ), $seat_name ) . '</h5>';
+        }
         if ($equipment !== false) {
-            $output .= '<div class="rsvp-item-equipment"><h5 class="small">' . sprintf(__('Seat %s', 'rrze-rsvp'), $seat_name) . '</h5>';
             foreach  ($equipment as $e) {
                 $e_arr[] = $e->name;
             }
