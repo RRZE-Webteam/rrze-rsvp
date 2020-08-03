@@ -60,13 +60,27 @@ class Main
 		});		
 	}
 
-	public function adminEnqueueScripts($hook)
+	public function adminEnqueueScripts()
 	{
 		global $post_type;
 
-		if ($hook != 'edit.php' || !in_array($post_type, ['booking', 'room', 'seat'])) {
+		wp_enqueue_style(
+			'rrze-rsvp-admin-menu',
+			plugins_url('assets/css/rrze-rsvp-admin-menu.css', plugin()->getBasename()),
+			[],
+			plugin()->getVersion()
+		);
+
+		if (!in_array($post_type, array_keys(Capabilities::getCurrentCptArgs()))) {
 			return;
 		}
+
+		wp_enqueue_style(
+			'rrze-rsvp-admin',
+			plugins_url('assets/css/rrze-rsvp-admin.css', plugin()->getBasename()),
+			[],
+			plugin()->getVersion()
+		);
 
 		wp_enqueue_script(
 			'rrze-rsvp-admin',
@@ -82,12 +96,5 @@ class Main
 			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
 			'ajaxurl' => admin_url('admin-ajax.php')
 		));
-
-		wp_enqueue_style(
-			'rrze-rsvp-admin',
-			plugins_url('assets/css/rrze-rsvp-admin.css', plugin()->getBasename()),
-			[],
-			plugin()->getVersion()
-		);
 	}
 }
