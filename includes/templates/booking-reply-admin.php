@@ -67,16 +67,6 @@ get_header();
 				?>
 			</p>
 
-			<?php if ($_GET['action'] == 'confirm') { ?>
-				<form>
-					<input type="hidden" name="rrze-rsvp-booking-reply" value="<?php echo esc_attr($hash); ?>" />
-					<input type="hidden" name="id" value="<?php echo esc_attr($bookingId); ?>" />
-					<input type="hidden" name="action" value="<?php echo esc_attr($_GET['action']); ?>" />
-					<input type="hidden" name="ics" value="true" />
-					<input type="submit" class="button button-accept" value="<?php _e('Download Calendar (ics) File', 'rrze-rsvp'); ?>">
-				</form>
-			<?php } ?>
-
 		<?php } ?>
 
 	</div>
