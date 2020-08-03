@@ -78,14 +78,14 @@ class Functions
         }
     }
 
-    public static function dateFormat($date)
+    public static function dateFormat(int $timestamp): string
     {
-        return date_i18n(get_option('date_format'), strtotime($date));
+        return date_i18n(get_option('date_format'), $timestamp);
     }
 
-    public static function timeFormat($time)
+    public static function timeFormat(int $timestamp): string
     {
-        return date_i18n(get_option('time_format'), strtotime($time));
+        return date_i18n(get_option('time_format'), $timestamp);
     }
 
     public static function getBooking(int $bookingId): array
