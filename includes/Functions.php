@@ -103,7 +103,7 @@ class Functions
         $data['start'] = get_post_meta($post->ID, 'rrze-rsvp-booking-start', true);
         $start = new Carbon(date('Y-m-d H:i:s', $data['start']));
         $end = get_post_meta($post->ID, 'rrze-rsvp-booking-end', true);
-        $data['end'] = !$end ? $end : $start->endOfDay()->getTimestamp();
+        $data['end'] = $end ? $end : $start->endOfDay()->getTimestamp();
         $data['date'] = Functions::dateFormat($data['start']);
         $data['time'] = Functions::timeFormat($data['start']) . ' - ' . Functions::timeFormat($data['end']);
 
