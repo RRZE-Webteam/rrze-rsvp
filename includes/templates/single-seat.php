@@ -33,43 +33,13 @@ if (Helper::isFauTheme()) {
     </div>';
 }
 
-$bookings = get_posts([
-    'post_type' => 'booking',
-    'post_status' => 'publish',
-    'nopaging' => true,
-    'meta_query' => [
-        [
-            'key' => 'rrze-rsvp-booking-seat',
-            'value'   => $id,
-        ],
-        [
-            'key'     => 'rrze-rsvp-booking-start',
-            'value' => time(),
-            'compare' => '<=',
-            'type' => 'numeric'
-        ],
-        [
-            'key'     => 'rrze-rsvp-booking-end',
-            'value' => time(),
-            'compare' => '>=',
-            'type' => 'numeric'
-        ],
-    ],
-]);
-
 $id = get_the_ID();
 $meta = get_post_meta($id);
 $room_id = $meta['rrze-rsvp-seat-room'][0];
 
 echo $div_open;
 
-while ( have_posts() ) : the_post();
-//var_dump($bookings);
-//    if (!empty($bookings)) {
-//
-//    }
-
-?>
+while ( have_posts() ) : the_post(); ?>
 
     <p><button class="btn btn-success btn-lg btn-block"><?php _e('Check in', 'rrze-rsvp');?></button></p>
     <p><button class="btn btn-danger btn-lg btn-block"><?php _e('Check out', 'rrze-rsvp');?></button></p>

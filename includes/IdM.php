@@ -55,17 +55,21 @@ class IdM
         return $this->personAttributes;
     }
 
-    public function getGuestData()
+    public function getCustomerData()
     {
-        $displayName = $this->displayName;
-        $displayNameAry = explode(' ', $displayName);
-        $guestFirstname = array_shift($displayNameAry);
-        $guestLastname = implode(' ', $displayNameAry);
+        if ($displayName = $this->displayName) {
+            $displayNameAry = array_map('trim', explode(' ', $displayName));
+            $customerFirstname = array_shift($displayNameAry);
+            $customerLastname = implode(' ', $displayNameAry);
+        } else {
+            $customerFirstname = __('No name', 'rrze-rsvp');
+            $customerLastname = $customerFirstname;
+        }
 
         return [
-            'guest_firstname' => $guestFirstname,
-            'guest_lastname' => $guestLastname,
-            'guest_email' => $this->mail
+            'customer_firstname' => $customerFirstname,
+            'customer_lastname' => $customerLastname,
+            'customer_email' => $this->mail ? $this->mail : __('no@email', 'rrze-rsvp')
         ];
     }
 

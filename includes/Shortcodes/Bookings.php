@@ -2,6 +2,7 @@
 
 namespace RRZE\RSVP\Shortcodes;
 
+use RRZE\RSVP\Email;
 use RRZE\RSVP\Functions;
 use function RRZE\RSVP\Config\getShortcodeSettings;
 use function RRZE\RSVP\Config\getShortcodeDefaults;
@@ -22,6 +23,7 @@ class Bookings extends Shortcodes {
     {
         parent::__construct($pluginFile, $settings);
         $this->shortcodesettings = getShortcodeSettings();
+        $this->email = new Email;
     }
 
 
@@ -45,8 +47,15 @@ class Bookings extends Shortcodes {
                 }
             );
             $posted_data = $_POST;
-            var_dump($posted_data);
-            $booking_timestamp = strtotime($posted_data['rsvp_date'] . ' ' . $posted_data['rsvp_time']);
+//            echo Helper::get_html_var_dump($posted_data);
+            $booking_date = sanitize_text_field($posted_data['rsvp_date']);
+            $booking_start = sanitize_text_field($posted_data['rsvp_time']);
+            $booking_timestamp_start = strtotime($booking_date . ' ' . $booking_start);
+            $booking_seat = absint($posted_data['rsvp_seat']);
+            $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
+            $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
+            $booking_email = sanitize_email($posted_data['rsvp_email']);
+            $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
 
             // Überprüfen ob bereits eine Bewerbung mit gleicher E-Mail-Adresse zur gleichen Zeit vorliegt
             $check_args = [
@@ -55,11 +64,11 @@ class Bookings extends Shortcodes {
                     'relation' => 'AND',
                     [
                         'key' => 'rrze-rsvp-booking-guest-email',
-                        'value' => $posted_data['rsvp_email']
+                        'value' => $booking_email
                     ],
                     [
                         'key' => 'rrze-rsvp-booking-start',
-                        'value' => $booking_timestamp
+                        'value' => $booking_timestamp_start
                     ],
                     [
                         'key' => 'rrze-rsvp-booking-status',
@@ -72,38 +81,73 @@ class Bookings extends Shortcodes {
             $check_bookings = get_posts($check_args);
             if ($check_bookings !== false && !empty($check_bookings)) {
                 return '<h2>Mehrfache Buchung</h2>'
-                    . '<p>Sie haben für den angegebenen Zeitraum bereits einen Sitzplatz gebucht. Wenn Sie Ihre Buchung ändern möchten, stornieren Sie bitte zuerst die bestehende Buchung. Den Link dazu finden Sie in der Bestätigungsmail.</p>';
+                    . '<div class="alert alert-danger" role="alert">' . sprintf('%sSie haben für den angegebenen Zeitraum bereits einen Sitzplatz gebucht.%s Wenn Sie Ihre Buchung ändern möchten, stornieren Sie bitte zuerst die bestehende Buchung. Den Link dazu finden Sie in Ihrer Bestätigungsmail.', '<strong>', '</strong><br />') . '</div>';
             }
 
-            $room_id = get_post_meta((int)$posted_data['rsvp_seat'], 'rrze-rsvp-seat-room', true);
+            $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
             $room_autoconfirmation = get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true);
+            $room_timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
+            foreach ($room_timeslots as $week) {
+                foreach ($week['rrze-rsvp-room-weekday'] as $day) {
+                    $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+                }
+            }
+            $weekday = date('N', $booking_timestamp_start);
+            $booking_end = array_key_exists($booking_start, $schedule[$weekday]) ? $schedule[$weekday][$booking_start] : $booking_start;
+            $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
 
             //Buchung speichern
-            $newdraft = [
+            $new_draft = [
                 'post_status' => 'publish',
                 'post_type' => 'booking',
             ];
-            if ($newpostid = wp_insert_post($newdraft)) {
-                update_post_meta($newpostid, 'rrze-rsvp-booking-start', (int)$booking_timestamp);
-                update_post_meta($newpostid, 'rrze-rsvp-booking-end', strtotime( '+4  hours', (int)$booking_timestamp) ); //TODO: aus Room-Meta holen
-                update_post_meta($newpostid, 'rrze-rsvp-booking-seat', (int)$posted_data['rsvp_seat']);
-                update_post_meta($newpostid, 'rrze-rsvp-booking-guest-lastname', sanitize_text_field($posted_data['rsvp_lastname']));
-                update_post_meta($newpostid, 'rrze-rsvp-booking-guest-firstname', sanitize_text_field($posted_data['rsvp_firstname']));
-                update_post_meta($newpostid, 'rrze-rsvp-booking-guest-email', sanitize_text_field($posted_data['rsvp_email']));
-                update_post_meta($newpostid, 'rrze-rsvp-booking-guest-phone', sanitize_text_field($posted_data['rsvp_phone']));
+            if ($booking_id = wp_insert_post($new_draft)) {
+                update_post_meta($booking_id, 'rrze-rsvp-booking-start', $booking_timestamp_start);
+                $weekday = date_i18n('w', $booking_timestamp_start);
+                update_post_meta($booking_id, 'rrze-rsvp-booking-end', $booking_timestamp_end );
+                update_post_meta($booking_id, 'rrze-rsvp-booking-seat', $booking_seat);
+                update_post_meta($booking_id, 'rrze-rsvp-booking-guest-lastname', $booking_lastname);
+                update_post_meta($booking_id, 'rrze-rsvp-booking-guest-firstname', $booking_firstname);
+                update_post_meta($booking_id, 'rrze-rsvp-booking-guest-email', $booking_email);
+                update_post_meta($booking_id, 'rrze-rsvp-booking-guest-phone', $booking_phone);
                 if ($room_autoconfirmation == 'on') {
-                    update_post_meta( $newpostid, 'rrze-rsvp-booking-status', 'confirmed' );
+                    update_post_meta( $booking_id, 'rrze-rsvp-booking-status', 'confirmed' );
                 } else {
-                    update_post_meta( $newpostid, 'rrze-rsvp-booking-status', 'booked' );
+                    update_post_meta( $booking_id, 'rrze-rsvp-booking-status', 'booked' );
+                }
+                
+                // E-Mail senden
+                if ($room_autoconfirmation == 'on') {
+                    $this->email->bookingConfirmedCustomer($booking_id);
+                } else {
+                    $this->email->bookingRequestedCustomer($booking_id);
                 }
 
             } else {
                 $errors['wp_insert_post'] = 'Fehler beim Speichern der Buchung.';
             }
 
-                // TODO: Mail verschicken
+            $output .= '<h2>' . __('Die Daten wurden erfolgreich übertragen. Vielen Dank!', 'rrze-rsvp') . '</h2>';
+            if ($room_autoconfirmation == 'on') {
+                $output .= '<p>' . __('Ihre Reservierung:', 'rrze-rsvp') . '</p>';
+            } else {
+                $output .= '<p>' . __('Ihre Reservierungsanfrage:', 'rrze-rsvp') . '</p>';
+            }
+            $output .= '<ul>'
+                . '<li>'. __('Date', 'rrze-rsvp') . ': <strong>' . date_i18n(get_option('date_format'), $booking_timestamp_start) . '</strong></li>'
+                . '<li>'. __('Time', 'rrze-rsvp') . ': <strong>' . $booking_start . ' - ' . $booking_end . '</strong></li>'
+                . '<li>'. __('Room', 'rrze-rsvp') . ': <strong>' . get_the_title($room_id) . '</strong></li>'
+                . '<li>'. __('Seat', 'rrze-rsvp') . ': <strong>' . get_the_title($booking_seat) . '</strong></li>'
+                . '</ul>'
+                . '<p>' . sprintf(__('Diese Daten wurden Ihnen ebenfalls per E-Mail an %s gesendet.', 'rrze-rsvp'), '<strong>' . $booking_email . '</strong>') . '</p>'
+                . '<div class="alert alert-danger" role="alert">';
+            if ($room_autoconfirmation == 'on') {
+                $output .= sprintf(__('%sDieser Platz wurde verbindlich für Sie reserviert.%s Sie können ihn jederzeit stornieren, falls Sie den Termin nicht wahrnemen können. Informationen dazu finden Sie in Ihrer Bestätigungsmail.', 'rrze-rsvp'),'<strong>', '</strong><br />');
+            } else {
+                $output .= sprintf(__('%sBitte beachten Sie, dass dies nur eine Reservierungsanfrage ist.%s Sie erst wird verbindlich, sobald wir Ihre Buchung per E-Mail bestätigen.', 'rrze-rsvp'),'<strong>', '</strong><br />');
+            }
+            $output .= '</div>';
 
-            $output .= "<h2>Die Daten wurden erfolgreich übertragen. Vielen Dank!</h2>";
         } else {
 
             $shortcode_atts = parent::shortcodeAtts( $atts, $tag, $this->shortcodesettings );

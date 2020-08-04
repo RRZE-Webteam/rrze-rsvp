@@ -5,6 +5,7 @@ namespace RRZE\RSVP;
 defined('ABSPATH') || exit;
 
 use DateTime;
+use Carbon\Carbon;
 
 class Functions
 {
@@ -100,7 +101,9 @@ class Functions
         $data['id'] = $post->ID;
         $data['status'] = get_post_meta($post->ID, 'rrze-rsvp-booking-status', true);
         $data['start'] = get_post_meta($post->ID, 'rrze-rsvp-booking-start', true);
-        $data['end'] = get_post_meta($post->ID, 'rrze-rsvp-booking-end', true);
+        $start = new Carbon(date('Y-m-d H:i:s', $data['start']));
+        $end = get_post_meta($post->ID, 'rrze-rsvp-booking-end', true);
+        $data['end'] = $end ? $end : $start->endOfDay()->getTimestamp();
         $data['date'] = Functions::dateFormat($data['start']);
         $data['time'] = Functions::timeFormat($data['start']) . ' - ' . Functions::timeFormat($data['end']);
 
