@@ -40,8 +40,8 @@ class ICS
 
 		$cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $booking['id'], $booking['start']), $booking['id']);
 
-		$description = $booking['room_name'] . ':\\n';
-		$description .= ! empty($booking['seat_name']) ? $booking['seat_name'] . ':\\n' : '';
+		$description = $booking['room_name'] . '\\n';
+		$description .= ! empty($booking['seat_name']) ? $booking['seat_name'] . '\\n' : '';
 		$description .= "\\n\\n" . __('Cancel Booking', 'rrze-rsvp') . ':\\n' . $cancelUrl;
 		$description .= "\\n\\n" . __('Generated', 'rrze-rsvp') . ': ' . $dtstampFormat;
 
