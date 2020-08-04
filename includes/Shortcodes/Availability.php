@@ -52,6 +52,7 @@ class Availability extends Shortcodes {
                 foreach ($timeslot as $time => $seat_ids) {
                     $seat_names = [];
                     $date_formatted = date_i18n('d.m.Y', strtotime($date));
+                    $seat_names_raw = [];
                     foreach ($seat_ids as $seat_id) {
                         $seat_names_raw[$seat_id] = get_the_title($seat_id);
                     }
