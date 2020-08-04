@@ -33,13 +33,6 @@ class CPT extends Main
 
         add_action('admin_menu', [$this, 'bookingMenu']);
         add_filter('parent_file', [$this, 'filterParentMenu']);
-
-        // Print QR 
-		add_filter('bulk_actions-edit-room', [$this, 'add_bulk_actions']);
-		add_filter('bulk_actions-edit-seat', [$this, 'add_bulk_actions']);
-		add_filter('handle_bulk_actions-edit-room', [$this, 'bulk_print_qr'], 10, 3);
-		add_filter('handle_bulk_actions-edit-seat', [$this, 'bulk_print_qr'], 10, 3);
-		add_action('admin_notices', [$this, 'bulk_action_admin_notice']);
     }
 
     public function bookingMenu()
@@ -122,63 +115,5 @@ class CPT extends Main
         }
 
         return $parent_file;
-    }
-
-    public function add_bulk_actions($bulk_actions) {
-        $bulk_actions['print-qr'] = __( 'Print QR code', 'rrze-rsvp');
-        return $bulk_actions;
-    }
-
-    public function bulk_print_qr( $redirect_to, $doaction, $post_ids ) {
-        if ( $doaction !== 'print-qr' ) {
-            return $redirect_to;
-        }
-
-        $aSeats = array();
-
-        $currentScreen = get_current_screen();
-        $postType = $currentScreen->post_type;
-
-        if ($postType == 'room'){
-            // get seats for each selected room
-            foreach ( $post_ids as $post_id ){
-                $seat_ids = get_posts([
-                    'meta_key'   => 'rrze-rsvp-seat-room',
-                    'meta_value' => $post_id,
-                    'post_type' => 'seat',
-                    'fields' => 'ids',
-                    'orderby' => 'post_title',
-                    'order' => 'ASC',
-                    'numberposts' => -1
-                ]);
-                array_push($aSeats, $seat_ids);
-            }
-        } else {
-            $aSeats = $post_ids;
-        }
-
-        // 2DO: Generate 1 PDF including all QR-pngs
-        foreach ( $aSeats as $post_id ) {
-            // generate QR for each seat
-            // QRcode::png($_GET['url'].'#'.$_GET['collapse']);
-          
-
-		}
-
-        $redirect_to = add_query_arg( 'bulk_print_qr_count', count($aSeats), $redirect_to );
-        return $redirect_to;
-    }
-
- 
-    public function bulk_action_admin_notice() {
-        if ( ! empty( $_REQUEST['bulk_print_qr_count'] ) ) {
-            $printed_count = intval( $_REQUEST['bulk_print_qr_count'] );
-            printf( '<div id="message" class="updated fade">' .
-            _n( 'Printed QR for %s seat.',
-                'Printed QR for %s seats.',
-                $printed_count,
-                'rrze-rsvp'
-            ) . '</div>', $printed_count );
-        }
     }
 }

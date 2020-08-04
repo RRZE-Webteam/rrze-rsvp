@@ -9,6 +9,7 @@ use RRZE\RSVP\CPT\CPT;
 // use RRZE\RSVP\Exceptions\Main as Exceptions;
 use RRZE\RSVP\Settings;
 use RRZE\RSVP\Shortcodes\Shortcodes;
+use RRZE\RSVP\Printing\Printing;
 
 /**
  * [Main description]
@@ -57,7 +58,11 @@ class Main
 		add_action('rest_api_init', function () {
 			//$api = new API;
 			//$api->register_routes();
-		});		
+        });	
+        
+		$printing = new Printing;
+		$printing->onLoaded();
+        
 	}
 
 	public function adminEnqueueScripts()
