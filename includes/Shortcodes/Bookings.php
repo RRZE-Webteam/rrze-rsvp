@@ -151,13 +151,20 @@ class Bookings extends Shortcodes {
         } else {
 
             $shortcode_atts = parent::shortcodeAtts( $atts, $tag, $this->shortcodesettings );
-            $date_selected = '';
+
 //        var_dump($_GET);
-            if ( isset( $_GET[ 'bookingdate' ] ) ) {
-                $date_selected = sanitize_text_field( $_GET[ 'bookingdate' ] );
+            $get_date = isset( $_GET[ 'bookingdate' ] ) ? sanitize_text_field( $_GET[ 'bookingdate' ] ) : false;
+            $get_time = isset( $_GET[ 'timeslot' ] ) ? sanitize_text_field( $_GET[ 'timeslot' ] ) : false;
+            $get_room = isset( $_GET[ 'room_id' ] ) ? absint( $_GET[ 'room_id' ] ) : false;
+            $get_seat = isset( $_GET[ 'seat_id' ] ) ? absint( $_GET[ 'seat_id' ] ) : false;
+
+            if ($get_room && $get_date) {
+                $availability = Functions::getRoomAvailability( $get_room, $get_date, date( 'Y-m-d', strtotime( $get_date . ' +1 days' ) ) );
             }
+
             $days = (int)$shortcode_atts[ 'days' ];
             $input_room = sanitize_title( $shortcode_atts[ 'room' ] );
+            if ($get_room) $input_room = $get_room;
             if ( is_numeric( $input_room ) ) {
                 $post_room = get_post( $input_room );
                 if ( !$post_room ) {
@@ -171,7 +178,7 @@ class Bookings extends Shortcodes {
                 $endday = date( 'Y-m-d', strtotime( $today . ' + ' . $days . ' days' ) );
             }
 
-            $output .= '<div class="rsvp">';
+            $output .= '<div class="rrze-rsvp">';
             $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room">'
                 . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
 
@@ -188,20 +195,31 @@ class Bookings extends Shortcodes {
             $start = date_create();
             $end = date_create();
             date_modify( $end, '+' . $days . ' days' );
-            $output .= $this->buildCalendar( $month, $year, $start, $end, $room, $date_selected );
+            $output .= $this->buildCalendar( $month, $year, $start, $end, $room, $get_date );
 //        $output .= $this->buildDateBoxes($days);
             $output .= '</div>'; //.rsvp-date-container
 
             $output .= '<div class="rsvp-time-container">'
-                . '<h4>' . __( 'Available time slots:', 'rrze-rsvp' ) . '</h4>'
-                . '<div class="rsvp-time-select error">' . __( 'Please select a date.', 'rrze-rsvp' ) . '</div>'
-                . '</div>'; //.rsvp-time-container
+                . '<h4>' . __( 'Available time slots:', 'rrze-rsvp' ) . '</h4>';
+            if ($get_date) {
+                $output .= $this->buildTimeslotSelect($room, $get_date, $get_time, $availability);
+            } else {
+                $output .= '<div class="rsvp-time-select error">' . __( 'Please select a date.', 'rrze-rsvp' ) . '</div>';
+            }
+            $output .= '</div>'; //.rsvp-time-container
 
             $output .= '</div>'; //.rsvp-datetime-container
 
-            $output .= '<div class="rsvp-service-container"></div>';
+            $output .= '<div class="rsvp-seat-container">';
+            if ($get_date && $get_time) {
+                $output .= $this->buildSeatSelect($room, $get_date, $get_time, $get_seat, $availability);
+            } else {
+                $output .= '<div class="rsvp-time-select error">' . __( 'Please select a date.', 'rrze-rsvp' ) . '</div>';
+            }
+            $output .= '</div>'; //.rsvp-seat-container
 
-            $output .= '<div class="form-group"><label for="rsvp_lastname">' . __( 'Last name', 'rrze-rsvp' ) . ' *</label>'
+            $output .= '<legend>' . __( 'Your data', 'rrze-rsvp' ) . '</legend>'
+            . '<div class="form-group"><label for="rsvp_lastname">' . __( 'Last name', 'rrze-rsvp' ) . ' *</label>'
                 . '<input type="text" name="rsvp_lastname" id="rsvp_lastname" required aria-required="true">'
                 . '</div>';
 
@@ -359,10 +377,10 @@ class Bookings extends Shortcodes {
             $techtime2 = date('Y-m-d_14-30', $timestamp);
             $output .= '<div class="rsvp-datebox">';
             $output .= date_i18n("D", $timestamp) . ', ' . date_i18n(get_option('date_format'), $timestamp);
-            $output .= '<br /> <input type="radio" id="service_'. $techtime1 . '" name="datetime" value="'. $techtime1 . '" disabled>'
-                . '<label for="service_'. $techtime1 . '" class="disabled"> 09:00-13:30 Uhr</label>';
-            $output .= '<br /> <input type="radio" id="service_'. $techtime2 . '" name="datetime" value="'. $techtime2 . '" disabled>'
-                . '<label for="service_'. $techtime2 . '" class="disabled"> 14:30-19:00 Uhr</label><br />';
+            $output .= '<br /> <input type="radio" id="seat_'. $techtime1 . '" name="datetime" value="'. $techtime1 . '" disabled>'
+                . '<label for="seat_'. $techtime1 . '" class="disabled"> 09:00-13:30 Uhr</label>';
+            $output .= '<br /> <input type="radio" id="seat_'. $techtime2 . '" name="datetime" value="'. $techtime2 . '" disabled>'
+                . '<label for="seat_'. $techtime2 . '" class="disabled"> 14:30-19:00 Uhr</label><br />';
             $output .= '';
             $output .= '</div>';
         }
@@ -394,42 +412,13 @@ class Bookings extends Shortcodes {
             $response['time'] = '<div class="rsvp-time-select error">'.__('Please select a date.', 'rrze-rsvp').'</div>';
         }
         if (!$date || !$time) {
-            $response['service'] = '<div class="rsvp-service-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
+            $response['seat'] = '<div class="rsvp-seat-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
         }
-        $timeSelects = '';
-        $seatSelects = '';
+        $availability = Functions::getRoomAvailability($room, $date, date('Y-m-d', strtotime($date. ' +1 days')));
         if ($date) {
-            $slots = [];
-            if ($room == '') {
-            } else {
-                $availability = Functions::getRoomAvailability($room, $date, date('Y-m-d', strtotime($date. ' +1 days')));
-                $slots = array_keys($availability[$date]);
-            }
-            foreach ($slots as $slot) {
-                $id = 'rsvp_time_' . sanitize_title($slot);
-                $checked = checked($time !== false && $time == $slot, true, false);
-                $timeSelects .= "<div class='form-group'><input type='radio' id='$id' value='$slot' name='rsvp_time' " . $checked . "><label for='$id'>$slot</label></div>";
-            }
-            if ($timeSelects == '') {
-                $timeSelects .= __('No time slots available.', 'rrze-rsvp');
-            }
-            $response['time'] = '<div class="rsvp-time-select">' . $timeSelects . '</div>';
+            $response['time'] = $this->buildTimeslotSelect($room, $date, $time, $availability);
             if ($time) {
-                $seats = (isset($availability[$date][$time])) ? $availability[$date][$time] : [];
-                foreach ($seats as $seat) {
-                    $seatname = get_the_title($seat);
-                    $id = 'rsvp_seat_' . sanitize_title($seat);
-                    $seatSelects .= "<div class='form-group'>"
-                        . "<input type='radio' id='$id' value='$seat' name='rsvp_seat'>"
-                        . "<label for='$id'>$seatname</label>"
-                        . "</div>";
-                }
-                if ($seatSelects == '') {
-                    $seatSelects = '<div class="rsvp-service-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
-                } else {
-                    $seatSelects = '<div class="rsvp-service-select">' . $seatSelects . '</div>';
-                }
-                $response['service'] = '<h4>' . __('Available items:', 'rrze-rsvp') . '</h4>' . $seatSelects;
+                $response['seat'] = $this->buildSeatSelect($room, $date, $time, false, $availability);
             }
         }
         wp_send_json($response);
@@ -476,12 +465,37 @@ class Bookings extends Shortcodes {
         wp_die();
     }
 
-    private function buildTimeslotSelect($timeslots = []) {
-
+    private function buildTimeslotSelect($room, $date, $time = false, $availability) {
+        $slots = [];
+        $timeSelects = '';
+        $slots = array_keys($availability[$date]);
+        foreach ($slots as $slot) {
+            $id = 'rsvp_time_' . sanitize_title($slot);
+            $checked = checked($time !== false && $time == $slot, true, false);
+            $timeSelects .= "<div class='form-group'><input type='radio' id='$id' value='$slot' name='rsvp_time' " . $checked . "><label for='$id'>$slot</label></div>";
+        }
+        if ($timeSelects == '') {
+            $timeSelects .= __('No time slots available.', 'rrze-rsvp');
+        }
+        return '<div class="rsvp-time-select">' . $timeSelects . '</div>';
     }
 
-    private function buildSeatSelect() {
-
+    private function buildSeatSelect($room, $date, $time, $seat_id, $availability) {
+        $seats = (isset($availability[$date][$time])) ? $availability[$date][$time] : [];
+        $seatSelects = '';
+        foreach ($seats as $seat) {
+            $seatname = get_the_title($seat);
+            $id = 'rsvp_seat_' . sanitize_title($seat);
+            $checked = checked($seat_id !== false && $seat == $seat_id, true, false);
+            $seatSelects .= "<div class='form-group'>"
+                . "<input type='radio' id='$id' value='$seat' name='rsvp_seat' $checked>"
+                . "<label for='$id'>$seatname</label>"
+                . "</div>";
+        }
+        if ($seatSelects == '') {
+            $seatSelects = __('Please select a date and a time slot.', 'rrze-rsvp');
+        }
+        return '<h4>' . __('Available seats:', 'rrze-rsvp') . '</h4><div class="rsvp-seat-select">' . $seatSelects . '</div>';
     }
 
 }

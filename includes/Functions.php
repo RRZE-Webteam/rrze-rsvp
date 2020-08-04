@@ -169,9 +169,12 @@ class Functions
     }
 
     public static function getRoomAvailability ($room, $start, $end) {
+        $availability = [];
         // Array aus verfügbaren Timeslots des Raumes erstellen
-        $timeslots = get_post_meta($room, 'rrze-rsvp-room-timeslots');
-        $timeslots = $timeslots[0];
+        $timeslots = get_post_meta($room, 'rrze-rsvp-room-timeslots', true);
+        if ($timeslots == '') {
+            return $availability;
+        }
         foreach($timeslots as $timeslot) {
             foreach ($timeslot['rrze-rsvp-room-weekday'] as $weekday) {
                 $slots[$weekday][] = $timeslot['rrze-rsvp-room-starttime'];

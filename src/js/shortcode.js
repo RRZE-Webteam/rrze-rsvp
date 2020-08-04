@@ -13,7 +13,7 @@ jQuery(document).ready(function($){
     $('div.rsvp-datetime-container').on('click', 'input', updateForm);
     $('select#rsvp_room').change(updateForm);
 
-    $('div.rsvp-service-container').on('click', 'input', function(){
+    $('div.rsvp-seat-container').on('click', 'input', function(){
         var id = $(this).val();
         $('div.rsvp-item-info').remove();
         $.post(rsvp_ajax.ajax_url, {         //POST request
@@ -22,7 +22,7 @@ jQuery(document).ready(function($){
             id: id,
         }, function(result) {                 //callback
             //console.log(result);
-            $('div.rsvp-service-select').after(result);
+            $('div.rsvp-seat-select').after(result);
         });
     });
 
@@ -34,7 +34,7 @@ jQuery(document).ready(function($){
         var room = $('#rsvp_room').val();
         $('table.rsvp_calendar').remove();
         $('div.rsvp-time-select').remove();
-        $('div.rsvp-service-select').remove();
+        $('div.rsvp-seat-select').remove();
         $.post(rsvp_ajax.ajax_url, {         //POST request
             _ajax_nonce: rsvp_ajax.nonce,     //nonce
             action: "UpdateCalendar",            //action
@@ -57,7 +57,7 @@ function updateForm() {
     // console.log(date);
     // console.log(time);
     jQuery('div.rsvp-time-select').remove();
-    jQuery('div.rsvp-service-select').remove();
+    jQuery('div.rsvp-seat-select').remove();
     jQuery.post(rsvp_ajax.ajax_url, {         //POST request
         _ajax_nonce: rsvp_ajax.nonce,     //nonce
         action: "UpdateForm",            //action
@@ -67,6 +67,6 @@ function updateForm() {
     }, function(result) {                 //callback
         //console.log(result);
         jQuery('div.rsvp-time-container').append(result['time']);
-        jQuery('div.rsvp-service-container').html(result['service']);
+        jQuery('div.rsvp-seat-container').html(result['seat']);
     });
 }
