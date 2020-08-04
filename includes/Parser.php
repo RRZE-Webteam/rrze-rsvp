@@ -113,7 +113,6 @@ class Parser
         $val = $this->getValue($key);
 
         $temp = '';
-        $i;
 
         if (! $val) {
             // Check for if negation
@@ -138,7 +137,7 @@ class Parser
             $_key = $this->vars['_key'];
             $_val = $this->vars['_val'];
 
-            foreach ($val as $i => $v) {
+            foreach ($_val as $i => $v) {
                 $this->vars['_key'] = $i;
                 $this->vars['_val'] = $v;
 
