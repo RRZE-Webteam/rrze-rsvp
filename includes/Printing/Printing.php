@@ -60,7 +60,7 @@ class Printing {
                     'order' => 'ASC',
                     'numberposts' => -1
                 ]);
-                array_push($aSeats, $seat_ids);
+                $aSeats = array_merge($aSeats, $seat_ids);
             }
         } else {
             $aSeats = $post_ids;
