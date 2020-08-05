@@ -128,7 +128,7 @@
     .rsvp-time-select label {
         min-width: 0;
     }
-    .rsvp-service-select {
+    .rsvp-seat-select {
         margin-bottom: 1em;
         @media (min-width: 480px) {
             display: flex;
@@ -141,6 +141,9 @@
     .rsvp-item-info {
         border: 1px solid #dde5f0;
         padding: 10px;
+        margin-bottom: 1em;
+    }
+    .rsvp-seat-container {
         margin-bottom: 1em;
     }
 }

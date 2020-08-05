@@ -107,18 +107,21 @@ RRZE RSVP Frontend CSS
 .rrze-rsvp .rsvp-time-select label {
   min-width: 0; }
 
-.rrze-rsvp .rsvp-service-select {
+.rrze-rsvp .rsvp-seat-select {
   margin-bottom: 1em; }
   @media (min-width: 480px) {
-    .rrze-rsvp .rsvp-service-select {
+    .rrze-rsvp .rsvp-seat-select {
       display: flex;
       flex-wrap: wrap; } }
-  .rrze-rsvp .rsvp-service-select label {
+  .rrze-rsvp .rsvp-seat-select label {
     min-width: 0; }
 
 .rrze-rsvp .rsvp-item-info {
   border: 1px solid #dde5f0;
   padding: 10px;
+  margin-bottom: 1em; }
+
+.rrze-rsvp .rsvp-seat-container {
   margin-bottom: 1em; }
 
 .rrze-rsvp-booking-reply {

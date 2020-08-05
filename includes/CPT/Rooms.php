@@ -176,9 +176,8 @@ class Rooms
             'type' => 'text',
             'attributes' => array(
                 'type' => 'number',
-                'pattern' => '\d*',
+                'min' => '0',
             ),
-            'sanitization_cb' => 'intval',
         ));
 
         $cmb_general->add_field(array(
