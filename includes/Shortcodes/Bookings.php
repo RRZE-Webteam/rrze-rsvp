@@ -3,6 +3,7 @@
 namespace RRZE\RSVP\Shortcodes;
 
 use RRZE\RSVP\Email;
+use RRZE\RSVP\Idm;
 use RRZE\RSVP\Functions;
 use function RRZE\RSVP\Config\getShortcodeSettings;
 use function RRZE\RSVP\Config\getShortcodeDefaults;
@@ -19,21 +20,34 @@ class Bookings extends Shortcodes {
     private $settings = '';
     private $shortcodesettings = '';
 
+    protected $email;
+    protected $idm;
+
     public function __construct($pluginFile, $settings)
     {
         parent::__construct($pluginFile, $settings);
         $this->shortcodesettings = getShortcodeSettings();
         $this->email = new Email;
+        $this->idm = new IdM;
     }
 
 
     public function onLoaded()
     {
+        add_action('template_redirect', [$this, 'ssoLogin']);
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         add_action( 'wp_ajax_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
         add_action( 'wp_ajax_UpdateForm', [$this, 'ajaxUpdateForm'] );
         add_action( 'wp_ajax_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );
     }
+
+    public function ssoLogin()
+    {
+        if (!is_user_logged_in() && Functions::hasShortcodeSSO('rsvp-booking')) {
+            $this->idm->tryLogIn();
+        }
+    }
+
 
     public function shortcodeBooking($atts, $content = '', $tag) {
         $output = '';
@@ -46,6 +60,7 @@ class Bookings extends Shortcodes {
                     }
                 }
             );
+
             $posted_data = $_POST;
 //            echo Helper::get_html_var_dump($posted_data);
             $booking_date = sanitize_text_field($posted_data['rsvp_date']);
