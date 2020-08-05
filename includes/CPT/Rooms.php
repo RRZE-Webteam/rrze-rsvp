@@ -184,6 +184,15 @@ class Rooms
             'desc' => __('If the automatic confirmation is not activated, the booking must be confirmed manually.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-auto-confirmation',
             'type' => 'checkbox',
+            'default' => 'on',
+        ));
+
+        $cmb_general->add_field(array(
+            'name' => __('Allow Instant Check-In', 'rrze-rsvp'),
+            'desc' => __('Seats can be booked and checked-in in one step. This only works if automatic confirmation activated!', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-instant-check-in',
+            'type' => 'checkbox',
+            'default' => '',
         ));
 
         $cmb_general->add_field(array(

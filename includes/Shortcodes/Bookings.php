@@ -269,12 +269,12 @@ class Bookings extends Shortcodes {
             $output .= '<legend>' . __('Your data', 'rrze-rsvp') . '</legend>';
             if ($sso) {
                 $data = $this->idm->getCustomerData();
-                $disabled        = 'disabled';
+                $readonly        = 'readonly';
                 $input_lastname  = $data['customer_lastname'];
                 $input_firstname = $data['customer_firstname'];
                 $input_email     = $data['customer_email'];
             } else {
-                $disabled        = '';
+                $readonly        = '';
                 $input_lastname  = '';
                 $input_firstname = '';
                 $input_email     = '';
@@ -282,17 +282,17 @@ class Bookings extends Shortcodes {
 
             $output .= '<div class="form-group"><label for="rsvp_lastname">'
                        . __('Last name', 'rrze-rsvp') . ' *</label>'
-                       . "<input type=\"text\" name=\"rsvp_lastname\" id=\"rsvp_lastname\" required $disabled aria-required=\"true\" value=\"$input_lastname\">"
+                       . "<input type=\"text\" name=\"rsvp_lastname\" id=\"rsvp_lastname\" required $readonly aria-required=\"true\" value=\"$input_lastname\">"
                        . '</div>';
 
             $output .= '<div class="form-group"><label for="rsvp_firstname">'
                        . __('First name', 'rrze-rsvp') . ' *</label>'
-                       . "<input type=\"text\" name=\"rsvp_firstname\" id=\"rsvp_firstname\" required $disabled aria-required=\"true\" value=\"$input_firstname\">"
+                       . "<input type=\"text\" name=\"rsvp_firstname\" id=\"rsvp_firstname\" required $readonly aria-required=\"true\" value=\"$input_firstname\">"
                        . '</div>';
 
             $output .= '<div class="form-group"><label for="rsvp_email">'
                        . __('Email', 'rrze-rsvp') . ' *</label>'
-                       . "<input type=\"text\" name=\"rsvp_email\" id=\"rsvp_email\" required $disabled aria-required=\"true\" value=\"$input_email\">"
+                       . "<input type=\"text\" name=\"rsvp_email\" id=\"rsvp_email\" required $readonly aria-required=\"true\" value=\"$input_email\">"
                        . '</div>';
 
             $output .= '<div class="form-group"><label for="rsvp_phone">'
@@ -423,7 +423,7 @@ class Bookings extends Shortcodes {
             $input_close = '</span>';
             if ($active) {
                 $selected = $bookingdate_selected == $date ? 'checked="checked"' : '';
-                $input_open = "<input type=\"radio\" id=\"rsvp_date_$date\" value=\"$date\" name=\"rsvp_date\" $selected><label for=\"rsvp_date_$date\">";
+                $input_open = "<input type=\"radio\" id=\"rsvp_date_$date\" value=\"$date\" name=\"rsvp_date\" $selected required aria-required='true'><label for=\"rsvp_date_$date\">";
                 $input_close = '</label>';
             }
             $calendar .= "<td class='day $class' rel='$date' title='$title'>" . $input_open.$currentDay.$input_close . "</td>";
@@ -544,7 +544,7 @@ class Bookings extends Shortcodes {
         foreach ($slots as $slot) {
             $id = 'rsvp_time_' . sanitize_title($slot);
             $checked = checked($time !== false && $time == $slot, true, false);
-            $timeSelects .= "<div class='form-group'><input type='radio' id='$id' value='$slot' name='rsvp_time' " . $checked . "><label for='$id'>$slot</label></div>";
+            $timeSelects .= "<div class='form-group'><input type='radio' id='$id' value='$slot' name='rsvp_time' " . $checked . " required aria-required='true'><label for='$id'>$slot</label></div>";
         }
         if ($timeSelects == '') {
             $timeSelects .= __('No time slots available.', 'rrze-rsvp');
@@ -560,7 +560,7 @@ class Bookings extends Shortcodes {
             $id = 'rsvp_seat_' . sanitize_title($seat);
             $checked = checked($seat_id !== false && $seat == $seat_id, true, false);
             $seatSelects .= "<div class='form-group'>"
-                . "<input type='radio' id='$id' value='$seat' name='rsvp_seat' $checked>"
+                . "<input type='radio' id='$id' value='$seat' name='rsvp_seat' $checked required aria-required='true'>"
                 . "<label for='$id'>$seatname</label>"
                 . "</div>";
         }
