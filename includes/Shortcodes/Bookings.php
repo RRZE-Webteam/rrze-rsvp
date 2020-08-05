@@ -39,7 +39,7 @@ class Bookings extends Shortcodes {
 
     public function onLoaded()
     {
-        add_action('wp', [$this, 'ssoLogin'], 0);
+        add_action('template_redirect', [$this, 'ssoLogin']);
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         add_action( 'wp_ajax_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
         add_action( 'wp_ajax_nopriv_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
@@ -51,7 +51,7 @@ class Bookings extends Shortcodes {
 
     public function ssoLogin()
     {
-        if (!is_user_logged_in() && Functions::hasShortcodeSSO('rsvp-booking')) {
+        if (is_page() && Functions::hasShortcodeSSO('rsvp-booking')) {
             $this->sso = $this->idm->tryLogIn(true);
         }
     }
