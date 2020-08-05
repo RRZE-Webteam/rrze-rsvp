@@ -54,8 +54,8 @@ function getConstants() {
             'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp'),
             'single_room_availability_table' => 'yes_link',
             'logo' => 'fau',
-            'instructions_de' => __('Scan the QR code for booking.', 'rrze-rsvp'),
-            'instructions_en' => __('Scan the QR code for booking.', 'rrze-rsvp'),
+            'instructions_de' => 'Bitte lesen Sie den QR Code ein um zur Buchung zu kommen.',
+            'instructions_en' => 'Scan the QR code for booking.',
         ];
     }
     
