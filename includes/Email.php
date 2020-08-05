@@ -100,20 +100,27 @@ class Email
             return;
         }
 
+        $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
+        $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
+        $customerPhone = sprintf('%s: %s', __('Phone', 'rrze-rsvp'), $booking['guest_phone']);
         $confirmUrl = Functions::bookingReplyUrl('confirm', sprintf('%s-%s', $bookingId, $booking['start']), $bookingId);
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s%-s', $bookingId, $booking['start']), $bookingId);
 
-        $booking['text'] = sprintf(__('You received a new request for a booking on %s.', 'rrze-rsvp'), get_bloginfo('name'));
+        $data = [];
+        $data['text'] = sprintf(__('You received a new request for a booking on %s.', 'rrze-rsvp'), get_bloginfo('name'));
+        $data['date'] = $booking['date'];
+        $data['time'] = $booking['time'];
+        $data['room_name'] = $booking['room_name'];
+        $data['seat_name'] = $booking['seat_name'];
+        $data['customer']['name'] = $customerName;
+        $data['customer']['email'] = $customerEmail;
+        $data['customer']['phone'] = $customerPhone;
+        $data['confirm_url'] = $confirmUrl;
+        $data['confirm_link_text'] = __('Confirm Booking', 'rrze-rsvp');
+        $data['cancel_url'] = $cancelUrl;
+        $data['cancel_link_text'] = __('Cancel Booking', 'rrze-rsvp');
 
-        $booking['user_info'] = '';
-
-        $booking['confirm_url'] = $confirmUrl;
-        $booking['confirm_link_text'] = __('Confirm Booking', 'rrze-rsvp');
-
-        $booking['cancel_url'] = $cancelUrl;
-        $booking['cancel_link_text'] = __('Cancel Booking', 'rrze-rsvp');
-
-        $message = $this->template->getContent('email/booking-requested-admin', $booking);
+        $message = $this->template->getContent('email/booking-requested-admin', $data);
 
         $this->send($to, $subject, $message);
     }
@@ -132,15 +139,19 @@ class Email
         }
 
         $to = $this->options->email_notification_email;
-
-        $booking['booking_info'] = Functions::dataToStr($booking);
-
         $subject = __('Booking has been cancelled', 'rrze-rsvp');
+
         $text = sprintf(__('A booking on %s has been cancelled by the customer.', 'rrze-rsvp'), get_bloginfo('name'));
 
-        $booking['text'] = $this->placeholderParser($text, $booking);
+        $data = [];
+        $data['text'] = $this->placeholderParser($text, $booking);
+        $data['date'] = $booking['date'];
+        $data['time'] = $booking['time'];
+        $data['room_name'] = $booking['room_name'];
+        $data['seat_name'] = $booking['seat_name'];
+        $data['booking_info'] = Functions::dataToStr($booking);
 
-        $message = $this->template->getContent('email/booking-cancelled-admin', $booking);
+        $message = $this->template->getContent('email/booking-cancelled-admin', $data);
 
         $this->send($to, $subject, $message);
     }
@@ -162,18 +173,22 @@ class Email
         }
 
         $subject = $this->options->email_received_subject;
-        $text = $this->options->email_received_text;
-
         $subject = $this->placeholderParser($subject, $booking);
-        $booking['text'] = $this->placeholderParser($text, $booking);
 
+        $text = $this->options->email_received_text;
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
-        $booking['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl) . '</p>';
 
-        $booking['site_url'] = site_url();
-        $booking['site_url_text'] = get_bloginfo('name');
+        $data = [];
+        $data['text'] = $this->placeholderParser($text, $booking);
+        $data['date'] = $booking['date'];
+        $data['time'] = $booking['time'];
+        $data['room_name'] = $booking['room_name'];
+        $data['seat_name'] = $booking['seat_name'];
+        $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl);
+        $data['site_url'] = site_url();
+        $data['site_url_text'] = get_bloginfo('name');
 
-        $message = $this->template->getContent('email/booking-requested-customer', $booking);
+        $message = $this->template->getContent('email/booking-requested-customer', $data);
 
         $this->send($booking['guest_email'], $subject, $message);
     }
@@ -193,21 +208,24 @@ class Email
         }
 
         $subject = $this->options->email_confirm_subject;
-        $text = $this->options->email_confirm_text;
-
         $subject = $this->placeholderParser($subject, $booking);
-        $booking['text'] = $this->placeholderParser($text, $booking);
 
+        $text = $this->options->email_confirm_text;
         $icsUrl = Functions::bookingReplyUrl('ics', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
-        $booking['ics_download'] = sprintf(__('<a href="%s">Add the booking to your calendar</a>.', 'rzze-rsvp'), $icsUrl) . '</p>';
-
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
-        $booking['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl) . '</p>';
 
-        $booking['site_url'] = site_url();
-        $booking['site_url_text'] = get_bloginfo('name');
+        $data = [];
+        $data['text'] = $this->placeholderParser($text, $booking);
+        $data['date'] = $booking['date'];
+        $data['time'] = $booking['time'];
+        $data['room_name'] = $booking['room_name'];
+        $data['seat_name'] = $booking['seat_name'];
+        $data['ics_download'] = sprintf(__('<a href="%s">Add the booking to your calendar</a>.', 'rzze-rsvp'), $icsUrl);
+        $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl);
+        $data['site_url'] = site_url();
+        $data['site_url_text'] = get_bloginfo('name');
 
-        $message = $this->template->getContent('email/booking-confirmed-customer', $booking);
+        $message = $this->template->getContent('email/booking-confirmed-customer', $data);
 
         $this->send($booking['guest_email'], $subject, $message);
     }
@@ -227,15 +245,20 @@ class Email
         }
 
         $subject = $this->options->email_cancel_subject;
+        $subject = $this->placeholderParser($subject, $booking);
+
         $text = $this->options->email_cancel_text;
 
-        $subject = $this->placeholderParser($subject, $booking);
-        $booking['text'] = $this->placeholderParser($text, $booking);
+        $data = [];
+        $data['text'] = $this->placeholderParser($text, $booking);
+        $data['date'] = $booking['date'];
+        $data['time'] = $booking['time'];
+        $data['room_name'] = $booking['room_name'];
+        $data['seat_name'] = $booking['seat_name'];
+        $data['site_url'] = site_url();
+        $data['site_url_text'] = get_bloginfo('name');
 
-        $booking['site_url'] = site_url();
-        $booking['site_url_text'] = get_bloginfo('name');
-
-        $message = $this->template->getContent('email/booking-cancelled-customer', $booking);
+        $message = $this->template->getContent('email/booking-cancelled-customer', $data);
 
         $this->send($booking['guest_email'], $subject, $message);
     }
