@@ -51,10 +51,12 @@ class PDF extends TCPDF{
         // $pdf->SetHeaderData($logo, PDF_HEADER_LOGO_WIDTH, $room_name, PDF_HEADER_STRING, array(0,64,255), array(0,64,128));
         // $pdf->SetHeaderData($logo, PDF_HEADER_LOGO_WIDTH, $room->post_title, '', 0, 0);
         // $pdf->setFooterData(array(0,64,0), array(0,64,128));
+        // $pdf->setFooterData(array(0,64,0), array(0,64,128));
+        $pdf->SetPrintFooter(false);
 
         // set header and footer fonts
         // $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-        $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+        // $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
 
         // set default monospaced font
         $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
