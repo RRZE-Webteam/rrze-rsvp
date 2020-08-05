@@ -1,4 +1,4 @@
-<p>{{=text))</p>
+<p>{{=text}}</p>
 
 <p class="date">
     {{=date}}
@@ -13,12 +13,10 @@
     {{/seat_name}}    
 </p>
 
-<p class="user-info" style="line-height: 24px;">
-    {{=user_info}}
-</p>
-
-<p>
-    {{=action_text}}
+<p class="customer" style="line-height: 24px;">
+    {{=customer.name}}<br>
+    {{=customer.email}}<br>
+    {{=customer.phone}}
 </p>
 
 <table border="0" cellspacing="20" cellpadding="0" width="100%">
