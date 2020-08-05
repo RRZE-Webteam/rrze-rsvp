@@ -37,8 +37,11 @@ class Bookings extends Shortcodes {
         add_action('template_redirect', [$this, 'ssoLogin']);
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         add_action( 'wp_ajax_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
+        add_action( 'wp_ajax_nopriv_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
         add_action( 'wp_ajax_UpdateForm', [$this, 'ajaxUpdateForm'] );
+        add_action( 'wp_ajax_nopriv_UpdateForm', [$this, 'ajaxUpdateForm'] );
         add_action( 'wp_ajax_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );
+        add_action( 'wp_ajax_nopriv_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );
     }
 
     public function ssoLogin()
@@ -258,6 +261,10 @@ class Bookings extends Shortcodes {
 
         wp_enqueue_style('rrze-rsvp-shortcode');
         wp_enqueue_script('rrze-rsvp-shortcode');
+        wp_localize_script('rrze-rsvp-shortcode', 'rsvp_ajax', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce( 'rsvp-ajax-nonce' ),
+        ]);
 
         return $output;
     }
@@ -405,7 +412,7 @@ class Bookings extends Shortcodes {
     }
 
     public function ajaxUpdateCalendar() {
-        check_ajax_referer( 'rsvp-ajax-nonce' );
+        check_ajax_referer( 'rsvp-ajax-nonce', 'nonce' );
         $period = explode('-', $_POST['month']);
         $mod = ($_POST['direction'] == 'next' ? 1 : -1);
         $start = date_create();
@@ -418,7 +425,7 @@ class Bookings extends Shortcodes {
     }
 
     public function ajaxUpdateForm() {
-        check_ajax_referer( 'rsvp-ajax-nonce' );
+        check_ajax_referer( 'rsvp-ajax-nonce', 'nonce'  );
         $room = ((isset($_POST['room']) && $_POST['room'] > 0) ? (int)$_POST['room'] : '');
         $date = (isset($_POST['date']) ? sanitize_text_field($_POST['date']) : false);
         $time = (isset($_POST['time']) ? sanitize_text_field($_POST['time']) : false);
