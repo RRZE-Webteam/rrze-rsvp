@@ -43,7 +43,6 @@ class Rooms
             'view_item'                => __('View Room', 'rrze-rsvp'),
             'all_items'                => __('All Rooms', 'rrze-rsvp'),
             'search_items'            => __('Search Rooms', 'rrze-rsvp'),
-            'parent_item_colon'        => __('Parent Rooms:', 'rrze-rsvp'),
             'not_found'                => __('No Rooms found.', 'rrze-rsvp'),
             'not_found_in_trash'    => __('No Rooms found in Trash.', 'rrze-rsvp'),
             'featured_image'        => _x('Room Image', 'Overrides the “Featured Image” phrase for this post type. Added in 4.3', 'rrze-rsvp'),

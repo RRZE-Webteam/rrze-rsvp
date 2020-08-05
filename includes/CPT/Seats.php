@@ -44,7 +44,6 @@ class Seats
 			'view_item'				=> __('View Seat', 'rrze-rsvp'),
 			'all_items'				=> __('All Seats', 'rrze-rsvp'),
 			'search_items'			=> __('Search Seats', 'rrze-rsvp'),
-			'parent_item_colon'		=> __('Parent Seats:', 'rrze-rsvp'),
 			'not_found'				=> __('No Seats found.', 'rrze-rsvp'),
 			'not_found_in_trash'	=> __('No Seats found in Trash.', 'rrze-rsvp'),
 			'featured_image'		=> _x('Seat Image', 'Overrides the “Featured Image” phrase for this post type. Added in 4.3', 'rrze-rsvp'),
@@ -87,8 +86,8 @@ class Seats
 	public function seats_taxonomies()
 	{
 		$labels_equipment = array(
-			'name'				=> _x('Equipment', 'taxonomy general name'),
-			'singular_name'		=> _x('Equipment', 'taxonomy singular name'),
+			'name'				=> _x('Equipment', 'taxonomy general name', 'rrze-rsvp'),
+			'singular_name'		=> _x('Equipment', 'taxonomy singular name', 'rrze-rsvp'),
 		);
 		$args_equipment = array(
 			'labels' => $labels_equipment,
