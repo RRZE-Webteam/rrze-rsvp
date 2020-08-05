@@ -3,7 +3,7 @@
 namespace RRZE\RSVP\Shortcodes;
 
 use RRZE\RSVP\Email;
-//use RRZE\RSVP\IdM;
+use RRZE\RSVP\IdM;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Helper;
 
