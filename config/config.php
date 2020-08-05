@@ -112,7 +112,7 @@ function getSections()
             'title' => __('E-Mail Settings', 'rrze-rsvp')
         ],
         [
-            'id'    => 'qr',
+            'id'    => 'pdf',
             'title' => __('QR PDF Settings', 'rrze-rsvp')
         ]
     ];
