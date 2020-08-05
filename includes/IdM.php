@@ -76,6 +76,11 @@ class IdM
         return $message;
     }
 
+    public function isAuthenticated()
+    {
+        return $this->simplesamlAuth && $this->simplesamlAuth->isAuthenticated();
+    }
+
     public function getPersonAttributes()
     {
         return $this->personAttributes;
