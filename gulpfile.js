@@ -91,5 +91,6 @@ exports.js = js;
 exports.dev = series(js, cssdev, prereleasePackageVersion);
 exports.build = series(js, css, patchPackageVersion);
 exports.pot = updatepot;
-
+exports.devversion = prereleasePackageVersion;
+exports.buildversion = patchPackageVersion;
 exports.default = startWatch;

@@ -404,12 +404,12 @@ function getShortcodeSettings(){
             ],
             'date-select' => [
                 'values' => [
-                    'calendar' => __( 'Kalender', 'rrze-rsvp' ),
-                    'boxes' => __( 'Boxen', 'rrze-rsvp' )
+                    'calendar' => __( 'Calendar', 'rrze-rsvp' ),
+                    'boxes' => __( 'Boxes', 'rrze-rsvp' )
                 ],
                 'default' => 'calendar', // vorausgewählter Wert: Achtung: string, kein array!
                 'field_type' => 'select',
-                'label' => __( 'Datumsauswahl', 'rrze-rsvp' ),
+                'label' => __( 'Date selection', 'rrze-rsvp' ),
                 'type' => 'string' // Variablentyp des auswählbaren Werts
             ],
             'room' => [
