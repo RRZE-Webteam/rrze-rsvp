@@ -3,7 +3,7 @@
 namespace RRZE\RSVP\Shortcodes;
 
 use RRZE\RSVP\Email;
-use RRZE\RSVP\Idm;
+use RRZE\RSVP\IdM;
 use RRZE\RSVP\Functions;
 use function RRZE\RSVP\Config\getShortcodeSettings;
 use function RRZE\RSVP\Config\getShortcodeDefaults;
