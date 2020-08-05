@@ -150,6 +150,8 @@ class Bookings
                 'booked' => __('Booked', 'rrze-rsvp'),
                 'confirmed'   => __('Confirmed', 'rrze-rsvp'),
                 'cancelled'     => __('Cancelled', 'rrze-rsvp'),
+                'checked-in'     => __('Checked In', 'rrze-rsvp'),
+                'checked-out'     => __('Checked Out', 'rrze-rsvp'),
             ),
         ));
 
