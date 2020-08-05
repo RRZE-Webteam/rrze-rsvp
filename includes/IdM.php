@@ -34,7 +34,7 @@ class IdM
     public function tryLogIn(bool $message = false)
     {
         if (! $this->simplesamlAuth()) {
-            return;
+            return false;
         }
 
         if (!$this->simplesamlAuth->isAuthenticated()) {
