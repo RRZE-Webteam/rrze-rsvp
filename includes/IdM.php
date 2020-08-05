@@ -31,12 +31,24 @@ class IdM
         //
     }
 
-    public function tryLogIn()
+    public function tryLogIn(bool $message = false)
     {
-        $this->simplesamlAuth();
-
-        if (!$this->simplesamlAuth || !$this->simplesamlAuth->isAuthenticated()) {
+        if (! $this->simplesamlAuth()) {
             return false;
+        }
+
+        if (!$this->simplesamlAuth->isAuthenticated()) {
+            if ($message) {
+                wp_die(
+                    $this->getMessage(),
+                    __('Forbidden', 'rrze-rsvp'),
+                    [
+                        'response' => '403',
+                        'back_link' => false
+                    ]
+                );
+            }
+            $this->simplesamlAuth->requireAuth();
         }
 
         $this->personAttributes = $this->simplesamlAuth->getAttributes();
@@ -48,6 +60,27 @@ class IdM
         $this->eduPersonEntitlement = isset($this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement']) ? $this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement'] : null;
 
         return true;
+    }
+
+    protected function getMessage()
+    {
+        $message = '';
+
+        if ($this->simplesamlAuth) {
+            $login_url = $this->simplesamlAuth->getLoginURL();
+            $message .= '<h3>' . __('Access to the requested page is denied', 'rrze-rsvp') . '</h3>';
+            $message .= '<p>' . sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $login_url) . '</p>';
+            $message .= '<p>' . sprintf(__('<a href="%s">Login through Single Sign-On (central login service of the University Erlangen-Nürnberg)</a>.', 'rrze-rsvp'), $login_url) . '</p>';
+            return $message;
+        }
+
+        $message .= '<h3>' . __('Access is denied', 'rrze-rsvp') . '</h3>';
+        return $message;
+    }
+
+    public function isAuthenticated()
+    {
+        return $this->simplesamlAuth && $this->simplesamlAuth->isAuthenticated();
     }
 
     public function getPersonAttributes()

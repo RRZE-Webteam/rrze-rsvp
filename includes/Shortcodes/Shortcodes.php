@@ -40,11 +40,7 @@ class Shortcodes {
     {
         wp_register_style('rrze-rsvp-shortcode', plugins_url('assets/css/rrze-rsvp.css', plugin_basename($this->pluginFile)));
         wp_register_script('rrze-rsvp-shortcode', plugins_url('assets/js/shortcode.js', plugin_basename($this->pluginFile)));
-        $nonce = wp_create_nonce( 'rsvp-ajax-nonce' );
-        wp_localize_script('rrze-rsvp-shortcode', 'rsvp_ajax', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => $nonce,
-        ]);
+
     }
 
 

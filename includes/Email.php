@@ -170,6 +170,9 @@ class Email
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
         $booking['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl) . '</p>';
 
+        $booking['site_url'] = site_url();
+        $booking['site_url_text'] = get_bloginfo('name');
+
         $message = $this->template->getContent('email/booking-requested-customer', $booking);
 
         $this->send($booking['guest_email'], $subject, $message);
@@ -201,6 +204,9 @@ class Email
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
         $booking['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl) . '</p>';
 
+        $booking['site_url'] = site_url();
+        $booking['site_url_text'] = get_bloginfo('name');
+
         $message = $this->template->getContent('email/booking-confirmed-customer', $booking);
 
         $this->send($booking['guest_email'], $subject, $message);
@@ -225,6 +231,9 @@ class Email
 
         $subject = $this->placeholderParser($subject, $booking);
         $booking['text'] = $this->placeholderParser($text, $booking);
+
+        $booking['site_url'] = site_url();
+        $booking['site_url_text'] = get_bloginfo('name');
 
         $message = $this->template->getContent('email/booking-cancelled-customer', $booking);
 

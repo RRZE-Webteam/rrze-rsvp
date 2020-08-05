@@ -396,28 +396,34 @@ function getShortcodeSettings(){
                 'label' => __( 'Days in advance', 'rrze-rsvp' ),
                 'type' => 'number' // Variablentyp der Eingabe
             ],
-            'multiple' => [
-                'field_type' => 'toggle',
-                'label' => __( 'Multiple choice available', 'rrze-rsvp' ),
-                'type' => 'boolean',
-                'default'   => false // Vorauswahl: ausgewählt
-            ],
-            'date-select' => [
-                'values' => [
-                    'calendar' => __( 'Calendar', 'rrze-rsvp' ),
-                    'boxes' => __( 'Boxes', 'rrze-rsvp' )
-                ],
-                'default' => 'calendar', // vorausgewählter Wert: Achtung: string, kein array!
-                'field_type' => 'select',
-                'label' => __( 'Date selection', 'rrze-rsvp' ),
-                'type' => 'string' // Variablentyp des auswählbaren Werts
-            ],
             'room' => [
                 'default' => '',
                 'field_type' => 'text', // Art des Feldes im Gutenberg Editor
                 'label' => __( 'Room', 'rrze-rsvp' ),
                 'type' => 'text' // Variablentyp der Eingabe
             ],
+            'sso' => [
+                'field_type' => 'toggle',
+                'label' => __( 'Require SSO Authentication', 'rrze-rsvp' ),
+                'type' => 'boolean',
+                'default'   => false
+            ],
+//            'multiple' => [
+//                'field_type' => 'toggle',
+//                'label' => __( 'Multiple choice available', 'rrze-rsvp' ),
+//                'type' => 'boolean',
+//                'default'   => false // Vorauswahl: ausgewählt
+//            ],
+//            'date-select' => [
+//                'values' => [
+//                    'calendar' => __( 'Kalender', 'rrze-rsvp' ),
+//                    'boxes' => __( 'Boxen', 'rrze-rsvp' )
+//                ],
+//                'default' => 'calendar', // vorausgewählter Wert: Achtung: string, kein array!
+//                'field_type' => 'select',
+//                'label' => __( 'Datumsauswahl', 'rrze-rsvp' ),
+//                'type' => 'string' // Variablentyp des auswählbaren Werts
+//            ],
         ],
         'rsvp-availability' => [
             'block' => [
