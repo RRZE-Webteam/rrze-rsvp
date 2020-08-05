@@ -126,7 +126,9 @@ class IdM
             return false;
         }
 
-        require_once(WP_CONTENT_DIR . $options['simplesaml_include']);
+        if (! class_exists('\SimpleSAML\Auth\Simple')) {
+            require_once(WP_CONTENT_DIR . $options['simplesaml_include']);
+        }       
         $this->simplesamlAuth = new SimpleSAMLAuthSimple($options['simplesaml_auth_source']);
         return true;
     }
