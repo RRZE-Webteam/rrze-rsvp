@@ -59,7 +59,7 @@ get_header();
 				<?php echo $booking['date']; ?><br />
 				<?php echo $booking['time']; ?>
 			</p>
-			<p class="user-info">
+			<p class="customer">
 				<?php
 				printf('%s: %s %s<br>', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
 				printf('%s: %s<br>', __('Email', 'rrze-rsvp'), $booking['guest_email']);
