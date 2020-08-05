@@ -144,12 +144,13 @@ class Bookings extends Shortcodes {
                     $this->email->bookingConfirmedCustomer($booking_id);
                 } else {
                     $this->email->bookingRequestedCustomer($booking_id);
+                    if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
+                        $to = $this->options->email_notification_email;
+                        $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
+                        $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
+                    }                    
                 }
-                if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
-                    $to = $this->options->email_notification_email;
-                    $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
-                    $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
-                }
+
 
 //                wp_redirect(get_permalink().'?submit=success');
 //                exit;
