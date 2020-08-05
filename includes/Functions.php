@@ -362,4 +362,29 @@ class Functions
         }
         return $output;
     }
+
+    public static function hasShortcodeSSO(string $shortcode): bool
+    {
+        global $post;
+        if (is_a($post, '\WP_Post') && has_shortcode($post->post_content, 'rsvp-booking')) {
+            $result = [];
+            $pattern = get_shortcode_regex();
+            if (preg_match_all('/' . $pattern . '/s', $post->post_content, $matches)) {
+                $keys = [];
+                $result = [];
+                foreach ($matches[0] as $key => $value) {
+                    $get = str_replace(" ", "&", $matches[3][$key]);
+                    parse_str($get, $output);
+                    $keys = array_unique(array_merge($keys, array_keys($output)));
+                    $result[][$matches[2][$key]] = $output;
+                }
+            }
+            foreach ($result as $key => $value) {
+                if (isset($value[$shortcode]) && !empty($value[$shortcode]['sso'])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
