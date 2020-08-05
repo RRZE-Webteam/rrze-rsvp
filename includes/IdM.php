@@ -33,9 +33,11 @@ class IdM
 
     public function tryLogIn(bool $message = false)
     {
-        $this->simplesamlAuth();
+        if (! $this->simplesamlAuth()) {
+            return;
+        }
 
-        if (!$this->simplesamlAuth || !$this->simplesamlAuth->isAuthenticated()) {
+        if (!$this->simplesamlAuth->isAuthenticated()) {
             if ($message) {
                 wp_die(
                     $this->getMessage(),
