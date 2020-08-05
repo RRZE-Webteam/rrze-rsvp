@@ -46,7 +46,7 @@ class IdM
                     ]
                 );
             }
-            return false;
+            $this->simplesamlAuth->requireAuth();
         }
 
         $this->personAttributes = $this->simplesamlAuth->getAttributes();
