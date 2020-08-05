@@ -5,6 +5,8 @@ namespace RRZE\RSVP\Shortcodes;
 use RRZE\RSVP\Email;
 //use RRZE\RSVP\IdM;
 use RRZE\RSVP\Functions;
+use RRZE\RSVP\Helper;
+
 use function RRZE\RSVP\Config\getShortcodeSettings;
 use function RRZE\RSVP\Config\getShortcodeDefaults;
 use function RRZE\RSVP\getRoomAvailability;
@@ -19,6 +21,7 @@ class Bookings extends Shortcodes {
     protected $pluginFile;
     private $settings = '';
     private $shortcodesettings = '';
+    private $options = '';
 
     protected $email;
     protected $idm;
@@ -27,8 +30,9 @@ class Bookings extends Shortcodes {
     {
         parent::__construct($pluginFile, $settings);
         $this->shortcodesettings = getShortcodeSettings();
+        $this->options = (object) $settings->getOptions();
         $this->email = new Email;
-        //$this->idm = new IdM;
+        $this->idm = new IdM;
         $this->sso = false;
     }
 
@@ -48,7 +52,7 @@ class Bookings extends Shortcodes {
     public function ssoLogin()
     {
         if (!is_user_logged_in() && Functions::hasShortcodeSSO('rsvp-booking')) {
-            //$this->sso = $this->idm->tryLogIn();
+            $this->sso = $this->idm->tryLogIn(true);
         }
     }
 
@@ -141,16 +145,29 @@ class Bookings extends Shortcodes {
                 } else {
                     $this->email->bookingRequestedCustomer($booking_id);
                 }
+                if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
+                    $to = $this->options->email_notification_email;
+                    $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
+                    $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
+                }
+
+//                wp_redirect(get_permalink().'?submit=success');
+//                exit;
 
             } else {
-                $errors['wp_insert_post'] = 'Fehler beim Speichern der Buchung.';
+//                wp_redirect(get_permalink().'?submit=error');
+//                exit;
+
+                return '<div class="alert alert-danger" role="alert">' . __('Fehler beim Speichern der Buchung.', 'rrze-rsvp') . '</div>';
             }
 
-            $output .= '<h2>' . __('Die Daten wurden erfolgreich übertragen. Vielen Dank!', 'rrze-rsvp') . '</h2>';
+
+
+            $output .= '<h2>' . __('Your reservation has been submitted. Thank you for booking!', 'rrze-rsvp') . '</h2>';
             if ($room_autoconfirmation == 'on') {
-                $output .= '<p>' . __('Ihre Reservierung:', 'rrze-rsvp') . '</p>';
+                $output .= '<p>' . __('Your reservation:', 'rrze-rsvp') . '</p>';
             } else {
-                $output .= '<p>' . __('Ihre Reservierungsanfrage:', 'rrze-rsvp') . '</p>';
+                $output .= '<p>' . __('Your reservation request:', 'rrze-rsvp') . '</p>';
             }
             $output .= '<ul>'
                 . '<li>'. __('Date', 'rrze-rsvp') . ': <strong>' . date_i18n(get_option('date_format'), $booking_timestamp_start) . '</strong></li>'
