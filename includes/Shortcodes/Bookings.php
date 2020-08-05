@@ -25,6 +25,7 @@ class Bookings extends Shortcodes {
 
     protected $email;
     protected $idm;
+    protected $sso = false;
 
     public function __construct($pluginFile, $settings)
     {
@@ -33,13 +34,12 @@ class Bookings extends Shortcodes {
         $this->options = (object) $settings->getOptions();
         $this->email = new Email;
         $this->idm = new IdM;
-        $this->sso = false;
     }
 
 
     public function onLoaded()
     {
-        add_action('template_redirect', [$this, 'ssoLogin']);
+        add_action('wp', [$this, 'ssoLogin'], 0);
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         add_action( 'wp_ajax_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
         add_action( 'wp_ajax_nopriv_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
