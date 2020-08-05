@@ -366,7 +366,7 @@ class Functions
     public static function hasShortcodeSSO(string $shortcode): bool
     {
         global $post;
-        if (is_a($post, '\WP_Post') && has_shortcode($post->post_content, 'rsvp-booking')) {
+        if (is_a($post, '\WP_Post') && has_shortcode($post->post_content, $shortcode)) {
             $result = [];
             $pattern = get_shortcode_regex();
             if (preg_match_all('/' . $pattern . '/s', $post->post_content, $matches)) {
