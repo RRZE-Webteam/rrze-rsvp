@@ -312,7 +312,7 @@ function getFields(){
             ]
            
         ],
-        'qr' => [
+        'pdf' => [
             [
                 'name'    => 'logo',
                 'label'   => __('Logo', 'rrze-rsvp'),

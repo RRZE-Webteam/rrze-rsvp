@@ -7,33 +7,39 @@ defined('ABSPATH') || exit;
 use RRZE\RSVP\Printing\PDF;
 
 
-
 class Printing {
 
-    private $file_name;
-    private $file_url;
-
 	public function __construct() {
-        $upload_dir = wp_get_upload_dir();
-        $this->file_name = $upload_dir['basedir'] . '/seats.pdf';
-        $this->file_url = $upload_dir['baseurl'] . '/seats.pdf';
-	}
+    }
 
 	public function onLoaded() {
-		add_filter('bulk_actions-edit-room', [$this, 'add_bulk_actions']);
-		add_filter('bulk_actions-edit-seat', [$this, 'add_bulk_actions']);
-		add_filter('handle_bulk_actions-edit-room', [$this, 'bulk_print_qr'], 10, 3);
-		add_filter('handle_bulk_actions-edit-seat', [$this, 'bulk_print_qr'], 10, 3);
-		add_action('admin_notices', [$this, 'bulk_action_admin_notice']);
+		add_filter('bulk_actions-edit-room', [$this, 'addBulkActions']);
+		add_filter('bulk_actions-edit-seat', [$this, 'addBulkActions']);
+		add_filter('handle_bulk_actions-edit-room', [$this, 'bulkGeneratePDF'], 10, 3);
+		add_filter('handle_bulk_actions-edit-seat', [$this, 'bulkGeneratePDF'], 10, 3);
+        add_action('admin_notices', [$this, 'bulkAdminNotice']);
+		add_action('admin_init', [$this, 'handlePDFAction']);
+    }
+
+    public function handlePDFAction(){
+        if( isset($_POST['generate_pdf'])){
+            $seat_ids = get_option('rsvp_pdf_ids');
+            if (!$seat_ids){
+                echo __('No seats foound', 'rrze-rsvp');
+                exit;
+            }
+            $pdf = new PDF();
+            $pdf->createPDF($seat_ids);
+        }
     }
     
-    public function add_bulk_actions($bulk_actions) {
-        $bulk_actions['print-qr'] = __( 'Generate PDF', 'rrze-rsvp');
+    public function addBulkActions($bulk_actions) {
+        $bulk_actions['generate-pdf'] = __( 'Generate PDF', 'rrze-rsvp');
         return $bulk_actions;
     }
 
-    public function bulk_print_qr( $redirect_to, $doaction, $post_ids ) {
-        if ( $doaction !== 'print-qr' ) {
+    public function bulkGeneratePDF( $redirect_to, $doaction, $post_ids ) {
+        if ( $doaction !== 'generate-pdf' ) {
             return $redirect_to;
         }
 
@@ -60,22 +66,22 @@ class Printing {
             $aSeats = $post_ids;
         }
 
-        $pdf = new PDF();
-        $pdf->generatePDF($this->file_name, json_encode($aSeats));
+        // store $post_ids for seats in option 'rsvp-pdf-ids'
+        update_option('rsvp_pdf_ids', json_encode($aSeats));
 
         $redirect_to = add_query_arg('seatCnt', count($aSeats), $redirect_to);
         return $redirect_to;
     }
 
-    public function bulk_action_admin_notice() {
+    public function bulkAdminNotice() {
         if (!empty($_REQUEST['seatCnt'])) {
             $cnt = intval( $_REQUEST['seatCnt'] );
-            printf( '<div id="message" class="updated fade">' .
-            _n( 'PDF generated for %s seat',
-                'PDF generated for %s seats',
-                $cnt,
-                'rrze-rsvp'
-            ) . ': ' . '<a href="' . $this->file_url . '" target="_blank">Open PDF</a>' . '</div>', $cnt );
+            // remove_query_arg('seatCnt');
+
+            printf( '<div id="message" class="updated fade">' 
+                . '<form method="post" id="as-fdpf-form" target="_blank"><button class="button button-primary" type="submit" name="generate_pdf" value="generate">' 
+                . _n( 'Generate PDF for %s seat', 'Generate PDF for %s seats', $cnt, 'rrze-rsvp') 
+                . '</button></form>' . '</div>', $cnt );
         }
     }
 
