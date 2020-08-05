@@ -3,7 +3,7 @@
 namespace RRZE\RSVP\Shortcodes;
 
 use RRZE\RSVP\Email;
-use RRZE\RSVP\IdM;
+//use RRZE\RSVP\IdM;
 use RRZE\RSVP\Functions;
 use function RRZE\RSVP\Config\getShortcodeSettings;
 use function RRZE\RSVP\Config\getShortcodeDefaults;
@@ -28,7 +28,7 @@ class Bookings extends Shortcodes {
         parent::__construct($pluginFile, $settings);
         $this->shortcodesettings = getShortcodeSettings();
         $this->email = new Email;
-        $this->idm = new IdM;
+        //$this->idm = new IdM;
         $this->sso = false;
     }
 
@@ -48,7 +48,7 @@ class Bookings extends Shortcodes {
     public function ssoLogin()
     {
         if (!is_user_logged_in() && Functions::hasShortcodeSSO('rsvp-booking')) {
-            $this->sso = $this->idm->tryLogIn();
+            //$this->sso = $this->idm->tryLogIn();
         }
     }
 
@@ -251,11 +251,11 @@ class Bookings extends Shortcodes {
 
             $output .= '<legend>' . __('Your data', 'rrze-rsvp') . '</legend>';
             if ($sso) {
-                $data = $this->idm->getCustomerData();
-                $disabled        = 'disabled';
-                $input_lastname  = $data['customer_lastname'];
-                $input_firstname = $data['customer_firstname'];
-                $input_email     = $data['customer_email'];
+//                //$data = $this->idm->getCustomerData();
+//                $disabled        = 'disabled';
+//                $input_lastname  = $data['customer_lastname'];
+//                $input_firstname = $data['customer_firstname'];
+//                $input_email     = $data['customer_email'];
             } else {
                 $disabled        = '';
                 $input_lastname  = '';
