@@ -115,7 +115,9 @@ class PDF extends TCPDF{
             $y = $pdf->GetY();
             $pdf->MultiCell($w, 5, __('Room', 'rrze-rsvp') . ':', 0, 'L', 0);
             $pdf->SetFont('helvetica', '', 26, '', true);
-            $pdf->MultiCell($w, 5, $room->post_title, 0, 'L', 0);
+            if (isset($room->post_title)){
+                $pdf->MultiCell($w, 5, $room->post_title, 0, 'L', 0);
+            }
 
             $x = $pdf->GetX();
             $yRoom = $pdf->GetY();
@@ -176,7 +178,12 @@ class PDF extends TCPDF{
             $pdf->Text($pdf->GetX(), $y + 5, $permalink);
         }
 
-        $pdf->Output(sanitize_file_name($room->post_title) . '.pdf', 'I');
+        if (isset($room->post_title)){
+            $pdf_file_name = sanitize_file_name($room->post_title);
+        }else{
+            $pdf_file_name = 'seat';
+        }
+        $pdf->Output($pdf_file_name . '.pdf', 'I');
     }
 
 }

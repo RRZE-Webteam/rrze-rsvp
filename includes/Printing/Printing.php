@@ -23,7 +23,7 @@ class Printing {
 
     public function handlePDFAction(){
         if( isset($_POST['generate_pdf'])){
-                $seat_ids = get_option('rsvp_pdf_ids');
+            $seat_ids = get_option('rsvp_pdf_ids');
             if (!$seat_ids){
                 echo __('No seats foound', 'rrze-rsvp');
                 exit;
