@@ -51,8 +51,7 @@ class Bookings extends Shortcodes {
 
     public function ssoLogin()
     {
-        // BK TEST
-        if (is_page() && Functions::hasShortcodeSSO('rsvp-booking') && (!isset($_POST['generate_pdf']))) {
+        if (is_page() && Functions::hasShortcodeSSO('rsvp-booking')) {
             $this->sso = $this->idm->tryLogIn(true);
         }
     }
