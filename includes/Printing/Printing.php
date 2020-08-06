@@ -22,8 +22,9 @@ class Printing {
     }
 
     public function handlePDFAction(){
-        if( isset($_POST['generate_pdf'])){
-            $seat_ids = get_option('rsvp_pdf_ids');
+        // if( isset($_POST['generate_pdf'])){
+        if( isset($_GET['generate_pdf'])){
+                $seat_ids = get_option('rsvp_pdf_ids');
             if (!$seat_ids){
                 echo __('No seats foound', 'rrze-rsvp');
                 exit;
@@ -78,10 +79,13 @@ class Printing {
             $cnt = intval( $_REQUEST['seatCnt'] );
             // remove_query_arg('seatCnt');
 
+            // printf( '<div id="message" class="updated fade">' 
+            //     . '<form method="post" id="as-fdpf-form" target="_blank"><button class="button button-primary" type="submit" name="generate_pdf" value="generate">' 
+            //     . _n( 'Generate PDF for %s seat', 'Generate PDF for %s seats', $cnt, 'rrze-rsvp') 
+            //     . '</button></form>' . '</div>', $cnt );
+
             printf( '<div id="message" class="updated fade">' 
-                . '<form method="post" id="as-fdpf-form" target="_blank"><button class="button button-primary" type="submit" name="generate_pdf" value="generate">' 
-                . _n( 'Generate PDF for %s seat', 'Generate PDF for %s seats', $cnt, 'rrze-rsvp') 
-                . '</button></form>' . '</div>', $cnt );
+                . '<a href="?generate_pdf=1" target="_blank">Generate PDF</a></div>');
         }
     }
 
