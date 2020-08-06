@@ -47,11 +47,17 @@ function getConstants() {
             'sender_name' => '',
             'sender_email' => '',
             'received_subject' => __('Thank you for booking', 'rrze-rsvp'),
+            'received_subject_en' => 'Thank you for booking',
             'received_text' => __('We received your booking and we will notify you once it has been confirmed.', 'rrze-rsvp'),
+            'received_text_en' => 'We received your booking and we will notify you once it has been confirmed.',
             'confirm_subject' => __('Your booking has been confirmed', 'rrze-rsvp'),
+            'confirm_subject_en' => 'Your booking has been confirmed',
             'confirm_text' => __('We are happy to inform you that your booking has been confirmed.', 'rrze-rsvp'),
+            'confirm_text_en' => 'We are happy to inform you that your booking has been confirmed.',
             'cancel_subject' => __('Your booking has been cancelled', 'rrze-rsvp'),
+            'cancel_subject_en' => 'Your booking has been cancelled',
             'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp'),
+            'cancel_text_en' => 'Unfortunately we have to cancel your booking on {{date}} at {{time}}.',
             'single_room_availability_table' => 'yes_link',
             'logo' => 'fau',
             'instructions_de' => 'Bitte lesen Sie den QR Code ein, um auf diesem Platz einzuchecken oder diesen Platz für einen späteren Zeitpunkt zu reservieren.',
@@ -276,12 +282,28 @@ function getFields(){
                 'default'           =>  $defaults['received_subject'],
                 'sanitize_callback' => 'sanitize_text_field'
             ],
+            [
+                'name'              => 'received_subject_en',
+                'label'             => __('Subject (english)', 'rrze-rsvp'),
+                'desc'              => __('Subject for mails', 'rrze-rsvp'),
+                'type'              => 'text',
+                'default'           =>  $defaults['received_subject_en'],
+                'sanitize_callback' => 'sanitize_text_field',
+                'exception'         => ['locale' => 'en']
+            ],            
 	     [
                 'name'              => 'received_text',
                 'label'             => __('Text', 'rrze-rsvp'),
                 'type'              => 'textarea',
-                'default'           => $defaults['received_text'],
+                'default'           => $defaults['received_text']
             ],
+            [
+                'name'              => 'received_text_en',
+                'label'             => __('Text (english)', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           => $defaults['received_text_en'],
+                'exception'         => ['locale' => 'en']
+            ],            
 	      [
                 'name'              => 'confirm_subject',
                 'label'             => __('Subject Confirmation', 'rrze-rsvp'),
@@ -290,12 +312,28 @@ function getFields(){
                 'default'           => $defaults['confirm_subject'],
                 'sanitize_callback' => 'sanitize_text_field'
             ],
+            [
+                'name'              => 'confirm_subject_en',
+                'label'             => __('Subject Confirmation (english)', 'rrze-rsvp'),
+                'desc'              => __('Subject for confirmation mails', 'rrze-rsvp'),
+                'type'              => 'text',
+                'default'           => $defaults['confirm_subject_en'],
+                'sanitize_callback' => 'sanitize_text_field',
+                'exception'         => ['locale' => 'en']
+            ],            
 	     [
                 'name'              => 'confirm_text',
                 'label'             => __('Confirmation Text', 'rrze-rsvp'),
                 'type'              => 'textarea',
-                'default'           => $defaults['confirm_text'],
+                'default'           => $defaults['confirm_text']
             ],
+            [
+                'name'              => 'confirm_text_en',
+                'label'             => __('Confirmation Text (english)', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           => $defaults['confirm_text_en'],
+                'exception'         => ['locale' => 'en']
+            ],            
 	        [
                 'name'              => 'cancel_subject',
                 'label'             => __('Subject Canceling', 'rrze-rsvp'),
@@ -304,12 +342,28 @@ function getFields(){
                 'default'           =>  $defaults['cancel_subject'],
                 'sanitize_callback' => 'sanitize_text_field'
             ],
+	        [
+                'name'              => 'cancel_subject_en',
+                'label'             => __('Subject Canceling (english)', 'rrze-rsvp'),
+                'desc'              => __('Subject for canceling mails', 'rrze-rsvp'),
+                'type'              => 'text',
+                'default'           =>  $defaults['cancel_subject_en'],
+                'sanitize_callback' => 'sanitize_text_field',
+                'exception'         => ['locale' => 'en']
+            ],            
 	     [
                 'name'              => 'cancel_text',
                 'label'             => __('Cancel Text', 'rrze-rsvp'),
                 'type'              => 'textarea',
-                'default'           => $defaults['cancel_text'],
-            ]
+                'default'           => $defaults['cancel_text']
+         ],
+	     [
+            'name'              => 'cancel_text_en',
+            'label'             => __('Cancel Text (english)', 'rrze-rsvp'),
+            'type'              => 'textarea',
+            'default'           => $defaults['cancel_text_en'],
+            'exception'         => ['locale' => 'en']
+        ]         
            
         ],
         'pdf' => [

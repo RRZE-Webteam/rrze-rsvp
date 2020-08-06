@@ -363,6 +363,11 @@ class Settings
         // Hinzufügen von Einstellungsfelder
         foreach ($this->settingsFields as $section => $field) {
             foreach ($field as $option) {
+                if (isset($option['exception'])) {
+                    if (isset($option['exception']['locale']) && $option['exception']['locale'] = 'en' && Functions::isLocaleEnglish()) {
+                        continue;
+                    }
+                }
                 $name = $option['name'];
                 $type = isset($option['type']) ? $option['type'] : 'text';
                 $label = isset($option['label']) ? $option['label'] : '';
