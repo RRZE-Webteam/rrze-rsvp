@@ -19,6 +19,12 @@ class Email
     protected $template;
 
     /**
+     * True if locale is an english language
+     * @var boolean
+     */
+    protected $isLocaleEnglish;
+
+    /**
      * __construct
      */
     public function __construct()
@@ -26,6 +32,7 @@ class Email
         $settings = new Settings(plugin()->getFile());
         $this->options = (object) $settings->getOptions();
         $this->template = new Template;
+        $this->isLocaleEnglish = Functions::isLocaleEnglish();
     }
 
     /**
@@ -174,17 +181,27 @@ class Email
 
         $subject = $this->options->email_received_subject;
         $subject = $this->placeholderParser($subject, $booking);
+        $subjectEnglish = $this->options->email_received_subject_en;
+        $subjectEnglish = $this->placeholderParser($subjectEnglish, $booking);         
 
         $text = $this->options->email_received_text;
+        $textEnglish = $this->options->email_received_text_en;
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
 
         $data = [];
+        if (! $this->isLocaleEnglish) $data['is_locale_not_english'] = 1;
+        $data['subject'] = $subject;
+        $data['subject_en'] = $subjectEnglish;        
         $data['text'] = $this->placeholderParser($text, $booking);
+        $data['text_en'] = $this->placeholderParser($textEnglish, $booking);
         $data['date'] = $booking['date'];
+        $data['date_en'] = $booking['date_en'];
         $data['time'] = $booking['time'];
+        $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
         $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl);
+        $data['cancel_booking_en'] = sprintf('Please <a href="%s">cancel your booking</a> in time if your plans change.', $cancelUrl);
         $data['site_url'] = site_url();
         $data['site_url_text'] = get_bloginfo('name');
 
@@ -209,21 +226,33 @@ class Email
 
         $subject = $this->options->email_confirm_subject;
         $subject = $this->placeholderParser($subject, $booking);
+        $subjectEnglish = $this->options->email_confirm_subject_en;
+        $subjectEnglish = $this->placeholderParser($subjectEnglish, $booking);        
 
         $text = $this->options->email_confirm_text;
+        $textEnglish = $this->options->email_confirm_text_en;
         $icsUrl = Functions::bookingReplyUrl('ics', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
         $checkInUrl = Functions::bookingReplyUrl('checkin', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);        
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
 
         $data = [];
+        if (! $this->isLocaleEnglish) $data['is_locale_not_english'] = 1;
+        $data['subject'] = $subject;
+        $data['subject_en'] = $subjectEnglish;
         $data['text'] = $this->placeholderParser($text, $booking);
+        $data['text_en'] = $this->placeholderParser($textEnglish, $booking);
         $data['date'] = $booking['date'];
+        $data['date_en'] = $booking['date_en'];
         $data['time'] = $booking['time'];
+        $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
         $data['ics_download'] = sprintf(__('<a href="%s">Add the booking to your calendar</a>.', 'rzze-rsvp'), $icsUrl);
+        $data['ics_download_en'] = sprintf('<a href="%s">Add the booking to your calendar</a>.', $icsUrl);
         $data['checkin_booking'] = sprintf(__('Please <a href="%s">check-in your booking</a> on site.', 'rzze-rsvp'), $checkInUrl);
+        $data['checkin_booking_en'] = sprintf('Please <a href="%s">check-in your booking</a> on site.', $checkInUrl);
         $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl);
+        $data['cancel_booking_en'] = sprintf('Please <a href="%s">cancel your booking</a> in time if your plans change.', $cancelUrl);
         $data['site_url'] = site_url();
         $data['site_url_text'] = get_bloginfo('name');
 
@@ -248,13 +277,22 @@ class Email
 
         $subject = $this->options->email_cancel_subject;
         $subject = $this->placeholderParser($subject, $booking);
+        $subjectEnglish = $this->options->email_cancel_subject_en;
+        $subjectEnglish = $this->placeholderParser($subjectEnglish, $booking);
 
         $text = $this->options->email_cancel_text;
+        $textEnglish = $this->options->email_cancel_text_en;
 
         $data = [];
+        if (! $this->isLocaleEnglish) $data['is_locale_not_english'] = 1;
+        $data['subject'] = $subject;
+        $data['subject_en'] = $subjectEnglish;        
         $data['text'] = $this->placeholderParser($text, $booking);
+        $data['text_en'] = $this->placeholderParser($textEnglish, $booking);
         $data['date'] = $booking['date'];
+        $data['date_en'] = $booking['date_en'];
         $data['time'] = $booking['time'];
+        $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
         $data['site_url'] = site_url();
