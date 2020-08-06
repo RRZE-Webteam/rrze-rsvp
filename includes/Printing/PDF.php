@@ -99,22 +99,63 @@ class PDF extends TCPDF{
         foreach($aSeats as $seat_post_id){
             $pdf->AddPage();
 
-            $pdf->MultiCell(0, 5, __('Room', 'rrze-rsvp') . ':', 0, 'L', 0, 1, '', $pdf->GetY(), true, 0);
-            $pdf->MultiCell(0, 5, $room->post_title, 0, 'L', 0, 1, '', '', true, 0);
+            // neu:
+            // $pdf->multicell(120, 5, '   ' . $actividad, 0, 'l', true);
+            $columnMargin = 5;
+            $ySpace = 10;
+            $w = ($pdf->getPageWidth() - PDF_MARGIN_LEFT - PDF_MARGIN_RIGHT - $columnMargin) / 2;
+            $y = $pdf->GetY();
+            $pdf->MultiCell($w, 5, __('Room', 'rrze-rsvp') . ':', 0, 'L', 0);
+            $pdf->SetFont('helvetica', '', 36, '', true);
+            $pdf->MultiCell($w, 5, $room->post_title, 0, 'L', 0);
+
+            $x = $pdf->GetX();
+            $yRoom = $pdf->GetY();
+            $pdf->SetXY($x + $w + $columnMargin, $y);
+
+            $seat_title = get_the_title($seat_post_id);
+            $pdf->SetFont('helvetica', '', 12, '', true);
+            $pdf->MultiCell(0, 5, __('Seat', 'rrze-rsvp') . ':', 0, 'L', 0);
+            $x = $pdf->GetX();
+            $y = $pdf->GetY();
+            $pdf->SetXY($x + $w + $columnMargin, $y);
+            $pdf->SetFont('helvetica', '', 36, '', true);
+            $pdf->MultiCell($w, 5, $seat_title, 0, 'L', 0);
+            $pdf->SetFont('helvetica', '', 12, '', true);
+
+            $ySeat = $pdf->GetY();
+
+            $yRoomSeat = ($yRoom < $ySeat ? $ySeat : $yRoom) + $ySpace;
+
+            // $pdf->Cell(70, -5, $room->post_title, '', 0, 'l', true);
+
+            // $pdf->MultiCell(0, 5, __('Room', 'rrze-rsvp') . ':', 0, 'L', 0, 1, '', $pdf->GetY(), true, 0);
+            // $pdf->MultiCell(0, 5, $room->post_title, 0, 'L', 0, 1, '', '', true, 0);
+
 
             $y = 0;
             if ($this->options->pdf_room_address == 'on'){
+                // $x = $pdf->GetX();
+                // $y = $pdf->GetY() + $ySpace;
+                // $pdf->SetXY($x, $y);
                 $room_street = get_post_meta($room_post_id, 'rrze-rsvp-room-street', true);
                 $room_zip = get_post_meta($room_post_id, 'rrze-rsvp-room-zip', true);
                 $room_city = get_post_meta($room_post_id, 'rrze-rsvp-room-city', true);
-                $pdf->MultiCell(0, 5, $room_street . "\n" . $room_zip . ' ' . $room_city, 0, 'L', 0, 1, '', '', true, 0);
-                $y = 10;
+                $pdf->MultiCell(0, 5, $room_street . "\n" . $room_zip . ' ' . $room_city, 0, 'L', 0, 1, '', $yRoomSeat, true, 0);
+                // $pdf->MultiCell(0, 5, $room_street . "\n" . $room_zip . ' ' . $room_city, 0, 'L', 0, 1, '', '', true, 0);
+                // $pdf->MultiCell(0, 5, $room_street . "\n" . $room_zip . ' ' . $room_city, 0, 'L', 0);
+                // $y = 10;
             }
 
-            $y = 0;
+            // $y = 0;
+            $y = $pdf->GetY();
+            $y = ( $y < $yRoomSeat ? $yRoomSeat : $y );
             if ($this->options->pdf_room_text == 'on'){
-                $pdf->MultiCell(0, 5, $room->post_content, 0, 'L', 0, 1, '', $pdf->GetY() + 10, true, 0);
+                $pdf->MultiCell(0, 5, $room->post_content, 0, 'L', 0, 1, '', $y + $ySpace, true, 0);
+                // $pdf->MultiCell(0, 5, $room->post_content, 0, 'L', 0, 1, '', $pdf->GetY() + 10, true, 0);
+                // $pdf->MultiCell(0, 5, $room->post_content, 0, 'L', 0);
                 $y = 10;
+                $yRoomSeat = $pdf->GetY();
             }
 
             // $y = 0;
@@ -128,12 +169,15 @@ class PDF extends TCPDF{
             //     }
             // }
 
-            $seat_title = get_the_title($seat_post_id);
-            $pdf->MultiCell(0, 5, __('Seat', 'rrze-rsvp') . ':', 0, 'L', 0, 1, '', $pdf->GetY() + 10, true, 0);
-            $pdf->MultiCell(0, 5, $seat_title, 0, 'L', 0, 1, '', $pdf->GetY(), true, 0);
+            // $seat_title = get_the_title($seat_post_id);
+            // $pdf->MultiCell(0, 5, __('Seat', 'rrze-rsvp') . ':', 0, 'L', 0, 1, '', $pdf->GetY() + 10, true, 0);
+            // $pdf->MultiCell(0, 5, $seat_title, 0, 'L', 0, 1, '', $pdf->GetY(), true, 0);
 
-            $pdf->MultiCell(0, 5, $instructions_de, 0, 'L', 0, 1, '', $pdf->GetY() + 20, true, 0);
-            $pdf->MultiCell(0, 5, $instructions_en, 0, 'L', 0, 1, '', $pdf->GetY() + 10, true, 0);
+            $y = $pdf->GetY();
+            $y = ( $y < $yRoomSeat ? $yRoomSeat : $y );
+
+            $pdf->MultiCell(0, 5, $instructions_de, 0, 'L', 0, 1, '', $y + $ySpace, true, 0);
+            $pdf->MultiCell(0, 5, $instructions_en, 0, 'L', 0, 1, '', $pdf->GetY() + $ySpace, true, 0);
             
             $permalink = get_permalink($seat_post_id);
             $pdf->write2DBarcode($permalink, 'QRCODE,H', 20, $pdf->GetY() + 10, 50, 50, $qr_style, 'N');
