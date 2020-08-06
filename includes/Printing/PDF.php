@@ -27,10 +27,8 @@ class PDF extends TCPDF{
         if (!$seat_ids){
             return;
         }
-        echo '<pre>';
-        var_dump(headers_list());
-        exit;
-        
+       
+
         $aSeats = json_decode($seat_ids);
 
         // set document information
@@ -178,7 +176,8 @@ class PDF extends TCPDF{
             $pdf->Text($pdf->GetX(), $y + 5, $permalink);
         }
 
-
+        header("Content-type:application/pdf");
+        
         $pdf->Output(sanitize_file_name($room->post_title) . '.pdf', 'I');
     }
 
