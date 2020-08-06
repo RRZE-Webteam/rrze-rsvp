@@ -148,6 +148,10 @@ class Email
         $to = $this->options->email_notification_email;
         $subject = __('Booking has been cancelled', 'rrze-rsvp');
 
+        $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
+        $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
+        $customerPhone = sprintf('%s: %s', __('Phone', 'rrze-rsvp'), $booking['guest_phone']);
+
         $text = sprintf(__('A booking on %s has been cancelled by the customer.', 'rrze-rsvp'), get_bloginfo('name'));
 
         $data = [];
@@ -156,7 +160,9 @@ class Email
         $data['time'] = $booking['time'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
-        $data['booking_info'] = Functions::dataToStr($booking);
+        $data['customer']['name'] = $customerName;
+        $data['customer']['email'] = $customerEmail;
+        $data['customer']['phone'] = $customerPhone;
 
         $message = $this->template->getContent('email/booking-cancelled-admin', $data);
 
@@ -263,7 +269,7 @@ class Email
 
     /**
      * bookingCancelledCustomer
-     * Send a booking cancellation email to the client. No further action 
+     * Send a booking cancellation email to the customer. No further action 
      * is necessary.
      * @param integer $bookingId Booking Id
      * @return void

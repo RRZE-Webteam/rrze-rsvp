@@ -31,7 +31,7 @@ $replyUrl = Functions::bookingReplyUrl($action, sprintf('%s-%s-customer', $booki
 
 if (! $bookingCancelled && ! $bookingCkeckedIn && $action == 'cancel') {
 	update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
-	$email->bookingCancelledCustomer($bookingId);
+	$email->bookingCancelledAdmin($bookingId);
 	$bookingCancelled = true;
 } elseif (! $bookingCkeckedIn && $bookingConfirmed && $action == 'checkin') {
 	if ($start <= $now && $end >= $now) {
