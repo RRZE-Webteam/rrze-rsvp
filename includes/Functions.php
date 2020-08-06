@@ -267,6 +267,7 @@ class Functions
     public static function getSeatAvailability($seat, $start, $end) {
         $availability = [];
         $seat_availability = [];
+        $timeslots_booked = [];
 
         // Array aus verfügbaren Timeslots des Raumes erstellen
         $room_id = get_post_meta($seat, 'rrze-rsvp-seat-room', true);
