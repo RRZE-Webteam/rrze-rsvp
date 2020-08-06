@@ -142,7 +142,7 @@ class Bookings
             'options'          => array(
                 'booked' => __('Booked', 'rrze-rsvp'),
                 'confirmed'   => __('Confirmed', 'rrze-rsvp'),
-                'cancelled'     => __('Cancelled', 'rrze-rsvp'),
+                'cancelled'     => _x('Cancelled', 'Booking', 'rrze-rsvp'),
                 'checked-in'     => __('Checked In', 'rrze-rsvp'),
                 'checked-out'     => __('Checked Out', 'rrze-rsvp'),
             ),
@@ -284,7 +284,7 @@ class Bookings
             if ($archive) {
                 $start = new Carbon(date('Y-m-d H:i:s', $booking['start']));
                 if ($booking['status'] == 'cancelled' && $start->endOfDay()->gt(new Carbon('now'))) {
-                    $cancelledButton = '<button class="button rrzs-rsvp-cancel" disabled>' . __('Cancelled', 'rrze-rsvp') . '</button>';
+                    $cancelledButton = '<button class="button rrzs-rsvp-cancel" disabled>' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</button>';
                     $restoreButton = sprintf(
                         '<a href="edit.php?post_type=%1$s&action=restore&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>',
                         'booking',
@@ -296,7 +296,7 @@ class Bookings
                 } else {
                     switch ($booking['status']) {
                         case 'cancelled':
-                            $button = __('Cancelled', 'rrze-rsvp');
+                            $button = _x('Cancelled', 'Booking', 'rrze-rsvp');
                             break;
                         case 'booked':
                             $button = __('Booked', 'rrze-rsvp');
@@ -330,7 +330,7 @@ class Bookings
                     'booking',
                     $booking['id'],
                     $_wpnonce,
-                    __('Cancel', 'rrze-rsvp')
+                    _x('Cancel', 'Booking', 'rrze-rsvp')
                 );
                 if ($booking['status'] == 'confirmed') {
                     $button = $cancelButton . "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
