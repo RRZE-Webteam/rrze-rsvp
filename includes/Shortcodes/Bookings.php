@@ -158,7 +158,7 @@ class Bookings extends Shortcodes {
                 }
 
                 // Redirect zur Seat-Seite, falls
-                if ($status = 'checked-in') {
+                if ($status == 'checked-in') {
                     echo'<script> window.location="' . get_permalink($booking_seat) . '"; </script> ';
                     exit;
                 }

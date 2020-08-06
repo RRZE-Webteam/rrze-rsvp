@@ -1,3 +1,8 @@
+{{is_locale_not_english}}
+<p class="english-version">(English version below)</p>
+{{/is_locale_not_english}}
+<h1>{{=subject}}</h1>
+
 <p>{{=text}}</p>
 
 <p class="date">
@@ -42,3 +47,54 @@
     </tr>
 </table>
 {{/site_url}}
+
+{{is_locale_not_english}}
+<p class='lang-hr'>&nbsp;</p>
+
+<h1>{{=subject_en}}</h1>
+
+<p>{{=text_en}}</p>
+
+<p class="date">
+    {{=date_en}}
+    {{=time_en}}
+</p>
+
+<p class="room" style="line-height: 24px;">
+    {{=room_name}}
+    {{seat_name}}
+        <br>
+        {{=seat_name}}
+    {{/seat_name}}
+</p>
+
+{{checkin_booking_en}}
+<p>
+    {{=checkin_booking_en}}
+</p>
+{{/checkin_booking_en}}
+
+{{ics_download_en}}
+<p>
+    {{=ics_download_en}}
+</p>
+{{/ics_download_en}}
+
+{{cancel_booking_en}}
+<p class="cancel">
+    {{=cancel_booking_en}}
+</p>
+{{/cancel_booking_en}}
+
+{{site_url}}
+<table border="0" cellspacing="20" cellpadding="0" width="100%">
+    <tr>
+        <td align="center">
+            <a href="{{=site_url}}" style="text-decoration: none; padding: 10px 15px; display: inline-block;">
+                {{=site_url_text}}
+            </a>
+        </td>
+    </tr>
+</table>
+{{/site_url}}
+{{/is_locale_not_english}}
