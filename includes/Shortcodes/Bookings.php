@@ -79,6 +79,7 @@ class Bookings extends Shortcodes {
             $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
             $booking_email = sanitize_email($posted_data['rsvp_email']);
             $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
+            $booking_instant = ($posted_data['rsvp_instant'] == '1');
 
             // Überprüfen ob bereits eine Bewerbung mit gleicher E-Mail-Adresse zur gleichen Zeit vorliegt
             $check_args = [
@@ -134,10 +135,15 @@ class Bookings extends Shortcodes {
                 update_post_meta($booking_id, 'rrze-rsvp-booking-guest-email', $booking_email);
                 update_post_meta($booking_id, 'rrze-rsvp-booking-guest-phone', $booking_phone);
                 if ($room_autoconfirmation == 'on') {
-                    update_post_meta( $booking_id, 'rrze-rsvp-booking-status', 'confirmed' );
+                    $status = 'confirmed';
+                    $timestamp = current_time('timestamp');
+                    if ($booking_instant && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+                        $status = 'checked-in';
+                    }
                 } else {
-                    update_post_meta( $booking_id, 'rrze-rsvp-booking-status', 'booked' );
+                    $status = 'booked';
                 }
+                update_post_meta( $booking_id, 'rrze-rsvp-booking-status', $status );
                 
                 // E-Mail senden
                 if ($room_autoconfirmation == 'on') {
@@ -150,15 +156,7 @@ class Bookings extends Shortcodes {
                         $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
                     }                    
                 }
-
-
-//                wp_redirect(get_permalink().'?submit=success');
-//                exit;
-
             } else {
-//                wp_redirect(get_permalink().'?submit=error');
-//                exit;
-
                 return '<div class="alert alert-danger" role="alert">' . __('Fehler beim Speichern der Buchung.', 'rrze-rsvp') . '</div>';
             }
 
@@ -197,6 +195,7 @@ class Bookings extends Shortcodes {
             $get_time = isset($_GET[ 'timeslot' ]) ? sanitize_text_field($_GET[ 'timeslot' ]) : false;
             $get_room = isset($_GET[ 'room_id' ]) ? absint($_GET[ 'room_id' ]) : false;
             $get_seat = isset($_GET[ 'seat_id' ]) ? absint($_GET[ 'seat_id' ]) : false;
+            $get_instant = (isset($_GET[ 'instant' ]) && $_GET[ 'instant' ] == '1');
 
             if ($get_room && $get_date) {
                 $availability = Functions::getRoomAvailability(
@@ -220,13 +219,17 @@ class Bookings extends Shortcodes {
             $room = $input_room;
 
             if (isset($post_room)) {
-                $today  = date('Y-m-d');
+                $today  = date('Y-m-d', current_time('timestamp'));
                 $endday = date('Y-m-d', strtotime($today . ' + ' . $days . ' days'));
             }
 
             $output .= '<div class="rrze-rsvp">';
             $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room">'
                        . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
+
+            if ($get_instant) {
+                $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
+            }
 
             $output .= '<p><input type="hidden" value="' . $room . '" id="rsvp_room">'
                        . wp_nonce_field('post_nonce', 'rrze_rsvp_post_nonce_field')
@@ -398,7 +401,7 @@ class Bookings extends Shortcodes {
             $class = '';
             $title = '';
             $active = true;
-            if ($currentDate < $bookingDaysStart || $currentDate > $bookingDaysEnd) {
+            if ($date < date_format($bookingDaysStart, 'Y-m-d') || $date > date_format($bookingDaysEnd, 'Y-m-d')) {
                 $active = false;
                 $title = __('Not bookable (outside booking period)','rrze-rsvp');
             } else {

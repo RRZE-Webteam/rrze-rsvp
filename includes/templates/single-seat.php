@@ -1,6 +1,11 @@
 <?php
 
 use RRZE\RSVP\Helper;
+use RRZE\RSVP\Settings;
+use function RRZE\RSVP\plugin;
+
+$settings = new Settings(plugin()->getFile());
+$options = (object) $settings->getOptions();
 
 get_header();
 
@@ -33,6 +38,8 @@ if (Helper::isFauTheme()) {
     </div>';
 }
 
+
+
 echo $div_open;
 
 while ( have_posts() ) : the_post();
@@ -63,22 +70,56 @@ while ( have_posts() ) : the_post();
         ],
     ]);
 
+    $status = false;
     foreach ($bookings as $booking) {
         $status = get_post_meta($booking->ID, 'rrze-rsvp-booking-status', true);
-        switch ($status ) {
-            case 'confirmed':
-                echo '<p>' . __('This seat is currently reserved. If you have reserved this seat, <strong>please check in</strong>.', 'rrze-rsvp') . '</p>';
-                echo '<p><button class="btn btn-success btn-lg btn-block">' . __('Check in', 'rrze-rsvp') . '</button></p><hr />';
-                break;
-            case 'checked-in':
-                echo '<p>' . __('Thank you for checking in. Please remember to <strong>check out before leaving!</strong>', 'rrze-rsvp') . '</p>';
-                echo '<p><button class="btn btn-danger btn-lg btn-block">' . __('Check out', 'rrze-rsvp') . '</button></p><hr />';
-                break;
-            default:
+    }
+
+    switch ($status) {
+        case 'confirmed':
+            echo '<p>' . __('This seat is currently reserved. If you have reserved this seat, <strong>please check in</strong>.', 'rrze-rsvp') . '</p>';
+            echo '<p><button class="btn btn-success btn-lg btn-block">' . __('Check in', 'rrze-rsvp') . '</button></p><hr />';
+            break;
+        case 'checked-in':
+            echo '<p>' . __('Thank you for checking in. Please remember to <strong>check out before leaving!</strong>', 'rrze-rsvp') . '</p>';
+            echo '<p><button class="btn btn-danger btn-lg btn-block">' . __('Check out', 'rrze-rsvp') . '</button></p><hr />';
+            break;
+        default:
+    }
+
+    if (!$status && $options->general_booking_page > 0) {
+        $room_id = get_post_meta($id, 'rrze-rsvp-seat-room', true);
+        $allow_instant = get_post_meta($room_id, 'rrze-rsvp-room-instant-check-in', true);
+
+        if ($allow_instant == 'on') {
+            $timestamp = current_time('timestamp');
+            $day = date('Y-m-d', $timestamp);
+            $time = date('H:i', $timestamp);
+            $weekday = date('N', $timestamp);
+            $booking_start = $time;
+            $room_timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
+            foreach ($room_timeslots as $week) {
+                foreach ($week['rrze-rsvp-room-weekday'] as $wday) {
+                    $schedule[$wday][] = $week['rrze-rsvp-room-starttime'];
+                }
+            }
+            foreach ($schedule as $wday => $starttimes) {
+                if ($wday == $weekday) {
+                    asort($starttimes);
+                    foreach ($starttimes as $starttime) {
+                        if ($starttime <= $time) {
+                            $booking_start = $starttime;
+
+                        }
+                    }
+                }
+            }
+
+            $url = get_permalink($options->general_booking_page) . "?room_id=$room_id&seat_id=$id&bookingdate=$day&timeslot=$booking_start&instant=1";
+            echo '<p>' . sprintf( __('This seat is %sfree for instant check-in%s (booking and check-in in one step) for the current timeslot.', 'rrze-rsvp'), '<strong>', '</strong>') . '</p>';
+            echo '<p><a class="btn btn-success btn-lg btn-block" href="' . $url . '">' . __('Instant check-in', 'rrze-rsvp') . '</a></p><hr />';
         }
     }
-    echo '';
-//    echo Helper::get_html_var_dump($bookings);
 
     echo '<h3>' . __('Book this seat', 'rrze-rsvp') . '</h3>';
     echo do_shortcode('[rsvp-availability seat=' . $id . ' days=14 booking_link=true]');
