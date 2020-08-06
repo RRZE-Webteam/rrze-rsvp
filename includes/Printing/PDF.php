@@ -40,6 +40,16 @@ class PDF extends TCPDF{
         // $this->Cell(0, 15, '<< TCPDF Example 003 >>', 0, false, 'C', 0, '', 0, false, 'M', 'M');
     }    
 
+    // Page footer
+    public function Footer() {
+        // Position at 15 mm from bottom
+        $this->SetY(-15);
+        // Set font
+        $this->SetFont('helvetica', 'I', 8);
+        // Page number
+        $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    }    
+    
     public function createPDF($seat_ids){
         if (!$seat_ids){
             return;
@@ -125,7 +135,7 @@ class PDF extends TCPDF{
             $w = ($pdf->getPageWidth() - PDF_MARGIN_LEFT - PDF_MARGIN_RIGHT - $columnMargin) / 2;
             $y = $pdf->GetY();
             $pdf->MultiCell($w, 5, __('Room', 'rrze-rsvp') . ':', 0, 'L', 0);
-            $pdf->SetFont('helvetica', '', 36, '', true);
+            $pdf->SetFont('helvetica', '', 26, '', true);
             $pdf->MultiCell($w, 5, $room->post_title, 0, 'L', 0);
 
             $x = $pdf->GetX();
@@ -146,33 +156,18 @@ class PDF extends TCPDF{
 
             $yRoomSeat = ($yRoom < $ySeat ? $ySeat : $yRoom) + $ySpace;
 
-            // $pdf->Cell(70, -5, $room->post_title, '', 0, 'l', true);
-
-            // $pdf->MultiCell(0, 5, __('Room', 'rrze-rsvp') . ':', 0, 'L', 0, 1, '', $pdf->GetY(), true, 0);
-            // $pdf->MultiCell(0, 5, $room->post_title, 0, 'L', 0, 1, '', '', true, 0);
-
-
             $y = 0;
             if ($this->options->pdf_room_address == 'on'){
-                // $x = $pdf->GetX();
-                // $y = $pdf->GetY() + $ySpace;
-                // $pdf->SetXY($x, $y);
                 $room_street = get_post_meta($room_post_id, 'rrze-rsvp-room-street', true);
                 $room_zip = get_post_meta($room_post_id, 'rrze-rsvp-room-zip', true);
                 $room_city = get_post_meta($room_post_id, 'rrze-rsvp-room-city', true);
                 $pdf->MultiCell(0, 5, $room_street . "\n" . $room_zip . ' ' . $room_city, 0, 'L', 0, 1, '', $yRoomSeat, true, 0);
-                // $pdf->MultiCell(0, 5, $room_street . "\n" . $room_zip . ' ' . $room_city, 0, 'L', 0, 1, '', '', true, 0);
-                // $pdf->MultiCell(0, 5, $room_street . "\n" . $room_zip . ' ' . $room_city, 0, 'L', 0);
-                // $y = 10;
             }
 
-            // $y = 0;
             $y = $pdf->GetY();
             $y = ( $y < $yRoomSeat ? $yRoomSeat : $y );
             if ($this->options->pdf_room_text == 'on'){
                 $pdf->MultiCell(0, 5, $room->post_content, 0, 'L', 0, 1, '', $y + $ySpace, true, 0);
-                // $pdf->MultiCell(0, 5, $room->post_content, 0, 'L', 0, 1, '', $pdf->GetY() + 10, true, 0);
-                // $pdf->MultiCell(0, 5, $room->post_content, 0, 'L', 0);
                 $y = 10;
                 $yRoomSeat = $pdf->GetY();
             }
@@ -188,27 +183,21 @@ class PDF extends TCPDF{
             //     }
             // }
 
-            // $seat_title = get_the_title($seat_post_id);
-            // $pdf->MultiCell(0, 5, __('Seat', 'rrze-rsvp') . ':', 0, 'L', 0, 1, '', $pdf->GetY() + 10, true, 0);
-            // $pdf->MultiCell(0, 5, $seat_title, 0, 'L', 0, 1, '', $pdf->GetY(), true, 0);
-
             $y = $pdf->GetY();
             $y = ( $y < $yRoomSeat ? $yRoomSeat : $y );
-
-            $pdf->MultiCell(0, 5, $instructions_de, 0, 'L', 0, 1, '', $y + $ySpace, true, 0);
-            $pdf->MultiCell(0, 5, $instructions_en, 0, 'L', 0, 1, '', $pdf->GetY() + $ySpace, true, 0);
             
             $permalink = get_permalink($seat_post_id);
-            $pdf->write2DBarcode($permalink, 'QRCODE,H', 20, $pdf->GetY() + 10, 50, 50, $qr_style, 'N');
-            $pdf->Text(20, $pdf->GetY() + 5, $permalink);
+            $pdf->write2DBarcode($permalink, 'QRCODE,H', '', $y + $ySpace, 50, 50, $qr_style, 'N');
+            $yQR = $pdf->GetY();
 
+            $pdf->MultiCell(0, 5, $instructions_de, 0, 'L', 0, 1, 50 + 20, $y + $ySpace, true, 0);
+            $pdf->MultiCell(0, 5, $instructions_en, 0, 'L', 0, 1, 50 + 20, $pdf->GetY() + $ySpace, true, 0);
+            $y = $pdf->GetY();
+            $y = ($y < $yQR ? $yQR : $y);
+            $pdf->Text($pdf->GetX(), $y + 5, $permalink);
         }
 
 
-        // ---------------------------------------------------------
-
-        // Close and output PDF document
-        // This method has several options, check the source code documentation for more information.
         $pdf->Output(sanitize_file_name($room->post_title) . '.pdf', 'I');
     }
 
