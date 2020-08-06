@@ -97,7 +97,7 @@ class Main
 		wp_localize_script('rrze-rsvp-admin', 'rrze_rsvp_admin', array(
 			'dateformat' => get_option('date_format'),
 			'text_cancel' => __('Do you want to cancel?', 'rrze-rsvp'),
-			'text_cancelled' => __('Cancelled', 'rrze-rsvp'),
+			'text_cancelled' => _x('Cancelled', 'Booking', 'rrze-rsvp'),
 			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
 			'ajaxurl' => admin_url('admin-ajax.php')
 		));
