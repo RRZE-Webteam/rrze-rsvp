@@ -1,0 +1,67 @@
+/*
+Admin CSS
+*/
+
+
+table {
+	td {
+		vertical-align: middle;
+	}
+
+	&.wp-list-table {
+		
+		table-layout: auto;
+
+		th {
+			padding: 8px 10px;
+			font-weight: 400;
+		}
+
+		td.status {
+			text-align: center;
+
+			a, button {
+				margin: 2px 4px;
+				min-width: calc(50% - 10px);
+				text-align: center;
+
+				&.rrze-rsvp-confirmed[disabled] {
+					background: #009900 !important;
+					color: white !important;
+					border-color: #009900 !important;
+				}
+
+				&.rrze-rsvp-checkin[disabled] {
+					background: #802906 !important;
+					color: white !important;
+					border-color: #802906 !important;
+				}
+
+				&.rrze-rsvp-checkout[disabled] {
+					background: #807306 !important;
+					color: white !important;
+					border-color: #807306 !important;
+				}							
+			}
+
+			a.delete {
+				color: #a00;
+			}
+
+			.booking_date {
+				display: block;
+				text-align: center;
+				opacity: 0.6;
+			}
+		}
+	}
+
+}
+
+.selectvalues-input {
+	display: none;
+}
+
+.table.widefat input:not([type=submit]):not([type=checkbox]) {
+	width: 100%;
+}
