@@ -176,8 +176,6 @@ class PDF extends TCPDF{
             $pdf->Text($pdf->GetX(), $y + 5, $permalink);
         }
 
-        header("Content-type:application/pdf");
-        
         $pdf->Output(sanitize_file_name($room->post_title) . '.pdf', 'I');
     }
 
