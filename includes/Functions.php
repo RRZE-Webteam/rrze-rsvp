@@ -388,4 +388,18 @@ class Functions
         }
         return false;
     }
+
+    public static function isLocaleEnglish()
+    {
+        $englishLocale = [
+            'en_US',
+            'en_CA',
+            'en_AU',
+            'en_NZ',
+            'en_ZA',
+            'en_GB'
+        ];
+        $locale = get_locale();
+        return in_array($locale, $englishLocale) ? true : false;
+    }    
 }
