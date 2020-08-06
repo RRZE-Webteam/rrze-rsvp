@@ -27,7 +27,10 @@ class PDF extends TCPDF{
         if (!$seat_ids){
             return;
         }
-
+        echo '<pre>';
+        var_dump(headers_list());
+        exit;
+        
         $aSeats = json_decode($seat_ids);
 
         // set document information
