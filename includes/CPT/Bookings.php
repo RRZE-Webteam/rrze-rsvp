@@ -275,8 +275,10 @@ class Bookings
         if ('status' === $column) {
             $status = $booking['status'];
             $start = $booking['start'];
+            $end = $booking['end'];
+            $now = current_time('timestamp');
             $bookingDate = '<span class="booking_date">' . __('Booked on', 'rrze-rsvp') . ' ' . $booking['booking_date'] . '</span>';
-            $archive = ($status == 'cancelled') || ($start < current_time('timestamp'));
+            $archive = ($status == 'cancelled') || ($end < $now);
             $_wpnonce = wp_create_nonce('status');
 
             if ($archive) {
@@ -302,14 +304,24 @@ class Bookings
                         case 'confirmed':
                             $button = __('Confirmed', 'rrze-rsvp');
                             break;
+                        case 'checked-in':
+                            $button = __('Checked-In', 'rrze-rsvp');
+                            break;
+                        case 'checked-out':
+                            $button = __('Checked-Out', 'rrze-rsvp');
+                            break;                                                         
                     }
-                    $button = sprintf(
-                        '<a href="edit.php?post_type=%1$s&action=delete&id=%2$d&_wpnonce=%3$s" class="delete">%4$s</a>',
-                        'booking',
-                        $booking['id'],
-                        $_wpnonce,
-                        __('Delete', 'rrze-rsvp')
-                    );
+                    if (! in_array($booking['status'], ['checked-in', 'checked-out'])) {
+                        $button = sprintf(
+                            '<a href="edit.php?post_type=%1$s&action=delete&id=%2$d&_wpnonce=%3$s" class="delete">%4$s</a>',
+                            'booking',
+                            $booking['id'],
+                            $_wpnonce,
+                            __('Delete', 'rrze-rsvp')
+                        );
+                    } else {
+                        $button = '';
+                    }
                 }
                 echo $button . $bookingDate;
             } else {
@@ -321,9 +333,13 @@ class Bookings
                     __('Cancel', 'rrze-rsvp')
                 );
                 if ($booking['status'] == 'confirmed') {
-                    $confirmButton = "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
+                    $button = $cancelButton . "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
+                } elseif ($booking['status'] == 'checked-in') {
+                    $button = "<button class='button button-primary rrze-rsvp-checkin' disabled>" . __('Checked-In', 'rrze-rsvp') . "</button>";
+                } elseif ($booking['status'] == 'checked-out') {
+                    $button = "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Checked-Out', 'rrze-rsvp') . "</button>";
                 } else {
-                    $confirmButton = sprintf(
+                    $button = $cancelButton . sprintf(
                         '<a href="edit.php?post_type=%1$s&action=confirm&id=%2$d&_wpnonce=%3$s" class="button button-primary rrze-rsvp-confirm" data-id="%2$d">%4$s</a>',
                         'booking',
                         $booking['id'],
@@ -331,7 +347,7 @@ class Bookings
                         __('Confirm', 'rrze-rsvp')
                     );
                 }
-                echo $cancelButton . $confirmButton . $bookingDate;
+                echo $button . $bookingDate;
             }
         }
     }
