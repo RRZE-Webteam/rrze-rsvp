@@ -40,6 +40,8 @@ if (! $bookingCancelled && ! $bookingCkeckedIn && $action == 'cancel') {
 	}
 }
 
+$isLocaleEnglish = Functions::isLocaleEnglish();
+
 get_header();
 ?>
 
@@ -50,7 +52,11 @@ get_header();
 		<?php if (! $bookingCancelled && ! $bookingCkeckedIn && $action == 'cancel') { ?>
 
 			<p><?php _e('Do you really want to cancel your booking?', 'rrze-rsvp'); ?></p>
-
+			<?php if (! $isLocaleEnglish) { ?>
+				<p><?php echo 'Do you really want to cancel your booking?'; ?></p>
+			<?php
+			}
+			?>
 			<p class="date <?php if ($_GET['action'] == "cancel") echo 'cancelled'; ?>">
 				<?php echo get_the_title($booking['room']); ?><br>
 				<?php echo $booking['date']; ?><br>
