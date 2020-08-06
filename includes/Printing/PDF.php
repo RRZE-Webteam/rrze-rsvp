@@ -21,7 +21,24 @@ class PDF extends TCPDF{
         $settings = new Settings(plugin()->getFile());
         $this->options = (object) $settings->getOptions();
     }
-    
+
+    public function Header() {
+
+        // $customheader =  get_custom_header();
+        // $customheader->url
+        // $customheader->width
+        // $customheader->height
+
+        // Logo
+        // https://www.nickless.test.rrze.fau.de/dev4/wp-content/themes/FAU-Einrichtungen/img/logos/fau-logo-240x65.svg
+        // $image_file = K_PATH_IMAGES.'logo_example.jpg';
+        // $this->Image($image_file, 10, 10, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+
+        // Set font
+        // $this->SetFont('helvetica', 'B', 20);
+        // Title
+        // $this->Cell(0, 15, '<< TCPDF Example 003 >>', 0, false, 'C', 0, '', 0, false, 'M', 'M');
+    }    
 
     public function createPDF($seat_ids){
         if (!$seat_ids){
@@ -30,11 +47,10 @@ class PDF extends TCPDF{
 
         $aSeats = json_decode($seat_ids);
 
-
         // set document information
         $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
         // $pdf->SetCreator(PDF_CREATOR);
-        // $pdf->SetAuthor('Nicola Asuni');
+        $pdf->SetAuthor('RRZE-Webteam');
         // $pdf->SetTitle('TCPDF Example 001');
         // $pdf->SetSubject('TCPDF Tutorial');
         // $pdf->SetKeywords('TCPDF, PDF, example, test, guide');
@@ -48,7 +64,12 @@ class PDF extends TCPDF{
         $room_post_id = get_post_meta($aSeats[0], 'rrze-rsvp-seat-room', true);
         $room = get_post($room_post_id);
 
-        // $pdf->SetHeaderData($logo, PDF_HEADER_LOGO_WIDTH, $room_name, PDF_HEADER_STRING, array(0,64,255), array(0,64,128));
+        // logo:
+        // $custom_logo_id = get_theme_mod( 'custom_logo' );
+        // $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
+        // echo $image[0];
+
+        // $pdf->SetHeaderData($logo, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING, array(0,64,255), array(0,64,128));
         // $pdf->SetHeaderData($logo, PDF_HEADER_LOGO_WIDTH, $room->post_title, '', 0, 0);
         // $pdf->setFooterData(array(0,64,0), array(0,64,128));
         // $pdf->setFooterData(array(0,64,0), array(0,64,128));
@@ -99,8 +120,6 @@ class PDF extends TCPDF{
         foreach($aSeats as $seat_post_id){
             $pdf->AddPage();
 
-            // neu:
-            // $pdf->multicell(120, 5, '   ' . $actividad, 0, 'l', true);
             $columnMargin = 5;
             $ySpace = 10;
             $w = ($pdf->getPageWidth() - PDF_MARGIN_LEFT - PDF_MARGIN_RIGHT - $columnMargin) / 2;
