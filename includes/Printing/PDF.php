@@ -130,6 +130,12 @@ class PDF extends TCPDF{
         foreach($aSeats as $seat_post_id){
             $pdf->AddPage();
 
+            $wLogo = 60;
+            $xLogo = $pdf->getPageWidth() - PDF_MARGIN_RIGHT - $wLogo;
+            $logo = __DIR__ . '/fau-logo-240x65.svg';
+            $pdf->ImageSVG($file=$logo, $x=$xLogo, $y=0, $w=60, $h='', $link='', $align='', $palign='', $border=0, $fitonpage=false);
+
+
             $columnMargin = 5;
             $ySpace = 10;
             $w = ($pdf->getPageWidth() - PDF_MARGIN_LEFT - PDF_MARGIN_RIGHT - $columnMargin) / 2;
