@@ -70,7 +70,7 @@ class Actions
 
 		if ($hash !== false && $bookingId !== false && $action !== false) {
 			$booking = Functions::getBooking($bookingId);
-			if (($action == 'cancel' || $action == 'ics') && $booking && Functions::decrypt($hash)) {				
+			if (($action == 'checkin' || $action == 'cancel' || $action == 'ics') && $booking && Functions::decrypt($hash)) {				
 				
 				if ($action == 'ics') {
 					ICS::generate($bookingId);

@@ -20,14 +20,24 @@ if (!$booking || ! Functions::decrypt($hash)) {
 	exit;
 }
 
+$start = $booking['start'];
+$end = $booking['end'];
+$now = current_time('timestamp');
+$bookingConfirmed = ($booking['status'] === 'confirmed');
+$bookingCkeckedIn = ($booking['status'] === 'checked-in');
 $bookingCancelled = ($booking['status'] === 'cancelled');
 
 $replyUrl = Functions::bookingReplyUrl($action, sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
 
-if (! $bookingCancelled && $action == 'cancel') {
+if (! $bookingCancelled && ! $bookingCkeckedIn && $action == 'cancel') {
 	update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 	$email->bookingCancelledCustomer($bookingId);
 	$bookingCancelled = true;
+} elseif (! $bookingCkeckedIn && $bookingConfirmed && $action == 'checkin') {
+	if ($start <= $now && $end >= $now) {
+		update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
+		$bookingCkeckedIn = true;
+	}
 }
 
 get_header();
@@ -37,7 +47,7 @@ get_header();
 	<div class="container">
 		<h1><?php _e('Booking', 'rrze-rsvp'); ?></h1>
 
-		<?php if (!$bookingCancelled) { ?>
+		<?php if (! $bookingCancelled && ! $bookingCkeckedIn && $action == 'cancel') { ?>
 
 			<p><?php _e('Do you really want to cancel your booking?', 'rrze-rsvp'); ?></p>
 
@@ -50,8 +60,12 @@ get_header();
 			<a href="<?php echo $replyUrl; ?>" class="button button-delete"><?php _e('Cancel booking', 'rrze-rsvp'); ?></a>
 
 		<?php
-		} else {
+		} elseif ($bookingCancelled && $action == 'cancel') {
 			_e('Your booking has been cancelled. Please contact us to find a different arrangement.', 'rrze-rsvp');
+		} elseif (! $bookingCkeckedIn && $action == 'checkin') {
+			_e('Check-in is not possible at this time.', 'rrze-rsvp');
+		} elseif ($bookingCkeckedIn && $action == 'checkin') {
+			_e('Check-in has been completed.', 'rrze-rsvp');
 		}
 		?>
 

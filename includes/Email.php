@@ -212,6 +212,7 @@ class Email
 
         $text = $this->options->email_confirm_text;
         $icsUrl = Functions::bookingReplyUrl('ics', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
+        $checkInUrl = Functions::bookingReplyUrl('checkin', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);        
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
 
         $data = [];
@@ -221,6 +222,7 @@ class Email
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
         $data['ics_download'] = sprintf(__('<a href="%s">Add the booking to your calendar</a>.', 'rzze-rsvp'), $icsUrl);
+        $data['checkin_booking'] = sprintf(__('Please <a href="%s">check-in your booking</a> on site.', 'rzze-rsvp'), $checkInUrl);
         $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl);
         $data['site_url'] = site_url();
         $data['site_url_text'] = get_bloginfo('name');
