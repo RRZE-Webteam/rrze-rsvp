@@ -106,6 +106,8 @@ class Functions
         $data['end'] = $end ? $end : $start->endOfDay()->getTimestamp();
         $data['date'] = Functions::dateFormat($data['start']);
         $data['time'] = Functions::timeFormat($data['start']) . ' - ' . Functions::timeFormat($data['end']);
+        $data['date_en'] = date('F j, Y', $data['start']);
+        $data['time_en'] = date('g:i a', $data['end']);
 
         $data['booking_date'] = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
 
@@ -400,6 +402,6 @@ class Functions
             'en_GB'
         ];
         $locale = get_locale();
-        return in_array($locale, $englishLocale) ? true : false;
+        return in_array($locale, $englishLocale);
     }    
 }
