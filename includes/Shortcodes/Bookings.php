@@ -156,10 +156,16 @@ class Bookings extends Shortcodes {
                         $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
                     }                    
                 }
+
+                // Redirect zur Seat-Seite, falls
+                if ($status = 'checked-in') {
+                    echo'<script> window.location="' . get_permalink($booking_seat) . '"; </script> ';
+                    exit;
+                }
+
             } else {
                 return '<div class="alert alert-danger" role="alert">' . __('Fehler beim Speichern der Buchung.', 'rrze-rsvp') . '</div>';
             }
-
 
 
             $output .= '<h2>' . __('Your reservation has been submitted. Thank you for booking!', 'rrze-rsvp') . '</h2>';
