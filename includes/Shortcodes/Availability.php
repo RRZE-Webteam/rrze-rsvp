@@ -50,6 +50,7 @@ class Availability extends Shortcodes {
                 . '<th scope="col">' . __('Seats available', 'rrze-rsvp') . '</th>';
             foreach ($availability as $date => $timeslot) {
                 foreach ($timeslot as $time => $seat_ids) {
+                    $starttime = explode('-', $time)[0];
                     $seat_names = [];
                     $date_formatted = date_i18n('d.m.Y', strtotime($date));
                     $seat_names_raw = [];
@@ -62,7 +63,7 @@ class Availability extends Shortcodes {
                         $booking_link_close = '';
                         if ($booking_link && $this->options->general_booking_page != '') {
                             $permalink = get_permalink($this->options->general_booking_page);
-                            $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$time\" title='" . __('Book this seat/timeslot now','rrze-rsvp') . "'>";
+                            $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$starttime\" title='" . __('Book this seat/timeslot now','rrze-rsvp') . "'>";
                             $booking_link_close = '</a>';
                         }
                         $seat_names[] = $booking_link_open . $seat_name . $booking_link_close;
@@ -70,7 +71,7 @@ class Availability extends Shortcodes {
 
                     $output .= '<tr>'
                         . '<td>' . $date_formatted . ' &nbsp;&nbsp; ' . $time . '</td>';
-                    $output .= '<td>' . implode(', ', $seat_names) . '</td>';
+                    $output .= '<td>' . implode(',  ', $seat_names) . '</td>';
                     $output .= '</tr>';
                 }
             }
@@ -120,7 +121,7 @@ class Availability extends Shortcodes {
                     }
                     $output .= '<tr>'
                         .'<td>' . $date_formatted = date_i18n('d.m.Y', strtotime($date)) . '</td>'
-                        . '<td>' . implode(', ', $time_output) . '</td>'
+                        . '<td>' . implode(', &nbsp; ', $time_output) . '</td>'
                         . '</tr>';
                 }
                 $output .= '</table>'
