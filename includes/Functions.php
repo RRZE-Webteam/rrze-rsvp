@@ -107,7 +107,7 @@ class Functions
         $data['date'] = Functions::dateFormat($data['start']);
         $data['time'] = Functions::timeFormat($data['start']) . ' - ' . Functions::timeFormat($data['end']);
         $data['date_en'] = date('F j, Y', $data['start']);
-        $data['time_en'] = date('g:i a', $data['end']);
+        $data['time_en'] = date('g:i a', $data['start']) . ' - ' . date('g:i a', $data['end']);
 
         $data['booking_date'] = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
 
