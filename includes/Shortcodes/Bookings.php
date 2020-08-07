@@ -335,14 +335,14 @@ class Bookings extends Shortcodes {
                     . __('Email', 'rrze-rsvp') . ' *</label>'
                     . "<input type=\"text\" name=\"rsvp_email\" id=\"rsvp_email\" required aria-required=\"true\">"
                     . '</div>';
-
-                $output .= '<div class="form-group"><label for="rsvp_phone">'
-                    . __('Phone Number', 'rrze-rsvp') . ' *</label>'
-                    . '<input type="tel" name="rsvp_phone" id="rsvp_phone" required aria-required="true">'
-                    . '<p class="description">'
-                    . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
-                    . '</div>';
             }
+
+            $output .= '<div class="form-group"><label for="rsvp_phone">'
+                . __('Phone Number', 'rrze-rsvp') . ' *</label>'
+                . '<input type="tel" name="rsvp_phone" id="rsvp_phone" required aria-required="true">'
+                . '<p class="description">'
+                . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
+                . '</div>';
 
             $output .= '<button type="submit" class="btn btn-primary">' . __('Submit booking', 'rrze-rsvp') . '</button>
                 </form>
