@@ -5,9 +5,6 @@ namespace RRZE\RSVP;
 defined('ABSPATH') || exit;
 
 use RRZE\RSVP\CPT\CPT;
-
-// use RRZE\RSVP\Exceptions\Main as Exceptions;
-use RRZE\RSVP\Settings;
 use RRZE\RSVP\Shortcodes\Shortcodes;
 use RRZE\RSVP\Printing\Printing;
 
@@ -31,7 +28,6 @@ class Main
 
 	public function onLoaded()
 	{
-
 		$settings = new Settings($this->pluginFile);
 		$settings->onLoaded();
 
@@ -42,27 +38,21 @@ class Main
 		$actions = new Actions;
 		$actions->onLoaded();
 
-		/*
- * Erstmal noch nicht, werden umbenannt in Blocking Time:
- 
-		$exceptions = new Exceptions;
-		$exceptions->onLoaded();
-
-	*/
-
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();
+
+		$printing = new Printing;
+		$printing->onLoaded();
+
+		$schedule = new Schedule;
+		$schedule->onLoaded();
 
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
 
 		add_action('rest_api_init', function () {
 			//$api = new API;
 			//$api->register_routes();
-        });	
-        
-		$printing = new Printing;
-		$printing->onLoaded();
-        
+		});
 	}
 
 	public function adminEnqueueScripts()
