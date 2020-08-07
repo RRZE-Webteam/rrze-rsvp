@@ -50,8 +50,12 @@ function getConstants() {
             'received_subject_en' => 'Thank you for booking',
             'received_text' => __('We received your booking and we will notify you once it has been confirmed.', 'rrze-rsvp'),
             'received_text_en' => 'We received your booking and we will notify you once it has been confirmed.',
+            'force_to_confirm_subject' => __('Please confirm your booking now', 'rrze-rsvp'),
+            'force_to_confirm_subject_en' => 'Please confirm your booking now',
+            'force_to_confirm_text' => __('You are required to confirm the reservation now. Please note that unconfirmed reservations automatically expire after one hour.', 'rrze-rsvp'),
+            'force_to_confirm_text_en' => 'You are required to confirm the reservation now. Please note that unconfirmed reservations automatically expire after one hour.',                         
             'confirm_subject' => __('Your booking has been confirmed', 'rrze-rsvp'),
-            'confirm_subject_en' => 'Your booking has been confirmed',
+            'confirm_subject_en' => 'Your booking has been confirmed',            
             'confirm_text' => __('We are happy to inform you that your booking has been confirmed.', 'rrze-rsvp'),
             'confirm_text_en' => 'We are happy to inform you that your booking has been confirmed.',
             'cancel_subject' => __('Your booking has been cancelled', 'rrze-rsvp'),
@@ -305,7 +309,37 @@ function getFields(){
                 'type'              => 'textarea',
                 'default'           => $defaults['received_text_en'],
                 'exception'         => ['locale' => 'en']
-            ],            
+            ],  
+            [
+                'name'              => 'force_to_confirm_subject',
+                'label'             => __('Subject for confirmation required.', 'rrze-rsvp'),
+                'desc'              => __('Subject of the email where confirmation of the booking by the customer is required.', 'rrze-rsvp'),
+                'type'              => 'text',
+                'default'           => $defaults['force_to_confirm_subject'],
+                'sanitize_callback' => 'sanitize_text_field'
+            ],  
+            [
+                'name'              => 'force_to_confirm_subject_en',
+                'label'             => __('Subject for confirmation required. (english)', 'rrze-rsvp'),
+                'desc'              => __('Subject of the email where confirmation of the booking by the customer is required.', 'rrze-rsvp'),
+                'type'              => 'text',
+                'default'           => $defaults['force_to_confirm_subject_en'],
+                'sanitize_callback' => 'sanitize_text_field',
+                'exception'         => ['locale' => 'en']
+            ], 
+            [
+                'name'              => 'force_to_confirm_text',
+                'label'             => __('Text for confirmation required.', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           => $defaults['force_to_confirm_text']
+            ],   
+            [
+                'name'              => 'force_to_confirm_text_en',
+                'label'             => __('Text for confirmation required. (english)', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           => $defaults['force_to_confirm_text_en'],
+                'exception'         => ['locale' => 'en']
+            ],                                                    
 	      [
                 'name'              => 'confirm_subject',
                 'label'             => __('Subject Confirmation', 'rrze-rsvp'),
