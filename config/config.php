@@ -50,16 +50,22 @@ function getConstants() {
             'received_subject_en' => 'Thank you for booking',
             'received_text' => __('We received your booking and we will notify you once it has been confirmed.', 'rrze-rsvp'),
             'received_text_en' => 'We received your booking and we will notify you once it has been confirmed.',
+            'force_to_confirm_subject' => __('Please confirm your booking', 'rrze-rsvp'),
+            'force_to_confirm_subject_en' => 'Please confirm your booking',
+            'force_to_confirm_text' => __('You are required to confirm the booking now. Please note that unconfirmed bookings automatically expire after one hour.', 'rrze-rsvp'),
+            'force_to_confirm_text_en' => 'You are required to confirm the booking now. Please note that unconfirmed bookings automatically expire after one hour.',                         
             'confirm_subject' => __('Your booking has been confirmed', 'rrze-rsvp'),
-            'confirm_subject_en' => 'Your booking has been confirmed',
+            'confirm_subject_en' => 'Your booking has been confirmed',            
             'confirm_text' => __('We are happy to inform you that your booking has been confirmed.', 'rrze-rsvp'),
             'confirm_text_en' => 'We are happy to inform you that your booking has been confirmed.',
             'cancel_subject' => __('Your booking has been cancelled', 'rrze-rsvp'),
             'cancel_subject_en' => 'Your booking has been cancelled',
             'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp'),
-            'cancel_text_en' => 'Unfortunately we have to cancel your booking on {{date}} at {{time}}.',
+            'cancel_text_en' => 'Unfortunately we have to cancel your booking on {{date_en}} at {{time_en}}.',
             'single_room_availability_table' => 'yes_link',
-            'logo' => 'fau',
+            'fau_logo' => 'on',
+            'website_logo' => 'off',
+            'website_url' => 'on',
             'instructions_de' => 'Bitte lesen Sie den QR Code ein, um auf diesem Platz einzuchecken oder diesen Platz für einen späteren Zeitpunkt zu reservieren.',
             'instructions_en' => 'Please scan the QR code to check in at this place or to reserve this place for a later date.',
         ];
@@ -303,7 +309,37 @@ function getFields(){
                 'type'              => 'textarea',
                 'default'           => $defaults['received_text_en'],
                 'exception'         => ['locale' => 'en']
-            ],            
+            ],  
+            [
+                'name'              => 'force_to_confirm_subject',
+                'label'             => __('Subject for confirmation required.', 'rrze-rsvp'),
+                'desc'              => __('Subject of the email where confirmation of the booking by the customer is required.', 'rrze-rsvp'),
+                'type'              => 'text',
+                'default'           => $defaults['force_to_confirm_subject'],
+                'sanitize_callback' => 'sanitize_text_field'
+            ],  
+            [
+                'name'              => 'force_to_confirm_subject_en',
+                'label'             => __('Subject for confirmation required. (english)', 'rrze-rsvp'),
+                'desc'              => __('Subject of the email where confirmation of the booking by the customer is required.', 'rrze-rsvp'),
+                'type'              => 'text',
+                'default'           => $defaults['force_to_confirm_subject_en'],
+                'sanitize_callback' => 'sanitize_text_field',
+                'exception'         => ['locale' => 'en']
+            ], 
+            [
+                'name'              => 'force_to_confirm_text',
+                'label'             => __('Text for confirmation required.', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           => $defaults['force_to_confirm_text']
+            ],   
+            [
+                'name'              => 'force_to_confirm_text_en',
+                'label'             => __('Text for confirmation required. (english)', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           => $defaults['force_to_confirm_text_en'],
+                'exception'         => ['locale' => 'en']
+            ],                                                    
 	      [
                 'name'              => 'confirm_subject',
                 'label'             => __('Subject Confirmation', 'rrze-rsvp'),
@@ -368,16 +404,22 @@ function getFields(){
         ],
         'pdf' => [
             [
-                'name'    => 'logo',
-                'label'   => __('Logo', 'rrze-rsvp'),
-                'desc'    => __('Show logo in upper right corner of PDF', 'rrze-rsvp'),
-                'type'    => 'select',
-                'default' => $defaults['logo'],
-                'options' => [
-                    'none' => __('none', 'rrze-rsvp'),
-                    'fau' => __('FAU logo', 'rrze-rsvp'),
-                    'website' => __('Website logo', 'rrze-rsvp'),
-                ]
+                'name'  => 'fau_logo',
+                'label' => __('Print FAU logo', 'rrze-rsvp'),
+                'default'           => $defaults['fau_logo'],
+                'type'  => 'checkbox'
+            ],
+            [
+                'name'  => 'website_logo',
+                'label' => __('Print website\'s logo or title', 'rrze-rsvp'),
+                'default'           => $defaults['website_logo'],
+                'type'  => 'checkbox'
+            ],
+            [
+                'name'  => 'website_url',
+                'label' => __('Print website\'s URL', 'rrze-rsvp'),
+                'default'           => $defaults['website_url'],
+                'type'  => 'checkbox'
             ],
             [
                 'name'              => 'instructions_de',

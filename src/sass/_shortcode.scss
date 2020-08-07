@@ -23,6 +23,11 @@
             left: 50%;
         }
     }
+    .form-group {
+        .description {
+            font-style: italic;
+        }
+    }
     .rsvp-datetime-container {
         margin-bottom: 1em;
         @media (min-width: 480px) {

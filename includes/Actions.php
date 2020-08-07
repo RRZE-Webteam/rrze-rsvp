@@ -26,10 +26,23 @@ class Actions
 	{
 		$bookingId = absint($_POST['id']);
 		$type = sanitize_text_field($_POST['type']);
+		$booking = Functions::getBooking($bookingId);
+		if (!$booking) {
+			echo json_encode([
+				'result' => false
+			]);
+			exit;			
+		}
+		$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
 		if ($type == 'confirm') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
-			$this->email->bookingConfirmedCustomer($bookingId);
+			update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
+			if ($forceToConfirm) {
+				$this->email->bookingRequestedCustomer($bookingId);
+			} else {
+				$this->email->bookingConfirmedCustomer($bookingId);
+			}
 		} else if ($type == 'cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 			$this->email->bookingCancelledCustomer($bookingId);
@@ -38,7 +51,6 @@ class Actions
 		echo json_encode([
 			'result' => true
 		]);
-
 		exit;
 	}
 

@@ -13,17 +13,23 @@ $hash = isset($_GET['rrze-rsvp-booking-reply']) ? sanitize_text_field($_GET['rrz
 
 $booking = Functions::getBooking($bookingId);
 
-if (! $booking || ! Functions::decrypt($hash)) {
+if (!$booking || !Functions::decrypt($hash)) {
 	header('HTTP/1.0 403 Forbidden');
 	wp_redirect(get_site_url());
 	exit;
 }
 
+$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
+
 if ($booking['status'] == 'booked') {
 	if ($_GET['action'] == 'confirm') {
 		update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 		$action = __('confirmed', 'rrze-rsvp');
-		$email->bookingConfirmedCustomer($bookingId);
+		if ($forceToConfirm) {
+			$this->email->bookingRequestedCustomer($bookingId);
+		} else {
+			$this->email->bookingConfirmedCustomer($bookingId);
+		}
 	} else if ($_GET['action'] == 'cancel') {
 		update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 		$action = __('cancelled', 'rrze-rsvp');
