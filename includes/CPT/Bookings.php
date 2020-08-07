@@ -70,7 +70,7 @@ class Bookings
             'show_in_admin_bar'         => true,
             'menu_position'             => 5,
             'menu_icon'                 => 'dashicons-calendar-alt',
-            'can_export'                 => true,
+            'can_export'                 => false,
             'has_archive'                 => false,
             'exclude_from_search'         => true,
             'publicly_queryable'         => false,
