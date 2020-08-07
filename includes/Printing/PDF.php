@@ -25,7 +25,7 @@ class PDF extends TCPDF{
         // $this->options->pdf_logo
         $wLogo = 60;
         $xLogo = $this->getPageWidth() - PDF_MARGIN_RIGHT - $wLogo;
-        $logo = __DIR__ . '/fau-logo-240x65.svg';
+        $logo = plugins_url('assets/img/fau-logo-240x65.svg', plugin()->getBasename());
         $this->ImageSVG($file=$logo, $x=$xLogo, $y=0, $w=60, $h='', $link='', $align='', $palign='', $border=0, $fitonpage=false);
     }    
 
