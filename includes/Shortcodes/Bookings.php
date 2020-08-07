@@ -164,7 +164,7 @@ class Bookings extends Shortcodes {
                 }
 
             } else {
-                return '<div class="alert alert-danger" role="alert">' . __('Fehler beim Speichern der Buchung.', 'rrze-rsvp') . '</div>';
+                return '<div class="alert alert-danger" role="alert">' . __('Error saving the booking', 'rrze-rsvp') . '</div>';
             }
 
 
@@ -180,12 +180,12 @@ class Bookings extends Shortcodes {
                 . '<li>'. __('Room', 'rrze-rsvp') . ': <strong>' . get_the_title($room_id) . '</strong></li>'
                 . '<li>'. __('Seat', 'rrze-rsvp') . ': <strong>' . get_the_title($booking_seat) . '</strong></li>'
                 . '</ul>'
-                . '<p>' . sprintf(__('Diese Daten wurden Ihnen ebenfalls per E-Mail an %s gesendet.', 'rrze-rsvp'), '<strong>' . $booking_email . '</strong>') . '</p>'
+                . '<p>' . sprintf(__('This data was also sent to your email %s .', 'rrze-rsvp'), '<strong>' . $booking_email . '</strong>') . '</p>'
                 . '<div class="alert alert-danger" role="alert">';
             if ($room_autoconfirmation == 'on') {
-                $output .= sprintf(__('%sDieser Platz wurde verbindlich für Sie reserviert.%s Sie können ihn jederzeit stornieren, falls Sie den Termin nicht wahrnemen können. Informationen dazu finden Sie in Ihrer Bestätigungsmail.', 'rrze-rsvp'),'<strong>', '</strong><br />');
+                $output .= sprintf(__('%sThis place has been reserved for you.%s You can cancel it at any time if you cannot keep the appointment. You can find information on this in your confirmation email.', 'rrze-rsvp'),'<strong>', '</strong><br />');
             } else {
-                $output .= sprintf(__('%sBitte beachten Sie, dass dies nur eine Reservierungsanfrage ist.%s Sie erst wird verbindlich, sobald wir Ihre Buchung per E-Mail bestätigen.', 'rrze-rsvp'),'<strong>', '</strong><br />');
+                $output .= sprintf(__('%sPlease note that this is only a reservation request.%s It only becomes binding as soon as we confirm your booking by email.', 'rrze-rsvp'),'<strong>', '</strong><br />');
             }
             $output .= '</div>';
 
@@ -308,10 +308,8 @@ class Bookings extends Shortcodes {
             $output .= '<div class="form-group"><label for="rsvp_phone">'
                        . __('Phone Number', 'rrze-rsvp') . ' *</label>'
                        . '<input type="tel" name="rsvp_phone" id="rsvp_phone" required aria-required="true">'
-                       . '<p class="description">' . __(
-                           'Um die Konkakt-Nachverfolgbarkeit im Rahmen der Corona-Bekämpfungsverordnung zu gewährleisten, benötigen wir Ihre Telefonnummer.',
-                           'rrze-rsvp'
-                       ) . '</p>'
+                       . '<p class="description">' 
+			. __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
                        . '</div>';
 
             $output .= '<button type="submit" class="btn btn-primary">' . __('Submit booking', 'rrze-rsvp') . '</button>
