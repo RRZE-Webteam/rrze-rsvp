@@ -37,6 +37,7 @@ class Actions
 
 		if ($type == 'confirm') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
+			update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
 			if ($forceToConfirm) {
 				$this->email->bookingRequestedCustomer($bookingId);
 			} else {
