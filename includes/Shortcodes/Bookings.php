@@ -146,6 +146,7 @@ class Bookings extends Shortcodes {
 
             $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
             $room_autoconfirmation = get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true);
+            $roomForceToConfirm = get_post_meta($room_id, 'rrze-rsvp-room-force-to-confirm', true);
             $room_timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
             foreach ($room_timeslots as $week) {
                 foreach ($week['rrze-rsvp-room-weekday'] as $day) {
@@ -183,7 +184,11 @@ class Bookings extends Shortcodes {
                 
                 // E-Mail senden
                 if ($room_autoconfirmation == 'on') {
-                    $this->email->bookingConfirmedCustomer($booking_id);
+                    if ($roomForceToConfirm == 'on') {
+                        $this->email->bookingRequestedCustomer($booking_id);
+                    } else {
+                        $this->email->bookingConfirmedCustomer($booking_id);
+                    }
                 } else {
                     $this->email->bookingRequestedCustomer($booking_id);
                     if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
