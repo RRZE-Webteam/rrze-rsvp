@@ -196,6 +196,14 @@ class Rooms
         ));
 
         $cmb_general->add_field(array(
+            'name' => __('Force to confirm', 'rrze-rsvp'),
+            'desc' => __('The customer is forced to confirm his booking within a period of one hour. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-force-to-confirm',
+            'type' => 'checkbox',
+            'default' => '',
+        ));
+
+        $cmb_general->add_field(array(
             'name'    => __('Floor plan', 'rrze-rsvp'),
             'desc'    => 'Upload an image.',
             'id'      => 'rrze-rsvp-room-floorplan',
