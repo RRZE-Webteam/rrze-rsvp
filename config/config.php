@@ -61,7 +61,7 @@ function getConstants() {
             'cancel_subject' => __('Your booking has been cancelled', 'rrze-rsvp'),
             'cancel_subject_en' => 'Your booking has been cancelled',
             'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp'),
-            'cancel_text_en' => 'Unfortunately we have to cancel your booking on {{date}} at {{time}}.',
+            'cancel_text_en' => 'Unfortunately we have to cancel your booking on {{date_en}} at {{time_en}}.',
             'single_room_availability_table' => 'yes_link',
             'fau_logo' => 'on',
             'website_logo' => 'off',
