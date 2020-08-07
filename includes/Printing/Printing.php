@@ -180,7 +180,7 @@ class Printing {
             }
     
             $pdf->Output($pdf_file_name . '.pdf', 'I');
-    
+            exit;
         }
     }
     
