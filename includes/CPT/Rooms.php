@@ -71,12 +71,16 @@ class Rooms
             //'menu_position'             => 5,
             'menu_icon'                 => 'dashicons-building',
             'can_export'                 => true,
-            'has_archive'                 => false,
+            'has_archive'                 => 'room',
             'exclude_from_search'         => true,
             'publicly_queryable'         => true,
             'capability_type'             => Capabilities::getCptCapabilityType('room'),
             'capabilities'              => (array) Capabilities::getCptCaps('room'),
-            'map_meta_cap'              => Capabilities::getCptMapMetaCap('booking')
+            'map_meta_cap'              => Capabilities::getCptMapMetaCap('booking'),
+            'rewrite' => [
+                'slug' => 'room',
+                'with_front' => false
+            ],            
         ];
 
         register_post_type('room', $args);
