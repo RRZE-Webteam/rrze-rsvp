@@ -44,8 +44,8 @@ class Main
 		$printing = new Printing;
 		$printing->onLoaded();
 
-		$schedule = new Schedule;
-		$schedule->onLoaded();
+		//$schedule = new Schedule;
+		//$schedule->onLoaded();
 
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
 
