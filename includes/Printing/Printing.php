@@ -61,6 +61,7 @@ class Printing {
             $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
             $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
     
+    
             // set default font subsetting mode
             $pdf->setFontSubsetting(true);
     
@@ -82,7 +83,9 @@ class Printing {
                 $columnMargin = 5;
                 $ySpace = 10;
                 $w = ($pdf->getPageWidth() - PDF_MARGIN_LEFT - PDF_MARGIN_RIGHT - $columnMargin) / 2;
-                $y = $pdf->GetY();
+                $y = $pdf->GetY() + $ySpace;
+                $x = $pdf->GetX();
+                $pdf->SetXY($x, $y);
                 $pdf->MultiCell($w, 5, __('Room', 'rrze-rsvp') . ':', 0, 'L', 0);
                 $pdf->SetFont('helvetica', '', 26, '', true);
                 if (isset($room->post_title)){

@@ -59,7 +59,9 @@ function getConstants() {
             'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp'),
             'cancel_text_en' => 'Unfortunately we have to cancel your booking on {{date}} at {{time}}.',
             'single_room_availability_table' => 'yes_link',
-            'logo' => 'fau',
+            'fau_logo' => 'on',
+            'website_logo' => 'off',
+            'website_url' => 'on',
             'instructions_de' => 'Bitte lesen Sie den QR Code ein, um auf diesem Platz einzuchecken oder diesen Platz für einen späteren Zeitpunkt zu reservieren.',
             'instructions_en' => 'Please scan the QR code to check in at this place or to reserve this place for a later date.',
         ];
@@ -368,16 +370,22 @@ function getFields(){
         ],
         'pdf' => [
             [
-                'name'    => 'logo',
-                'label'   => __('Logo', 'rrze-rsvp'),
-                'desc'    => __('Show logo in upper right corner of PDF', 'rrze-rsvp'),
-                'type'    => 'select',
-                'default' => $defaults['logo'],
-                'options' => [
-                    'none' => __('none', 'rrze-rsvp'),
-                    'fau' => __('FAU logo', 'rrze-rsvp'),
-                    'website' => __('Website logo', 'rrze-rsvp'),
-                ]
+                'name'  => 'fau_logo',
+                'label' => __('Print FAU logo', 'rrze-rsvp'),
+                'default'           => $defaults['fau_logo'],
+                'type'  => 'checkbox'
+            ],
+            [
+                'name'  => 'website_logo',
+                'label' => __('Print website\'s logo or title', 'rrze-rsvp'),
+                'default'           => $defaults['website_logo'],
+                'type'  => 'checkbox'
+            ],
+            [
+                'name'  => 'website_url',
+                'label' => __('Print website\'s URL', 'rrze-rsvp'),
+                'default'           => $defaults['website_url'],
+                'type'  => 'checkbox'
             ],
             [
                 'name'              => 'instructions_de',

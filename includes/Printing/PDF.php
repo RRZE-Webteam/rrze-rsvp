@@ -22,16 +22,36 @@ class PDF extends TCPDF{
 
     //Page header
     public function Header() {
-        // $this->options->pdf_logo
-        $wLogo = 60;
-        $xLogo = $this->getPageWidth() - PDF_MARGIN_RIGHT - $wLogo;
-        $logo = plugins_url('assets/img/fau-logo-240x65.svg', plugin()->getBasename());
-        $this->ImageSVG($file=$logo, $x=$xLogo, $y=0, $w=60, $h='', $link='', $align='', $palign='', $border=0, $fitonpage=false);
+        $wTitle = 0;
+        if ($this->options->pdf_fau_logo == 'on'){
+            $wLogo = 80;
+            $wPage = $this->getPageWidth() - PDF_MARGIN_RIGHT;
+            $xLogo = $wPage - $wLogo;
+            $fau_logo = esc_url(plugins_url('assets/img/fau-logo-240x65.svg', plugin()->getBasename()));
+            $this->ImageSVG($file=$fau_logo, $x=$xLogo, $y=0, $w='', $h='', $link='', $align='', $palign='', $border=0, $fitonpage=false);
+            $wTitle = $wPage - $wLogo - 5;
+        }
+        if ($this->options->pdf_website_logo == 'on'){
+            $website_logo = get_header_image();
+            if ( !empty($website_logo)) {
+                $this->ImageSVG($file=$website_logo, $x='', $y=5, $w='', $h='', $link='', $align='', $palign='', $border=0, $fitonpage=false);
+            } else {
+                $this->SetFont('helvetica', '', 26, '', true);
+                $this->MultiCell($wTitle, 5, get_bloginfo( 'title' ), 0, 'L', 0);
+                // $this->Cell(0, 0, get_bloginfo( 'title' ), 0, false, 'L', 0, '', 0, false, 'T', 'M');
+                // $yLine = $this->GetY();
+            }
+        }    
+            // $this->Line('',$this->y,200,$this->y);
+            $this->Line('',$this->GetY(),200,$this->y);
+            // $this->writeHTML("<hr>", true, false, false, false, '');
     }    
 
     public function Footer() {
-        $website_url = preg_replace( "/^((http|https):\/\/)?/i", '', home_url() );
-        $this->Cell(0, 0, $website_url, 0, false, 'L', 0, '', 0, false, 'T', 'M');
+        if ($this->options->pdf_website_url == 'on'){
+            $website_url = preg_replace( "/^((http|https):\/\/)?/i", '', home_url() );
+            $this->Cell(0, 0, $website_url, 0, false, 'L', 0, '', 0, false, 'T', 'M');
+        }
     }
    
 }
