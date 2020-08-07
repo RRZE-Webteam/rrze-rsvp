@@ -185,13 +185,25 @@ class Email
             return;
         }
 
-        $subject = $this->options->email_received_subject;
-        $subject = $this->placeholderParser($subject, $booking);
-        $subjectEnglish = $this->options->email_received_subject_en;
-        $subjectEnglish = $this->placeholderParser($subjectEnglish, $booking);         
+        $forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
-        $text = $this->options->email_received_text;
-        $textEnglish = $this->options->email_received_text_en;
+        if (! $forceToConfirm) {
+            $subject = $this->options->email_received_subject;
+            $subject = $this->placeholderParser($subject, $booking);
+            $subjectEnglish = $this->options->email_received_subject_en;
+            $subjectEnglish = $this->placeholderParser($subjectEnglish, $booking);  
+            $text = $this->options->email_received_text;
+            $textEnglish = $this->options->email_received_text_en;                       
+        } else {
+            $subject = $this->options->email_force_to_confirm_subject;
+            $subject = $this->placeholderParser($subject, $booking);
+            $subjectEnglish = $this->options->email_force_to_confirm_subject_en;
+            $subjectEnglish = $this->placeholderParser($subjectEnglish, $booking);  
+            $text = $this->options->email_force_to_confirm_text;
+            $textEnglish = $this->options->email_force_to_confirm_text_en;                       
+        }
+
+        $confirmUrl = Functions::bookingReplyUrl('confirm', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);                
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
 
         $data = [];
@@ -206,6 +218,10 @@ class Email
         $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
+        if ($forceToConfirm) {
+            $data['confirm_booking'] = sprintf(__('Please <a href="%s">confirm your booking now</a>.', 'rzze-rsvp'), $confirmUrl);
+            $data['confirm_booking_en'] = sprintf('Please <a href="%s">confirm your booking now</a>.', $confirmUrl);    
+        }        
         $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl);
         $data['cancel_booking_en'] = sprintf('Please <a href="%s">cancel your booking</a> in time if your plans change.', $cancelUrl);
         $data['site_url'] = site_url();
@@ -238,7 +254,6 @@ class Email
         $text = $this->options->email_confirm_text;
         $textEnglish = $this->options->email_confirm_text_en;
         $icsUrl = Functions::bookingReplyUrl('ics', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
-        $confirmUrl = Functions::bookingReplyUrl('confirm', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);                
         $checkInUrl = Functions::bookingReplyUrl('checkin', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);        
         $checkOutUrl = Functions::bookingReplyUrl('checkout', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);        
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
@@ -255,10 +270,6 @@ class Email
         $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
-        if (get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true)) {
-            $data['confirm_booking'] = sprintf(__('Please <a href="%s">confirm your booking</a>.', 'rzze-rsvp'), $confirmUrl);
-            $data['confirm_booking_en'] = sprintf('Please <a href="%s">confirm your booking</a>.', $confirmUrl);    
-        }
         $data['ics_download'] = sprintf(__('<a href="%s">Add the booking to your calendar</a>.', 'rzze-rsvp'), $icsUrl);
         $data['ics_download_en'] = sprintf('<a href="%s">Add the booking to your calendar</a>.', $icsUrl);
         $data['checkin_booking'] = sprintf(__('Please <a href="%s">check-in your booking</a> on site.', 'rzze-rsvp'), $checkInUrl);
