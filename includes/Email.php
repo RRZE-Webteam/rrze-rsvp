@@ -329,6 +329,8 @@ class Email
         $data = [
             'date' => $booking['date'],
             'time' => $booking['time'],
+            'date_en' => $booking['date_en'],
+            'time_en' => $booking['time_en'],            
             'room_name' => $booking['room_name'],
             'seat_name' => $booking['seat_name'],
             'guest_name' => $booking['guest_firstname'] . ' ' . $booking['guest_lastname'],
