@@ -68,6 +68,11 @@ function getConstants() {
             'website_url' => 'on',
             'instructions_de' => 'Bitte lesen Sie den QR Code ein, um auf diesem Platz einzuchecken oder diesen Platz für einen späteren Zeitpunkt zu reservieren.',
             'instructions_en' => 'Please scan the QR code to check in at this place or to reserve this place for a later date.',
+            'room_text' => 'off',
+            // 'room_image' => 'off',
+            'room_address' => 'off',
+            // 'room_floorplan' => 'off',
+            'seat_equipment' => 'off',
         ];
     }
     
@@ -442,26 +447,31 @@ function getFields(){
             [
                 'name'  => 'room_text',
                 'label' => __('Print room\'s text', 'rrze-rsvp'),
+                'default' => $defaults['room_text'],
                 'type'  => 'checkbox'
             ],
-            [
-                'name'  => 'room_image',
-                'label' => __('Print room\'s image', 'rrze-rsvp'),
-                'type'  => 'checkbox'
-            ],
+            // [
+            //     'name'  => 'room_image',
+            //     'label' => __('Print room\'s image', 'rrze-rsvp'),
+            //     'default' => $defaults['room_image'],
+            //     'type'  => 'checkbox'
+            // ],
             [
                 'name'  => 'room_address',
                 'label' => __('Print room\'s address', 'rrze-rsvp'),
+                'default' => $defaults['room_address'],
                 'type'  => 'checkbox'
             ],
-            [
-                'name'  => 'room_floorplan',
-                'label' => __('Print floor plan', 'rrze-rsvp'),
-                'type'  => 'checkbox'
-            ],
+            // [
+            //     'name'  => 'room_floorplan',
+            //     'label' => __('Print floor plan', 'rrze-rsvp'),
+            //     'default' => $defaults['room_floorplan'],
+            //     'type'  => 'checkbox'
+            // ],
             [
                 'name'  => 'seat_equipment',
                 'label' => __('Print seats\' equipment', 'rrze-rsvp'),
+                'default' => $defaults['seat_equipment'],
                 'type'  => 'checkbox'
             ],
         ]

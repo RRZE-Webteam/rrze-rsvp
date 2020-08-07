@@ -79,23 +79,26 @@ class Printing {
     
             foreach($aSeats as $seat_post_id){
                 $pdf->AddPage();
-    
+
                 $columnMargin = 5;
                 $ySpace = 10;
                 $w = ($pdf->getPageWidth() - PDF_MARGIN_LEFT - PDF_MARGIN_RIGHT - $columnMargin) / 2;
                 $y = $pdf->GetY() + $ySpace;
                 $x = $pdf->GetX();
                 $pdf->SetXY($x, $y);
+                $pdf->Line(PDF_MARGIN_LEFT, $pdf->GetY() - 5, $pdf->getPageWidth() - PDF_MARGIN_RIGHT, $pdf->GetY() - 5);
+
+                // Room title
                 $pdf->MultiCell($w, 5, __('Room', 'rrze-rsvp') . ':', 0, 'L', 0);
                 $pdf->SetFont('helvetica', '', 26, '', true);
                 if (isset($room->post_title)){
                     $pdf->MultiCell($w, 5, $room->post_title, 0, 'L', 0);
                 }
     
+                // Seat
                 $x = $pdf->GetX();
                 $yRoom = $pdf->GetY();
                 $pdf->SetXY($x + $w + $columnMargin, $y);
-    
                 $seat_title = get_the_title($seat_post_id);
                 $pdf->SetFont('helvetica', '', 12, '', true);
                 $pdf->MultiCell(0, 5, __('Seat', 'rrze-rsvp') . ':', 0, 'L', 0);
@@ -106,10 +109,9 @@ class Printing {
                 $pdf->MultiCell($w, 5, $seat_title, 0, 'L', 0);
                 $pdf->SetFont('helvetica', '', 12, '', true);
     
+                // Room address
                 $ySeat = $pdf->GetY();
-    
                 $yRoomSeat = ($yRoom < $ySeat ? $ySeat : $yRoom) + $ySpace;
-    
                 $y = 0;
                 if ($this->options->pdf_room_address == 'on'){
                     $room_street = get_post_meta($room_post_id, 'rrze-rsvp-room-street', true);
@@ -118,6 +120,7 @@ class Printing {
                     $pdf->MultiCell(0, 5, $room_street . "\n" . $room_zip . ' ' . $room_city, 0, 'L', 0, 1, '', $yRoomSeat, true, 0);
                 }
     
+                // Room description
                 $y = $pdf->GetY();
                 $y = ( $y < $yRoomSeat ? $yRoomSeat : $y );
                 if ($this->options->pdf_room_text == 'on'){
@@ -125,18 +128,20 @@ class Printing {
                     $y = 10;
                     $yRoomSeat = $pdf->GetY();
                 }
-    
+
+                // Floor plan
+                // 2DO: check file-type + set x/y
                 // $y = 0;
                 // if ($this->options->pdf_room_floorplan == 'on'){
-                //     $meta = get_post_meta($room_post_id, 'rrze-rsvp-room-floorplan'); // why rrze-rsvp-room-floorplan_id and not rrze-rsvp-room-floorplan?
-                //     if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id'] != '') {
-                //         $img_src = wp_get_attachment_image_src( $meta['rrze-rsvp-room-floorplan_id'][0]);
+                //     $floorplan = get_post_meta($room_post_id, 'rrze-rsvp-room-floorplan');
+                //     if (isset($floorplan) && isset($floorplan[0])) {
                 //         $pdf->MultiCell(0, 5, __('Floor Plan', 'rrze-rsvp') . ':', 0, 'L', 0, 1, '', $pdf->GetY(), true, 0);
-                //         $pdf->Image($img_src, $x, $y, $w, $h, 'JPG', '', '', false, 300, '', false, false, 0, $fitbox, false, false);
+                //         $pdf->Image($floorplan[0], $x='', $y, $w, $h, 'JPG', '', '', false, 300, '', false, false, 0, $fitbox, false, false);
                 //         $y = 10;
                 //     }
                 // }
     
+                // QR Code
                 $y = $pdf->GetY();
                 $y = ( $y < $yRoomSeat ? $yRoomSeat : $y );
                 
@@ -144,18 +149,34 @@ class Printing {
                 $pdf->write2DBarcode($permalink, 'QRCODE,H', '', $y + $ySpace, 50, 50, $qr_style, 'N');
                 $yQR = $pdf->GetY();
     
+                // Instructions
                 $pdf->MultiCell(0, 5, $instructions_de, 0, 'L', 0, 1, 50 + 20, $y + $ySpace, true, 0);
                 $pdf->MultiCell(0, 5, $instructions_en, 0, 'L', 0, 1, 50 + 20, $pdf->GetY() + $ySpace, true, 0);
                 $y = $pdf->GetY();
                 $y = ($y < $yQR ? $yQR : $y);
                 $pdf->Text($pdf->GetX(), $y + 5, $permalink);
-                $pdf->Text(0, 0, $website_url);
+
+
+                // Seat equiptment
+                if ($this->options->pdf_seat_equipment == 'on'){
+                    $html = '';
+                    $aEquipment = get_the_terms($seat_post_id, 'rrze-rsvp-equipment');
+                    if ($aEquipment){
+                        $html = '<strong>' . __('Equipment:', 'rrze-rsvp') . '</strong><ul>';
+                        foreach($aEquipment as $equipment){
+                            $html .= '<li>' . $equipment->name . '</li>';
+                        }
+                        $html .= '<ul>';
+                        $pdf->writeHTMLCell(0, 1, PDF_MARGIN_LEFT, $pdf->GetY() + 2*$ySpace, $html, 0, 2, 0);
+                    }
+                }
             }
     
+            // File name
             if (isset($room->post_title)){
                 $pdf_file_name = sanitize_file_name($room->post_title);
             }else{
-                $pdf_file_name = 'seat';
+                $pdf_file_name = 'booking';
             }
     
             $pdf->Output($pdf_file_name . '.pdf', 'I');
