@@ -23,11 +23,11 @@ if ($booking['status'] == 'booked') {
 	if ($_GET['action'] == 'confirm') {
 		update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 		$action = __('confirmed', 'rrze-rsvp');
-		$email->bookingCancelledAdmin($bookingId);
+		$email->bookingConfirmedCustomer($bookingId);
 	} else if ($_GET['action'] == 'cancel') {
 		update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 		$action = __('cancelled', 'rrze-rsvp');
-		$email->bookingCancelledAdmin($bookingId);
+		$email->bookingCancelledCustomer($bookingId);
 	}
 	$bookingProcessed = false;
 } else {

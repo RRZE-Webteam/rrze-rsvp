@@ -148,6 +148,10 @@ class Email
         $to = $this->options->email_notification_email;
         $subject = __('Booking has been cancelled', 'rrze-rsvp');
 
+        $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
+        $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
+        $customerPhone = sprintf('%s: %s', __('Phone', 'rrze-rsvp'), $booking['guest_phone']);
+
         $text = sprintf(__('A booking on %s has been cancelled by the customer.', 'rrze-rsvp'), get_bloginfo('name'));
 
         $data = [];
@@ -156,7 +160,9 @@ class Email
         $data['time'] = $booking['time'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
-        $data['booking_info'] = Functions::dataToStr($booking);
+        $data['customer']['name'] = $customerName;
+        $data['customer']['email'] = $customerEmail;
+        $data['customer']['phone'] = $customerPhone;
 
         $message = $this->template->getContent('email/booking-cancelled-admin', $data);
 
@@ -232,7 +238,9 @@ class Email
         $text = $this->options->email_confirm_text;
         $textEnglish = $this->options->email_confirm_text_en;
         $icsUrl = Functions::bookingReplyUrl('ics', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
+        $confirmUrl = Functions::bookingReplyUrl('confirm', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);                
         $checkInUrl = Functions::bookingReplyUrl('checkin', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);        
+        $checkOutUrl = Functions::bookingReplyUrl('checkout', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);        
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
 
         $data = [];
@@ -247,10 +255,16 @@ class Email
         $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
+        if (get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true)) {
+            $data['confirm_booking'] = sprintf(__('Please <a href="%s">confirm your booking</a>.', 'rzze-rsvp'), $confirmUrl);
+            $data['confirm_booking_en'] = sprintf('Please <a href="%s">confirm your booking</a>.', $confirmUrl);    
+        }
         $data['ics_download'] = sprintf(__('<a href="%s">Add the booking to your calendar</a>.', 'rzze-rsvp'), $icsUrl);
         $data['ics_download_en'] = sprintf('<a href="%s">Add the booking to your calendar</a>.', $icsUrl);
         $data['checkin_booking'] = sprintf(__('Please <a href="%s">check-in your booking</a> on site.', 'rzze-rsvp'), $checkInUrl);
         $data['checkin_booking_en'] = sprintf('Please <a href="%s">check-in your booking</a> on site.', $checkInUrl);
+        $data['checkout_booking'] = sprintf(__('Please <a href="%s">check out</a> when you leave the site.', 'rzze-rsvp'), $checkOutUrl);
+        $data['checkout_booking_en'] = sprintf('Please <a href="%s">check out</a> when you leave the site.', $checkOutUrl);        
         $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl);
         $data['cancel_booking_en'] = sprintf('Please <a href="%s">cancel your booking</a> in time if your plans change.', $cancelUrl);
         $data['site_url'] = site_url();
@@ -263,7 +277,7 @@ class Email
 
     /**
      * bookingCancelledCustomer
-     * Send a booking cancellation email to the client. No further action 
+     * Send a booking cancellation email to the customer. No further action 
      * is necessary.
      * @param integer $bookingId Booking Id
      * @return void

@@ -36,15 +36,15 @@ class Actions
 		}
 
 		echo json_encode([
-			'email_send' => true
+			'result' => true
 		]);
 
 		exit;
 	}
 
 	public function handleActions()
-	{	
-		if (isset($_GET['action']) && isset($_GET['id']) && wp_verify_nonce($_REQUEST['_wpnonce'], 'status')) {	
+	{
+		if (isset($_GET['action']) && isset($_GET['id']) && wp_verify_nonce($_REQUEST['_wpnonce'], 'status')) {
 			$bookingId = absint($_GET['id']);
 			$action = sanitize_text_field($_GET['action']);
 			if ($action == 'confirm') {
@@ -70,18 +70,22 @@ class Actions
 
 		if ($hash !== false && $bookingId !== false && $action !== false) {
 			$booking = Functions::getBooking($bookingId);
-			if (($action == 'checkin' || $action == 'cancel' || $action == 'ics') && $booking && Functions::decrypt($hash)) {				
-				
+			$nonce = $booking ? sprintf('%s-%s', $bookingId, $booking['start']) : '';
+			$decryptedHash = Functions::decrypt($hash);
+			$isAdmin =  $decryptedHash == $nonce ? true : false;
+			$isCustomer =  $decryptedHash == $nonce . '-customer' ? true : false;
+			
+			if (($action == 'confirm' || $action == 'cancel') && $isAdmin) {
+				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
+				$template = $this->loadBookingReplyTemplate('booking-reply-admin', true);
+				return $template;
+			} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel' || $action == 'ics') && $isCustomer) {
 				if ($action == 'ics') {
 					ICS::generate($bookingId);
 					exit;
 				}
 				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
 				$template = $this->loadBookingReplyTemplate('booking-reply-customer', true);
-				return $template;
-			} elseif (($action == 'confirm' || $action == 'cancel') && $booking && Functions::decrypt($hash)) {				
-				wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
-				$template = $this->loadBookingReplyTemplate('booking-reply-admin', true);
 				return $template;
 			}
 
@@ -101,5 +105,4 @@ class Actions
 		}
 		require_once($templatePath);
 	}
-
 }

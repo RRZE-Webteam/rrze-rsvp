@@ -107,7 +107,7 @@ class Functions
         $data['date'] = Functions::dateFormat($data['start']);
         $data['time'] = Functions::timeFormat($data['start']) . ' - ' . Functions::timeFormat($data['end']);
         $data['date_en'] = date('F j, Y', $data['start']);
-        $data['time_en'] = date('g:i a', $data['end']);
+        $data['time_en'] = date('g:i a', $data['start']) . ' - ' . date('g:i a', $data['end']);
 
         $data['booking_date'] = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
 
@@ -170,26 +170,18 @@ class Functions
         return self::crypt($string, 'decrypt');
     }
 
-    public static function getRoomAvailability ($room, $start, $end) {
+    public static function getRoomAvailability ($room_id, $start, $end) {
         $availability = [];
         // Array aus verfügbaren Timeslots des Raumes erstellen
-        $timeslots = get_post_meta($room, 'rrze-rsvp-room-timeslots', true);
-        if ($timeslots == '') {
-            return $availability;
-        }
-        foreach($timeslots as $timeslot) {
-            foreach ($timeslot['rrze-rsvp-room-weekday'] as $weekday) {
-                $slots[$weekday][] = $timeslot['rrze-rsvp-room-starttime'];
-            }
-        }
-
+        $timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
+        $slots = self::getRoomSchedule($room_id);
         // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
         $seats = get_posts([
             'post_type' => 'seat',
             'post_status' => 'publish',
             'nopaging' => true,
             'meta_key' => 'rrze-rsvp-seat-room',
-            'meta_value' => $room,
+            'meta_value' => $room_id,
         ]);
         $seat_ids = [];
         $seats_booked = [];
@@ -226,7 +218,7 @@ class Functions
         while ($loopstart <= $loopend) {
             $weekday = date('w', $loopstart);
             if (isset($slots[$weekday])) {
-                foreach ( $slots[ $weekday ] as $time ) {
+                foreach ( $slots[ $weekday ] as $time => $endtime) {
                     $hours = explode( ':', $time )[ 0 ];
                     $room_availability[ strtotime( '+' . $hours . ' hours', $loopstart ) ] = $seat_ids;
                 }
@@ -251,7 +243,11 @@ class Functions
 
         // Für Kalender aus Array-Ebene Timestamp zwei Ebenen (Tag / Zeit) machen
         foreach ($room_availability as $timestamp => $v) {
-            $availability[date('Y-m-d', $timestamp)][date('H:i', $timestamp)] = $v;
+            $weekday = (date('w', $timestamp));
+            $start = date('H:i', $timestamp);
+            $end = $slots[$weekday][$start];
+
+            $availability[date('Y-m-d', $timestamp)][$start.'-'.$end] = $v;
         }
 
         return $availability;
@@ -273,14 +269,7 @@ class Functions
 
         // Array aus verfügbaren Timeslots des Raumes erstellen
         $room_id = get_post_meta($seat, 'rrze-rsvp-seat-room', true);
-        $timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots');
-        $timeslots = $timeslots[0];
-        foreach($timeslots as $timeslot) {
-            foreach ($timeslot['rrze-rsvp-room-weekday'] as $weekday) {
-                $slots[$weekday][] = $timeslot['rrze-rsvp-room-starttime'];
-            }
-        }
-
+        $slots = self::getRoomSchedule($room_id);
         // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
         $bookings = get_posts([
             'post_type' => 'booking',
@@ -312,11 +301,13 @@ class Functions
         while ($loopstart <= $loopend) {
             $weekday = date('w', $loopstart);
             if (isset($slots[$weekday])) {
-                foreach ( $slots[ $weekday ] as $time ) {
-                    $hours = explode( ':', $time )[ 0 ];
-                    $timestamp = strtotime( '+' . $hours . ' hours', $loopstart );
+                foreach ( $slots[ $weekday ] as $starttime  => $endtime) {
+                    $hours_start = explode( ':', $starttime )[ 0 ];
+                    $hours_end = explode( ':', $endtime )[ 0 ];
+                    $timestamp = strtotime( '+' . $hours_start . ' hours', $loopstart );
+                    $timestamp_end = strtotime( '+' . $hours_end . ' hours', $loopstart );
                     if (!in_array($timestamp, $timeslots_booked)) {
-                        $seat_availability[] = $timestamp;
+                        $seat_availability[$timestamp] = $timestamp_end;
                     }
                 }
             }
@@ -324,8 +315,8 @@ class Functions
         }
 
         // Für Ausgabe Timestamp zwei Ebenen (Tag / Zeit) machen
-        foreach ($seat_availability as $timestamp) {
-            $availability[date('Y-m-d', $timestamp)][] = date('H:i', $timestamp);
+        foreach ($seat_availability as $timestamp => $timestamp_end) {
+            $availability[date('Y-m-d', $timestamp)][] = date('H:i', $timestamp) . '-' . date('H:i', $timestamp_end);
         }
 
         return $availability;
@@ -403,5 +394,17 @@ class Functions
         ];
         $locale = get_locale();
         return in_array($locale, $englishLocale);
-    }    
+    }
+
+    public static function getRoomSchedule($room_id)
+    {
+        $schedule = [];
+        $room_timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
+        foreach ($room_timeslots as $week) {
+            foreach ($week['rrze-rsvp-room-weekday'] as $day) {
+                $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+            }
+        }
+        return $schedule;
+    }
 }

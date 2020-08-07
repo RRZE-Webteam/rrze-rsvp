@@ -79,7 +79,7 @@ class Bookings extends Shortcodes {
             $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
             $booking_email = sanitize_email($posted_data['rsvp_email']);
             $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
-            $booking_instant = ($posted_data['rsvp_instant'] == '1');
+            $booking_instant = (isset($posted_data['rsvp_instant']) && $posted_data['rsvp_instant'] == '1');
 
             // Überprüfen ob bereits eine Bewerbung mit gleicher E-Mail-Adresse zur gleichen Zeit vorliegt
             $check_args = [
@@ -497,6 +497,8 @@ class Bookings extends Shortcodes {
             $response['seat'] = '<div class="rsvp-seat-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
         }
         $availability = Functions::getRoomAvailability($room, $date, date('Y-m-d', strtotime($date. ' +1 days')));
+//        var_dump($availability);
+
         if ($date) {
             $response['time'] = $this->buildTimeslotSelect($room, $date, $time, $availability);
             if ($time) {
@@ -515,31 +517,13 @@ class Bookings extends Shortcodes {
         $output = '';
         $seat_name = get_the_title($id);
         $equipment = get_the_terms($id, 'rrze-rsvp-equipment');
-        $room_id = get_post_meta($id, 'rrze-rsvp-seat-room', true);
-        if ($room_id)
-            $room = get_post($room_id);
-        if ($equipment === false && $room === false) {
-//            echo '<div class="rsvp-item-info">' . __('No additional information available.','rrze-rsvp') . '</div>';
-            echo '';
-            wp_die();
-        }
         $output .= '<div class="rsvp-item-info">';
-        if ($equipment !== false || $room_id !== false) {
-            $output .= '<div class="rsvp-item-equipment"><h5 class="small">' . sprintf( __( 'Seat %s', 'rrze-rsvp' ), $seat_name ) . '</h5>';
-        }
         if ($equipment !== false) {
+            $output .= '<div class="rsvp-item-equipment"><h5 class="small">' . sprintf( __( 'Seat %s', 'rrze-rsvp' ), $seat_name ) . '</h5>';
             foreach  ($equipment as $e) {
                 $e_arr[] = $e->name;
             }
             $output .= '<p><strong>' . __('Equipment','rrze-rsvp') . '</strong>: ' . implode(', ', $e_arr) . '</p>';
-            $output .= '</div>';
-        }
-        if ($room_id) {
-            $output .= '<div class="rsvp-item-room"><p><strong>' . __('Room','rrze-rsvp') . ':</strong> ';
-            $output .= '<a href="'.get_permalink($room->ID).'" target="_blank" title="'.__('Open room info in new window.','rrze-rsvp').'">';
-            $output .= $room->post_title;
-            $output .= '</a></p>';
-
             $output .= '</div>';
         }
         $output .= '</div>';
@@ -552,9 +536,10 @@ class Bookings extends Shortcodes {
         $timeSelects = '';
         $slots = array_keys($availability[$date]);
         foreach ($slots as $slot) {
-            $id = 'rsvp_time_' . sanitize_title($slot);
-            $checked = checked($time !== false && $time == $slot, true, false);
-            $timeSelects .= "<div class='form-group'><input type='radio' id='$id' value='$slot' name='rsvp_time' " . $checked . " required aria-required='true'><label for='$id'>$slot</label></div>";
+            $slot_value = explode('-', $slot)[0];
+            $id = 'rsvp_time_' . sanitize_title($slot_value);
+            $checked = checked($time !== false && $time == $slot_value, true, false);
+            $timeSelects .= "<div class='form-group'><input type='radio' id='$id' value='$slot_value' name='rsvp_time' " . $checked . " required aria-required='true'><label for='$id'>$slot</label></div>";
         }
         if ($timeSelects == '') {
             $timeSelects .= __('No time slots available.', 'rrze-rsvp');
@@ -563,7 +548,15 @@ class Bookings extends Shortcodes {
     }
 
     private function buildSeatSelect($room, $date, $time, $seat_id, $availability) {
+        foreach ($availability as $date => $xtime) {
+            foreach ($xtime as $k => $v) {
+                $k_new = explode('-', $k)[0];
+                $availability[$date][$k_new] = $v;
+                unset($availability[$date][$k]);
+            }
+        }
         $seats = (isset($availability[$date][$time])) ? $availability[$date][$time] : [];
+        //var_dump($seats);
         $seatSelects = '';
         foreach ($seats as $seat) {
             $seatname = get_the_title($seat);

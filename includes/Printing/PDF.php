@@ -22,38 +22,12 @@ class PDF extends TCPDF{
         $this->options = (object) $settings->getOptions();
     }
 
-    public function Header() {
-
-        // $customheader =  get_custom_header();
-        // $customheader->url
-        // $customheader->width
-        // $customheader->height
-
-        // Logo
-        // https://www.nickless.test.rrze.fau.de/dev4/wp-content/themes/FAU-Einrichtungen/img/logos/fau-logo-240x65.svg
-        // $image_file = K_PATH_IMAGES.'logo_example.jpg';
-        // $this->Image($image_file, 10, 10, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-
-        // Set font
-        // $this->SetFont('helvetica', 'B', 20);
-        // Title
-        // $this->Cell(0, 15, '<< TCPDF Example 003 >>', 0, false, 'C', 0, '', 0, false, 'M', 'M');
-    }    
-
-    // Page footer
-    public function Footer() {
-        // Position at 15 mm from bottom
-        $this->SetY(-15);
-        // Set font
-        $this->SetFont('helvetica', 'I', 8);
-        // Page number
-        $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
-    }    
-    
+   
     public function createPDF($seat_ids){
         if (!$seat_ids){
             return;
         }
+       
 
         $aSeats = json_decode($seat_ids);
 
@@ -66,7 +40,7 @@ class PDF extends TCPDF{
         // $pdf->SetKeywords('TCPDF, PDF, example, test, guide');
 
         // set default header data
-        $logo = $this->options->pdf_logo;
+        // $logo = $this->options->pdf_logo;
         $instructions_de = $this->options->pdf_instructions_de;
         $instructions_en = $this->options->pdf_instructions_en;
         
@@ -141,7 +115,9 @@ class PDF extends TCPDF{
             $y = $pdf->GetY();
             $pdf->MultiCell($w, 5, __('Room', 'rrze-rsvp') . ':', 0, 'L', 0);
             $pdf->SetFont('helvetica', '', 26, '', true);
-            $pdf->MultiCell($w, 5, $room->post_title, 0, 'L', 0);
+            if (isset($room->post_title)){
+                $pdf->MultiCell($w, 5, $room->post_title, 0, 'L', 0);
+            }
 
             $x = $pdf->GetX();
             $yRoom = $pdf->GetY();
@@ -202,8 +178,12 @@ class PDF extends TCPDF{
             $pdf->Text($pdf->GetX(), $y + 5, $permalink);
         }
 
-
-        $pdf->Output(sanitize_file_name($room->post_title) . '.pdf', 'I');
+        if (isset($room->post_title)){
+            $pdf_file_name = sanitize_file_name($room->post_title);
+        }else{
+            $pdf_file_name = 'seat';
+        }
+        $pdf->Output($pdf_file_name . '.pdf', 'I');
     }
 
 }
