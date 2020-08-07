@@ -3,7 +3,7 @@ namespace RRZE\RSVP\Printing;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/tcpdf/tcpdf.php';
+require_once __DIR__ . '/../../vendor/tcpdf/tcpdf.php';
 
 use TCPDF;
 use RRZE\RSVP\Settings;
@@ -12,7 +12,6 @@ use function RRZE\RSVP\plugin;
 class PDF extends TCPDF{
 
     protected $options;
-    // protected $wPage;
 
 	public function __construct() {
         parent::__construct();
