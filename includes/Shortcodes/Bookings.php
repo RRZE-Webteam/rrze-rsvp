@@ -59,6 +59,9 @@ class Bookings extends Shortcodes {
 
     public function shortcodeBooking($atts, $content = '', $tag) {
         $output = '';
+        $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
+        $sso = ($shortcode_atts[ 'sso' ] == 'true');
+
         if (isset($_POST['rrze_rsvp_post_nonce_field']) && wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
 
             array_walk_recursive(
@@ -75,13 +78,46 @@ class Bookings extends Shortcodes {
             $booking_start = sanitize_text_field($posted_data['rsvp_time']);
             $booking_timestamp_start = strtotime($booking_date . ' ' . $booking_start);
             $booking_seat = absint($posted_data['rsvp_seat']);
-            $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
-            $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
-            $booking_email = sanitize_email($posted_data['rsvp_email']);
             $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
             $booking_instant = (isset($posted_data['rsvp_instant']) && $posted_data['rsvp_instant'] == '1');
 
-            // Überprüfen ob bereits eine Bewerbung mit gleicher E-Mail-Adresse zur gleichen Zeit vorliegt
+            if ($sso) {
+                if ($this->idm->isAuthenticated()){
+                    $sso_data = $this->idm->getCustomerData();
+                    $booking_lastname  = $sso_data['customer_lastname'];
+                    $booking_firstname  = $sso_data['customer_lastname'];
+                    $booking_email  = $sso_data['customer_lastname'];
+                } else {
+                    return '<h2>' . __('SSO error', 'rrze-rsvp') . '</h2>'
+                        . '<div class="alert alert-danger" role="alert">' . __("Error retrieving your data from SSO. Please try again or contact the room's administrator.", 'rrze-rsvp') . '</div>';
+
+                }
+            } else {
+                $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
+                $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
+                $booking_email = sanitize_email($posted_data['rsvp_email']);
+            }
+
+            // Überprüfen ob der Platz in der Zwischenzeit bereits anderweitig gebucht wurde
+            $check_availability = Functions::getSeatAvailability($booking_seat, $booking_date, date('Y-m-d', strtotime($booking_date. ' +1 days')));
+            $seat_available = false;
+            foreach ($check_availability[$booking_date] as $timeslot) {
+                if (strpos($timeslot, $booking_start) == 0) {
+                    $seat_available = true;
+                }
+            }
+            if (!$seat_available) {
+                $permalink = get_permalink($this->options->general_booking_page);
+                $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
+                $url = "$permalink?room_id=$room_id&bookingdate=$booking_date&timeslot=$booking_start\"";
+
+                return '<h2>' . __('Seat already booked', 'rrze-rsvp') . '</h2>'
+                    . '<div class="alert alert-danger" role="alert">'
+                    . sprintf('%sSorry! The seat you selected has been booked by someone else in the mean time.%s Please try again. %s-> Back to booking form%s', '<strong>', '</strong><br />', "<a href=\"$url\">", '</a>')
+                    . '</div>';
+            }
+
+            // Überprüfen ob bereits eine Buchung mit gleicher E-Mail-Adresse zur gleichen Zeit vorliegt
             $check_args = [
                 'post_type' => 'booking',
                 'meta_query' => [
@@ -190,9 +226,7 @@ class Bookings extends Shortcodes {
             $output .= '</div>';
 
         } else {
-            $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
 
-            $sso = ($shortcode_atts[ 'sso' ] == 'true');
             if ($sso == true && $this->sso == false)
                 return '<div class="alert alert-warning" role="alert">' . sprintf('%sSSO not available.%s Please activate SSO authentication or remove the SSO attribute from your shortcode.', '<strong>', '</strong><br />') . '</div>';
 
@@ -279,38 +313,36 @@ class Bookings extends Shortcodes {
             $output .= '<legend>' . __('Your data', 'rrze-rsvp') . '</legend>';
             if ($sso) {
                 $data = $this->idm->getCustomerData();
-                $readonly        = 'readonly';
-                $input_lastname  = $data['customer_lastname'];
-                $input_firstname = $data['customer_firstname'];
-                $input_email     = $data['customer_email'];
+                $output .= '<div class="form-group">'
+                    . '<p>' . __('Last name', 'rrze-rsvp') . ': <strong>' . $data['customer_lastname'] . '</strong></p>'
+                    . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
+                    . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
+                    . '</div>';
+
+
             } else {
-                $readonly        = '';
-                $input_lastname  = '';
-                $input_firstname = '';
-                $input_email     = '';
+                $output .= '<div class="form-group"><label for="rsvp_lastname">'
+                    . __('Last name', 'rrze-rsvp') . ' *</label>'
+                    . "<input type=\"text\" name=\"rsvp_lastname\" id=\"rsvp_lastname\" required aria-required=\"true\">"
+                    . '</div>';
+
+                $output .= '<div class="form-group"><label for="rsvp_firstname">'
+                    . __('First name', 'rrze-rsvp') . ' *</label>'
+                    . "<input type=\"text\" name=\"rsvp_firstname\" id=\"rsvp_firstname\" required aria-required=\"true\">"
+                    . '</div>';
+
+                $output .= '<div class="form-group"><label for="rsvp_email">'
+                    . __('Email', 'rrze-rsvp') . ' *</label>'
+                    . "<input type=\"text\" name=\"rsvp_email\" id=\"rsvp_email\" required aria-required=\"true\">"
+                    . '</div>';
+
+                $output .= '<div class="form-group"><label for="rsvp_phone">'
+                    . __('Phone Number', 'rrze-rsvp') . ' *</label>'
+                    . '<input type="tel" name="rsvp_phone" id="rsvp_phone" required aria-required="true">'
+                    . '<p class="description">'
+                    . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
+                    . '</div>';
             }
-
-            $output .= '<div class="form-group"><label for="rsvp_lastname">'
-                       . __('Last name', 'rrze-rsvp') . ' *</label>'
-                       . "<input type=\"text\" name=\"rsvp_lastname\" id=\"rsvp_lastname\" required $readonly aria-required=\"true\" value=\"$input_lastname\">"
-                       . '</div>';
-
-            $output .= '<div class="form-group"><label for="rsvp_firstname">'
-                       . __('First name', 'rrze-rsvp') . ' *</label>'
-                       . "<input type=\"text\" name=\"rsvp_firstname\" id=\"rsvp_firstname\" required $readonly aria-required=\"true\" value=\"$input_firstname\">"
-                       . '</div>';
-
-            $output .= '<div class="form-group"><label for="rsvp_email">'
-                       . __('Email', 'rrze-rsvp') . ' *</label>'
-                       . "<input type=\"text\" name=\"rsvp_email\" id=\"rsvp_email\" required $readonly aria-required=\"true\" value=\"$input_email\">"
-                       . '</div>';
-
-            $output .= '<div class="form-group"><label for="rsvp_phone">'
-                       . __('Phone Number', 'rrze-rsvp') . ' *</label>'
-                       . '<input type="tel" name="rsvp_phone" id="rsvp_phone" required aria-required="true">'
-                       . '<p class="description">' 
-			. __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
-                       . '</div>';
 
             $output .= '<button type="submit" class="btn btn-primary">' . __('Submit booking', 'rrze-rsvp') . '</button>
                 </form>
