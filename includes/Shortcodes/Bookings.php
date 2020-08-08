@@ -583,11 +583,11 @@ class Bookings extends Shortcodes {
     }
 
     private function buildSeatSelect($room, $date, $time, $seat_id, $availability) {
-        foreach ($availability as $date => $xtime) {
+        foreach ($availability as $xdate => $xtime) {
             foreach ($xtime as $k => $v) {
                 $k_new = explode('-', $k)[0];
-                $availability[$date][$k_new] = $v;
-                unset($availability[$date][$k]);
+                $availability[$xdate][$k_new] = $v;
+                unset($availability[$xdate][$k]);
             }
         }
         $seats = (isset($availability[$date][$time])) ? $availability[$date][$time] : [];

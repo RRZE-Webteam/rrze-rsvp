@@ -197,6 +197,11 @@ class Functions
                         'value'   => $seat->ID,
                     ],
                     [
+                        'key' => 'rrze-rsvp-booking-status',
+                        'value'   => ['confirmed', 'checked-in'],
+                        'compare' => 'IN'
+                    ],
+                    [
                         'key'     => 'rrze-rsvp-booking-start',
                         'value' => array( strtotime($start), strtotime($end) ),
                         'compare' => 'BETWEEN',
@@ -279,6 +284,11 @@ class Functions
                 [
                     'key' => 'rrze-rsvp-booking-seat',
                     'value'   => $seat,
+                ],
+                [
+                    'key' => 'rrze-rsvp-booking-status',
+                    'value'   => ['confirmed', 'checked-in'],
+                    'compare' => 'IN'
                 ],
                 [
                     'key'     => 'rrze-rsvp-booking-start',
