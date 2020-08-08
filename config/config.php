@@ -221,7 +221,7 @@ function getFields(){
             [
                 'name'    => 'booking_page',
                 'label'   => __('Booking Page', 'rrze-rsvp'),
-                'desc'    => __('Select the page that contains your booking form shortcode.', 'rrze-rsvp'),
+                'desc'    => __('Select the page that contains your booking form shortcode. You can find a shortcode hint on each room edit page.', 'rrze-rsvp'),
                 'type'    => 'select',
                 'options' => Functions::getPagesDropdownOptions(['show_option_none'=> '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;']),
             ],

@@ -28,6 +28,7 @@ class Bookings
         require_once(plugin_dir_path($this->pluginFile) . 'vendor/cmb2/init.php');
         add_action('init', [$this, 'booking_post_type'], 0);
         add_action('cmb2_admin_init', [$this, 'booking_metaboxes']);
+        add_action( 'add_meta_boxes', [$this, 'not_cmb_metabox'] );
         //add_filter( 'manage_edit-booking_columns', [$this, 'booking_filter_posts_columns'] );
         add_filter('manage_booking_posts_columns', [$this, 'booking_columns']);
         add_action('manage_booking_posts_custom_column', [$this, 'booking_column'], 10, 2);
@@ -189,6 +190,28 @@ class Bookings
             'id' => 'rrze-rsvp-booking-notes',
             'type' => 'textarea'
         ));
+    }
+
+    public function not_cmb_metabox()
+    {
+        add_meta_box( 'rrze-rsvp-room-shortcode-helper', esc_html__( 'Shortcode', 'rrze-rsvp' ), [$this, 'not_cmb_metabox_callback'], 'room', 'side', 'high' );
+    }
+
+    public function not_cmb_metabox_callback() {
+        printf(__('%sTo add a booking form for this room, add the following shortcode to a page:%s'
+         . '[rsvp-booking room="%s" sso="true"]%s'
+         . 'Skip %ssso="true"%s to deactivate SSO authentication.%s'
+         . 'Add %sdays="20"%s to overwrite the number of days you can book a seat in advance.%s', 'rrze-rsvp'),
+            '<p class="description">',
+            '</p><p><code>',
+            get_the_ID(),
+            '</code></p><p>',
+            '<code>',
+            '</code>',
+            '</p><p>',
+            '<code>',
+            '</code>',
+            '</p>');
     }
 
     public function post_select_options($field)
