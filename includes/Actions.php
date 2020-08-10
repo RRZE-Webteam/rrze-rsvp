@@ -22,7 +22,7 @@ class Actions
 	{
 		add_action('admin_init', [$this, 'handleActions']);
 		add_action('wp_ajax_booking_action', [$this, 'ajaxBookingAction']);
-		add_action('save_post', [$this, 'savePostAction']);
+		add_action('transition_post_status', [$this, 'transitionPostStatus'], 10, 3);
 		add_action('template_include', [$this, 'bookingReplyTemplate']);
 	}
 
@@ -87,17 +87,19 @@ class Actions
 		}
 	}
 
-	public function savePostAction($bookingId)
+	public function transitionPostStatus($newStatus, $oldStatus, $post)
 	{
-		if (get_post_type($bookingId) != 'booking') {
+		if (get_post_type($post) != 'booking') {
 			return;
 		}
 
-		if (!get_post_meta($bookingId, 'rrze-rsvp-booking-status', true)) {
+		if ('publish' != $newStatus || 'publish' != $oldStatus) {
 			return;
 		}
 
-		$newStatus = isset($_POST['rrze-rsvp-booking-status']) ? $_POST['rrze-rsvp-booking-status'] : '';
+		$bookingId = $post->ID;
+
+		$bookingStatus = isset($_POST['rrze-rsvp-booking-status']) ? $_POST['rrze-rsvp-booking-status'] : '';
 
 		$booking = Functions::getBooking($bookingId);
 		$bookingBooked = ($booking['status'] == 'booked');
@@ -105,8 +107,8 @@ class Actions
 		$bookingCancelled = ($booking['status'] == 'cancelled');
 		$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
-		if (($bookingBooked || $bookingCancelled) && $newStatus == 'confirmed') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', $newStatus);
+		if (($bookingBooked || $bookingCancelled) && $bookingStatus == 'confirmed') {
+			update_post_meta($bookingId, 'rrze-rsvp-booking-status', $bookingStatus);
 			update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
 			if ($forceToConfirm) {
 				update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'booked');
@@ -114,8 +116,8 @@ class Actions
 			} else {
 				$this->email->bookingConfirmedCustomer($bookingId);
 			}
-		} else if (($bookingBooked || $bookingConfirmed) && $newStatus == 'cancelled') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', $newStatus);
+		} else if (($bookingBooked || $bookingConfirmed) && $bookingStatus == 'cancelled') {
+			update_post_meta($bookingId, 'rrze-rsvp-booking-status', $bookingStatus);
 			$this->email->bookingCancelledCustomer($bookingId);
 		}
 	}
