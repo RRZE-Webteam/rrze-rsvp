@@ -130,6 +130,36 @@ RRZE RSVP Frontend CSS
 .rrze-rsvp .rsvp-seat-container {
   margin-bottom: 1em; }
 
+table.rsvp-room-availability a,
+table.rsvp-seat-availability a {
+  padding: 5px 8px;
+  color: #fff;
+  background: #036;
+  border: 1px solid #036;
+  border-radius: 3px;
+  text-decoration: none;
+  margin-right: 7px; }
+  .faculty-phil table.rsvp-room-availability a, .faculty-phil
+  table.rsvp-seat-availability a {
+    background: #a36b0d;
+    border-color: #a36b0d; }
+  .faculty-rw table.rsvp-room-availability a, .faculty-rw
+  table.rsvp-seat-availability a {
+    background: #8d1429;
+    border-color: #8d1429; }
+  .faculty-nat table.rsvp-room-availability a, .faculty-nat
+  table.rsvp-seat-availability a {
+    background: #048767;
+    border-color: #048767; }
+  .faculty-med table.rsvp-room-availability a, .faculty-med
+  table.rsvp-seat-availability a {
+    background: #0381a2;
+    border-color: #0381a2; }
+  .faculty-tf table.rsvp-room-availability a, .faculty-tf
+  table.rsvp-seat-availability a {
+    background: #6e7881;
+    border-color: #6e7881; }
+
 .rrze-rsvp-booking-reply {
   position: fixed;
   top: 0;

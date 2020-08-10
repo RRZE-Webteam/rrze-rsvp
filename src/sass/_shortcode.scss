@@ -156,3 +156,37 @@
         margin-bottom: 1em;
     }
 }
+
+table.rsvp-room-availability,
+table.rsvp-seat-availability {
+    a {
+        padding: 5px 8px;
+        color: #fff;
+        background: #036;
+        border: 1px solid #036;
+        border-radius: 3px;
+        text-decoration: none;
+        margin-right: 7px;
+        .faculty-phil & {
+            background: #a36b0d;
+            border-color: #a36b0d;
+        }
+        .faculty-rw & {
+            background: #8d1429;
+            border-color: #8d1429;
+        }
+        .faculty-nat & {
+            background: #048767;
+            border-color: #048767;
+        }
+        .faculty-med & {
+            background: #0381a2;
+            border-color: #0381a2;
+        }
+        .faculty-tf & {
+            background: #6e7881;
+            border-color: #6e7881;
+        }
+    }
+
+}
