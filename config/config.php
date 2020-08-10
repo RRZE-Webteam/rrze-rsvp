@@ -288,16 +288,16 @@ function getFields(){
             ],
 	     [
                 'name'              => 'received_subject',
-                'label'             => __('Subject', 'rrze-rsvp'),
-                'desc'              => __('Subject for mails', 'rrze-rsvp'),
+                'label'             => __('Subject of the received booking', 'rrze-rsvp'),
+                'desc'              => __('Subject of the email replying to a booking received.', 'rrze-rsvp'),
                 'type'              => 'text',
                 'default'           =>  $defaults['received_subject'],
                 'sanitize_callback' => 'sanitize_text_field'
             ],
             [
                 'name'              => 'received_subject_en',
-                'label'             => __('Subject (english)', 'rrze-rsvp'),
-                'desc'              => __('Subject for mails', 'rrze-rsvp'),
+                'label'             => __('Subject of the received booking (english)', 'rrze-rsvp'),
+                'desc'              => __('Subject of the email replying to a booking received.', 'rrze-rsvp'),
                 'type'              => 'text',
                 'default'           =>  $defaults['received_subject_en'],
                 'sanitize_callback' => 'sanitize_text_field',
@@ -305,13 +305,13 @@ function getFields(){
             ],            
 	     [
                 'name'              => 'received_text',
-                'label'             => __('Text', 'rrze-rsvp'),
+                'label'             => __('Text of the received booking', 'rrze-rsvp'),
                 'type'              => 'textarea',
                 'default'           => $defaults['received_text']
             ],
             [
                 'name'              => 'received_text_en',
-                'label'             => __('Text (english)', 'rrze-rsvp'),
+                'label'             => __('Text of the received booking (english)', 'rrze-rsvp'),
                 'type'              => 'textarea',
                 'default'           => $defaults['received_text_en'],
                 'exception'         => ['locale' => 'en']
