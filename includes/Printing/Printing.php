@@ -19,14 +19,14 @@ class Printing {
     }
 
 	public function onLoaded() {
-		add_filter('bulk_actions-edit-room', [$this, 'addBulkActions']);
-		add_filter('bulk_actions-edit-seat', [$this, 'addBulkActions']);
-		add_filter('handle_bulk_actions-edit-room', [$this, 'bulkGeneratePDF'], 10, 3);
-		add_filter('handle_bulk_actions-edit-seat', [$this, 'bulkGeneratePDF'], 10, 3);
+	    add_filter('bulk_actions-edit-room', [$this, 'addBulkActions']);
+	    add_filter('bulk_actions-edit-seat', [$this, 'addBulkActions']);
+	    add_filter('handle_bulk_actions-edit-room', [$this, 'bulkGeneratePDF'], 10, 3);
+	    add_filter('handle_bulk_actions-edit-seat', [$this, 'bulkGeneratePDF'], 10, 3);
         add_filter('post_row_actions', [$this, 'addRowActions'], 10, 2 );
 
         add_action('admin_notices', [$this, 'bulkAdminNotice']);
-		add_action('admin_init', [$this, 'handlePDFAction']);
+	    add_action('admin_init', [$this, 'handlePDFAction']);
     }
 
 
