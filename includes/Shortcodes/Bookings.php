@@ -185,6 +185,9 @@ class Bookings extends Shortcodes {
                 update_post_meta($booking_id, 'rrze-rsvp-booking-notes', $booking_comment);
 
                 // E-Mail senden
+                if ($roomForceToConfirm == 'on') {
+                    update_post_meta($booking_id, 'rrze-rsvp-customer-status', 'booked');
+                }
                 if ($room_autoconfirmation == 'on') {
                     if ($roomForceToConfirm == 'on') {
                         $this->email->bookingRequestedCustomer($booking_id);
