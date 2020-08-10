@@ -326,7 +326,7 @@ function getFields(){
             ],  
             [
                 'name'              => 'force_to_confirm_subject_en',
-                'label'             => __('Subject for confirmation required. (english)', 'rrze-rsvp'),
+                'label'             => __('Subject for confirmation required (english)', 'rrze-rsvp'),
                 'desc'              => __('Subject of the email where confirmation of the booking by the customer is required.', 'rrze-rsvp'),
                 'type'              => 'text',
                 'default'           => $defaults['force_to_confirm_subject_en'],
@@ -335,13 +335,13 @@ function getFields(){
             ], 
             [
                 'name'              => 'force_to_confirm_text',
-                'label'             => __('Text for confirmation required.', 'rrze-rsvp'),
+                'label'             => __('Text for confirmation required', 'rrze-rsvp'),
                 'type'              => 'textarea',
                 'default'           => $defaults['force_to_confirm_text']
             ],   
             [
                 'name'              => 'force_to_confirm_text_en',
-                'label'             => __('Text for confirmation required. (english)', 'rrze-rsvp'),
+                'label'             => __('Text for confirmation required (english)', 'rrze-rsvp'),
                 'type'              => 'textarea',
                 'default'           => $defaults['force_to_confirm_text_en'],
                 'exception'         => ['locale' => 'en']
