@@ -82,6 +82,7 @@ class Bookings extends Shortcodes {
             $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
             $booking_instant = (isset($posted_data['rsvp_instant']) && $posted_data['rsvp_instant'] == '1');
             $booking_comment = (isset($posted_data['rsvp_comment']) ? sanitize_textarea_field($posted_data['rsvp_comment']) : '');
+            $booking_dsgvo = (isset($posted_data['rsvp_dsgvo']) && $posted_data['rsvp_dsgvo'] == '1');
 
             if ($sso) {
                 if ($this->idm->isAuthenticated()){
@@ -98,25 +99,6 @@ class Bookings extends Shortcodes {
                 $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
                 $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
                 $booking_email = sanitize_email($posted_data['rsvp_email']);
-            }
-
-            // Überprüfen ob der Platz in der Zwischenzeit bereits anderweitig gebucht wurde
-            $check_availability = Functions::getSeatAvailability($booking_seat, $booking_date, date('Y-m-d', strtotime($booking_date. ' +1 days')));
-            $seat_available = false;
-            foreach ($check_availability[$booking_date] as $timeslot) {
-                if (strpos($timeslot, $booking_start) == 0) {
-                    $seat_available = true;
-                }
-            }
-            if (!$seat_available) {
-                $permalink = get_permalink($this->options->general_booking_page);
-                $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
-                $url = "$permalink?room_id=$room_id&bookingdate=$booking_date&timeslot=$booking_start\"";
-
-                return '<h2>' . __('Seat already booked', 'rrze-rsvp') . '</h2>'
-                    . '<div class="alert alert-danger" role="alert">'
-                    . sprintf('%sSorry! The seat you selected has been booked by someone else in the mean time.%s Please try again. %s-> Back to booking form%s', '<strong>', '</strong><br />', "<a href=\"$url\">", '</a>')
-                    . '</div>';
             }
 
             // Überprüfen ob bereits eine Buchung mit gleicher E-Mail-Adresse zur gleichen Zeit vorliegt
@@ -144,6 +126,25 @@ class Bookings extends Shortcodes {
             if ($check_bookings !== false && !empty($check_bookings)) {
                 return '<h2>' . __('Multiple Booking', 'rrze-rsvp') . '</h2>'
                     . '<div class="alert alert-danger" role="alert">' . sprintf('%sSie haben für den angegebenen Zeitraum bereits einen Sitzplatz gebucht.%s Wenn Sie Ihre Buchung ändern möchten, stornieren Sie bitte zuerst die bestehende Buchung. Den Link dazu finden Sie in Ihrer Bestätigungsmail.', '<strong>', '</strong><br />') . '</div>';
+            }
+
+            // Überprüfen ob der Platz in der Zwischenzeit bereits anderweitig gebucht wurde
+            $check_availability = Functions::getSeatAvailability($booking_seat, $booking_date, date('Y-m-d', strtotime($booking_date. ' +1 days')));
+            $seat_available = false;
+            foreach ($check_availability[$booking_date] as $timeslot) {
+                if (strpos($timeslot, $booking_start) == 0) {
+                    $seat_available = true;
+                }
+            }
+            if (!$seat_available) {
+                $permalink = get_permalink($this->options->general_booking_page);
+                $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
+                $url = "$permalink?room_id=$room_id&bookingdate=$booking_date&timeslot=$booking_start\"";
+
+                return '<h2>' . __('Seat already booked', 'rrze-rsvp') . '</h2>'
+                       . '<div class="alert alert-danger" role="alert">'
+                       . sprintf('%sSorry! The seat you selected has been booked by someone else in the mean time.%s Please try again. %s-> Back to booking form%s', '<strong>', '</strong><br />', "<a href=\"$url\">", '</a>')
+                       . '</div>';
             }
 
             $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
@@ -184,6 +185,9 @@ class Bookings extends Shortcodes {
                 }
                 update_post_meta( $booking_id, 'rrze-rsvp-booking-status', $status );
                 update_post_meta($booking_id, 'rrze-rsvp-booking-notes', $booking_comment);
+                update_post_meta($booking_id, 'rrze-rsvp-booking-dsgvo', $booking_dsgvo);
+
+
 
                 // E-Mail senden
                 if ($roomForceToConfirm == 'on') {
@@ -366,6 +370,11 @@ class Bookings extends Shortcodes {
                     . '<label for="rsvp_comment">' . $label . '</label>'
                     . '<textarea name="rsvp_comment" id="rsvp_comment"></textarea>';
             }
+
+            $output .= '<div class="form-group">'
+                       . '<input type="checkbox" value="1" id="rsvp_dsgvo" name="rsvp_dsgvo" required> '
+                       . '<label for="rsvp_dsgvo">' . $defaults['dsgvo-declaration'] . '</label>'
+                       . '</div>';
 
             $output .= '<button type="submit" class="btn btn-primary">' . __('Submit booking', 'rrze-rsvp') . '</button>
                 </form>
