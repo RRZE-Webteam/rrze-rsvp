@@ -15,8 +15,8 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"POT-Creation-Date: 2020-08-10 14:43+0000\n"
-"PO-Revision-Date: 2020-08-10 14:47+0000\n"
+"POT-Creation-Date: 2020-08-10 14:55+0000\n"
+"PO-Revision-Date: 2020-08-10 14:59+0000\n"
 "Last-Translator: RRZE Webteam <webmaster@fau.de>\n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -139,7 +139,7 @@ msgstr ""
 "Wählen Sie die Seite aus, die den Shortcode Ihres Buchungsformulars enthält. "
 "Sie finden einen Shortcode-Hinweis auf jeder Raumbearbeitungsseite."
 
-#: config/config.php:227 includes/CPT/Seats.php:128
+#: config/config.php:227 includes/Tools.php:35 includes/CPT/Seats.php:128
 #: includes/CPT/Bookings.php:141 includes/CPT/Bookings.php:156
 msgid "Please select"
 msgstr "Bitte wählen"
@@ -243,28 +243,29 @@ msgstr ""
 "erforderlich ist."
 
 #: config/config.php:329
-msgid "Subject for confirmation required. (english)"
-msgstr "Betreff für Bestätigung erforderlich (englische Fassung)."
+#| msgid "Subject for confirmation required. (english)"
+msgid "Subject for confirmation required (english)"
+msgstr "Betreff für Bestätigung erforderlich (Englische Fassung)"
 
 #: config/config.php:338
-msgid "Text for confirmation required."
-msgstr "Text zur Bestätigung erforderlich."
+msgid "Text for confirmation required"
+msgstr "Text zur Bestätigung erforderlich"
 
 #: config/config.php:344
-msgid "Text for confirmation required. (english)"
-msgstr "Text zur Bestätigung erforderlich."
+msgid "Text for confirmation required (english)"
+msgstr "Text zur Bestätigung erforderlich (Englische Fassung)"
 
 #: config/config.php:351
 msgid "Subject Confirmation"
-msgstr "Titel der Bestätigungsmail"
+msgstr "Betreff der Bestätigungsmail"
 
 #: config/config.php:352 config/config.php:360
 msgid "Subject for confirmation mails"
-msgstr "Titel der Mail für Bestätigungen"
+msgstr "Betreff der E-Mail für Bestätigungen."
 
 #: config/config.php:359
 msgid "Subject Confirmation (english)"
-msgstr "Titel der Bestätigungsmail (Englische Fassung)"
+msgstr "Betreff der Bestätigungsmail (Englische Fassung)"
 
 #: config/config.php:368
 msgid "Confirmation Text"
@@ -276,23 +277,23 @@ msgstr "Text der Bestätigungsmail (Englische Fassung)"
 
 #: config/config.php:381
 msgid "Subject Canceling"
-msgstr "Titel der Mail zur Buchungsabsage"
+msgstr "Betreff der E-Mail zur Buchungsabsage"
 
 #: config/config.php:382 config/config.php:390
 msgid "Subject for canceling mails"
-msgstr "Titel der Mail zur Buchungsabsage."
+msgstr "Betreff der E-Mail zur Buchungsabsage."
 
 #: config/config.php:389
 msgid "Subject Canceling (english)"
-msgstr "Titel der Mail zur Buchungsabsage (Englische Fassung)"
+msgstr "Betreff der E-Mail zur Buchungsabsage (Englische Fassung)"
 
 #: config/config.php:398
 msgid "Cancel Text"
-msgstr "Text der Mail zur Buchungsabsage"
+msgstr "Text der E-Mail zur Buchungsabsage"
 
 #: config/config.php:404
 msgid "Cancel Text (english)"
-msgstr "Text der Mail zur Buchungsabsage (Englische Fassung)"
+msgstr "Text der E-Mail zur Buchungsabsage (Englische Fassung)"
 
 #: config/config.php:414
 msgid "Print FAU logo"
@@ -338,10 +339,10 @@ msgstr "Suchen Sie die Einstellungen auf der rechten Seite"
 msgid "Days in advance"
 msgstr "Verfügbare Tage zu denen eine Vorabreservierung möglich ist."
 
-#: config/config.php:509 includes/CPT/Seats.php:124
+#: config/config.php:509 includes/Tools.php:32 includes/CPT/Seats.php:124
 #: includes/CPT/Bookings.php:245 includes/CPT/Bookings.php:259
 #: includes/CPT/Bookings.php:384 includes/CPT/Rooms.php:61
-#: includes/Printing/Printing.php:92 includes/Shortcodes/Bookings.php:227
+#: includes/Printing/Printing.php:127 includes/Shortcodes/Bookings.php:227
 #: includes/templates/single-seat.php:51
 msgid "Room"
 msgstr "Raum"
@@ -502,17 +503,17 @@ msgstr "Sie wurden erfolgreich ausgecheckt."
 msgid "No action was taken."
 msgstr "Es wurde keine Änderung vorgenommen."
 
-#: includes/Main.php:89
+#: includes/Main.php:92
 msgid "Do you want to cancel?"
 msgstr "Wollen Sie die Buchung absagen?"
 
-#: includes/Main.php:90 includes/CPT/Bookings.php:146
+#: includes/Main.php:93 includes/CPT/Bookings.php:146
 #: includes/CPT/Bookings.php:311 includes/CPT/Bookings.php:323
 msgctxt "Booking"
 msgid "Cancelled"
 msgstr "Abgesagt"
 
-#: includes/Main.php:91 includes/CPT/Bookings.php:145
+#: includes/Main.php:94 includes/CPT/Bookings.php:145
 #: includes/CPT/Bookings.php:329 includes/CPT/Bookings.php:360
 msgid "Confirmed"
 msgstr "Bestätigt"
@@ -520,6 +521,56 @@ msgstr "Bestätigt"
 #: includes/Plugin.php:189
 #, php-format
 msgid "Call to undefined method %1$s::%2$s"
+msgstr ""
+
+#: includes/Tools.php:20 includes/Tools.php:30
+msgctxt "admin page title"
+msgid "Create Seats"
+msgstr ""
+
+#: includes/Tools.php:21
+msgctxt "admin menu entry title"
+msgid "RSVP Create Seats"
+msgstr ""
+
+#: includes/Tools.php:49
+msgid "Number of Table Rows"
+msgstr ""
+
+#: includes/Tools.php:54
+msgid "Rows Numbering System"
+msgstr ""
+
+#: includes/Tools.php:55 includes/Tools.php:66
+msgid "Numeric (1 - 999)"
+msgstr ""
+
+#: includes/Tools.php:56 includes/Tools.php:67
+msgid "A-Z"
+msgstr ""
+
+#: includes/Tools.php:60
+msgid "Number of Seats per Row"
+msgstr ""
+
+#: includes/Tools.php:65
+msgid "Seats Numbering System"
+msgstr ""
+
+#: includes/Tools.php:70 includes/CPT/CPT.php:64 includes/CPT/CPT.php:65
+#: includes/Shortcodes/Bookings.php:584
+msgid "Equipment"
+msgstr "Ausstattung"
+
+#: includes/Tools.php:73
+msgid ""
+"Preselect equipment that is available on all seats. You can modify the "
+"equipment later by editing the seats individually or by bulk editing several "
+"seats in the seats table."
+msgstr ""
+
+#: includes/Tools.php:77
+msgid "Generate Seats"
 msgstr ""
 
 #: includes/Users.php:82
@@ -538,11 +589,6 @@ msgstr "Erstellt"
 #: includes/API.php:163
 msgid "message"
 msgstr "Nachricht"
-
-#: includes/CPT/CPT.php:64 includes/CPT/CPT.php:65
-#: includes/Shortcodes/Bookings.php:584
-msgid "Equipment"
-msgstr "Ausstattung"
 
 #: includes/CPT/Seats.php:36
 msgctxt "Post type general name"
@@ -669,7 +715,7 @@ msgstr "Sitzplatzliste"
 
 #: includes/CPT/Seats.php:62 includes/CPT/Bookings.php:153
 #: includes/CPT/Bookings.php:246 includes/CPT/Bookings.php:260
-#: includes/CPT/Bookings.php:385 includes/Printing/Printing.php:104
+#: includes/CPT/Bookings.php:385 includes/Printing/Printing.php:139
 #: includes/Shortcodes/Bookings.php:228
 msgid "Seat"
 msgstr "Sitzplatz"
@@ -1140,19 +1186,19 @@ msgstr ""
 msgid "Floor plan"
 msgstr "Grundriss"
 
-#: includes/Printing/Printing.php:34
-msgid "No seats foound"
-msgstr "Keine Sitzplätze gefunden"
-
-#: includes/Printing/Printing.php:165
-msgid "Equipment:"
-msgstr ""
-
-#: includes/Printing/Printing.php:188
+#: includes/Printing/Printing.php:35 includes/Printing/Printing.php:217
 msgid "Generate PDF"
 msgstr "PDF erstellen"
 
-#: includes/Printing/Printing.php:234
+#: includes/Printing/Printing.php:61 includes/Printing/Printing.php:68
+msgid "No seats found"
+msgstr ""
+
+#: includes/Printing/Printing.php:200
+msgid "Equipment:"
+msgstr ""
+
+#: includes/Printing/Printing.php:263
 #, php-format
 msgid "Generate PDF for %s seat"
 msgid_plural "Generate PDF for %s seats"

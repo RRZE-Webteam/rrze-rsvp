@@ -16,7 +16,7 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"POT-Creation-Date: 2020-08-10 14:43+0000\n"
+"POT-Creation-Date: 2020-08-10 14:55+0000\n"
 "Language: \n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: Loco https://localise.biz/"
@@ -125,7 +125,7 @@ msgid ""
 "shortcode hint on each room edit page."
 msgstr ""
 
-#: config/config.php:227 includes/CPT/Seats.php:128
+#: config/config.php:227 includes/Tools.php:35 includes/CPT/Seats.php:128
 #: includes/CPT/Bookings.php:141 includes/CPT/Bookings.php:156
 msgid "Please select"
 msgstr ""
@@ -225,15 +225,15 @@ msgid ""
 msgstr ""
 
 #: config/config.php:329
-msgid "Subject for confirmation required. (english)"
+msgid "Subject for confirmation required (english)"
 msgstr ""
 
 #: config/config.php:338
-msgid "Text for confirmation required."
+msgid "Text for confirmation required"
 msgstr ""
 
 #: config/config.php:344
-msgid "Text for confirmation required. (english)"
+msgid "Text for confirmation required (english)"
 msgstr ""
 
 #: config/config.php:351
@@ -320,10 +320,10 @@ msgstr ""
 msgid "Days in advance"
 msgstr ""
 
-#: config/config.php:509 includes/CPT/Seats.php:124
+#: config/config.php:509 includes/Tools.php:32 includes/CPT/Seats.php:124
 #: includes/CPT/Bookings.php:245 includes/CPT/Bookings.php:259
 #: includes/CPT/Bookings.php:384 includes/CPT/Rooms.php:61
-#: includes/Printing/Printing.php:92 includes/Shortcodes/Bookings.php:227
+#: includes/Printing/Printing.php:127 includes/Shortcodes/Bookings.php:227
 #: includes/templates/single-seat.php:51
 msgid "Room"
 msgstr ""
@@ -481,17 +481,17 @@ msgstr ""
 msgid "No action was taken."
 msgstr ""
 
-#: includes/Main.php:89
+#: includes/Main.php:92
 msgid "Do you want to cancel?"
 msgstr ""
 
-#: includes/Main.php:90 includes/CPT/Bookings.php:146
+#: includes/Main.php:93 includes/CPT/Bookings.php:146
 #: includes/CPT/Bookings.php:311 includes/CPT/Bookings.php:323
 msgctxt "Booking"
 msgid "Cancelled"
 msgstr ""
 
-#: includes/Main.php:91 includes/CPT/Bookings.php:145
+#: includes/Main.php:94 includes/CPT/Bookings.php:145
 #: includes/CPT/Bookings.php:329 includes/CPT/Bookings.php:360
 msgid "Confirmed"
 msgstr ""
@@ -499,6 +499,56 @@ msgstr ""
 #: includes/Plugin.php:189
 #, php-format
 msgid "Call to undefined method %1$s::%2$s"
+msgstr ""
+
+#: includes/Tools.php:20 includes/Tools.php:30
+msgctxt "admin page title"
+msgid "Create Seats"
+msgstr ""
+
+#: includes/Tools.php:21
+msgctxt "admin menu entry title"
+msgid "RSVP Create Seats"
+msgstr ""
+
+#: includes/Tools.php:49
+msgid "Number of Table Rows"
+msgstr ""
+
+#: includes/Tools.php:54
+msgid "Rows Numbering System"
+msgstr ""
+
+#: includes/Tools.php:55 includes/Tools.php:66
+msgid "Numeric (1 - 999)"
+msgstr ""
+
+#: includes/Tools.php:56 includes/Tools.php:67
+msgid "A-Z"
+msgstr ""
+
+#: includes/Tools.php:60
+msgid "Number of Seats per Row"
+msgstr ""
+
+#: includes/Tools.php:65
+msgid "Seats Numbering System"
+msgstr ""
+
+#: includes/Tools.php:70 includes/CPT/CPT.php:64 includes/CPT/CPT.php:65
+#: includes/Shortcodes/Bookings.php:584
+msgid "Equipment"
+msgstr ""
+
+#: includes/Tools.php:73
+msgid ""
+"Preselect equipment that is available on all seats. You can modify the "
+"equipment later by editing the seats individually or by bulk editing several "
+"seats in the seats table."
+msgstr ""
+
+#: includes/Tools.php:77
+msgid "Generate Seats"
 msgstr ""
 
 #: includes/Users.php:82
@@ -516,11 +566,6 @@ msgstr ""
 #: includes/API.php:108 includes/API.php:127 includes/API.php:145
 #: includes/API.php:163
 msgid "message"
-msgstr ""
-
-#: includes/CPT/CPT.php:64 includes/CPT/CPT.php:65
-#: includes/Shortcodes/Bookings.php:584
-msgid "Equipment"
 msgstr ""
 
 #: includes/CPT/Seats.php:36
@@ -648,7 +693,7 @@ msgstr ""
 
 #: includes/CPT/Seats.php:62 includes/CPT/Bookings.php:153
 #: includes/CPT/Bookings.php:246 includes/CPT/Bookings.php:260
-#: includes/CPT/Bookings.php:385 includes/Printing/Printing.php:104
+#: includes/CPT/Bookings.php:385 includes/Printing/Printing.php:139
 #: includes/Shortcodes/Bookings.php:228
 msgid "Seat"
 msgstr ""
@@ -1109,19 +1154,19 @@ msgstr ""
 msgid "Floor plan"
 msgstr ""
 
-#: includes/Printing/Printing.php:34
-msgid "No seats foound"
-msgstr ""
-
-#: includes/Printing/Printing.php:165
-msgid "Equipment:"
-msgstr ""
-
-#: includes/Printing/Printing.php:188
+#: includes/Printing/Printing.php:35 includes/Printing/Printing.php:217
 msgid "Generate PDF"
 msgstr ""
 
-#: includes/Printing/Printing.php:234
+#: includes/Printing/Printing.php:61 includes/Printing/Printing.php:68
+msgid "No seats found"
+msgstr ""
+
+#: includes/Printing/Printing.php:200
+msgid "Equipment:"
+msgstr ""
+
+#: includes/Printing/Printing.php:263
 #, php-format
 msgid "Generate PDF for %s seat"
 msgid_plural "Generate PDF for %s seats"
