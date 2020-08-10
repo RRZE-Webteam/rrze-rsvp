@@ -207,6 +207,14 @@ class Rooms
             'default' => '',
         ));
 
+        $cmb_general->add_field(array(
+            'name' => __('Check-in is required', 'rrze-rsvp'),
+            'desc' => __('The customer must check-in their booking within 15 minutes from the start of the event. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-force-to-checkin',
+            'type' => 'checkbox',
+            'default' => '',
+        ));
+                
         $cmb_general->add_field( array(
             'name' => __('Show notes/comment input in booking form','rrze-rsvp'),
             'desc' => 'If not checked, the comment text input will still be visible in the backend for booking admins for internal notes.',
