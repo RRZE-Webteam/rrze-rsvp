@@ -73,6 +73,7 @@ function getConstants() {
             'room_address' => 'off',
             // 'room_floorplan' => 'off',
             'seat_equipment' => 'off',
+            'room-notes-label' => __('Additional informations', 'rrze-rsvp'),
         ];
     }
     
