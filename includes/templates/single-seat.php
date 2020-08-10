@@ -122,6 +122,7 @@ while ( have_posts() ) : the_post();
     }
 
     echo '<h3>' . __('Book this seat', 'rrze-rsvp') . '</h3>';
+    // echo do_shortcode('[rsvp-qr seat=' . $id . ']');
     echo do_shortcode('[rsvp-availability seat=' . $id . ' days=14 booking_link=true]');
 
 endwhile;
