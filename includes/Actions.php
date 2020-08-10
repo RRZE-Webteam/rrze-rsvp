@@ -93,6 +93,10 @@ class Actions
 			return;
 		}
 
+		if (!get_post_meta($bookingId, 'rrze-rsvp-booking-status', true)) {
+			return;
+		}
+
 		$newStatus = isset($_POST['rrze-rsvp-booking-status']) ? $_POST['rrze-rsvp-booking-status'] : '';
 
 		$booking = Functions::getBooking($bookingId);
