@@ -66,12 +66,17 @@ while ( have_posts() ) : the_post();
                 $schedule[$weekdays[$day]][] = $timeslot['rrze-rsvp-room-starttime'] . ' - ' . $timeslot['rrze-rsvp-room-endtime'];
             }
         }
-        echo '<table>';
+        echo '<table class="rsvp-schedule">';
+        echo '<tr>'
+            . '<th>'. __('Weekday', 'rrze-rsvp') . '</th>'
+            . '<th>'. __('Time slots', 'rrze-rsvp') . '</th>';
+
+        echo '</tr>';
         foreach ($schedule as $weekday => $daily_slots) {
-            echo '<tr>';
-            echo '<td>' . $weekday . '</td>';
-            echo '<td>' . implode('<br />', $daily_slots) . '</td>';
-            echo '</tr>';
+            echo '<tr>'
+            .'<td>' . $weekday . '</td>'
+            . '<td>' . implode('<br />', $daily_slots) . '</td>'
+            . '</tr>';
         }
         echo "</table>";
     }

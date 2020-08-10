@@ -209,6 +209,7 @@ class Printing {
     
             $pdf_file_name = 'rrze-rsvp-' . date('Y-m-d-His') . '.pdf';
             $pdf->Output($pdf_file_name, 'I');
+            exit;
         }
     }
     

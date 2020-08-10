@@ -44,7 +44,7 @@ class Availability extends Shortcodes {
             $room = (int)$shortcode_atts['room'];
             $availability = Functions::getRoomAvailability($room, $today, date('Y-m-d', strtotime($today. ' +'.$days.' days')));
 
-            $output .= '<table>';
+            $output .= '<table class="rsvp-room-availability">';
             $output .= '<tr>'
                 . '<th scope="col" width="200">' . __('Date/Time', 'rrze-rsvp') . '</th>'
                 . '<th scope="col">' . __('Seats available', 'rrze-rsvp') . '</th>';
@@ -61,17 +61,19 @@ class Availability extends Shortcodes {
                     foreach ($seat_names_raw as $seat_id => $seat_name) {
                         $booking_link_open = '';
                         $booking_link_close = '';
+                        $glue = ', ';
                         if ($booking_link && $this->options->general_booking_page != '') {
                             $permalink = get_permalink($this->options->general_booking_page);
-                            $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$starttime\" title='" . __('Book this seat/timeslot now','rrze-rsvp') . "'>";
+                            $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$starttime\" title='" . __('Book this seat/timeslot now','rrze-rsvp') . "' class='seat-link'>";
                             $booking_link_close = '</a>';
+                            $glue = '';
                         }
                         $seat_names[] = $booking_link_open . $seat_name . $booking_link_close;
                     }
 
                     $output .= '<tr>'
                         . '<td>' . $date_formatted . ' &nbsp;&nbsp; ' . $time . '</td>';
-                    $output .= '<td>' . implode(',  ', $seat_names) . '</td>';
+                    $output .= '<td>' . implode($glue, $seat_names) . '</td>';
                     $output .= '</tr>';
                 }
             }
@@ -104,7 +106,7 @@ class Availability extends Shortcodes {
                 return __( 'No timeslots available for this seat.', 'rrze-rsvp' );
             } else {
                 $output .= '<div class="rrze-rsvp">'
-                    . '<table class="seat-availability">'
+                    . '<table class="rsvp-seat-availability">'
                     . '<th scope="col" width="200">' . __('Date', 'rrze-rsvp') . '</th>'
                     . '<th scope="col">' . __('Available Time Slots', 'rrze-rsvp') . '</th>';
                 foreach ($availability as $date => $timeslots) {
@@ -112,16 +114,18 @@ class Availability extends Shortcodes {
                     foreach ($timeslots as $time) {
                         $booking_link_open = '';
                         $booking_link_close = '';
+                        $glue = ', &nbsp; ';
                         if ( $booking_link && $this->options->general_booking_page != '' ) {
                             $permalink = get_permalink( $this->options->general_booking_page );
                             $booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$time\" title='" . __( 'Book this seat/timeslot now', 'rrze-rsvp' ) . "'>";
                             $booking_link_close = '</a>';
+                            $glue = '';
                         }
                         $time_output[] = $booking_link_open . $time . $booking_link_close;
                     }
                     $output .= '<tr>'
                         .'<td>' . $date_formatted = date_i18n('d.m.Y', strtotime($date)) . '</td>'
-                        . '<td>' . implode(', &nbsp; ', $time_output) . '</td>'
+                        . '<td>' . implode($glue, $time_output) . '</td>'
                         . '</tr>';
                 }
                 $output .= '</table>'

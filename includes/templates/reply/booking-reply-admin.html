@@ -1,0 +1,30 @@
+<div class="rrze-rsvp-booking-reply">
+	<div class="container">
+		<h1>{{=booking_title}}</h1>
+
+		{{processed}}
+		
+		<p>{{=booking_has_already_been}}</p>
+
+		{{:processed}}
+
+		<p>{{=booking_has_been}}</p>
+
+		<p>{{=customer_has_received_an_email}}</p>
+
+		<p class="date {{=class_cancelled}}">
+			{{=room_name}}<br>
+			{{=date}}<br />
+			{{=time}}
+		</p>
+		<p class="customer">
+			{{=customer.name}}<br>
+			{{=customer.email}}<br>
+			{{=customer.phone}}
+		</p>
+
+		{{/processed}}
+
+	</div>
+	{{=backlink}}
+</div>

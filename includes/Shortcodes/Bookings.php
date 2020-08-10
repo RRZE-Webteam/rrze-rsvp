@@ -7,6 +7,7 @@ use RRZE\RSVP\IdM;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Helper;
 
+use function RRZE\RSVP\Config\defaultOptions;
 use function RRZE\RSVP\Config\getShortcodeSettings;
 use function RRZE\RSVP\Config\getShortcodeDefaults;
 use function RRZE\RSVP\getRoomAvailability;
@@ -80,6 +81,7 @@ class Bookings extends Shortcodes {
             $booking_seat = absint($posted_data['rsvp_seat']);
             $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
             $booking_instant = (isset($posted_data['rsvp_instant']) && $posted_data['rsvp_instant'] == '1');
+            $booking_comment = (isset($posted_data['rsvp_comment']) ? sanitize_textarea_field($posted_data['rsvp_comment']) : '');
 
             if ($sso) {
                 if ($this->idm->isAuthenticated()){
@@ -181,8 +183,12 @@ class Bookings extends Shortcodes {
                     $status = 'booked';
                 }
                 update_post_meta( $booking_id, 'rrze-rsvp-booking-status', $status );
-                
+                update_post_meta($booking_id, 'rrze-rsvp-booking-notes', $booking_comment);
+
                 // E-Mail senden
+                if ($roomForceToConfirm == 'on') {
+                    update_post_meta($booking_id, 'rrze-rsvp-customer-status', 'booked');
+                }
                 if ($room_autoconfirmation == 'on') {
                     if ($roomForceToConfirm == 'on') {
                         $this->email->bookingRequestedCustomer($booking_id);
@@ -262,6 +268,7 @@ class Bookings extends Shortcodes {
                 }
             }
             $room = $input_room;
+            $comment = (get_post_meta($room, 'rrze-rsvp-room-notes-check', true) == 'on');
 
             if (isset($post_room)) {
                 $today  = date('Y-m-d', current_time('timestamp'));
@@ -348,6 +355,17 @@ class Bookings extends Shortcodes {
                 . '<p class="description">'
                 . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
                 . '</div>';
+
+            if ($comment) {
+                $label = get_post_meta($room, 'rrze-rsvp-room-notes-label', true);
+                if ($label == '') {
+                    $defaults = defaultOptions();
+                    $label = $defaults['room-notes-label'];
+                }
+                $output .= '<div class="form-group">'
+                    . '<label for="rsvp_comment">' . $label . '</label>'
+                    . '<textarea name="rsvp_comment" id="rsvp_comment"></textarea>';
+            }
 
             $output .= '<button type="submit" class="btn btn-primary">' . __('Submit booking', 'rrze-rsvp') . '</button>
                 </form>
@@ -467,7 +485,12 @@ class Bookings extends Shortcodes {
             $input_open = '<span class="inactive">';
             $input_close = '</span>';
             if ($active) {
-                $selected = $bookingdate_selected == $date ? 'checked="checked"' : '';
+                if ($bookingdate_selected == $date || ($bookingdate_selected == false && $date == $startDate)) {
+                    $selected = 'checked="checked"';
+                } else {
+                    $selected = '';
+                }
+                //$selected = $bookingdate_selected == $date ? 'checked="checked"' : '';
                 $input_open = "<input type=\"radio\" id=\"rsvp_date_$date\" value=\"$date\" name=\"rsvp_date\" $selected required aria-required='true'><label for=\"rsvp_date_$date\">";
                 $input_close = '</label>';
             }
@@ -583,11 +606,11 @@ class Bookings extends Shortcodes {
     }
 
     private function buildSeatSelect($room, $date, $time, $seat_id, $availability) {
-        foreach ($availability as $date => $xtime) {
+        foreach ($availability as $xdate => $xtime) {
             foreach ($xtime as $k => $v) {
                 $k_new = explode('-', $k)[0];
-                $availability[$date][$k_new] = $v;
-                unset($availability[$date][$k]);
+                $availability[$xdate][$k_new] = $v;
+                unset($availability[$xdate][$k]);
             }
         }
         $seats = (isset($availability[$date][$time])) ? $availability[$date][$time] : [];
