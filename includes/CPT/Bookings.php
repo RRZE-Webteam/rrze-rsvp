@@ -12,6 +12,8 @@ use RRZE\RSVP\Capabilities;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Carbon;
 
+use function RRZE\RSVP\Config\defaultOptions;
+
 class Bookings
 {
 
@@ -89,6 +91,8 @@ class Bookings
 
     public function booking_metaboxes()
     {
+        $defaults = defaultOptions();
+
         $cmb = new_cmb2_box(array(
             'id'            => 'rrze-rsvp-booking-details',
             'title'         => __('Details', 'rrze-rsvp'),
@@ -191,6 +195,16 @@ class Bookings
             'type' => 'textarea',
             'desc' => __("This textarea contains the 'Additional Information' field content if this option is activated in the room settings. It can also be used for notes for internal use.", 'rrze-rsvp'),
         ));
+
+        $cmb->add_field( array(
+            'name' => __('DSGVO', 'rrze-rsvp'),
+            'desc' => __('[readonly] – ', 'rrze-rsvp') . $defaults['dsgvo-declaration'],
+            'id'   => 'rrze-rsvp-booking-dsgvo',
+            'type' => 'checkbox',
+            'attributes' => array(
+                'onclick' => 'return false;',
+            ),
+        ) );
     }
 
     public function not_cmb_metabox()

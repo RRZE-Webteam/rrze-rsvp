@@ -47,7 +47,7 @@ class Printing {
             }elseif (isset($_GET['room'])){
                 $room_id = filter_input(INPUT_GET, 'room', FILTER_VALIDATE_INT);
                 // get seats for this room
-                $seat_ids = get_posts([
+                $aSeats = get_posts([
                     'meta_key'   => 'rrze-rsvp-seat-room',
                     'meta_value' => $room_id,
                     'post_type' => 'seat',
@@ -56,10 +56,10 @@ class Printing {
                     'order' => 'ASC',
                     'numberposts' => -1
                 ]);
-                $aSeats = array_merge($aSeats, $seat_ids);
-            }else{
-                echo __('No seats found', 'rrze-rsvp');
-                exit;
+                if (!$aSeats){
+                    wp_redirect(get_admin_url() . 'edit.php?post_type=room&seatCnt=0');
+                    exit;
+                }
             }
         }elseif (isset($_POST['generate_pdf'])){
             // Click on button "Generate PDF for x seats" which is generated after click on bulk actions on wp-admin/edit.php?post_type=seat or wp-admin/edit.php?post_type=room
@@ -254,14 +254,17 @@ class Printing {
     }
 
     public function bulkAdminNotice() {
-        if (!empty($_REQUEST['seatCnt'])) {
+        if (isset($_REQUEST['seatCnt'])) {
             $cnt = intval( $_REQUEST['seatCnt'] );
-            // remove_query_arg('seatCnt');
+            if ($cnt){
+                printf( '<div id="message" class="notice notice-info is-dismissible">' 
+                    . '<form method="post" id="as-fdpf-form" target="_blank"><button class="button button-primary" type="submit" name="generate_pdf" value="generate">' 
+                    . _n( 'Generate PDF for %s seat', 'Generate PDF for %s seats', $cnt, 'rrze-rsvp') 
+                    . '</button></form>' . '</div>', $cnt );
+            }else{
+                print( '<div id="message" class="notice notice-error is-dismissible">' . __('No seats found', 'rrze-rsvp') . '</div>');
 
-            printf( '<div id="message" class="updated fade">' 
-                . '<form method="post" id="as-fdpf-form" target="_blank"><button class="button button-primary" type="submit" name="generate_pdf" value="generate">' 
-                . _n( 'Generate PDF for %s seat', 'Generate PDF for %s seats', $cnt, 'rrze-rsvp') 
-                . '</button></form>' . '</div>', $cnt );
+            }
         }
     }
 
