@@ -92,6 +92,10 @@ class Actions
 		if (get_post_type($bookingId) != 'booking') {
 			return;
 		}
+		
+		if (!absint(get_post_meta($bookingId, 'rrze-rsvp-booking-status', true))) {
+			return;
+		}
 
 		$newStatus = isset($_POST['rrze-rsvp-booking-status']) ? $_POST['rrze-rsvp-booking-status'] : '';
 
