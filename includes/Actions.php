@@ -40,6 +40,7 @@ class Actions
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 			update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
 			if ($forceToConfirm) {
+				update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'booked');
 				$this->email->bookingRequestedCustomer($bookingId);
 			} else {
 				$this->email->bookingConfirmedCustomer($bookingId);
@@ -175,7 +176,7 @@ class Actions
 		$bookingCkeckedOut = ($booking['status'] == 'checked-out');
 		$bookingCancelled = ($booking['status'] == 'cancelled');
 				
-		if (! $bookingConfirmed && ! $userConfirmed && $action == 'confirm') {
+		if (! $userConfirmed && $action == 'confirm') {
 			update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'confirmed');
 			$this->email->bookingConfirmedCustomer($bookingId);
 			$userConfirmed = true;
@@ -241,6 +242,7 @@ class Actions
 			$data['checkout_has_been_completed_en'] = 'Check-out has been completed.';
 		} else {
 			$data['no_action_was_taken'] = __('No action was taken.', 'rrze-rsvp');
+			$data['no_action_was_taken_en'] = 'No action was taken.';
 		}
 
 		wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
