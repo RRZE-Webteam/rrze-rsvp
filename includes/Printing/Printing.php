@@ -32,7 +32,7 @@ class Printing {
 
     public function addRowActions( $actions, $post ) {
         if ($post->post_type == 'seat' || $post->post_type == 'room'){
-            $actions['generate-pdf'] = '<a href="?'. $post->post_type . '='. $post->ID . '&generate_pdf" title="" rel="permalink">' . __( 'Generate PDF', 'rrze-rsvp') . '</a>';
+            $actions['generate-pdf'] = '<a href="?'. $post->post_type . '='. $post->ID . '&generate_pdf" title="" rel="permalink" target="_blank">' . __( 'Generate PDF', 'rrze-rsvp') . '</a>';
         }
         return $actions;
     }    
@@ -57,7 +57,8 @@ class Printing {
                     'numberposts' => -1
                 ]);
                 if (!$aSeats){
-                    wp_redirect(get_admin_url() . 'edit.php?post_type=room&seatCnt=0');
+                    // wp_redirect(get_admin_url() . 'edit.php?post_type=room&seatCnt=0');
+                    echo __('No seats found', 'rrze-rsvp');
                     exit;
                 }
             }
