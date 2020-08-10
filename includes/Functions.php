@@ -85,7 +85,7 @@ class Functions
         }
         return false;
     }
-        
+
     public static function getBooking(int $bookingId): array
     {
         $data = [];
@@ -97,9 +97,9 @@ class Functions
 
         $data['id'] = $post->ID;
         $data['status'] = get_post_meta($post->ID, 'rrze-rsvp-booking-status', true);
-        $data['start'] = get_post_meta($post->ID, 'rrze-rsvp-booking-start', true);
+        $data['start'] = absint(get_post_meta($post->ID, 'rrze-rsvp-booking-start', true));
         $start = new Carbon(date('Y-m-d H:i:s', $data['start']), wp_timezone());
-        $end = get_post_meta($post->ID, 'rrze-rsvp-booking-end', true);
+        $end = absint(get_post_meta($post->ID, 'rrze-rsvp-booking-end', true));
         $data['end'] = $end ? $end : $start->endOfDay()->getTimestamp();
         $data['date'] = Functions::dateFormat($data['start']);
         $data['time'] = Functions::timeFormat($data['start']) . ' - ' . Functions::timeFormat($data['end']);
