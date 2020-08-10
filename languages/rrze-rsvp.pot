@@ -1,5 +1,6 @@
 # Copyright (C) 2020 rrze-rsvp
 # This file is distributed under the same license as the rrze-rsvp package.
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: rrze-rsvp\n"
@@ -8,21 +9,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Report-Msgid-Bugs-To: https://github.com/RRZE-Webteam/rrze-rsvp/issues\n"
 "X-Poedit-Basepath: ..\n"
-"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
+"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:"
+"1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;"
+"esc_html_x:1,2c\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: rrze-rsvp.php:56
-msgid "The server is running WordPress version %1$s. The Plugin requires at least WordPress version %2$s."
-msgstr ""
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"POT-Creation-Date: 2020-08-10 14:55+0000\n"
+"Language: \n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: Loco https://localise.biz/"
 
 #: rrze-rsvp.php:54
-msgid "The server is running PHP version %1$s. The Plugin requires at least PHP version %2$s."
+#, php-format
+msgid ""
+"The server is running PHP version %1$s. The Plugin requires at least PHP "
+"version %2$s."
+msgstr ""
+
+#: rrze-rsvp.php:56
+#, php-format
+msgid ""
+"The server is running WordPress version %1$s. The Plugin requires at least "
+"WordPress version %2$s."
 msgstr ""
 
 #: rrze-rsvp.php:116
+#, php-format
 msgid "Plugins: %1$s: %2$s"
 msgstr ""
 
@@ -31,315 +45,303 @@ msgid "Thank you for booking"
 msgstr ""
 
 #: config/config.php:51
-msgid "We received your booking and we will notify you once it has been confirmed."
+msgid ""
+"We received your booking and we will notify you once it has been confirmed."
 msgstr ""
 
 #: config/config.php:53
-msgid "Your booking has been confirmed"
+msgid "Please confirm your booking"
 msgstr ""
 
 #: config/config.php:55
-msgid "We are happy to inform you that your booking has been confirmed."
+msgid ""
+"You are required to confirm the booking now. Please note that unconfirmed "
+"bookings automatically expire after one hour."
 msgstr ""
 
 #: config/config.php:57
-msgid "Your booking has been cancelled"
+msgid "Your booking has been confirmed"
 msgstr ""
 
 #: config/config.php:59
+msgid "We are happy to inform you that your booking has been confirmed."
+msgstr ""
+
+#: config/config.php:61
+msgid "Your booking has been cancelled"
+msgstr ""
+
+#: config/config.php:63
 msgid "Unfortunately we have to cancel your booking on {{date}} at {{time}}."
 msgstr ""
 
-#: config/config.php:75, config/config.php:76
+#: config/config.php:76
+msgid "Additional informations"
+msgstr ""
+
+#: config/config.php:87 config/config.php:88
 msgid "RRZE RSVP"
 msgstr ""
 
-#: config/config.php:79
+#: config/config.php:91
 msgid "RRZE RSVP Settings"
 msgstr ""
 
-#: config/config.php:93
+#: config/config.php:105
 msgid "Here comes the Context Help content."
 msgstr ""
 
-#: config/config.php:95
+#: config/config.php:107
 msgid "Overview"
 msgstr ""
 
-#: config/config.php:96
+#: config/config.php:108
 msgid "For more information"
 msgstr ""
 
-#: config/config.php:96
+#: config/config.php:108
 msgid "RRZE Webteam on Github"
 msgstr ""
 
-#: config/config.php:114
+#: config/config.php:126
 msgid "General Settings"
 msgstr ""
 
-#: config/config.php:118
+#: config/config.php:130
 msgid "E-Mail Settings"
 msgstr ""
 
-#: config/config.php:122
+#: config/config.php:134
 msgid "QR PDF Settings"
 msgstr ""
 
-#: config/config.php:212
+#: config/config.php:224
 msgid "Booking Page"
 msgstr ""
 
-#: config/config.php:213
-msgid "Select the page that contains your booking form shortcode."
+#: config/config.php:225
+msgid ""
+"Select the page that contains your booking form shortcode. You can find a "
+"shortcode hint on each room edit page."
 msgstr ""
 
-#: config/config.php:215, includes/CPT/Bookings.php:140, includes/CPT/Bookings.php:155, includes/CPT/Seats.php:128
+#: config/config.php:227 includes/Tools.php:35 includes/CPT/Seats.php:128
+#: includes/CPT/Bookings.php:141 includes/CPT/Bookings.php:156
 msgid "Please select"
 msgstr ""
 
-#: config/config.php:219
+#: config/config.php:231
 msgid "Show Availability table on Room page."
 msgstr ""
 
-#: config/config.php:220
+#: config/config.php:232
 msgid "If 'Yes (with link)' you need to specify the booking page (see above)."
 msgstr ""
 
-#: config/config.php:223
+#: config/config.php:235
 msgid "Yes (with seats linked to booking form)"
 msgstr ""
 
-#: config/config.php:224
+#: config/config.php:236
 msgid "Yes (no link)"
 msgstr ""
 
-#: config/config.php:225, config/config.php:245, config/config.php:256
+#: config/config.php:237 config/config.php:257 config/config.php:268
 msgid "No"
 msgstr ""
 
-#: config/config.php:232
+#: config/config.php:244
 msgid "Notification email"
 msgstr ""
 
-#: config/config.php:233
+#: config/config.php:245
 msgid "Email address for notifications."
 msgstr ""
 
-#: config/config.php:240
+#: config/config.php:252
 msgid "Booking Notification"
 msgstr ""
 
-#: config/config.php:241
+#: config/config.php:253
 msgid "New booking notification."
 msgstr ""
 
-#: config/config.php:244, config/config.php:255
+#: config/config.php:256 config/config.php:267
 msgid "Yes"
 msgstr ""
 
-#: config/config.php:251
+#: config/config.php:263
 msgid "Cancel Notification"
 msgstr ""
 
-#: config/config.php:252
+#: config/config.php:264
 msgid "Notification of booking cancellation."
 msgstr ""
 
-#: config/config.php:262, config/config.php:264
+#: config/config.php:274 config/config.php:276
 msgid "Sender name"
 msgstr ""
 
-#: config/config.php:263
+#: config/config.php:275
 msgid "Name for Sender for the booking system."
 msgstr ""
 
-#: config/config.php:271
+#: config/config.php:283
 msgid "Sender email"
 msgstr ""
 
-#: config/config.php:272
+#: config/config.php:284
 msgid "Email address of sender."
 msgstr ""
 
-#: config/config.php:279
-msgid "Subject"
+#: config/config.php:291
+msgid "Subject of the received booking"
 msgstr ""
 
-#: config/config.php:280, config/config.php:288
-msgid "Subject for mails"
+#: config/config.php:292 config/config.php:300
+msgid "Subject of the email replying to a booking received."
 msgstr ""
 
-#: config/config.php:287
-msgid "Subject (english)"
+#: config/config.php:299
+msgid "Subject of the received booking (english)"
 msgstr ""
 
-#: config/config.php:296
-msgid "Text"
+#: config/config.php:308
+msgid "Text of the received booking"
 msgstr ""
 
-#: config/config.php:302
-msgid "Text (english)"
+#: config/config.php:314
+msgid "Text of the received booking (english)"
 msgstr ""
 
-#: config/config.php:309
+#: config/config.php:321
+msgid "Subject for confirmation required."
+msgstr ""
+
+#: config/config.php:322 config/config.php:330
+msgid ""
+"Subject of the email where confirmation of the booking by the customer is "
+"required."
+msgstr ""
+
+#: config/config.php:329
+msgid "Subject for confirmation required (english)"
+msgstr ""
+
+#: config/config.php:338
+msgid "Text for confirmation required"
+msgstr ""
+
+#: config/config.php:344
+msgid "Text for confirmation required (english)"
+msgstr ""
+
+#: config/config.php:351
 msgid "Subject Confirmation"
 msgstr ""
 
-#: config/config.php:310, config/config.php:318
+#: config/config.php:352 config/config.php:360
 msgid "Subject for confirmation mails"
 msgstr ""
 
-#: config/config.php:317
+#: config/config.php:359
 msgid "Subject Confirmation (english)"
 msgstr ""
 
-#: config/config.php:326
+#: config/config.php:368
 msgid "Confirmation Text"
 msgstr ""
 
-#: config/config.php:332
+#: config/config.php:374
 msgid "Confirmation Text (english)"
 msgstr ""
 
-#: config/config.php:339
+#: config/config.php:381
 msgid "Subject Canceling"
 msgstr ""
 
-#: config/config.php:340, config/config.php:348
+#: config/config.php:382 config/config.php:390
 msgid "Subject for canceling mails"
 msgstr ""
 
-#: config/config.php:347
+#: config/config.php:389
 msgid "Subject Canceling (english)"
 msgstr ""
 
-#: config/config.php:356
+#: config/config.php:398
 msgid "Cancel Text"
 msgstr ""
 
-#: config/config.php:362
+#: config/config.php:404
 msgid "Cancel Text (english)"
 msgstr ""
 
-#: config/config.php:372
-msgid "Logo"
+#: config/config.php:414
+msgid "Print FAU logo"
 msgstr ""
 
-#: config/config.php:373
-msgid "Show logo in upper right corner of PDF"
+#: config/config.php:420
+msgid "Print website's logo or title"
 msgstr ""
 
-#: config/config.php:377
-msgid "none"
+#: config/config.php:426
+msgid "Print website's URL"
 msgstr ""
 
-#: config/config.php:378
-msgid "FAU logo"
-msgstr ""
-
-#: config/config.php:379
-msgid "Website logo"
-msgstr ""
-
-#: config/config.php:384, config/config.php:386
+#: config/config.php:432 config/config.php:434
 msgid "Instructions in German"
 msgstr ""
 
-#: config/config.php:385, config/config.php:394
+#: config/config.php:433 config/config.php:442
 msgid "This text will be shown above the QR code."
 msgstr ""
 
-#: config/config.php:393, config/config.php:395
+#: config/config.php:441 config/config.php:443
 msgid "Instructions in English"
 msgstr ""
 
-#: config/config.php:402
+#: config/config.php:450
 msgid "Print room's text"
 msgstr ""
 
-#: config/config.php:407
-msgid "Print room's image"
-msgstr ""
-
-#: config/config.php:412
+#: config/config.php:462
 msgid "Print room's address"
 msgstr ""
 
-#: config/config.php:417
-msgid "Print floor plan"
-msgstr ""
-
-#: config/config.php:422
+#: config/config.php:474
 msgid "Print seats' equipment"
 msgstr ""
 
-#: config/config.php:445, config/config.php:490
+#: config/config.php:498 config/config.php:543
 msgid "Find the settings on the right side"
 msgstr ""
 
-#: config/config.php:450, config/config.php:495
+#: config/config.php:503 config/config.php:548
 msgid "Days in advance"
 msgstr ""
 
-#: config/config.php:456, includes/CPT/Bookings.php:221, includes/CPT/Bookings.php:235, includes/CPT/Bookings.php:360, includes/CPT/Rooms.php:61, includes/CPT/Seats.php:124, includes/Printing/PDF.php:116, includes/Shortcodes/Bookings.php:180, includes/templates/single-seat.php:51
+#: config/config.php:509 includes/Tools.php:32 includes/CPT/Seats.php:124
+#: includes/CPT/Bookings.php:245 includes/CPT/Bookings.php:259
+#: includes/CPT/Bookings.php:384 includes/CPT/Rooms.php:61
+#: includes/Printing/Printing.php:127 includes/Shortcodes/Bookings.php:227
+#: includes/templates/single-seat.php:51
 msgid "Room"
 msgstr ""
 
-#: config/config.php:461
+#: config/config.php:514
 msgid "Require SSO Authentication"
 msgstr ""
 
-#: config/config.php:501
+#: config/config.php:554
 msgid "Room(s)"
 msgstr ""
 
-#: config/config.php:507
+#: config/config.php:560
 msgid "Seat(s)"
 msgstr ""
 
-#: config/config.php:512
+#: config/config.php:565
 msgid "Show booking link"
-msgstr ""
-
-#: includes/API.php:108, includes/API.php:127, includes/API.php:145, includes/API.php:163
-msgid "message"
-msgstr ""
-
-#: includes/Email.php:110, includes/Email.php:151, includes/CPT/Bookings.php:223, includes/CPT/Bookings.php:237, includes/CPT/Bookings.php:362, includes/templates/booking-reply-admin.php:64
-msgid "Name"
-msgstr ""
-
-#: includes/Email.php:111, includes/Email.php:152, includes/CPT/Bookings.php:173, includes/CPT/Bookings.php:224, includes/CPT/Bookings.php:238, includes/Shortcodes/Bookings.php:304, includes/templates/booking-reply-admin.php:65
-msgid "Email"
-msgstr ""
-
-#: includes/Email.php:112, includes/Email.php:153, includes/CPT/Bookings.php:179, includes/CPT/Bookings.php:242, includes/templates/booking-reply-admin.php:66
-msgid "Phone"
-msgstr ""
-
-#: includes/Email.php:117
-msgid "You received a new request for a booking on %s."
-msgstr ""
-
-#: includes/Email.php:126
-msgid "Confirm Booking"
-msgstr ""
-
-#: includes/Email.php:128, includes/ICS.php:45, includes/templates/booking-reply-customer.php:76
-msgid "Cancel Booking"
-msgstr ""
-
-#: includes/Email.php:149
-msgid "Booking has been cancelled"
-msgstr ""
-
-#: includes/Email.php:155
-msgid "A booking on %s has been cancelled by the customer."
-msgstr ""
-
-#: includes/ICS.php:46
-msgid "Generated"
 msgstr ""
 
 #: includes/IdM.php:44
@@ -351,11 +353,15 @@ msgid "Access to the requested page is denied"
 msgstr ""
 
 #: includes/IdM.php:72
+#, php-format
 msgid "<a href=\"%s\">Please login with your IdM username</a>."
 msgstr ""
 
 #: includes/IdM.php:73
-msgid "<a href=\"%s\">Login through Single Sign-On (central login service of the University Erlangen-Nürnberg)</a>."
+#, php-format
+msgid ""
+"<a href=\"%s\">Login through Single Sign-On (central login service of the "
+"University Erlangen-Nürnberg)</a>."
 msgstr ""
 
 #: includes/IdM.php:77
@@ -370,194 +376,526 @@ msgstr ""
 msgid "no@email"
 msgstr ""
 
-#: includes/Main.php:89
+#: includes/Email.php:110 includes/Email.php:151 includes/Actions.php:178
+#: includes/CPT/Bookings.php:247 includes/CPT/Bookings.php:261
+#: includes/CPT/Bookings.php:386
+msgid "Name"
+msgstr ""
+
+#: includes/Email.php:111 includes/Email.php:152 includes/Actions.php:179
+#: includes/CPT/Bookings.php:174 includes/CPT/Bookings.php:248
+#: includes/CPT/Bookings.php:262 includes/Shortcodes/Bookings.php:331
+#: includes/Shortcodes/Bookings.php:347
+msgid "Email"
+msgstr ""
+
+#: includes/Email.php:112 includes/Email.php:153 includes/Actions.php:180
+#: includes/CPT/Bookings.php:180 includes/CPT/Bookings.php:266
+msgid "Phone"
+msgstr ""
+
+#: includes/Email.php:117
+#, php-format
+msgid "You received a new request for a booking on %s."
+msgstr ""
+
+#: includes/Email.php:126
+msgid "Confirm Booking"
+msgstr ""
+
+#: includes/Email.php:128 includes/ICS.php:45
+msgid "Cancel Booking"
+msgstr ""
+
+#: includes/Email.php:149
+msgid "Booking has been cancelled"
+msgstr ""
+
+#: includes/Email.php:155
+#, php-format
+msgid "A booking on %s has been cancelled by the customer."
+msgstr ""
+
+#: includes/Actions.php:161 includes/Actions.php:175
+msgid "confirmed"
+msgstr ""
+
+#: includes/Actions.php:169 includes/Actions.php:175
+msgid "cancelled"
+msgstr ""
+
+#: includes/Actions.php:187 includes/Actions.php:251
+#: includes/CPT/Bookings.php:62
+msgid "Booking"
+msgstr ""
+
+#: includes/Actions.php:189
+#, php-format
+msgid "The booking has already been %s."
+msgstr ""
+
+#: includes/Actions.php:190
+#, php-format
+msgid "The booking has been %s."
+msgstr ""
+
+#: includes/Actions.php:191
+msgid "Your customer has received an email confirmation."
+msgstr ""
+
+#: includes/Actions.php:257
+msgid "Do you really want to cancel your booking?"
+msgstr ""
+
+#: includes/Actions.php:268
+msgid "Cancel Your Booking"
+msgstr ""
+
+#: includes/Actions.php:271
+msgid ""
+"Your booking has been cancelled. Please contact us to find a different "
+"arrangement."
+msgstr ""
+
+#: includes/Actions.php:274
+msgid "Thank you for confirming your booking."
+msgstr ""
+
+#: includes/Actions.php:277
+msgid "Check-in is not possible at this time."
+msgstr ""
+
+#: includes/Actions.php:280
+msgid "Check-in has been completed."
+msgstr ""
+
+#: includes/Actions.php:283
+msgid "Check-out is not possible at this time."
+msgstr ""
+
+#: includes/Actions.php:286
+msgid "Check-out has been completed."
+msgstr ""
+
+#: includes/Actions.php:289
+msgid "No action was taken."
+msgstr ""
+
+#: includes/Main.php:92
 msgid "Do you want to cancel?"
 msgstr ""
 
-#: includes/Main.php:90, includes/CPT/Bookings.php:145, includes/CPT/Bookings.php:299, includes/CPT/Bookings.php:287
+#: includes/Main.php:93 includes/CPT/Bookings.php:146
+#: includes/CPT/Bookings.php:311 includes/CPT/Bookings.php:323
 msgctxt "Booking"
 msgid "Cancelled"
 msgstr ""
 
-#: includes/Main.php:91, includes/CPT/Bookings.php:144, includes/CPT/Bookings.php:336, includes/CPT/Bookings.php:305
+#: includes/Main.php:94 includes/CPT/Bookings.php:145
+#: includes/CPT/Bookings.php:329 includes/CPT/Bookings.php:360
 msgid "Confirmed"
 msgstr ""
 
 #: includes/Plugin.php:189
+#, php-format
 msgid "Call to undefined method %1$s::%2$s"
+msgstr ""
+
+#: includes/Tools.php:20 includes/Tools.php:30
+msgctxt "admin page title"
+msgid "Create Seats"
+msgstr ""
+
+#: includes/Tools.php:21
+msgctxt "admin menu entry title"
+msgid "RSVP Create Seats"
+msgstr ""
+
+#: includes/Tools.php:49
+msgid "Number of Table Rows"
+msgstr ""
+
+#: includes/Tools.php:54
+msgid "Rows Numbering System"
+msgstr ""
+
+#: includes/Tools.php:55 includes/Tools.php:66
+msgid "Numeric (1 - 999)"
+msgstr ""
+
+#: includes/Tools.php:56 includes/Tools.php:67
+msgid "A-Z"
+msgstr ""
+
+#: includes/Tools.php:60
+msgid "Number of Seats per Row"
+msgstr ""
+
+#: includes/Tools.php:65
+msgid "Seats Numbering System"
+msgstr ""
+
+#: includes/Tools.php:70 includes/CPT/CPT.php:64 includes/CPT/CPT.php:65
+#: includes/Shortcodes/Bookings.php:584
+msgid "Equipment"
+msgstr ""
+
+#: includes/Tools.php:73
+msgid ""
+"Preselect equipment that is available on all seats. You can modify the "
+"equipment later by editing the seats individually or by bulk editing several "
+"seats in the seats table."
+msgstr ""
+
+#: includes/Tools.php:77
+msgid "Generate Seats"
 msgstr ""
 
 #: includes/Users.php:82
 msgid "Booking Agent"
 msgstr ""
 
-#: includes/CPT/Bookings.php:41
+#: includes/Schedule.php:52
+msgid "Every five minutes"
+msgstr ""
+
+#: includes/ICS.php:46
+msgid "Generated"
+msgstr ""
+
+#: includes/API.php:108 includes/API.php:127 includes/API.php:145
+#: includes/API.php:163
+msgid "message"
+msgstr ""
+
+#: includes/CPT/Seats.php:36
+msgctxt "Post type general name"
+msgid "Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:37
+msgctxt "Post type singular name"
+msgid "Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:38
+msgctxt "Admin Menu text"
+msgid "Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:39
+msgctxt "Add New on Toolbar"
+msgid "Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:40 includes/CPT/Bookings.php:46
+#: includes/CPT/Rooms.php:39
+msgid "Add New"
+msgstr ""
+
+#: includes/CPT/Seats.php:41
+msgid "Add New Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:42
+msgid "New Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:43
+msgid "Edit Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:44
+msgid "View Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:45
+msgid "All Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:46
+msgid "Search Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:47
+msgid "No Seats found."
+msgstr ""
+
+#: includes/CPT/Seats.php:48
+msgid "No Seats found in Trash."
+msgstr ""
+
+#: includes/CPT/Seats.php:49
+msgctxt ""
+"Overrides the “Featured Image” phrase for this post type. Added in 4.3"
+msgid "Seat Image"
+msgstr ""
+
+#: includes/CPT/Seats.php:50
+msgctxt ""
+"Overrides the “Set featured image” phrase for this post type. Added in 4.3"
+msgid "Set seat image"
+msgstr ""
+
+#: includes/CPT/Seats.php:51
+msgctxt ""
+"Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
+msgid "Remove seat image"
+msgstr ""
+
+#: includes/CPT/Seats.php:52
+msgctxt ""
+"Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
+msgid "Use as Seat image"
+msgstr ""
+
+#: includes/CPT/Seats.php:53
+msgctxt ""
+"The post type archive label used in nav menus. Default “Post Archives”. "
+"Added in 4.4"
+msgid "Seat archives"
+msgstr ""
+
+#: includes/CPT/Seats.php:54
+msgctxt ""
+"Overrides the “Insert into post”/”Insert into page” phrase (used when "
+"inserting media into a post). Added in 4.4"
+msgid "Insert into Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:55
+msgctxt ""
+"Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used "
+"when viewing media attached to a post). Added in 4.4"
+msgid "Uploaded to this Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:56
+msgctxt ""
+"Screen reader text for the filter links heading on the post type listing "
+"screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+msgid "Filter Seats list"
+msgstr ""
+
+#: includes/CPT/Seats.php:57
+msgctxt ""
+"Screen reader text for the pagination heading on the post type listing "
+"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+msgid "Seats list navigation"
+msgstr ""
+
+#: includes/CPT/Seats.php:58
+msgctxt ""
+"Screen reader text for the items list heading on the post type listing "
+"screen. Default “Posts list”/”Pages list”. Added in 4.4"
+msgid "Seats list"
+msgstr ""
+
+#: includes/CPT/Seats.php:62 includes/CPT/Bookings.php:153
+#: includes/CPT/Bookings.php:246 includes/CPT/Bookings.php:260
+#: includes/CPT/Bookings.php:385 includes/Printing/Printing.php:139
+#: includes/Shortcodes/Bookings.php:228
+msgid "Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:63
+msgid "Add and edit seat informations"
+msgstr ""
+
+#: includes/CPT/Seats.php:89
+msgctxt "taxonomy general name"
+msgid "Equipment"
+msgstr ""
+
+#: includes/CPT/Seats.php:90
+msgctxt "taxonomy singular name"
+msgid "Equipment"
+msgstr ""
+
+#: includes/CPT/Seats.php:110 includes/CPT/Bookings.php:94
+#: includes/CPT/Rooms.php:148
+msgid "Details"
+msgstr ""
+
+#: includes/CPT/Bookings.php:42
 msgctxt "Post type general name"
 msgid "Bookings"
 msgstr ""
 
-#: includes/CPT/Bookings.php:42
+#: includes/CPT/Bookings.php:43
 msgctxt "Post type singular name"
 msgid "Booking"
 msgstr ""
 
-#: includes/CPT/Bookings.php:43
+#: includes/CPT/Bookings.php:44
 msgctxt "Admin Menu text"
 msgid "Bookings"
 msgstr ""
 
-#: includes/CPT/Bookings.php:44
+#: includes/CPT/Bookings.php:45
 msgctxt "Add New on Toolbar"
 msgid "Booking"
 msgstr ""
 
-#: includes/CPT/Bookings.php:45, includes/CPT/Rooms.php:39, includes/CPT/Seats.php:40
-msgid "Add New"
-msgstr ""
-
-#: includes/CPT/Bookings.php:46
+#: includes/CPT/Bookings.php:47
 msgid "Add New Booking"
 msgstr ""
 
-#: includes/CPT/Bookings.php:47
+#: includes/CPT/Bookings.php:48
 msgid "New Booking"
 msgstr ""
 
-#: includes/CPT/Bookings.php:48
+#: includes/CPT/Bookings.php:49
 msgid "Edit Booking"
 msgstr ""
 
-#: includes/CPT/Bookings.php:49
+#: includes/CPT/Bookings.php:50
 msgid "View Booking"
 msgstr ""
 
-#: includes/CPT/Bookings.php:50
+#: includes/CPT/Bookings.php:51
 msgid "All Bookings"
 msgstr ""
 
-#: includes/CPT/Bookings.php:51
+#: includes/CPT/Bookings.php:52
 msgid "Search Bookings"
 msgstr ""
 
-#: includes/CPT/Bookings.php:52
+#: includes/CPT/Bookings.php:53
 msgid "No Bookings found."
 msgstr ""
 
-#: includes/CPT/Bookings.php:53
+#: includes/CPT/Bookings.php:54
 msgid "No Bookings found in Trash."
 msgstr ""
 
-#: includes/CPT/Bookings.php:54
-msgctxt "The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4"
+#: includes/CPT/Bookings.php:55
+msgctxt ""
+"The post type archive label used in nav menus. Default “Post Archives”. "
+"Added in 4.4"
 msgid "Booking archives"
 msgstr ""
 
-#: includes/CPT/Bookings.php:55
-msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+#: includes/CPT/Bookings.php:56
+msgctxt ""
+"Screen reader text for the filter links heading on the post type listing "
+"screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
 msgid "Filter Bookings list"
 msgstr ""
 
-#: includes/CPT/Bookings.php:56
-msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+#: includes/CPT/Bookings.php:57
+msgctxt ""
+"Screen reader text for the pagination heading on the post type listing "
+"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
 msgid "Bookings list navigation"
 msgstr ""
 
-#: includes/CPT/Bookings.php:57
-msgctxt "Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4"
+#: includes/CPT/Bookings.php:58
+msgctxt ""
+"Screen reader text for the items list heading on the post type listing "
+"screen. Default “Posts list”/”Pages list”. Added in 4.4"
 msgid "Bookings list"
 msgstr ""
 
-#: includes/CPT/Bookings.php:61, includes/templates/booking-reply-admin.php:43, includes/templates/booking-reply-customer.php:60
-msgid "Booking"
-msgstr ""
-
-#: includes/CPT/Bookings.php:62
+#: includes/CPT/Bookings.php:63
 msgid "Add and edit Booking informations"
 msgstr ""
 
-#: includes/CPT/Bookings.php:93, includes/CPT/Rooms.php:144, includes/CPT/Seats.php:110
-msgid "Details"
-msgstr ""
-
-#: includes/CPT/Bookings.php:103
+#: includes/CPT/Bookings.php:104
 msgid "Start"
 msgstr ""
 
-#: includes/CPT/Bookings.php:120
+#: includes/CPT/Bookings.php:121
 msgid "End"
 msgstr ""
 
-#: includes/CPT/Bookings.php:137, includes/CPT/Bookings.php:225, includes/CPT/Bookings.php:244
+#: includes/CPT/Bookings.php:138 includes/CPT/Bookings.php:249
+#: includes/CPT/Bookings.php:268
 msgid "Status"
 msgstr ""
 
-#: includes/CPT/Bookings.php:143, includes/CPT/Bookings.php:302
+#: includes/CPT/Bookings.php:144 includes/CPT/Bookings.php:326
 msgid "Booked"
 msgstr ""
 
-#: includes/CPT/Bookings.php:146
+#: includes/CPT/Bookings.php:147
 msgid "Checked In"
 msgstr ""
 
-#: includes/CPT/Bookings.php:147
+#: includes/CPT/Bookings.php:148
 msgid "Checked Out"
 msgstr ""
 
-#: includes/CPT/Bookings.php:152, includes/CPT/Bookings.php:222, includes/CPT/Bookings.php:236, includes/CPT/Bookings.php:361, includes/CPT/Seats.php:62, includes/Printing/PDF.php:128, includes/Shortcodes/Bookings.php:181
-msgid "Seat"
-msgstr ""
-
-#: includes/CPT/Bookings.php:161, includes/Shortcodes/Bookings.php:294
+#: includes/CPT/Bookings.php:162 includes/Shortcodes/Bookings.php:329
+#: includes/Shortcodes/Bookings.php:337
 msgid "Last name"
 msgstr ""
 
-#: includes/CPT/Bookings.php:167, includes/Shortcodes/Bookings.php:299
+#: includes/CPT/Bookings.php:168 includes/Shortcodes/Bookings.php:330
+#: includes/Shortcodes/Bookings.php:342
 msgid "First name"
 msgstr ""
 
-#: includes/CPT/Bookings.php:188
+#: includes/CPT/Bookings.php:189
 msgid "Notes"
 msgstr ""
 
-#: includes/CPT/Bookings.php:219, includes/CPT/Bookings.php:233, includes/CPT/Bookings.php:358, includes/Shortcodes/Availability.php:108, includes/Shortcodes/Bookings.php:178
+#: includes/CPT/Bookings.php:192
+msgid ""
+"This textarea contains the 'Additional Information' field content if this "
+"option is activated in the room settings. It can also be used for notes for "
+"internal use."
+msgstr ""
+
+#: includes/CPT/Bookings.php:198
+msgid "Shortcode"
+msgstr ""
+
+#: includes/CPT/Bookings.php:202
+#, php-format
+msgid ""
+"Add %sdays=\"20\"%s to overwrite the number of days you can book a seat in "
+"advance.%s"
+msgstr ""
+
+#: includes/CPT/Bookings.php:243 includes/CPT/Bookings.php:257
+#: includes/CPT/Bookings.php:382 includes/Shortcodes/Availability.php:110
+#: includes/Shortcodes/Bookings.php:225
 msgid "Date"
 msgstr ""
 
-#: includes/CPT/Bookings.php:220, includes/CPT/Bookings.php:234, includes/CPT/Bookings.php:359, includes/Shortcodes/Bookings.php:179
+#: includes/CPT/Bookings.php:244 includes/CPT/Bookings.php:258
+#: includes/CPT/Bookings.php:383 includes/Shortcodes/Bookings.php:226
 msgid "Time"
 msgstr ""
 
-#: includes/CPT/Bookings.php:280
+#: includes/CPT/Bookings.php:304
 msgid "Booked on"
 msgstr ""
 
-#: includes/CPT/Bookings.php:333
+#: includes/CPT/Bookings.php:317
+msgid "Restore"
+msgstr ""
+
+#: includes/CPT/Bookings.php:332 includes/CPT/Bookings.php:362
+msgid "Checked-In"
+msgstr ""
+
+#: includes/CPT/Bookings.php:335 includes/CPT/Bookings.php:364
+msgid "Checked-Out"
+msgstr ""
+
+#: includes/CPT/Bookings.php:344
+msgid "Delete"
+msgstr ""
+
+#: includes/CPT/Bookings.php:357
 msgctxt "Booking"
 msgid "Cancel"
 msgstr ""
 
-#: includes/CPT/Bookings.php:347
+#: includes/CPT/Bookings.php:371
 msgid "Confirm"
-msgstr ""
-
-#: includes/CPT/Bookings.php:340, includes/CPT/Bookings.php:311
-msgid "Checked-Out"
-msgstr ""
-
-#: includes/CPT/Bookings.php:338, includes/CPT/Bookings.php:308
-msgid "Checked-In"
-msgstr ""
-
-#: includes/CPT/Bookings.php:320
-msgid "Delete"
-msgstr ""
-
-#: includes/CPT/Bookings.php:293
-msgid "Restore"
-msgstr ""
-
-#: includes/CPT/CPT.php:64, includes/CPT/CPT.php:65, includes/Shortcodes/Bookings.php:524
-msgid "Equipment"
 msgstr ""
 
 #: includes/CPT/Rooms.php:35
@@ -613,52 +951,68 @@ msgid "No Rooms found in Trash."
 msgstr ""
 
 #: includes/CPT/Rooms.php:48
-msgctxt "Overrides the “Featured Image” phrase for this post type. Added in 4.3"
+msgctxt ""
+"Overrides the “Featured Image” phrase for this post type. Added in 4.3"
 msgid "Room Image"
 msgstr ""
 
 #: includes/CPT/Rooms.php:49
-msgctxt "Overrides the “Set featured image” phrase for this post type. Added in 4.3"
+msgctxt ""
+"Overrides the “Set featured image” phrase for this post type. Added in 4.3"
 msgid "Set room image"
 msgstr ""
 
 #: includes/CPT/Rooms.php:50
-msgctxt "Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
+msgctxt ""
+"Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
 msgid "Remove room image"
 msgstr ""
 
 #: includes/CPT/Rooms.php:51
-msgctxt "Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
+msgctxt ""
+"Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
 msgid "Use as Room image"
 msgstr ""
 
 #: includes/CPT/Rooms.php:52
-msgctxt "The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4"
+msgctxt ""
+"The post type archive label used in nav menus. Default “Post Archives”. "
+"Added in 4.4"
 msgid "Room archives"
 msgstr ""
 
 #: includes/CPT/Rooms.php:53
-msgctxt "Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4"
+msgctxt ""
+"Overrides the “Insert into post”/”Insert into page” phrase (used when "
+"inserting media into a post). Added in 4.4"
 msgid "Insert into Room"
 msgstr ""
 
 #: includes/CPT/Rooms.php:54
-msgctxt "Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4"
+msgctxt ""
+"Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used "
+"when viewing media attached to a post). Added in 4.4"
 msgid "Uploaded to this Room"
 msgstr ""
 
 #: includes/CPT/Rooms.php:55
-msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+msgctxt ""
+"Screen reader text for the filter links heading on the post type listing "
+"screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
 msgid "Filter Rooms list"
 msgstr ""
 
 #: includes/CPT/Rooms.php:56
-msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+msgctxt ""
+"Screen reader text for the pagination heading on the post type listing "
+"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
 msgid "Rooms list navigation"
 msgstr ""
 
 #: includes/CPT/Rooms.php:57
-msgctxt "Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4"
+msgctxt ""
+"Screen reader text for the items list heading on the post type listing "
+"screen. Default “Posts list”/”Pages list”. Added in 4.4"
 msgid "Rooms list"
 msgstr ""
 
@@ -666,435 +1020,339 @@ msgstr ""
 msgid "Add and edit room informations"
 msgstr ""
 
-#: includes/CPT/Rooms.php:89
+#: includes/CPT/Rooms.php:93
 msgid "Timeslots"
 msgstr ""
 
-#: includes/CPT/Rooms.php:101
+#: includes/CPT/Rooms.php:105
 msgid "Define bookable time slots."
 msgstr ""
 
-#: includes/CPT/Rooms.php:103
+#: includes/CPT/Rooms.php:107
 msgid "Time slot {#}"
 msgstr ""
 
-#: includes/CPT/Rooms.php:113
+#: includes/CPT/Rooms.php:117
 msgid "Week day"
 msgstr ""
 
-#: includes/CPT/Rooms.php:118, includes/templates/single-room.php:56
+#: includes/CPT/Rooms.php:122 includes/templates/single-room.php:56
 msgid "Monday"
 msgstr ""
 
-#: includes/CPT/Rooms.php:119, includes/templates/single-room.php:57
+#: includes/CPT/Rooms.php:123 includes/templates/single-room.php:57
 msgid "Tuesday"
 msgstr ""
 
-#: includes/CPT/Rooms.php:120, includes/templates/single-room.php:58
+#: includes/CPT/Rooms.php:124 includes/templates/single-room.php:58
 msgid "Wednesday"
 msgstr ""
 
-#: includes/CPT/Rooms.php:121, includes/templates/single-room.php:59
+#: includes/CPT/Rooms.php:125 includes/templates/single-room.php:59
 msgid "Thursday"
 msgstr ""
 
-#: includes/CPT/Rooms.php:122, includes/templates/single-room.php:60
+#: includes/CPT/Rooms.php:126 includes/templates/single-room.php:60
 msgid "Friday"
 msgstr ""
 
-#: includes/CPT/Rooms.php:123, includes/templates/single-room.php:61
+#: includes/CPT/Rooms.php:127 includes/templates/single-room.php:61
 msgid "Saturday"
 msgstr ""
 
-#: includes/CPT/Rooms.php:124, includes/templates/single-room.php:62
+#: includes/CPT/Rooms.php:128 includes/templates/single-room.php:62
 msgid "Sunday"
 msgstr ""
 
-#: includes/CPT/Rooms.php:129
+#: includes/CPT/Rooms.php:133
 msgid "Start time"
 msgstr ""
 
-#: includes/CPT/Rooms.php:136
+#: includes/CPT/Rooms.php:140
 msgid "End time"
 msgstr ""
 
-#: includes/CPT/Rooms.php:154
+#: includes/CPT/Rooms.php:158
 msgid "Street"
 msgstr ""
 
-#: includes/CPT/Rooms.php:160
+#: includes/CPT/Rooms.php:164
 msgid "ZIP"
 msgstr ""
 
-#: includes/CPT/Rooms.php:166
+#: includes/CPT/Rooms.php:170
 msgid "City"
 msgstr ""
 
-#: includes/CPT/Rooms.php:172
+#: includes/CPT/Rooms.php:176
 msgid "Available days in advance"
 msgstr ""
 
-#: includes/CPT/Rooms.php:173
+#: includes/CPT/Rooms.php:177
 msgid "Number of days for which bookings are available in advance."
 msgstr ""
 
-#: includes/CPT/Rooms.php:183
+#: includes/CPT/Rooms.php:187
 msgid "Automatic confirmation"
 msgstr ""
 
-#: includes/CPT/Rooms.php:184
-msgid "If the automatic confirmation is not activated, the booking must be confirmed manually."
+#: includes/CPT/Rooms.php:188
+msgid ""
+"If the automatic confirmation is not activated, the booking must be "
+"confirmed manually."
 msgstr ""
 
-#: includes/CPT/Rooms.php:191
+#: includes/CPT/Rooms.php:195
 msgid "Allow Instant Check-In"
 msgstr ""
 
-#: includes/CPT/Rooms.php:192
-msgid "Seats can be booked and checked-in in one step. This only works if automatic confirmation activated!"
+#: includes/CPT/Rooms.php:196
+msgid ""
+"Seats can be booked and checked-in in one step. This only works if automatic "
+"confirmation activated!"
 msgstr ""
 
-#: includes/CPT/Rooms.php:199
+#: includes/CPT/Rooms.php:203
 msgid "Force to confirm"
 msgstr ""
 
-#: includes/CPT/Rooms.php:200
-msgid "The customer is forced to confirm his booking within a period of one hour. Otherwise the system will cancel the booking."
+#: includes/CPT/Rooms.php:204
+msgid ""
+"The customer is forced to confirm his booking within a period of one hour. "
+"Otherwise the system will cancel the booking."
 msgstr ""
 
-#: includes/CPT/Rooms.php:207
+#: includes/CPT/Rooms.php:211
+msgid "Check-in is required"
+msgstr ""
+
+#: includes/CPT/Rooms.php:212
+msgid ""
+"The customer must check-in their booking within 15 minutes from the start of "
+"the event. Otherwise the system will cancel the booking."
+msgstr ""
+
+#: includes/CPT/Rooms.php:219
+msgid "Show notes/comment input in booking form"
+msgstr ""
+
+#: includes/CPT/Rooms.php:226
+msgid "Comment input label"
+msgstr ""
+
+#: includes/CPT/Rooms.php:227
+msgid ""
+"Choose a label for the text input on the booking form. E.g. 'Additional "
+"information' or 'Main interests'"
+msgstr ""
+
+#: includes/CPT/Rooms.php:230
+msgid "Additional information"
+msgstr ""
+
+#: includes/CPT/Rooms.php:234
 msgid "Floor plan"
 msgstr ""
 
-#: includes/CPT/Seats.php:36
-msgctxt "Post type general name"
-msgid "Seats"
-msgstr ""
-
-#: includes/CPT/Seats.php:37
-msgctxt "Post type singular name"
-msgid "Seat"
-msgstr ""
-
-#: includes/CPT/Seats.php:38
-msgctxt "Admin Menu text"
-msgid "Seats"
-msgstr ""
-
-#: includes/CPT/Seats.php:39
-msgctxt "Add New on Toolbar"
-msgid "Seat"
-msgstr ""
-
-#: includes/CPT/Seats.php:41
-msgid "Add New Seat"
-msgstr ""
-
-#: includes/CPT/Seats.php:42
-msgid "New Seat"
-msgstr ""
-
-#: includes/CPT/Seats.php:43
-msgid "Edit Seat"
-msgstr ""
-
-#: includes/CPT/Seats.php:44
-msgid "View Seat"
-msgstr ""
-
-#: includes/CPT/Seats.php:45
-msgid "All Seats"
-msgstr ""
-
-#: includes/CPT/Seats.php:46
-msgid "Search Seats"
-msgstr ""
-
-#: includes/CPT/Seats.php:47
-msgid "No Seats found."
-msgstr ""
-
-#: includes/CPT/Seats.php:48
-msgid "No Seats found in Trash."
-msgstr ""
-
-#: includes/CPT/Seats.php:49
-msgctxt "Overrides the “Featured Image” phrase for this post type. Added in 4.3"
-msgid "Seat Image"
-msgstr ""
-
-#: includes/CPT/Seats.php:50
-msgctxt "Overrides the “Set featured image” phrase for this post type. Added in 4.3"
-msgid "Set seat image"
-msgstr ""
-
-#: includes/CPT/Seats.php:51
-msgctxt "Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
-msgid "Remove seat image"
-msgstr ""
-
-#: includes/CPT/Seats.php:52
-msgctxt "Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
-msgid "Use as Seat image"
-msgstr ""
-
-#: includes/CPT/Seats.php:53
-msgctxt "The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4"
-msgid "Seat archives"
-msgstr ""
-
-#: includes/CPT/Seats.php:54
-msgctxt "Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4"
-msgid "Insert into Seat"
-msgstr ""
-
-#: includes/CPT/Seats.php:55
-msgctxt "Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4"
-msgid "Uploaded to this Seat"
-msgstr ""
-
-#: includes/CPT/Seats.php:56
-msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
-msgid "Filter Seats list"
-msgstr ""
-
-#: includes/CPT/Seats.php:57
-msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
-msgid "Seats list navigation"
-msgstr ""
-
-#: includes/CPT/Seats.php:58
-msgctxt "Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4"
-msgid "Seats list"
-msgstr ""
-
-#: includes/CPT/Seats.php:63
-msgid "Add and edit seat informations"
-msgstr ""
-
-#: includes/CPT/Seats.php:89
-msgctxt "taxonomy general name"
-msgid "Equipment"
-msgstr ""
-
-#: includes/CPT/Seats.php:90
-msgctxt "taxonomy singular name"
-msgid "Equipment"
-msgstr ""
-
-#: includes/Printing/Printing.php:28
-msgid "No seats foound"
-msgstr ""
-
-#: includes/Printing/Printing.php:37
+#: includes/Printing/Printing.php:35 includes/Printing/Printing.php:217
 msgid "Generate PDF"
 msgstr ""
 
-#: includes/Printing/Printing.php:83
+#: includes/Printing/Printing.php:61 includes/Printing/Printing.php:68
+msgid "No seats found"
+msgstr ""
+
+#: includes/Printing/Printing.php:200
+msgid "Equipment:"
+msgstr ""
+
+#: includes/Printing/Printing.php:263
+#, php-format
 msgid "Generate PDF for %s seat"
 msgid_plural "Generate PDF for %s seats"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Shortcodes/Availability.php:131
-msgid "Please specify a room ID in your Shortcode."
-msgstr ""
-
-#: includes/Shortcodes/Availability.php:96
-msgid "Please enter a valid seat slug or ID"
-msgstr ""
-
-#: includes/Shortcodes/Availability.php:109
-msgid "Available Time Slots"
-msgstr ""
-
-#: includes/Shortcodes/Availability.php:117, includes/Shortcodes/Availability.php:66
-msgid "Book this seat/timeslot now"
-msgstr ""
-
-#: includes/Shortcodes/Availability.php:104
-msgid "No timeslots available for this seat."
-msgstr ""
-
 #: includes/Shortcodes/Availability.php:49
 msgid "Date/Time"
 msgstr ""
 
-#: includes/Shortcodes/Availability.php:50, includes/Shortcodes/Bookings.php:423
+#: includes/Shortcodes/Availability.php:50 includes/Shortcodes/Bookings.php:478
 msgid "Seats available"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:222
-msgid "Room specified in shortcode does not exist."
+#: includes/Shortcodes/Availability.php:67
+#: includes/Shortcodes/Availability.php:120
+msgid "Book this seat/timeslot now"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:242
-msgid "Book a seat at"
+#: includes/Shortcodes/Availability.php:98
+msgid "Please enter a valid seat slug or ID"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:245
-msgid "Select date and time"
+#: includes/Shortcodes/Availability.php:106
+msgid "No timeslots available for this seat."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:261
-msgid "Available time slots:"
+#: includes/Shortcodes/Availability.php:111
+msgid "Available Time Slots"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:265, includes/Shortcodes/Bookings.php:275, includes/Shortcodes/Bookings.php:492
-msgid "Please select a date."
+#: includes/Shortcodes/Availability.php:135
+msgid "Please specify a room ID in your Shortcode."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:279
-msgid "Your data"
+#: includes/Shortcodes/Bookings.php:93
+msgid "SSO error"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:309
-msgid "Phone Number"
+#: includes/Shortcodes/Bookings.php:94
+msgid ""
+"Error retrieving your data from SSO. Please try again or contact the room's "
+"administrator."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:312
-msgid "In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number."
+#: includes/Shortcodes/Bookings.php:116
+msgid "Seat already booked"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:315
-msgid "Submit booking"
-msgstr ""
-
-#: includes/Shortcodes/Bookings.php:107
+#: includes/Shortcodes/Bookings.php:145
 msgid "Multiple Booking"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:167
-msgid "Error saving the booking"
-msgstr ""
-
-#: includes/Shortcodes/Bookings.php:155
+#: includes/Shortcodes/Bookings.php:202
 msgctxt "Mail Subject for room admin: new booking received"
 msgid "[RSVP] New booking received"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:171
+#: includes/Shortcodes/Bookings.php:214
+msgid "Error saving the booking"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:218
 msgid "Your reservation has been submitted. Thank you for booking!"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:175
-msgid "Your reservation request:"
-msgstr ""
-
-#: includes/Shortcodes/Bookings.php:173
+#: includes/Shortcodes/Bookings.php:220
 msgid "Your reservation:"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:183
+#: includes/Shortcodes/Bookings.php:222
+msgid "Your reservation request:"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:230
+#, php-format
 msgid "This data was also sent to your email %s ."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:188
-msgid "%sPlease note that this is only a reservation request.%s It only becomes binding as soon as we confirm your booking by email."
+#: includes/Shortcodes/Bookings.php:233
+#, php-format
+msgid ""
+"%sThis place has been reserved for you.%s You can cancel it at any time if "
+"you cannot keep the appointment. You can find information on this in your "
+"confirmation email."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:186
-msgid "%sThis place has been reserved for you.%s You can cancel it at any time if you cannot keep the appointment. You can find information on this in your confirmation email."
+#: includes/Shortcodes/Bookings.php:235
+#, php-format
+msgid ""
+"%sPlease note that this is only a reservation request.%s It only becomes "
+"binding as soon as we confirm your booking by email."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:414
-msgid "Not bookable (soldout or room blocked)"
+#: includes/Shortcodes/Bookings.php:267
+msgid "Room specified in shortcode does not exist."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:410
+#: includes/Shortcodes/Bookings.php:288
+msgid "Book a seat at"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:291
+msgid "Select date and time"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:307
+msgid "Available time slots:"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:311 includes/Shortcodes/Bookings.php:321
+#: includes/Shortcodes/Bookings.php:552
+msgid "Please select a date."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:325
+msgid "Your data"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:353
+msgid "Phone Number"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:356
+msgid ""
+"In order to track contacts during the measures against the corona pandemic, "
+"it is necessary to record the telephone number."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:370
+msgid "Submit booking"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:465
 msgid "Not bookable (outside booking period)"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:467
+#: includes/Shortcodes/Bookings.php:469
+msgid "Not bookable (soldout or room blocked)"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:527
 msgid "More"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:495, includes/Shortcodes/Bookings.php:569
+#: includes/Shortcodes/Bookings.php:555 includes/Shortcodes/Bookings.php:629
 msgid "Please select a date and a time slot."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:520
+#: includes/Shortcodes/Bookings.php:580
+#, php-format
 msgid "Seat %s"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:543
+#: includes/Shortcodes/Bookings.php:603
 msgid "No time slots available."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:571
+#: includes/Shortcodes/Bookings.php:631
 msgid "Available seats:"
-msgstr ""
-
-#: includes/templates/booking-reply-admin.php:35, includes/templates/booking-reply-admin.php:25
-msgid "confirmed"
-msgstr ""
-
-#: includes/templates/booking-reply-admin.php:35, includes/templates/booking-reply-admin.php:29
-msgid "cancelled"
-msgstr ""
-
-#: includes/templates/booking-reply-admin.php:51
-msgid "The booking has been %s."
-msgstr ""
-
-#: includes/templates/booking-reply-admin.php:54
-msgid "Your customer has received an email confirmation."
-msgstr ""
-
-#: includes/templates/booking-reply-admin.php:47
-msgid "The booking has already been %s."
-msgstr ""
-
-#: includes/templates/booking-reply-admin.php:73, includes/templates/booking-reply-customer.php:97
-msgid "Go to"
-msgstr ""
-
-#: includes/templates/booking-reply-customer.php:92
-msgid "No action was taken."
-msgstr ""
-
-#: includes/templates/booking-reply-customer.php:90
-msgid "Check-out has been completed."
-msgstr ""
-
-#: includes/templates/booking-reply-customer.php:88
-msgid "Check-out is not possible at this time."
-msgstr ""
-
-#: includes/templates/booking-reply-customer.php:86
-msgid "Check-in has been completed."
-msgstr ""
-
-#: includes/templates/booking-reply-customer.php:84
-msgid "Check-in is not possible at this time."
-msgstr ""
-
-#: includes/templates/booking-reply-customer.php:82
-msgid "Thank you for confirming your booking."
-msgstr ""
-
-#: includes/templates/booking-reply-customer.php:80
-msgid "Your booking has been cancelled. Please contact us to find a different arrangement."
-msgstr ""
-
-#: includes/templates/booking-reply-customer.php:64
-msgid "Do you really want to cancel your booking?"
 msgstr ""
 
 #: includes/templates/single-room.php:53
 msgid "Schedule"
 msgstr ""
 
-#: includes/templates/single-room.php:84
+#: includes/templates/single-room.php:71
+msgid "Weekday"
+msgstr ""
+
+#: includes/templates/single-room.php:72
+msgid "Time slots"
+msgstr ""
+
+#: includes/templates/single-room.php:89
 msgid "Availability"
 msgstr ""
 
-#: includes/templates/single-room.php:90
+#: includes/templates/single-room.php:95
 msgid "Floor Plan"
 msgstr ""
 
 #: includes/templates/single-seat.php:85
-msgid "This seat is currently reserved. If you have reserved this seat, <strong>please check in</strong>."
+msgid ""
+"This seat is currently reserved. If you have reserved this seat, <strong>"
+"please check in</strong>."
 msgstr ""
 
 #: includes/templates/single-seat.php:86
@@ -1102,7 +1360,9 @@ msgid "Check in"
 msgstr ""
 
 #: includes/templates/single-seat.php:89
-msgid "Seat checked in. Please remember to <strong>check out before leaving!</strong>"
+msgid ""
+"Seat checked in. Please remember to <strong>check out before leaving!"
+"</strong>"
 msgstr ""
 
 #: includes/templates/single-seat.php:90
@@ -1110,7 +1370,10 @@ msgid "Check out"
 msgstr ""
 
 #: includes/templates/single-seat.php:118
-msgid "This seat is %sfree for instant check-in%s (booking and check-in in one step) for the current timeslot."
+#, php-format
+msgid ""
+"This seat is %sfree for instant check-in%s (booking and check-in in one step)"
+" for the current timeslot."
 msgstr ""
 
 #: includes/templates/single-seat.php:119
@@ -1119,4 +1382,24 @@ msgstr ""
 
 #: includes/templates/single-seat.php:124
 msgid "Book this seat"
+msgstr ""
+
+#. Name of the plugin
+msgid "RRZE-RSVP"
+msgstr ""
+
+#. Description of the plugin
+msgid "Booking system."
+msgstr ""
+
+#. URI of the plugin
+msgid "https://github.com/RRZE-Webteam/rrze-rsvp"
+msgstr ""
+
+#. Author of the plugin
+msgid "RRZE-Webteam"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://blogs.fau.de/webworking/"
 msgstr ""

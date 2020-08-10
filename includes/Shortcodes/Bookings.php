@@ -7,6 +7,7 @@ use RRZE\RSVP\IdM;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Helper;
 
+use function RRZE\RSVP\Config\defaultOptions;
 use function RRZE\RSVP\Config\getShortcodeSettings;
 use function RRZE\RSVP\Config\getShortcodeDefaults;
 use function RRZE\RSVP\getRoomAvailability;
@@ -356,8 +357,13 @@ class Bookings extends Shortcodes {
                 . '</div>';
 
             if ($comment) {
+                $label = get_post_meta($room, 'rrze-rsvp-room-notes-label', true);
+                if ($label == '') {
+                    $defaults = defaultOptions();
+                    $label = $defaults['room-notes-label'];
+                }
                 $output .= '<div class="form-group">'
-                    . '<label for="rsvp_comment">' . get_post_meta($room, 'rrze-rsvp-room-notes-label', true) . '</label>'
+                    . '<label for="rsvp_comment">' . $label . '</label>'
                     . '<textarea name="rsvp_comment" id="rsvp_comment"></textarea>';
             }
 
@@ -479,7 +485,12 @@ class Bookings extends Shortcodes {
             $input_open = '<span class="inactive">';
             $input_close = '</span>';
             if ($active) {
-                $selected = $bookingdate_selected == $date ? 'checked="checked"' : '';
+                if ($bookingdate_selected == $date || ($bookingdate_selected == false && $date == $startDate)) {
+                    $selected = 'checked="checked"';
+                } else {
+                    $selected = '';
+                }
+                //$selected = $bookingdate_selected == $date ? 'checked="checked"' : '';
                 $input_open = "<input type=\"radio\" id=\"rsvp_date_$date\" value=\"$date\" name=\"rsvp_date\" $selected required aria-required='true'><label for=\"rsvp_date_$date\">";
                 $input_close = '</label>';
             }

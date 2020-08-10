@@ -4,9 +4,6 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use DateTime;
-use Carbon\Carbon;
-
 class Functions
 {
     public static function actionUrl($atts = [])
@@ -48,37 +45,6 @@ class Functions
         return $default;
     }
 
-    public static function isInactiveWorkday($option, $string1, $string2 = '')
-    {
-        echo ($option['start'] == '00:00' && $option['end'] == '00:00') ? $string1 : $string2;
-    }
-
-    public static function validateDate(string $date, string $format = 'Y-m-d\TH:i:s\Z')
-    {
-        $dateTime = DateTime::createFromFormat($format, $date);
-        if ($dateTime && $dateTime->format($format) === $date) {
-            return $date;
-        } else {
-            return false;
-        }
-    }
-
-    public static function validateTime(string $time): string
-    {
-        $time = trim($time);
-        if (preg_match("/^(2[0-3]|[01][0-9]):([0-5][0-9])$/", $time)) {
-            return $time;
-        } else if (preg_match("/^(2[0-3]|[01][0-9])$/", $time)) {
-            return $time . ':00';
-        } else if (preg_match("/^([0-9]):([0-5][0-9])$/", $time)) {
-            return '0' . $time;
-        } else if (preg_match("/^([0-9])$/", $time)) {
-            return '0' . $time . ':00';
-        } else {
-            return '00:00';
-        }
-    }
-
     public static function dateFormat(int $timestamp): string
     {
         return date_i18n(get_option('date_format'), $timestamp);
@@ -87,6 +53,37 @@ class Functions
     public static function timeFormat(int $timestamp): string
     {
         return date_i18n(get_option('time_format'), $timestamp);
+    }
+
+    public static function isLocaleEnglish()
+    {
+        $locale = get_locale();
+        return (strpos($locale, 'en_') === 0);
+    }
+
+    public static function hasShortcodeSSO(string $shortcode): bool
+    {
+        global $post;
+        if (is_a($post, '\WP_Post') && has_shortcode($post->post_content, $shortcode)) {
+            $result = [];
+            $pattern = get_shortcode_regex();
+            if (preg_match_all('/' . $pattern . '/s', $post->post_content, $matches)) {
+                $keys = [];
+                $result = [];
+                foreach ($matches[0] as $key => $value) {
+                    $get = str_replace(" ", "&", $matches[3][$key]);
+                    parse_str($get, $output);
+                    $keys = array_unique(array_merge($keys, array_keys($output)));
+                    $result[][$matches[2][$key]] = $output;
+                }
+            }
+            foreach ($result as $key => $value) {
+                if (isset($value[$shortcode]) && !empty($value[$shortcode]['sso'])) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static function getBooking(int $bookingId): array
@@ -100,9 +97,9 @@ class Functions
 
         $data['id'] = $post->ID;
         $data['status'] = get_post_meta($post->ID, 'rrze-rsvp-booking-status', true);
-        $data['start'] = get_post_meta($post->ID, 'rrze-rsvp-booking-start', true);
-        $start = new Carbon(date('Y-m-d H:i:s', $data['start']));
-        $end = get_post_meta($post->ID, 'rrze-rsvp-booking-end', true);
+        $data['start'] = absint(get_post_meta($post->ID, 'rrze-rsvp-booking-start', true));
+        $start = new Carbon(date('Y-m-d H:i:s', $data['start']), wp_timezone());
+        $end = absint(get_post_meta($post->ID, 'rrze-rsvp-booking-end', true));
         $data['end'] = $end ? $end : $start->endOfDay()->getTimestamp();
         $data['date'] = Functions::dateFormat($data['start']);
         $data['time'] = Functions::timeFormat($data['start']) . ' - ' . Functions::timeFormat($data['end']);
@@ -112,7 +109,7 @@ class Functions
         $data['booking_date'] = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
 
         $data['seat'] = get_post_meta($post->ID, 'rrze-rsvp-booking-seat', true);
-        $data['seat_name'] = ! empty($data['seat']) ? get_the_title($data['seat']) : '';
+        $data['seat_name'] = !empty($data['seat']) ? get_the_title($data['seat']) : '';
 
         $data['room'] = get_post_meta($data['seat'], 'rrze-rsvp-seat-room', true);
         $data['room_name'] = get_the_title($data['room']);
@@ -125,18 +122,6 @@ class Functions
         $data['guest_phone'] = get_post_meta($post->ID, 'rrze-rsvp-booking-guest-phone', true);
 
         return $data;
-    }
-
-    public static function dataToStr(array $data, string $delimiter = '<br>'): string
-    {
-        $output = '';
-
-        foreach ($data as $key => $value) {
-            $value = sanitize_text_field($value) ? sanitize_text_field($value) : '-';
-            $output .= $value . $delimiter;
-        }
-
-        return $output;
     }
 
     public static function bookingReplyUrl(string $action, string $password, int $id): string
@@ -170,7 +155,8 @@ class Functions
         return self::crypt($string, 'decrypt');
     }
 
-    public static function getRoomAvailability ($room_id, $start, $end) {
+    public static function getRoomAvailability($room_id, $start, $end)
+    {
         $availability = [];
         // Array aus verfügbaren Timeslots des Raumes erstellen
         $timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
@@ -203,7 +189,7 @@ class Functions
                     ],
                     [
                         'key'     => 'rrze-rsvp-booking-start',
-                        'value' => array( strtotime($start), strtotime($end) ),
+                        'value' => array(strtotime($start), strtotime($end)),
                         'compare' => 'BETWEEN',
                         'type' => 'numeric'
                     ],
@@ -223,9 +209,9 @@ class Functions
         while ($loopstart <= $loopend) {
             $weekday = date('w', $loopstart);
             if (isset($slots[$weekday])) {
-                foreach ( $slots[ $weekday ] as $time => $endtime) {
-                    $hours = explode( ':', $time )[ 0 ];
-                    $room_availability[ strtotime( '+' . $hours . ' hours', $loopstart ) ] = $seat_ids;
+                foreach ($slots[$weekday] as $time => $endtime) {
+                    $hours = explode(':', $time)[0];
+                    $room_availability[strtotime('+' . $hours . ' hours', $loopstart)] = $seat_ids;
                 }
             }
             $loopstart = strtotime("+1 day", $loopstart);
@@ -233,14 +219,14 @@ class Functions
 
         // Bereits gebuchte Plätze aus Array $room_availability entfernen
         foreach ($seats_booked as $timestamp => $v) {
-            foreach ( $v as $k => $seat_booked ) {
-                if (isset($room_availability[ $timestamp ])) {
-                    $key = array_search( $seat_booked, $room_availability[ $timestamp ] );
-                    if ( $key !== false ) {
-                        unset( $room_availability[ $timestamp ][ $key ] );
+            foreach ($v as $k => $seat_booked) {
+                if (isset($room_availability[$timestamp])) {
+                    $key = array_search($seat_booked, $room_availability[$timestamp]);
+                    if ($key !== false) {
+                        unset($room_availability[$timestamp][$key]);
                     }
-                    if ( empty($room_availability[ $timestamp ]) ) {
-                        unset( $room_availability[ $timestamp ] );
+                    if (empty($room_availability[$timestamp])) {
+                        unset($room_availability[$timestamp]);
                     }
                 }
             }
@@ -252,7 +238,7 @@ class Functions
             $start = date('H:i', $timestamp);
             $end = $slots[$weekday][$start];
 
-            $availability[date('Y-m-d', $timestamp)][$start.'-'.$end] = $v;
+            $availability[date('Y-m-d', $timestamp)][$start . '-' . $end] = $v;
         }
 
         return $availability;
@@ -267,7 +253,8 @@ class Functions
      * @param string $end end date of the period (format 'Y-m-d')
      * @return array
      */
-    public static function getSeatAvailability($seat, $start, $end) {
+    public static function getSeatAvailability($seat, $start, $end)
+    {
         $availability = [];
         $seat_availability = [];
         $timeslots_booked = [];
@@ -292,7 +279,7 @@ class Functions
                 ],
                 [
                     'key'     => 'rrze-rsvp-booking-start',
-                    'value' => array( strtotime($start), strtotime($end) ),
+                    'value' => array(strtotime($start), strtotime($end)),
                     'compare' => 'BETWEEN',
                     'type' => 'numeric'
                 ],
@@ -311,11 +298,11 @@ class Functions
         while ($loopstart <= $loopend) {
             $weekday = date('w', $loopstart);
             if (isset($slots[$weekday])) {
-                foreach ( $slots[ $weekday ] as $starttime  => $endtime) {
-                    $hours_start = explode( ':', $starttime )[ 0 ];
-                    $hours_end = explode( ':', $endtime )[ 0 ];
-                    $timestamp = strtotime( '+' . $hours_start . ' hours', $loopstart );
-                    $timestamp_end = strtotime( '+' . $hours_end . ' hours', $loopstart );
+                foreach ($slots[$weekday] as $starttime  => $endtime) {
+                    $hours_start = explode(':', $starttime)[0];
+                    $hours_end = explode(':', $endtime)[0];
+                    $timestamp = strtotime('+' . $hours_start . ' hours', $loopstart);
+                    $timestamp_end = strtotime('+' . $hours_end . ' hours', $loopstart);
                     if (!in_array($timestamp, $timeslots_booked)) {
                         $seat_availability[$timestamp] = $timestamp_end;
                     }
@@ -365,37 +352,6 @@ class Functions
             }
         }
         return $output;
-    }
-
-    public static function hasShortcodeSSO(string $shortcode): bool
-    {
-        global $post;
-        if (is_a($post, '\WP_Post') && has_shortcode($post->post_content, $shortcode)) {
-            $result = [];
-            $pattern = get_shortcode_regex();
-            if (preg_match_all('/' . $pattern . '/s', $post->post_content, $matches)) {
-                $keys = [];
-                $result = [];
-                foreach ($matches[0] as $key => $value) {
-                    $get = str_replace(" ", "&", $matches[3][$key]);
-                    parse_str($get, $output);
-                    $keys = array_unique(array_merge($keys, array_keys($output)));
-                    $result[][$matches[2][$key]] = $output;
-                }
-            }
-            foreach ($result as $key => $value) {
-                if (isset($value[$shortcode]) && !empty($value[$shortcode]['sso'])) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static function isLocaleEnglish()
-    {
-        $locale = get_locale();
-        return (strpos($locale, 'en_') === 0);
     }
 
     public static function getRoomSchedule($room_id)

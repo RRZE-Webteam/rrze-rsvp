@@ -10,7 +10,7 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Capabilities;
 use RRZE\RSVP\Functions;
-use Carbon\Carbon;
+use RRZE\RSVP\Carbon;
 
 class Bookings
 {
@@ -306,7 +306,7 @@ class Bookings
             $_wpnonce = wp_create_nonce('status');
 
             if ($archive) {
-                $start = new Carbon(date('Y-m-d H:i:s', $booking['start']));
+                $start = new Carbon(date('Y-m-d H:i:s', $booking['start']), wp_timezone());
                 if ($booking['status'] == 'cancelled' && $start->endOfDay()->gt(new Carbon('now'))) {
                     $cancelledButton = '<button class="button rrzs-rsvp-cancel" disabled>' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</button>';
                     $restoreButton = sprintf(

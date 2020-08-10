@@ -73,6 +73,7 @@ function getConstants() {
             'room_address' => 'off',
             // 'room_floorplan' => 'off',
             'seat_equipment' => 'off',
+            'room-notes-label' => __('Additional informations', 'rrze-rsvp'),
         ];
     }
     
@@ -287,16 +288,16 @@ function getFields(){
             ],
 	     [
                 'name'              => 'received_subject',
-                'label'             => __('Subject', 'rrze-rsvp'),
-                'desc'              => __('Subject for mails', 'rrze-rsvp'),
+                'label'             => __('Subject of the received booking', 'rrze-rsvp'),
+                'desc'              => __('Subject of the email replying to a booking received.', 'rrze-rsvp'),
                 'type'              => 'text',
                 'default'           =>  $defaults['received_subject'],
                 'sanitize_callback' => 'sanitize_text_field'
             ],
             [
                 'name'              => 'received_subject_en',
-                'label'             => __('Subject (english)', 'rrze-rsvp'),
-                'desc'              => __('Subject for mails', 'rrze-rsvp'),
+                'label'             => __('Subject of the received booking (english)', 'rrze-rsvp'),
+                'desc'              => __('Subject of the email replying to a booking received.', 'rrze-rsvp'),
                 'type'              => 'text',
                 'default'           =>  $defaults['received_subject_en'],
                 'sanitize_callback' => 'sanitize_text_field',
@@ -304,13 +305,13 @@ function getFields(){
             ],            
 	     [
                 'name'              => 'received_text',
-                'label'             => __('Text', 'rrze-rsvp'),
+                'label'             => __('Text of the received booking', 'rrze-rsvp'),
                 'type'              => 'textarea',
                 'default'           => $defaults['received_text']
             ],
             [
                 'name'              => 'received_text_en',
-                'label'             => __('Text (english)', 'rrze-rsvp'),
+                'label'             => __('Text of the received booking (english)', 'rrze-rsvp'),
                 'type'              => 'textarea',
                 'default'           => $defaults['received_text_en'],
                 'exception'         => ['locale' => 'en']
@@ -325,7 +326,7 @@ function getFields(){
             ],  
             [
                 'name'              => 'force_to_confirm_subject_en',
-                'label'             => __('Subject for confirmation required. (english)', 'rrze-rsvp'),
+                'label'             => __('Subject for confirmation required (english)', 'rrze-rsvp'),
                 'desc'              => __('Subject of the email where confirmation of the booking by the customer is required.', 'rrze-rsvp'),
                 'type'              => 'text',
                 'default'           => $defaults['force_to_confirm_subject_en'],
@@ -334,13 +335,13 @@ function getFields(){
             ], 
             [
                 'name'              => 'force_to_confirm_text',
-                'label'             => __('Text for confirmation required.', 'rrze-rsvp'),
+                'label'             => __('Text for confirmation required', 'rrze-rsvp'),
                 'type'              => 'textarea',
                 'default'           => $defaults['force_to_confirm_text']
             ],   
             [
                 'name'              => 'force_to_confirm_text_en',
-                'label'             => __('Text for confirmation required. (english)', 'rrze-rsvp'),
+                'label'             => __('Text for confirmation required (english)', 'rrze-rsvp'),
                 'type'              => 'textarea',
                 'default'           => $defaults['force_to_confirm_text_en'],
                 'exception'         => ['locale' => 'en']
