@@ -23,25 +23,60 @@ class Printing {
 		add_filter('bulk_actions-edit-seat', [$this, 'addBulkActions']);
 		add_filter('handle_bulk_actions-edit-room', [$this, 'bulkGeneratePDF'], 10, 3);
 		add_filter('handle_bulk_actions-edit-seat', [$this, 'bulkGeneratePDF'], 10, 3);
+        add_filter('post_row_actions', [$this, 'addRowActions'], 10, 2 );
+
         add_action('admin_notices', [$this, 'bulkAdminNotice']);
 		add_action('admin_init', [$this, 'handlePDFAction']);
     }
 
+
+    public function addRowActions( $actions, $post ) {
+        if ($post->post_type == 'seat' || $post->post_type == 'room'){
+            $actions['generate-pdf'] = '<a href="?'. $post->post_type . '='. $post->ID . '&generate_pdf" title="" rel="permalink">' . __( 'Generate PDF', 'rrze-rsvp') . '</a>';
+        }
+        return $actions;
+    }    
+
     public function handlePDFAction(){
-        if( isset($_POST['generate_pdf'])){
-            $seat_ids = get_option('rsvp_pdf_ids');
-            if (!$seat_ids){
-                echo __('No seats foound', 'rrze-rsvp');
+        $aSeats = [];
+
+        if (isset($_GET['generate_pdf'])){
+            // Click on row action link on wp-admin/edit.php?post_type=seat or wp-admin/edit.php?post_type=room
+            if (isset($_GET['seat'])){
+                $aSeats = [filter_input(INPUT_GET, 'seat', FILTER_VALIDATE_INT)];
+            }elseif (isset($_GET['room'])){
+                $room_id = filter_input(INPUT_GET, 'room', FILTER_VALIDATE_INT);
+                // get seats for this room
+                $seat_ids = get_posts([
+                    'meta_key'   => 'rrze-rsvp-seat-room',
+                    'meta_value' => $room_id,
+                    'post_type' => 'seat',
+                    'fields' => 'ids',
+                    'orderby' => 'post_title',
+                    'order' => 'ASC',
+                    'numberposts' => -1
+                ]);
+                $aSeats = array_merge($aSeats, $seat_ids);
+            }else{
+                echo __('No seats found', 'rrze-rsvp');
                 exit;
             }
-
+        }elseif (isset($_POST['generate_pdf'])){
+            // Click on button "Generate PDF for x seats" which is generated after click on bulk actions on wp-admin/edit.php?post_type=seat or wp-admin/edit.php?post_type=room
+            $seat_ids = get_option('rsvp_pdf_ids');
+            if (!$seat_ids){
+                echo __('No seats found', 'rrze-rsvp');
+                exit;
+            }
             $aSeats = json_decode($seat_ids);
-    
+        }
+
+        if ($aSeats){
             // set document information
             $pdf = new PDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
             // $pdf->SetCreator(PDF_CREATOR);
             $pdf->SetAuthor('RRZE-Webteam');
-            // $pdf->SetTitle('');
+            $pdf->SetTitle('RRZE-RSVP');
             // $pdf->SetSubject('');
             // $pdf->SetKeywords('PDF, Booking');
     
@@ -49,10 +84,6 @@ class Printing {
             $instructions_de = $this->options->pdf_instructions_de;
             $instructions_en = $this->options->pdf_instructions_en;
             
-            // room data:
-            $room_post_id = get_post_meta($aSeats[0], 'rrze-rsvp-seat-room', true);
-            $room = get_post($room_post_id);
-    
             // set default monospaced font
             $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
     
@@ -87,6 +118,10 @@ class Printing {
                 $x = $pdf->GetX();
                 $pdf->SetXY($x, $y);
                 $pdf->Line(PDF_MARGIN_LEFT, $pdf->GetY() - 5, $pdf->getPageWidth() - PDF_MARGIN_RIGHT, $pdf->GetY() - 5);
+
+                // room data:
+                $room_post_id = get_post_meta($seat_post_id, 'rrze-rsvp-seat-room', true);
+                $room = get_post($room_post_id);
 
                 // Room title
                 $pdf->MultiCell($w, 5, __('Room', 'rrze-rsvp') . ':', 0, 'L', 0);
@@ -172,15 +207,8 @@ class Printing {
                 }
             }
     
-            // File name
-            if (isset($room->post_title)){
-                $pdf_file_name = sanitize_file_name($room->post_title);
-            }else{
-                $pdf_file_name = 'booking';
-            }
-    
-            $pdf->Output($pdf_file_name . '.pdf', 'I');
-    
+            $pdf_file_name = 'rrze-rsvp-' . date('Y-m-d-His') . '.pdf';
+            $pdf->Output($pdf_file_name, 'I');
         }
     }
     
