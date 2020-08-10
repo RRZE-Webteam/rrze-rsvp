@@ -88,8 +88,8 @@ class Bookings extends Shortcodes {
                 if ($this->idm->isAuthenticated()){
                     $sso_data = $this->idm->getCustomerData();
                     $booking_lastname  = $sso_data['customer_lastname'];
-                    $booking_firstname  = $sso_data['customer_lastname'];
-                    $booking_email  = $sso_data['customer_lastname'];
+                    $booking_firstname  = $sso_data['customer_firstname'];
+                    $booking_email  = $sso_data['customer_email'];
                 } else {
                     return '<h2>' . __('SSO error', 'rrze-rsvp') . '</h2>'
                         . '<div class="alert alert-danger" role="alert">' . __("Error retrieving your data from SSO. Please try again or contact the room's administrator.", 'rrze-rsvp') . '</div>';
@@ -359,11 +359,10 @@ class Bookings extends Shortcodes {
                 . '<p class="description">'
                 . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
                 . '</div>';
-
+            $defaults = defaultOptions();
             if ($comment) {
                 $label = get_post_meta($room, 'rrze-rsvp-room-notes-label', true);
                 if ($label == '') {
-                    $defaults = defaultOptions();
                     $label = $defaults['room-notes-label'];
                 }
                 $output .= '<div class="form-group">'
