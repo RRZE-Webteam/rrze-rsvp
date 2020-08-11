@@ -271,7 +271,7 @@ class Actions
 			$data['time_en'] = $booking['time_en'];
 
 			$cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
-			$data['cancel_booking'] = sprintf(__('Please <a href="%s"  class="button button-cancel">%s</a>', 'rzze-rsvp'), $cancelUrl, __('Cancel Your Booking', 'rrze-rsvp'));
+			$data['cancel_booking'] = sprintf(__('<a href="%s" class="button button-cancel">Cancel Your Booking</a>.', 'rrze-rsvp'), $cancelUrl);
 			$data['cancel_booking_en'] = sprintf('<a href="%s" class="button button-cancel">Cancel Your Booking</a>.', $cancelUrl);
 		} elseif ($bookingCancelled && $action == 'cancel') {
 			$data['booking_has_been_cancelled'] = __('Your booking has been cancelled. Please contact us to find a different arrangement.', 'rrze-rsvp');
