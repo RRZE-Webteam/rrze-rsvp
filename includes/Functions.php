@@ -158,6 +158,7 @@ class Functions
     public static function getRoomAvailability($room_id, $start, $end)
     {
         $availability = [];
+        $room_availability = [];
         // Array aus verfügbaren Timeslots des Raumes erstellen
         $timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
         $slots = self::getRoomSchedule($room_id);
@@ -210,8 +211,8 @@ class Functions
             $weekday = date('w', $loopstart);
             if (isset($slots[$weekday])) {
                 foreach ($slots[$weekday] as $time => $endtime) {
-                    $hours = explode(':', $time)[0];
-                    $room_availability[strtotime('+' . $hours . ' hours', $loopstart)] = $seat_ids;
+                    $time_parts = explode(':', $time);
+                    $room_availability[strtotime('+' . $time_parts[0] . ' hours, + ' . $time_parts[1] . ' minutes', $loopstart)] = $seat_ids;
                 }
             }
             $loopstart = strtotime("+1 day", $loopstart);
@@ -299,10 +300,10 @@ class Functions
             $weekday = date('w', $loopstart);
             if (isset($slots[$weekday])) {
                 foreach ($slots[$weekday] as $starttime  => $endtime) {
-                    $hours_start = explode(':', $starttime)[0];
-                    $hours_end = explode(':', $endtime)[0];
-                    $timestamp = strtotime('+' . $hours_start . ' hours', $loopstart);
-                    $timestamp_end = strtotime('+' . $hours_end . ' hours', $loopstart);
+                    $start_parts = explode(':', $starttime);
+                    $end_parts = explode(':', $endtime);
+                    $timestamp = strtotime('+' . $start_parts[0] . ' hours, + ' . $start_parts[1] . ' minutes', $loopstart);
+                    $timestamp_end = strtotime('+' . $end_parts[0] . ' hours, + ' . $end_parts[1] . ' minutes', $loopstart);
                     if (!in_array($timestamp, $timeslots_booked)) {
                         $seat_availability[$timestamp] = $timestamp_end;
                     }
