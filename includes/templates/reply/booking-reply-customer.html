@@ -1,6 +1,14 @@
 <div class="rrze-rsvp-booking-reply">
 
 	<div class="container">
+		{{header_image}}
+		<img alt="" src="{{=header_image}}" width="{{=image_width}}" height="{{=image_height}}"><br>
+		{{=site_name}}
+		{{:header_image}}
+		<h1>{{=site_name}}</h1>
+		{{/header_image}}
+		<p class='lang-hr'>&nbsp;</p>
+
 		{{is_locale_not_english}}
 		<p class="english-version">(English version below)</p>
 		{{/is_locale_not_english}}

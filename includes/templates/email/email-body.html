@@ -42,9 +42,9 @@
 			color: #bbb;			
 		}  
         .lang-hr {
-            margin: 3em 0 0 0;
+            margin: 1em 0 0 0;
             border-top: 1px solid #dddddd;
-            padding-top: 3em;            
+            padding-top: 0.5em;            
         }          
     </style>
 </head>
@@ -57,6 +57,13 @@
                     style="border-collapse: collapse;" bgcolor="#ffffff">
                     <tr>
                         <td>
+                            {{header_image}}
+                            <img alt="" src="{{=header_image}}" width="{{=image_width}}" height="{{=image_height}}"><br>
+                            {{=site_name}}
+                            {{:header_image}}
+                            <h1>{{=site_name}}</h1>
+                            {{/header_image}}
+                            <p class='lang-hr'>&nbsp;</p>
                             {{=message}}
                         </td>
                     </tr>
