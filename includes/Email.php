@@ -109,7 +109,6 @@ class Email
 
         $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
         $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
-        $customerPhone = sprintf('%s: %s', __('Phone', 'rrze-rsvp'), $booking['guest_phone']);
         $confirmUrl = Functions::bookingReplyUrl('confirm', sprintf('%s-%s', $bookingId, $booking['start']), $bookingId);
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s%-s', $bookingId, $booking['start']), $bookingId);
 
@@ -121,7 +120,6 @@ class Email
         $data['seat_name'] = $booking['seat_name'];
         $data['customer']['name'] = $customerName;
         $data['customer']['email'] = $customerEmail;
-        $data['customer']['phone'] = $customerPhone;
         $data['confirm_url'] = $confirmUrl;
         $data['confirm_link_text'] = __('Confirm Booking', 'rrze-rsvp');
         $data['cancel_url'] = $cancelUrl;
@@ -150,7 +148,6 @@ class Email
 
         $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
         $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
-        $customerPhone = sprintf('%s: %s', __('Phone', 'rrze-rsvp'), $booking['guest_phone']);
 
         $text = sprintf(__('A booking on %s has been cancelled by the customer.', 'rrze-rsvp'), get_bloginfo('name'));
 
@@ -162,7 +159,6 @@ class Email
         $data['seat_name'] = $booking['seat_name'];
         $data['customer']['name'] = $customerName;
         $data['customer']['email'] = $customerEmail;
-        $data['customer']['phone'] = $customerPhone;
 
         $message = $this->template->getContent('email/booking-cancelled-admin', $data);
 
@@ -345,8 +341,7 @@ class Email
             'room_name' => $booking['room_name'],
             'seat_name' => $booking['seat_name'],
             'guest_name' => $booking['guest_firstname'] . ' ' . $booking['guest_lastname'],
-            'guest_email' => $booking['guest_email'],
-            'guest_phone' => $booking['guest_phone']
+            'guest_email' => $booking['guest_email']
         ];
 
         foreach ($data as $key => $field) {
