@@ -51,6 +51,9 @@
     .rsvp-time-container {
     }
     .rsvp-qr-container {
+        @media not print {
+            display: none;
+        }
         float: right;
     }
     .rsvp-datebox {
