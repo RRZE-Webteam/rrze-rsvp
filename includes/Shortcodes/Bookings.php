@@ -148,9 +148,12 @@ class Bookings extends Shortcodes {
             }
 
             $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
-            $room_autoconfirmation = get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true);
-            $roomForceToConfirm = get_post_meta($room_id, 'rrze-rsvp-room-force-to-confirm', true);
-            $room_timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
+            $room_meta = get_post_meta($room_id);
+            $room_autoconfirmation = isset($room_meta['rrze-rsvp-room-auto-confirmation']) ? $room_meta['rrze-rsvp-room-auto-confirmation'][0] : '';
+            $roomForceToConfirm = isset($room_meta['rrze-rsvp-room-force-to-confirm']) ? $room_meta['rrze-rsvp-room-force-to-confirm'][0] : '';
+            $roomForceToCheckin = isset($room_meta['rrze-rsvp-room-force-to-checkin']) ? $room_meta['rrze-rsvp-room-force-to-checkin'][0] : '';
+            $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : '';
+
             foreach ($room_timeslots as $week) {
                 foreach ($week['rrze-rsvp-room-weekday'] as $day) {
                     $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
@@ -186,13 +189,11 @@ class Bookings extends Shortcodes {
                 update_post_meta( $booking_id, 'rrze-rsvp-booking-status', $status );
                 update_post_meta($booking_id, 'rrze-rsvp-booking-notes', $booking_comment);
                 update_post_meta($booking_id, 'rrze-rsvp-booking-dsgvo', $booking_dsgvo);
-
-
-
-                // E-Mail senden
                 if ($roomForceToConfirm == 'on') {
                     update_post_meta($booking_id, 'rrze-rsvp-customer-status', 'booked');
                 }
+
+                // E-Mail senden
                 if ($room_autoconfirmation == 'on') {
                     if ($roomForceToConfirm == 'on') {
                         $this->email->bookingRequestedCustomer($booking_id);
@@ -204,7 +205,7 @@ class Bookings extends Shortcodes {
                         $to = $this->options->email_notification_email;
                         $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
                         $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
-                    }                    
+                    }
                 }
 
                 // Redirect zur Seat-Seite, falls
@@ -217,8 +218,13 @@ class Bookings extends Shortcodes {
                 return '<div class="alert alert-danger" role="alert">' . __('Error saving the booking', 'rrze-rsvp') . '</div>';
             }
 
+            if ($roomForceToConfirm == 'on') {
+                $output .= '<h2>' . __('Your reservation has been submitted. Please confirm your booking!', 'rrze-rsvp') . '</h2>';
+                $output .= '<div class="alert alert-danger" role="alert">'. sprintf(__('An email with the confirmation link and your booking information has been sent to your email address. %sPlease note that unconfirmed bookings automatically expire after one hour.%s', 'rrze-rsvp'),'<br /><strong>', '</strong>') . '</div>';
+            } else {
+                $output .= '<h2>' . __('Your reservation has been submitted. Thank you for booking!', 'rrze-rsvp') . '</h2>';
+            }
 
-            $output .= '<h2>' . __('Your reservation has been submitted. Thank you for booking!', 'rrze-rsvp') . '</h2>';
             if ($room_autoconfirmation == 'on') {
                 $output .= '<p>' . __('Your reservation:', 'rrze-rsvp') . '</p>';
             } else {
@@ -230,14 +236,23 @@ class Bookings extends Shortcodes {
                 . '<li>'. __('Room', 'rrze-rsvp') . ': <strong>' . get_the_title($room_id) . '</strong></li>'
                 . '<li>'. __('Seat', 'rrze-rsvp') . ': <strong>' . get_the_title($booking_seat) . '</strong></li>'
                 . '</ul>'
-                . '<p>' . sprintf(__('This data was also sent to your email %s .', 'rrze-rsvp'), '<strong>' . $booking_email . '</strong>') . '</p>'
-                . '<div class="alert alert-danger" role="alert">';
-            if ($room_autoconfirmation == 'on') {
-                $output .= sprintf(__('%sThis place has been reserved for you.%s You can cancel it at any time if you cannot keep the appointment. You can find information on this in your confirmation email.', 'rrze-rsvp'),'<strong>', '</strong><br />');
-            } else {
-                $output .= sprintf(__('%sPlease note that this is only a reservation request.%s It only becomes binding as soon as we confirm your booking by email.', 'rrze-rsvp'),'<strong>', '</strong><br />');
+                . '<p>' . sprintf(__('These data were also sent to your email address %s .', 'rrze-rsvp'), '<strong>' . $booking_email . '</strong>') . '</p>';
+
+            if ($roomForceToConfirm != 'on') {
+                $output .= '<div class="alert alert-info" role="alert">';
+                if ($room_autoconfirmation == 'on') {
+                    $output .= sprintf(__('%sThis place has been reserved for you.%s You can cancel it at any time if you cannot keep the appointment. You can find information on this in your confirmation email.', 'rrze-rsvp'), '<strong>', '</strong><br />');
+                } else {
+                    $output .= sprintf(__('%sPlease note that this is only a reservation request.%s It only becomes binding as soon as we confirm your booking by email.', 'rrze-rsvp'), '<strong>', '</strong><br />');
+                }
+                $output .= '</div>';
             }
-            $output .= '</div>';
+
+            if ($roomForceToCheckin == 'on') {
+                $output .= '<br /><br /><div class="alert alert-warning" role="alert">'
+                    . sprintf(__('Please remember to %scheck in%s to your seat when you arrive!', 'rrze-rsvp'), '<strong>', '</strong>')
+                    . '</div>';
+            }
 
         } else {
 
