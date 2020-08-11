@@ -219,10 +219,10 @@ class Email
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
         if ($forceToConfirm) {
-            $data['confirm_booking'] = sprintf(__('Please <a href="%s">confirm your booking now</a>.', 'rzze-rsvp'), $confirmUrl);
+            $data['confirm_booking'] = sprintf(__('Please <a href="%s">confirm your booking now</a>.', 'rrze-rsvp'), $confirmUrl);
             $data['confirm_booking_en'] = sprintf('Please <a href="%s">confirm your booking now</a>.', $confirmUrl);    
         }        
-        $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl);
+        $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rrze-rsvp'), $cancelUrl);
         $data['cancel_booking_en'] = sprintf('Please <a href="%s">cancel your booking</a> in time if your plans change.', $cancelUrl);
         $data['site_url'] = site_url();
         $data['site_url_text'] = get_bloginfo('name');
@@ -270,13 +270,13 @@ class Email
         $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
-        $data['ics_download'] = sprintf(__('<a href="%s">Add the booking to your calendar</a>.', 'rzze-rsvp'), $icsUrl);
+        $data['ics_download'] = sprintf(__('<a href="%s">Add the booking to your calendar</a>.', 'rrze-rsvp'), $icsUrl);
         $data['ics_download_en'] = sprintf('<a href="%s">Add the booking to your calendar</a>.', $icsUrl);
-        $data['checkin_booking'] = sprintf(__('Please <a href="%s">check-in your booking</a> on site.', 'rzze-rsvp'), $checkInUrl);
+        $data['checkin_booking'] = sprintf(__('Please <a href="%s">check-in your booking</a> on site.', 'rrze-rsvp'), $checkInUrl);
         $data['checkin_booking_en'] = sprintf('Please <a href="%s">check-in your booking</a> on site.', $checkInUrl);
-        $data['checkout_booking'] = sprintf(__('Please <a href="%s">check out</a> when you leave the site.', 'rzze-rsvp'), $checkOutUrl);
+        $data['checkout_booking'] = sprintf(__('Please <a href="%s">check out</a> when you leave the site.', 'rrze-rsvp'), $checkOutUrl);
         $data['checkout_booking_en'] = sprintf('Please <a href="%s">check out</a> when you leave the site.', $checkOutUrl);        
-        $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rzze-rsvp'), $cancelUrl);
+        $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rrze-rsvp'), $cancelUrl);
         $data['cancel_booking_en'] = sprintf('Please <a href="%s">cancel your booking</a> in time if your plans change.', $cancelUrl);
         $data['site_url'] = site_url();
         $data['site_url_text'] = get_bloginfo('name');
