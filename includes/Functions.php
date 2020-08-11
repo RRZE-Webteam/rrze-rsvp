@@ -359,9 +359,13 @@ class Functions
     {
         $schedule = [];
         $room_timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
-        foreach ($room_timeslots as $week) {
-            foreach ($week['rrze-rsvp-room-weekday'] as $day) {
-                $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+        if (is_array($room_timeslots)) {
+            foreach ($room_timeslots as $week) {
+                foreach ($week['rrze-rsvp-room-weekday'] as $day) {
+                    if (isset($week['rrze-rsvp-room-starttime']) && isset($week['rrze-rsvp-room-endtime'])) {
+                        $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+                    }
+                }
             }
         }
         return $schedule;
