@@ -7,6 +7,7 @@ defined('ABSPATH') || exit;
 use RRZE\RSVP\Main;
 use RRZE\RSVP\Shortcodes\Bookings;
 use RRZE\RSVP\Shortcodes\Availability;
+use RRZE\RSVP\Shortcodes\QR;
 use function RRZE\RSVP\Config\getShortcodeSettings;
 
 /**
@@ -32,6 +33,9 @@ class Shortcodes {
 
         $availability_shortcode = new Availability($this->pluginFile,  $this->settings);
         $availability_shortcode->onLoaded();
+
+        $qr_shortcode = new QR($this->pluginFile,  $this->settings);
+        $qr_shortcode->onLoaded();
     }
     /**
      * Enqueue der Skripte.
