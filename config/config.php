@@ -569,7 +569,23 @@ function getShortcodeSettings(){
             ],
 
         ],
-
+        'rsvp-qr' => [
+            'block' => [
+                'blocktype' => 'rrze-rsvp/rsvp-qr', // dieser Wert muss angepasst werden
+                'blockname' => 'rsvp-qr', // dieser Wert muss angepasst werden
+                'title' => 'RSVP QR', // Der Titel, der in der Blockauswahl im Gutenberg Editor angezeigt wird
+                'category' => 'widgets', // Die Kategorie, in der der Block im Gutenberg Editor angezeigt wird
+                'icon' => 'admin-users',  // Das Icon des Blocks
+                'show_block' => 'content', // 'right' or 'content' : Anzeige des Blocks im Content-Bereich oder in der rechten Spalte
+                'message' => __( 'Find the settings on the right side', 'rrze-rsvp' ) // erscheint bei Auswahl des Blocks, wenn "show_block" auf 'right' gesetzt ist
+            ],
+            'seat' => [
+                'default' => 0,
+                'field_type' => 'text', // Art des Feldes im Gutenberg Editor
+                'label' => __( 'Seat ID', 'rrze-rsvp' ),
+                'type' => 'number' // Variablentyp der Eingabe
+            ],
+        ]
     ];
 }
 

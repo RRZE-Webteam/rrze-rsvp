@@ -1,6 +1,6 @@
 {
   "name": "rrze-rsvp",
-  "version": "0.3.2-3",
+  "version": "0.3.3",
   "description": "Platzbuchungssystem der FAU.",
   "main": "rrze-rsvp.php",
   "textdomain": "rrze-rsvp",
@@ -20,7 +20,8 @@
     "ie 11"
   ],
   "supports": {
-    "email": "webmaster@fau.de"
+    "email": "webmaster@fau.de",
+    "docs": "https://www.wordpress.rrze.fau.de/plugins/fau-und-rrze-plugins/rsvp/"
   },
   "author": "RRZE-Webteam <webmaster@fau.de> (https://www.wordpress.rrze.fau.de/person/webmaster)",
   "license": "GPL-3.0-or-later",

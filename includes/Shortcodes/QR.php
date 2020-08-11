@@ -6,6 +6,9 @@ use RRZE\RSVP\Helper;
 use function RRZE\RSVP\Config\getShortcodeSettings;
 // use function RRZE\RSVP\Config\getShortcodeDefaults;
 
+require_once __DIR__ . '/../../vendor/tcpdf/tcpdf_barcodes_2d.php';
+use TCPDF2DBarcode;
+
 
 
 defined('ABSPATH') || exit;
@@ -27,9 +30,7 @@ class QR extends Shortcodes {
 
 
     public function onLoaded() {
-
         add_shortcode('rsvp-qr', [$this, 'shortcodeQR'], 10, 2);
-
     }
 
     public function shortcodeQR($atts, $content = '', $tag) {
@@ -58,11 +59,8 @@ class QR extends Shortcodes {
             }
             $permalink = get_permalink($seat_id);
 
-            // 2DO: 
-            // how to generate QR using tcpdf as image soley? 
-            // $output above echo do_shortcode('[rsvp-availability seat=' . $id . ' days=14 booking_link=true]');  in single-seat.php as <img ... float right 
-            // $pdf->write2DBarcode($permalink, 'QRCODE,H', '', $y + $ySpace, 50, 50, $qr_style, 'N');
-            $output = ''; 
+            $qr = new TCPDF2DBarcode($permalink, 'QRCODE,H');
+            $output = '<div class="rsvp-qr-container">' . $qr->getBarcodeSVGcode(3, 3, $color='black') . '</div>';
         } else {
             return __( 'Please specify a seat ID in your Shortcode.', 'rrze-rsvp' );
         }

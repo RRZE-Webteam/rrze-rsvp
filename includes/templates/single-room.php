@@ -50,8 +50,9 @@ while ( have_posts() ) : the_post();
     the_content();
 
     if (isset($meta['rrze-rsvp-room-timeslots']) && !empty($meta['rrze-rsvp-room-timeslots'])) {
+        $schedule = [];
         echo '<h2>'. __('Schedule','rrze-rsvp') . '</h2>';
-        $timeslots = get_post_meta(get_the_ID(), 'rrze-rsvp-room-timeslots');
+        $timeslots = get_post_meta(get_the_ID(), 'rrze-rsvp-room-timeslots', true);
         $weekdays = [
             1 => __('Monday', 'rrze-rsvp'),
             2 => __('Tuesday', 'rrze-rsvp'),
@@ -61,24 +62,31 @@ while ( have_posts() ) : the_post();
             6 => __('Saturday', 'rrze-rsvp'),
             7 => __('Sunday', 'rrze-rsvp')
         ];
-        foreach ($timeslots[0] as $timeslot) {
+        foreach ($timeslots as $timeslot) {
             foreach ($timeslot['rrze-rsvp-room-weekday'] as $day) {
-                $schedule[$weekdays[$day]][] = $timeslot['rrze-rsvp-room-starttime'] . ' - ' . $timeslot['rrze-rsvp-room-endtime'];
+                if (isset($timeslot['rrze-rsvp-room-starttime']) && isset($timeslot['rrze-rsvp-room-endtime'])) {
+                    $schedule[$weekdays[$day]][] = $timeslot['rrze-rsvp-room-starttime'] . ' - ' . $timeslot['rrze-rsvp-room-endtime'];
+                }
             }
         }
-        echo '<table class="rsvp-schedule">';
-        echo '<tr>'
-            . '<th>'. __('Weekday', 'rrze-rsvp') . '</th>'
-            . '<th>'. __('Time slots', 'rrze-rsvp') . '</th>';
-
-        echo '</tr>';
-        foreach ($schedule as $weekday => $daily_slots) {
+        if (!empty($schedule)) {
+            echo '<table class="rsvp-schedule">';
             echo '<tr>'
-            .'<td>' . $weekday . '</td>'
-            . '<td>' . implode('<br />', $daily_slots) . '</td>'
-            . '</tr>';
+                . '<th>'. __('Weekday', 'rrze-rsvp') . '</th>'
+                . '<th>'. __('Time slots', 'rrze-rsvp') . '</th>';
+
+            echo '</tr>';
+            foreach ($schedule as $weekday => $daily_slots) {
+                echo '<tr>'
+                    .'<td>' . $weekday . '</td>'
+                    . '<td>' . implode('<br />', $daily_slots) . '</td>'
+                    . '</tr>';
+            }
+            echo "</table>";
+        } else {
+            echo '<p>' . __('No schedule available.') . '</p>';
         }
-        echo "</table>";
+
     }
 
     if ($options->general_single_room_availability_table != 'no') {

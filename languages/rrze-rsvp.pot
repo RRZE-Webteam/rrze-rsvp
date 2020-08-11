@@ -16,7 +16,7 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"POT-Creation-Date: 2020-08-11 07:29+0000\n"
+"POT-Creation-Date: 2020-08-11 10:25+0000\n"
 "Language: \n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: Loco https://localise.biz/"
@@ -326,7 +326,7 @@ msgstr ""
 msgid "Print seats' equipment"
 msgstr ""
 
-#: config/config.php:499 config/config.php:544
+#: config/config.php:499 config/config.php:544 config/config.php:580
 msgid "Find the settings on the right side"
 msgstr ""
 
@@ -356,6 +356,10 @@ msgstr ""
 
 #: config/config.php:566
 msgid "Show booking link"
+msgstr ""
+
+#: config/config.php:585
+msgid "Seat ID"
 msgstr ""
 
 #: includes/IdM.php:44
@@ -577,7 +581,7 @@ msgid "Seats Numbering System"
 msgstr ""
 
 #: includes/Tools.php:70 includes/CPT/CPT.php:64 includes/CPT/CPT.php:65
-#: includes/Shortcodes/Bookings.php:593
+#: includes/Shortcodes/Bookings.php:592
 msgid "Equipment"
 msgstr ""
 
@@ -1227,7 +1231,7 @@ msgstr[1] ""
 msgid "Date/Time"
 msgstr ""
 
-#: includes/Shortcodes/Availability.php:50 includes/Shortcodes/Bookings.php:487
+#: includes/Shortcodes/Availability.php:50 includes/Shortcodes/Bookings.php:486
 msgid "Seats available"
 msgstr ""
 
@@ -1236,7 +1240,7 @@ msgstr ""
 msgid "Book this seat/timeslot now"
 msgstr ""
 
-#: includes/Shortcodes/Availability.php:98 includes/Shortcodes/QR.php:56
+#: includes/Shortcodes/Availability.php:98 includes/Shortcodes/QR.php:57
 msgid "Please enter a valid seat slug or ID"
 msgstr ""
 
@@ -1328,7 +1332,7 @@ msgid "Available time slots:"
 msgstr ""
 
 #: includes/Shortcodes/Bookings.php:315 includes/Shortcodes/Bookings.php:325
-#: includes/Shortcodes/Bookings.php:561
+#: includes/Shortcodes/Bookings.php:560
 msgid "Please select a date."
 msgstr ""
 
@@ -1346,40 +1350,40 @@ msgid ""
 "it is necessary to record the telephone number."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:379
+#: includes/Shortcodes/Bookings.php:378
 msgid "Submit booking"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:474
+#: includes/Shortcodes/Bookings.php:473
 msgid "Not bookable (outside booking period)"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:478
+#: includes/Shortcodes/Bookings.php:477
 msgid "Not bookable (soldout or room blocked)"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:536
+#: includes/Shortcodes/Bookings.php:535
 msgid "More"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:564 includes/Shortcodes/Bookings.php:638
+#: includes/Shortcodes/Bookings.php:563 includes/Shortcodes/Bookings.php:637
 msgid "Please select a date and a time slot."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:589
+#: includes/Shortcodes/Bookings.php:588
 #, php-format
 msgid "Seat %s"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:612
+#: includes/Shortcodes/Bookings.php:611
 msgid "No time slots available."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:640
+#: includes/Shortcodes/Bookings.php:639
 msgid "Available seats:"
 msgstr ""
 
-#: includes/Shortcodes/QR.php:67
+#: includes/Shortcodes/QR.php:65
 msgid "Please specify a seat ID in your Shortcode."
 msgstr ""
 
