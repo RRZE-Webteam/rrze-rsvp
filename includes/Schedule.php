@@ -78,13 +78,14 @@ class Schedule
     {
         $this->cancelUnconfirmedBookings();
         $this->cancelNotCheckedInBookings();
+        $this->checkOutNotCheckedOutBookings();
     }
 
     /**
      * dailyEvent
      * Run the event daily.
      * @return void
-     */    
+     */
     public function dailyEvent()
     {
         $this->deleteOldBookings();
@@ -93,7 +94,7 @@ class Schedule
 
     /**
      * deleteOldBookings
-     * Delete all reservations whose start datetime is older than 4 months.
+     * Delete all reservations whose start datetime is older than 4 weeks.
      * @return void
      */
     protected function deleteOldBookings()
@@ -244,7 +245,7 @@ class Schedule
                     'key'       => 'rrze-rsvp-booking-start',
                     'value'     => $timeStampAfter,
                     'compare'   => '<'
-                ]                
+                ]
             ]
         ];
 
@@ -258,6 +259,47 @@ class Schedule
                     update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'cancelled');
                     $this->email->bookingCancelledCustomer(get_the_ID());
                 }
+            }
+            wp_reset_postdata();
+        }
+    }
+
+    /**
+     * checkOutNotCheckedOutBookings
+     * Check-out booking with checked-in status that were 
+     * not checked-out by the customer.
+     * @return void
+     */
+    protected function checkOutNotCheckedOutBookings()
+    {
+        $timeStamp = current_time('timestamp');
+
+        $args = [
+            'fields'            => 'ids',
+            'post_type'         => ['booking'],
+            'post_status'       => 'publish',
+            'posts_per_page'    => '-1',
+            'meta_query'        => [
+                'relation'      => 'AND',
+                'booking_status_clause' => [
+                    'key'       => 'rrze-rsvp-booking-status',
+                    'value'     => ['checked-in'],
+                    'compare'   => 'IN'
+                ],
+                'booking_start_clause' => [
+                    'key'       => 'rrze-rsvp-booking-end',
+                    'value'     => $timeStamp,
+                    'compare'   => '>'
+                ]
+            ]
+        ];
+
+        $query = new WP_Query($args);
+
+        if ($query->have_posts()) {
+            while ($query->have_posts()) {
+                $query->the_post();
+                update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'checked-out');
             }
             wp_reset_postdata();
         }
