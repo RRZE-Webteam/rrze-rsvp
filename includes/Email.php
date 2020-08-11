@@ -122,7 +122,7 @@ class Email
         $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s%-s', $bookingId, $booking['start']), $bookingId);
 
         $data = [];
-        $data['text'] = sprintf(__('You received a new request for a booking on %s.', 'rrze-rsvp'), get_bloginfo('name'));
+        $data['text'] = __('You received a new request for a booking.', 'rrze-rsvp');
         $data['date'] = $booking['date'];
         $data['time'] = $booking['time'];
         $data['room_name'] = $booking['room_name'];
@@ -158,7 +158,7 @@ class Email
         $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
         $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
 
-        $text = sprintf(__('A booking on %s has been cancelled by the customer.', 'rrze-rsvp'), get_bloginfo('name'));
+        $text = __('A booking has been cancelled by the customer.', 'rrze-rsvp');
 
         $data = [];
         $data['text'] = $this->placeholderParser($text, $booking);
