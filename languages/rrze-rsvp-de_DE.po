@@ -15,9 +15,9 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"POT-Creation-Date: 2020-08-11 07:29+0000\n"
-"PO-Revision-Date: 2020-08-11 09:48+0000\n"
-"Last-Translator: Barbara\n"
+"POT-Creation-Date: 2020-08-11 10:25+0000\n"
+"PO-Revision-Date: 2020-08-11 10:29+0000\n"
+"Last-Translator: RRZE Webteam <webmaster@fau.de>\n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
 "X-Generator: Loco https://localise.biz/\n"
@@ -206,7 +206,7 @@ msgstr "Hinweis abbrechen"
 
 #: config/config.php:265
 msgid "Notification of booking cancellation."
-msgstr "Hinweistext zur Absage einer Buchung."
+msgstr "Hinweistext zur Stornierung einer Buchung."
 
 #: config/config.php:275 config/config.php:277
 msgid "Sender name"
@@ -344,7 +344,7 @@ msgstr "Drucke Raumadresse"
 msgid "Print seats' equipment"
 msgstr "Drucke SItzplatzaustattung"
 
-#: config/config.php:499 config/config.php:544
+#: config/config.php:499 config/config.php:544 config/config.php:580
 msgid "Find the settings on the right side"
 msgstr "Suchen Sie die Einstellungen auf der rechten Seite"
 
@@ -375,6 +375,10 @@ msgstr "Sitzplätze"
 #: config/config.php:566
 msgid "Show booking link"
 msgstr "Zeige Link zur Buchung"
+
+#: config/config.php:585
+msgid "Seat ID"
+msgstr ""
 
 #: includes/IdM.php:44
 msgid "Forbidden"
@@ -437,11 +441,11 @@ msgstr "Buchung bestätigen"
 
 #: includes/Email.php:128 includes/ICS.php:45
 msgid "Cancel Booking"
-msgstr "Buchung absagen"
+msgstr "Buchung stornieren"
 
 #: includes/Email.php:149
 msgid "Booking has been cancelled"
-msgstr "Die Buchung wurde abgesagt."
+msgstr "Die Buchung wurde storniert."
 
 #: includes/Email.php:155
 #, php-format
@@ -482,7 +486,7 @@ msgstr "bestätigt"
 
 #: includes/Actions.php:175 includes/Actions.php:181
 msgid "cancelled"
-msgstr "Abgebrochen"
+msgstr "storniert"
 
 #: includes/Actions.php:193 includes/Actions.php:257
 #: includes/CPT/Bookings.php:64
@@ -506,7 +510,7 @@ msgstr "Der Bucher erhielt eine E-Mail-Bestätigung. "
 
 #: includes/Actions.php:263
 msgid "Do you really want to cancel your booking?"
-msgstr "Wollen Sie wirklich Ihre Buchung absagen?"
+msgstr "Wollen Sie wirklich Ihre Buchung stornieren?"
 
 #: includes/Actions.php:274
 #, php-format
@@ -549,13 +553,13 @@ msgstr "Es wurde keine Änderung vorgenommen."
 
 #: includes/Main.php:92
 msgid "Do you want to cancel?"
-msgstr "Wollen Sie die Buchung absagen?"
+msgstr "Wollen Sie die Buchung stornieren?"
 
 #: includes/Main.php:93 includes/CPT/Bookings.php:150
 #: includes/CPT/Bookings.php:325 includes/CPT/Bookings.php:337
 msgctxt "Booking"
 msgid "Cancelled"
-msgstr "Abgesagt"
+msgstr "Storniert"
 
 #: includes/Main.php:94 includes/CPT/Bookings.php:149
 #: includes/CPT/Bookings.php:343 includes/CPT/Bookings.php:374
@@ -602,7 +606,7 @@ msgid "Seats Numbering System"
 msgstr ""
 
 #: includes/Tools.php:70 includes/CPT/CPT.php:64 includes/CPT/CPT.php:65
-#: includes/Shortcodes/Bookings.php:593
+#: includes/Shortcodes/Bookings.php:592
 msgid "Equipment"
 msgstr "Ausstattung"
 
@@ -966,7 +970,7 @@ msgstr "Löschen"
 #: includes/CPT/Bookings.php:371
 msgctxt "Booking"
 msgid "Cancel"
-msgstr "Absagen"
+msgstr "Stornieren"
 
 #: includes/CPT/Bookings.php:385
 msgid "Confirm"
@@ -1262,7 +1266,7 @@ msgstr[1] "Erstelle PDF für %s Sitzplätze"
 msgid "Date/Time"
 msgstr "Datum/Zeit"
 
-#: includes/Shortcodes/Availability.php:50 includes/Shortcodes/Bookings.php:487
+#: includes/Shortcodes/Availability.php:50 includes/Shortcodes/Bookings.php:486
 msgid "Seats available"
 msgstr "Verfügbare Sitzplätze"
 
@@ -1271,7 +1275,7 @@ msgstr "Verfügbare Sitzplätze"
 msgid "Book this seat/timeslot now"
 msgstr "Sitzplatz jetzt buchen"
 
-#: includes/Shortcodes/Availability.php:98 includes/Shortcodes/QR.php:56
+#: includes/Shortcodes/Availability.php:98 includes/Shortcodes/QR.php:57
 msgid "Please enter a valid seat slug or ID"
 msgstr "Bitte geben Sie gültige Sitzplatzbezeichnung oder Id an. "
 
@@ -1373,7 +1377,7 @@ msgid "Available time slots:"
 msgstr "Freie Termine"
 
 #: includes/Shortcodes/Bookings.php:315 includes/Shortcodes/Bookings.php:325
-#: includes/Shortcodes/Bookings.php:561
+#: includes/Shortcodes/Bookings.php:560
 msgid "Please select a date."
 msgstr "Wählen Sie ein Datum."
 
@@ -1393,44 +1397,44 @@ msgstr ""
 "Im Rahmen der Maßnahmen zur Kontaktverfolgung gegen die Corona-Pandemie, "
 "muss die Telefonnummer angegeben werden."
 
-#: includes/Shortcodes/Bookings.php:379
+#: includes/Shortcodes/Bookings.php:378
 msgid "Submit booking"
 msgstr "Buchung absenden"
 
-#: includes/Shortcodes/Bookings.php:474
+#: includes/Shortcodes/Bookings.php:473
 msgid "Not bookable (outside booking period)"
 msgstr ""
 "Dieses Sitzplatz ist nicht buchbar (Termin außerhalb der möglichen "
 "Buchungszeit)"
 
-#: includes/Shortcodes/Bookings.php:478
+#: includes/Shortcodes/Bookings.php:477
 msgid "Not bookable (soldout or room blocked)"
 msgstr ""
 "Dieses Sitzplatz ist nicht buchbar (Der Raum ist ausgebucht oder nicht "
 "verfügbar)"
 
-#: includes/Shortcodes/Bookings.php:536
+#: includes/Shortcodes/Bookings.php:535
 msgid "More"
 msgstr "Mehr"
 
-#: includes/Shortcodes/Bookings.php:564 includes/Shortcodes/Bookings.php:638
+#: includes/Shortcodes/Bookings.php:563 includes/Shortcodes/Bookings.php:637
 msgid "Please select a date and a time slot."
 msgstr "Bitte wählen Sie ein Datum und eine Zeit."
 
-#: includes/Shortcodes/Bookings.php:589
+#: includes/Shortcodes/Bookings.php:588
 #, php-format
 msgid "Seat %s"
 msgstr "Sitzplatz %s"
 
-#: includes/Shortcodes/Bookings.php:612
+#: includes/Shortcodes/Bookings.php:611
 msgid "No time slots available."
 msgstr "Keine freien Termine verfügbar."
 
-#: includes/Shortcodes/Bookings.php:640
+#: includes/Shortcodes/Bookings.php:639
 msgid "Available seats:"
 msgstr "Verfügbare Sitzplätze:"
 
-#: includes/Shortcodes/QR.php:67
+#: includes/Shortcodes/QR.php:65
 msgid "Please specify a seat ID in your Shortcode."
 msgstr "Bitte geben Sie in Ihrem Shortcode eine Sitz-ID an."
 
