@@ -60,7 +60,7 @@ class QR extends Shortcodes {
             $permalink = get_permalink($seat_id);
 
             $qr = new TCPDF2DBarcode($permalink, 'QRCODE,H');
-            $output = '<div class="rsvp-qr-container">' . $qr->getBarcodeHTML(3, 3, 'black') . '</div>';
+            $output = '<div class="rsvp-qr-container">' . $qr->getBarcodeSVGcode(3, 3, $color='black') . '</div>';
         } else {
             return __( 'Please specify a seat ID in your Shortcode.', 'rrze-rsvp' );
         }
