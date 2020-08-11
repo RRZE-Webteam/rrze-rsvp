@@ -132,33 +132,66 @@ RRZE RSVP Frontend CSS
 
 table.rsvp-room-availability a,
 table.rsvp-seat-availability a {
-  padding: 5px 8px;
+  padding: 6px 10px;
   color: #fff;
   background: #036;
-  border: 1px solid #036;
   border-radius: 3px;
   text-decoration: none;
   margin-right: 7px; }
+  table.rsvp-room-availability a:hover, table.rsvp-room-availability a:focus, table.rsvp-room-availability a:active,
+  table.rsvp-seat-availability a:hover,
+  table.rsvp-seat-availability a:focus,
+  table.rsvp-seat-availability a:active {
+    background: #24598f; }
   .faculty-phil table.rsvp-room-availability a, .faculty-phil
   table.rsvp-seat-availability a {
-    background: #a36b0d;
-    border-color: #a36b0d; }
+    background: #a36b0d; }
+    .faculty-phil table.rsvp-room-availability a:hover, .faculty-phil table.rsvp-room-availability a:focus, .faculty-phil table.rsvp-room-availability a:active, .faculty-phil
+    table.rsvp-seat-availability a:hover, .faculty-phil
+    table.rsvp-seat-availability a:focus, .faculty-phil
+    table.rsvp-seat-availability a:active {
+      background: #805000; }
   .faculty-rw table.rsvp-room-availability a, .faculty-rw
   table.rsvp-seat-availability a {
-    background: #8d1429;
-    border-color: #8d1429; }
+    background: #8d1429; }
+    .faculty-rw table.rsvp-room-availability a:hover, .faculty-rw table.rsvp-room-availability a:focus, .faculty-rw table.rsvp-room-availability a:active, .faculty-rw
+    table.rsvp-seat-availability a:hover, .faculty-rw
+    table.rsvp-seat-availability a:focus, .faculty-rw
+    table.rsvp-seat-availability a:active {
+      background: #690013; }
   .faculty-nat table.rsvp-room-availability a, .faculty-nat
   table.rsvp-seat-availability a {
-    background: #048767;
-    border-color: #048767; }
+    background: #048767; }
+    .faculty-nat table.rsvp-room-availability a:hover, .faculty-nat table.rsvp-room-availability a:focus, .faculty-nat table.rsvp-room-availability a:active, .faculty-nat
+    table.rsvp-seat-availability a:hover, .faculty-nat
+    table.rsvp-seat-availability a:focus, .faculty-nat
+    table.rsvp-seat-availability a:active {
+      background: #006e53; }
   .faculty-med table.rsvp-room-availability a, .faculty-med
   table.rsvp-seat-availability a {
-    background: #0381a2;
-    border-color: #0381a2; }
+    background: #0381a2; }
+    .faculty-med table.rsvp-room-availability a:hover, .faculty-med table.rsvp-room-availability a:focus, .faculty-med table.rsvp-room-availability a:active, .faculty-med
+    table.rsvp-seat-availability a:hover, .faculty-med
+    table.rsvp-seat-availability a:focus, .faculty-med
+    table.rsvp-seat-availability a:active {
+      background: #026480; }
   .faculty-tf table.rsvp-room-availability a, .faculty-tf
   table.rsvp-seat-availability a {
-    background: #6e7881;
-    border-color: #6e7881; }
+    background: #6e7881; }
+    .faculty-tf table.rsvp-room-availability a:hover, .faculty-tf table.rsvp-room-availability a:focus, .faculty-tf table.rsvp-room-availability a:active, .faculty-tf
+    table.rsvp-seat-availability a:hover, .faculty-tf
+    table.rsvp-seat-availability a:focus, .faculty-tf
+    table.rsvp-seat-availability a:active {
+      background: #53606b; }
+
+.single-room .rsvp-qr-container,
+.single-seat .rsvp-qr-container {
+  float: right;
+  margin-left: 20px; }
+  @media not print {
+    .single-room .rsvp-qr-container,
+    .single-seat .rsvp-qr-container {
+      display: none; } }
 
 .rrze-rsvp-booking-reply {
   position: fixed;
