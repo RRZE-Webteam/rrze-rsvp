@@ -18,10 +18,15 @@ class Functions
         return date_i18n(get_option('time_format'), $timestamp);
     }
 
-    public static function validateDate($date, $format = 'Y-m-d')
+    public static function validateDate(string $date, string $format = 'Y-m-d'): bool
     {
         $dt = DateTime::createFromFormat($format, $date);
         return $dt && $dt->format($format) === $date;
+    }
+
+    public static function validateTime(string $date, string $format = 'H:i:s'): bool
+    {
+        return self::validateDate($date, $format);
     }
 
     public static function isLocaleEnglish()
@@ -62,7 +67,8 @@ class Functions
      * @param int $room_id (the room's post id)
      * @return array
      */
-    public static function getOccupancyByRoomId(int $room_id): array {
+    public static function getOccupancyByRoomId(int $room_id): array
+    {
         $data = ['this is in development'];
 
         $timestamp = current_time('timestamp');
@@ -72,7 +78,7 @@ class Functions
         // get timeslots for today for this room
         $slots = self::getRoomSchedule($room_id); // liefert [wochentag-nummer][startzeit] = end-zeit;
 
-        $slots_today = ( isset($slots[$today_weeknumber]) ? $slots[$today_weeknumber] : array() );
+        $slots_today = (isset($slots[$today_weeknumber]) ? $slots[$today_weeknumber] : array());
 
         // get seats for this room
         $seatIds = get_posts([
@@ -84,9 +90,9 @@ class Functions
             'fields' => 'ids'
         ]);
 
-        foreach($seatIds as $seat_id){
+        foreach ($seatIds as $seat_id) {
             $slots_free = self::getSeatAvailability($seat_id, $today, $today); //   liefert ['Y-m-d'] => array('H:i - H:i', 'H:i - H:i' , ... );
-            $slots_today_free = ( isset($slots_free[$today]) ? $slots_free[$today] : array() );
+            $slots_today_free = (isset($slots_free[$today]) ? $slots_free[$today] : array());
         }
 
         return $data;
