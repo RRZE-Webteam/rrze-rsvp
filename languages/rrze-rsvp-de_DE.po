@@ -15,13 +15,13 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"POT-Creation-Date: 2020-08-11 19:31+0000\n"
-"PO-Revision-Date: 2020-08-11 19:32+0000\n"
-"Last-Translator: RRZE Webteam <webmaster@fau.de>\n"
+"POT-Creation-Date: 2020-08-12 14:50+0000\n"
+"PO-Revision-Date: 2020-08-12 15:01+0000\n"
+"Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
 "X-Generator: Loco https://localise.biz/\n"
-"X-Loco-Version: 2.4.1; wp-5.4.2"
+"X-Loco-Version: 2.4.0; wp-5.4.2"
 
 #: rrze-rsvp.php:54
 #, php-format
@@ -102,7 +102,9 @@ msgid ""
 "folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. "
 "Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten "
 "allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a "
-"DSGVO."
+"DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund "
+"der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden "
+"erfasst."
 msgstr ""
 
 #: config/config.php:88 config/config.php:89
@@ -153,7 +155,7 @@ msgstr ""
 "Wählen Sie die Seite aus, die den Shortcode Ihres Buchungsformulars enthält. "
 "Sie finden einen Shortcode-Hinweis auf jeder Raumbearbeitungsseite."
 
-#: config/config.php:228 includes/Tools.php:96 includes/CPT/Seats.php:128
+#: config/config.php:228 includes/Tools.php:232 includes/CPT/Seats.php:128
 #: includes/CPT/Bookings.php:145 includes/CPT/Bookings.php:160
 msgid "Please select"
 msgstr "Bitte wählen"
@@ -352,11 +354,11 @@ msgstr "Suchen Sie die Einstellungen auf der rechten Seite"
 msgid "Days in advance"
 msgstr "Verfügbare Tage zu denen eine Vorabreservierung möglich ist."
 
-#: config/config.php:510 includes/Tools.php:93 includes/CPT/Seats.php:124
-#: includes/CPT/Bookings.php:259 includes/CPT/Bookings.php:273
-#: includes/CPT/Bookings.php:398 includes/CPT/Rooms.php:61
-#: includes/Printing/Printing.php:128 includes/Shortcodes/Bookings.php:236
-#: includes/templates/single-seat.php:51
+#: config/config.php:510 includes/Tools.php:105 includes/Tools.php:229
+#: includes/CPT/Seats.php:124 includes/CPT/Bookings.php:259
+#: includes/CPT/Bookings.php:273 includes/CPT/Bookings.php:398
+#: includes/CPT/Rooms.php:61 includes/Printing/Printing.php:128
+#: includes/Shortcodes/Bookings.php:236 includes/templates/single-seat.php:51
 msgid "Room"
 msgstr "Raum"
 
@@ -569,76 +571,143 @@ msgstr "Bestätigt"
 msgid "Call to undefined method %1$s::%2$s"
 msgstr ""
 
-#: includes/Tools.php:20 includes/Tools.php:30
+#: includes/Tools.php:21 includes/Tools.php:41
 msgctxt "admin page title"
 msgid "Create Seats"
-msgstr ""
+msgstr "Sitzplatzgenerator"
 
-#: includes/Tools.php:21
+#: includes/Tools.php:22
 msgctxt "admin menu entry title"
 msgid "RSVP Create Seats"
-msgstr ""
+msgstr "RSVP Sitzplatzgenerator"
 
-#: includes/Tools.php:70
+#: includes/Tools.php:79 includes/Tools.php:159
+msgctxt "part of the generated seat name"
+msgid "Row"
+msgstr "Reihe"
+
+#: includes/Tools.php:80 includes/Tools.php:160
+msgctxt "part of the generated seat name"
+msgid "Seat"
+msgstr "Platz"
+
+#: includes/Tools.php:100
 #, php-format
-msgid "%s seats%s will be created in room %s"
-msgstr ""
+msgid "%s seats will be created"
+msgstr "%s Plätze werden erstellt"
 
-#: includes/Tools.php:72
-msgid "with the following equipment:"
-msgstr ""
+#: includes/Tools.php:104
+msgid "Seat name example"
+msgstr "Beispiel Platzname"
 
-#: includes/Tools.php:79
-msgid "Continue?"
-msgstr ""
-
-#: includes/Tools.php:82
-msgid "Cancel"
-msgstr ""
-
-#: includes/Tools.php:83
-msgid "Create seats"
-msgstr ""
-
-#: includes/Tools.php:110
-msgid "Number of Table Rows"
-msgstr ""
-
-#: includes/Tools.php:115
-msgid "Rows Numbering System"
-msgstr ""
-
-#: includes/Tools.php:116 includes/Tools.php:127
-msgid "Numeric (1 - 999)"
-msgstr ""
-
-#: includes/Tools.php:117 includes/Tools.php:128
-msgid "A-Z"
-msgstr ""
-
-#: includes/Tools.php:121
-msgid "Number of Seats per Row"
-msgstr ""
-
-#: includes/Tools.php:126
-msgid "Seats Numbering System"
-msgstr ""
-
-#: includes/Tools.php:131 includes/CPT/CPT.php:64 includes/CPT/CPT.php:65
-#: includes/Shortcodes/Bookings.php:606
+#: includes/Tools.php:106 includes/Tools.php:282 includes/CPT/CPT.php:64
+#: includes/CPT/CPT.php:65 includes/Shortcodes/Bookings.php:606
 msgid "Equipment"
 msgstr "Ausstattung"
 
-#: includes/Tools.php:144
+#: includes/Tools.php:114
+msgctxt "no equipment selected -> Equipment: none"
+msgid "none"
+msgstr "nichts auswählt"
+
+#: includes/Tools.php:117
+msgid "Existing seats with the same name will be updated."
+msgstr "Bereits bestehende Plätze mit demselben Namen werden aktualisiert."
+
+#: includes/Tools.php:119
+msgid "Continue?"
+msgstr "Weiter?"
+
+#: includes/Tools.php:124
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: includes/Tools.php:131
+msgid "Create seats"
+msgstr "Plätze erstellen"
+
+#: includes/Tools.php:211
+#, php-format
+msgid "%s new seats have been created."
+msgstr "%s Plätze wurden erstellt."
+
+#: includes/Tools.php:214
+#, php-format
+msgid "%s existing seats have been updated."
+msgstr "%s Plätze wurden aktualisiert."
+
+#: includes/Tools.php:246
+msgid "Number of Rows"
+msgstr "Anzahl der Reihen"
+
+#: includes/Tools.php:251
+msgid "Number of Seats per Row"
+msgstr "Anzahl der Plätze pro Reihe"
+
+#: includes/Tools.php:256
+msgid "Rows Numbering System"
+msgstr "Reihennummerierung"
+
+#: includes/Tools.php:257 includes/Tools.php:271
+msgid "Numeric (1 - 999)"
+msgstr "Numerisch (1 - 999)"
+
+#: includes/Tools.php:258 includes/Tools.php:272
+msgid "A-Z"
+msgstr "A-Z"
+
+#: includes/Tools.php:263
+msgid "Starting number"
+msgstr "Startnummer"
+
+#: includes/Tools.php:263 includes/Tools.php:276 includes/Tools.php:282
+msgid "optional"
+msgstr "optional"
+
+#: includes/Tools.php:265
+msgid ""
+"Row numbers will start with 1 by default. You may enter a different starting "
+"number, e.g. 101."
+msgstr ""
+"Reihennummern beginnen standardmäßig mit 1. Hier können Sie eine abweichende "
+"Startnummer festlegen (z.B. 101)."
+
+#: includes/Tools.php:270
+msgid "Seats Numbering System"
+msgstr "Platznummerierung"
+
+#: includes/Tools.php:276
+msgid "Prefix"
+msgstr "Präfix"
+
+#: includes/Tools.php:278
+msgid ""
+"Seat names will look like \"15A\" or \"C7\" where the first element "
+"indicates the row and the second indicates the seat. <br />If the same "
+"numbering system ist used for rows and seats, labels will be added "
+"automatically: \"Row 20 - Seat 3\".<br />If a name prefix is given, it will "
+"be added before the row, e.g. \"1st floor 15A\""
+msgstr ""
+"Platznamen werden nach dem Schema \"15A\" bzw. \"C7\" erstellt, wobei das "
+"erste Element die Reihe, das zweite die Platznummer bezeichnet. <br />Wenn "
+"für Reihen und Plätze die gleich Nummerierungsart verwendet wird, werden "
+"automatisch Bezeichnungen ergänzt: \"Reihe 20 - Platz 3\".<br />Wenn ein "
+"Präfix eingegeben wurde, wird es vor der Reihenbezeichnung eingefügt, z.B. "
+"\"Erdgeschoss 15A\"."
+
+#: includes/Tools.php:295
 msgid ""
 "Preselect equipment that will be available on all seats. You can modify the "
 "equipment later by editing the seats individually or by bulk editing several "
 "seats in the seats table."
 msgstr ""
+"Wählen Sie Ausstattung aus, die an allen Plätzen verfügbar ist. Sie können "
+"die Ausstattung später individuell bei den Sitzplätzen anpassen oder mehrere "
+"zugleich über die Mehrfachaktionen in der Sitzplatz-Tabelle."
 
-#: includes/Tools.php:148
-msgid "Generate Seats"
-msgstr ""
+#: includes/Tools.php:299
+msgid "Create Seats"
+msgstr "Plätze erstellen"
 
 #: includes/Users.php:82
 msgid "Booking Agent"

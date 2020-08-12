@@ -47,8 +47,8 @@ class Main
 		$schedule = new Schedule;
 		$schedule->onLoaded();
 
-//        $tools = new Tools($this->pluginFile);
-//        $tools->onLoaded();
+        $tools = new Tools($this->pluginFile);
+        $tools->onLoaded();
 
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
 
