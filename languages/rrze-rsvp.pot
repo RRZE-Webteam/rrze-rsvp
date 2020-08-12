@@ -16,7 +16,7 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"POT-Creation-Date: 2020-08-11 16:05+0000\n"
+"POT-Creation-Date: 2020-08-11 19:31+0000\n"
 "Language: \n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: Loco https://localise.biz/"
@@ -139,7 +139,7 @@ msgid ""
 "shortcode hint on each room edit page."
 msgstr ""
 
-#: config/config.php:228 includes/Tools.php:35 includes/CPT/Seats.php:128
+#: config/config.php:228 includes/Tools.php:96 includes/CPT/Seats.php:128
 #: includes/CPT/Bookings.php:145 includes/CPT/Bookings.php:160
 msgid "Please select"
 msgstr ""
@@ -334,7 +334,7 @@ msgstr ""
 msgid "Days in advance"
 msgstr ""
 
-#: config/config.php:510 includes/Tools.php:32 includes/CPT/Seats.php:124
+#: config/config.php:510 includes/Tools.php:93 includes/CPT/Seats.php:124
 #: includes/CPT/Bookings.php:259 includes/CPT/Bookings.php:273
 #: includes/CPT/Bookings.php:398 includes/CPT/Rooms.php:61
 #: includes/Printing/Printing.php:128 includes/Shortcodes/Bookings.php:236
@@ -554,43 +554,64 @@ msgctxt "admin menu entry title"
 msgid "RSVP Create Seats"
 msgstr ""
 
-#: includes/Tools.php:49
+#: includes/Tools.php:70
+#, php-format
+msgid "%s seats%s will be created in room %s"
+msgstr ""
+
+#: includes/Tools.php:72
+msgid "with the following equipment:"
+msgstr ""
+
+#: includes/Tools.php:79
+msgid "Continue?"
+msgstr ""
+
+#: includes/Tools.php:82
+msgid "Cancel"
+msgstr ""
+
+#: includes/Tools.php:83
+msgid "Create seats"
+msgstr ""
+
+#: includes/Tools.php:110
 msgid "Number of Table Rows"
 msgstr ""
 
-#: includes/Tools.php:54
+#: includes/Tools.php:115
 msgid "Rows Numbering System"
 msgstr ""
 
-#: includes/Tools.php:55 includes/Tools.php:66
+#: includes/Tools.php:116 includes/Tools.php:127
 msgid "Numeric (1 - 999)"
 msgstr ""
 
-#: includes/Tools.php:56 includes/Tools.php:67
+#: includes/Tools.php:117 includes/Tools.php:128
 msgid "A-Z"
 msgstr ""
 
-#: includes/Tools.php:60
+#: includes/Tools.php:121
 msgid "Number of Seats per Row"
 msgstr ""
 
-#: includes/Tools.php:65
+#: includes/Tools.php:126
 msgid "Seats Numbering System"
 msgstr ""
 
-#: includes/Tools.php:70 includes/CPT/CPT.php:64 includes/CPT/CPT.php:65
+#: includes/Tools.php:131 includes/CPT/CPT.php:64 includes/CPT/CPT.php:65
 #: includes/Shortcodes/Bookings.php:606
 msgid "Equipment"
 msgstr ""
 
-#: includes/Tools.php:73
+#: includes/Tools.php:144
 msgid ""
-"Preselect equipment that is available on all seats. You can modify the "
+"Preselect equipment that will be available on all seats. You can modify the "
 "equipment later by editing the seats individually or by bulk editing several "
 "seats in the seats table."
 msgstr ""
 
-#: includes/Tools.php:77
+#: includes/Tools.php:148
 msgid "Generate Seats"
 msgstr ""
 
