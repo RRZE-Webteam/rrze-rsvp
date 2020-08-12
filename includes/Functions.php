@@ -4,47 +4,10 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
+use DateTime;
+
 class Functions
 {
-    public static function actionUrl($atts = [])
-    {
-        $atts = array_merge(
-            [
-                'page' => 'rrze-rsvp'
-            ],
-            $atts
-        );
-        if (isset($atts['action'])) {
-            switch ($atts['action']) {
-                case 'add':
-                    $atts['_wpnonce'] = wp_create_nonce('add');
-                    break;
-                case 'edit':
-                    $atts['_wpnonce'] = wp_create_nonce('edit');
-                    break;
-                case 'delete':
-                    $atts['_wpnonce'] = wp_create_nonce('delete');
-                    break;
-                default:
-                    break;
-            }
-        }
-        return add_query_arg($atts, get_admin_url(null, 'admin.php'));
-    }
-
-    public static function requestVar($param, $default = '')
-    {
-        if (isset($_POST[$param])) {
-            return $_POST[$param];
-        }
-
-        if (isset($_GET[$param])) {
-            return $_GET[$param];
-        }
-
-        return $default;
-    }
-
     public static function dateFormat(int $timestamp): string
     {
         return date_i18n(get_option('date_format'), $timestamp);
@@ -53,6 +16,12 @@ class Functions
     public static function timeFormat(int $timestamp): string
     {
         return date_i18n(get_option('time_format'), $timestamp);
+    }
+
+    public static function validateDate($date, $format = 'Y-m-d')
+    {
+        $dt = DateTime::createFromFormat($format, $date);
+        return $dt && $dt->format($format) === $date;
     }
 
     public static function isLocaleEnglish()
