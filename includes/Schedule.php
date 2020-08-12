@@ -105,7 +105,7 @@ class Schedule
             'fields'            => 'ids',
             'post_type'         => ['booking'],
             'post_status'       => 'publish',
-            'posts_per_page'    => '-1',
+            'nopaging'          => true,
             'meta_query'        => [
                 [
                     'key'       => 'rrze-rsvp-booking-start',
@@ -139,7 +139,7 @@ class Schedule
             'fields'            => 'ids',
             'post_type'         => ['booking'],
             'post_status'       => 'publish',
-            'posts_per_page'    => '-1',
+            'nopaging'          => true,
             'date_query'        => [
                 [
                     'before'    => date('Y-m-d H:i:s', $timeStampBefore),
@@ -181,7 +181,7 @@ class Schedule
             'fields'            => 'ids',
             'post_type'         => ['booking'],
             'post_status'       => 'publish',
-            'posts_per_page'    => '-1',
+            'nopaging'          => true,
             'date_query'        => [
                 [
                     'before'    => date('Y-m-d H:i:s', $timeStampBefore),
@@ -233,7 +233,7 @@ class Schedule
             'fields'            => 'ids',
             'post_type'         => ['booking'],
             'post_status'       => 'publish',
-            'posts_per_page'    => '-1',
+            'nopaging'          => true,
             'meta_query'        => [
                 'relation'      => 'AND',
                 'booking_status_clause' => [
@@ -278,7 +278,7 @@ class Schedule
             'fields'            => 'ids',
             'post_type'         => ['booking'],
             'post_status'       => 'publish',
-            'posts_per_page'    => '-1',
+            'nopaging'          => true,
             'meta_query'        => [
                 'relation'      => 'AND',
                 'booking_status_clause' => [
