@@ -86,6 +86,44 @@ class Functions
         return false;
     }
 
+
+    /**
+     * getOccupancyByRoomId
+     * Returns an array(seat names => array(timeslot => true/false if seat is available)) for today
+     * @param int $room_id (the room's post id)
+     * @return array
+     */
+    public static function getOccupancyByRoomId(int $room_id): array {
+        $data = ['this is in development'];
+
+        $timestamp = current_time('timestamp');
+        $today = date('Y-m-d', $timestamp);
+        $today_weeknumber = date('N', $timestamp);
+
+        // get timeslots for today for this room
+        $slots = self::getRoomSchedule($room_id); // liefert [wochentag-nummer][startzeit] = end-zeit;
+
+        $slots_today = ( isset($slots[$today_weeknumber]) ? $slots[$today_weeknumber] : array() );
+
+        // get seats for this room
+        $seatIds = get_posts([
+            'post_type' => 'seat',
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'meta_key' => 'rrze-rsvp-seat-room',
+            'meta_value' => $room_id,
+            'fields' => 'ids'
+        ]);
+
+        foreach($seatIds as $seat_id){
+            $slots_free = self::getSeatAvailability($seat_id, $today, $today); //   liefert ['Y-m-d'] => array('H:i - H:i', 'H:i - H:i' , ... );
+            $slots_today_free = ( isset($slots_free[$today]) ? $slots_free[$today] : array() );
+        }
+
+        return $data;
+    }
+
+
     public static function getBooking(int $bookingId): array
     {
         $data = [];
