@@ -130,6 +130,10 @@ RRZE RSVP Frontend CSS
 .rrze-rsvp .rsvp-seat-container {
   margin-bottom: 1em; }
 
+.alert {
+  margin-top: 10px;
+  margin-bottom: 10px; }
+
 table.rsvp-room-availability a,
 table.rsvp-seat-availability a {
   padding: 6px 10px;
@@ -247,9 +251,9 @@ table.rsvp-seat-availability a {
       display: block;
       color: #bbb; }
     .rrze-rsvp-booking-reply .container .lang-hr {
-      margin: 6em 0 0 0;
+      margin: 1em 0 0 0;
       border-top: 1px solid #dddddd;
-      padding-top: 3em; }
+      padding-top: 0.5em; }
   .rrze-rsvp-booking-reply a.backlink {
     display: block;
     color: #bbb;
