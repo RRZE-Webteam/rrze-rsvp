@@ -8,6 +8,17 @@ use RRZE\RSVP\Functions;
 // use RRZE\RSVP\Capabilities;
 
 
+if (isset($_POST['rsvp_room_id'])){
+    echo '<pre>';
+    echo 'echo rsvp_room_id posted';
+    $roomId = filter_input(INPUT_POST, 'rsvp_room_id', FILTER_VALIDATE_INT);
+    $response = Functions::getOccupancyByRoomId($roomId);
+
+    var_dump($response);
+
+    exit;
+}
+
 class Occupancy{
     /**
      * Options
@@ -27,8 +38,8 @@ class Occupancy{
     public function onLoaded(){
         add_action( 'admin_menu', [$this, 'registerOccupancyPage'] );
         add_action( 'admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
-        add_action( 'wp_ajax_ShowOccupancy', [$this, 'ajaxGetOccupancy'] );
-        add_action( 'wp_ajax_nopriv_ShowOccupancy', [$this, 'ajaxGetOccupancy'] );
+        // add_action( 'wp_ajax_ShowOccupancy', [$this, 'ajaxGetOccupancy'] );
+        // add_action( 'wp_ajax_nopriv_ShowOccupancy', [$this, 'ajaxGetOccupancy'] );
     }
 
     public function registerOccupancyPage(){
@@ -95,7 +106,8 @@ class Occupancy{
             echo '<option value="' . $room->ID . '">' . $room->post_title . '</option>';
         }
 
-        echo '</select></form></td></tr>';
+        // echo '</select></form></td></tr>';
+        echo '</select> <input type="submit" value="Submit"></form></td></tr>';
         echo '</tbody></table>';
 
         echo '<div class="rsvp-occupancy-container"></div>';
