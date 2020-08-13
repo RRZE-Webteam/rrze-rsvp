@@ -401,7 +401,7 @@ class Functions
      * Returns an array of post_id => post_title that can be used by settings select callback.
      * Reduced version of wp_dropdown_pages()
      * @param array $args
-     * @return array
+     * @return array page_id => page_title
      */
     public static function getPagesDropdownOptions($args = '')
     {
@@ -431,6 +431,12 @@ class Functions
         return $output;
     }
 
+    /**
+     * getRoomSchedule
+     * Returns an array of timeslots per weekday for a specific room.
+     * @param int $room_id
+     * @return array [weekday_number(1-7)][starttime(H:i)] => endtime(H:i)
+     */
     public static function getRoomSchedule($room_id)
     {
         $schedule = [];
