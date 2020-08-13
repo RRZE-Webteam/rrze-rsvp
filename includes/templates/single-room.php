@@ -1,5 +1,6 @@
 <?php
 
+use RRZE\RSVP\Functions;
 use RRZE\RSVP\Helper;
 use RRZE\RSVP\Settings;
 use function RRZE\RSVP\plugin;
@@ -7,6 +8,33 @@ use function RRZE\RSVP\plugin;
 $settings = new Settings(plugin()->getFile());
 $options = (object) $settings->getOptions();
 global $post;
+
+//TODO: Format embedded
+get_header();
+echo '<style>
+    body {
+        width: 1820px;
+        height: 590px;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        padding: 20px;
+    }
+    html .admin-bar {
+        margin-top: 0 !important;
+    }
+    div[role="navigation"],
+    #header {
+        display: none;
+    }
+    </style>';
+
+if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
+    while ( have_posts() ) : the_post();
+        echo Functions::getOccupancyByRoomId(get_the_ID());
+    endwhile;
+
+    return;
+}
 
 get_header();
 
