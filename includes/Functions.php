@@ -63,13 +63,15 @@ class Functions
 
     /**
      * getOccupancyByRoomId
-     * Returns an array(seat names => array(timeslot => true/false if seat is available)) for today
+     * Returns an array(seat_id => array(timeslot-span => true/false)) for today
+     * Example: given room has 2 seats; 1 seat is not available at 09:30-10:30 
+     *          array(2) { [2244487]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(true) ["11:05-12:10"]=> bool(true) } [1903]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(false) ["11:05-12:10"]=> bool(true) } }
      * @param int $room_id (the room's post id)
      * @return array
      */
     public static function getOccupancyByRoomId(int $room_id): array
     {
-        $data = ['this is in development'];
+        $data = [];
 
         $timestamp = current_time('timestamp');
         $today = date('Y-m-d', $timestamp);
@@ -77,16 +79,11 @@ class Functions
 
         // get timeslots for today for this room
         $slots = self::getRoomSchedule($room_id); // liefert [wochentag-nummer][startzeit] = end-zeit;
-
-        echo '<pre>';
-        echo 'in getOccupancyByRoomId<br><br>';
-        echo '$slots = ';
-        var_dump($slots);
-
-        $slots_today = (isset($slots[$today_weeknumber]) ? $slots[$today_weeknumber] : array());
-
-        echo '$slots_today = ';
-        var_dump($slots_today);
+        $slots_today_tmp = (isset($slots[$today_weeknumber]) ? $slots[$today_weeknumber] : []);
+        $slots_today = [];
+        foreach($slots_today_tmp as $start => $end){
+            $slots_today[] = $start . '-' . $end;
+        }
 
         // get seats for this room
         $seatIds = get_posts([
@@ -98,23 +95,17 @@ class Functions
             'fields' => 'ids'
         ]);
 
-        echo '$seatIds = ';
-        var_dump($seatIds);
-        
-
         foreach ($seatIds as $seat_id) {
-            $slots_free = self::getSeatAvailability($seat_id, $today, $today); //   liefert ['Y-m-d'] => array('H:i - H:i', 'H:i - H:i' , ... );
 
-            echo '<br><br>$seat_id = ' . $seat_id . '<br>';
-            echo '$slots_free = ';
-            var_dump($slots_free);
-    
-            $slots_today_free = (isset($slots_free[$today]) ? $slots_free[$today] : array());
+            $slots_free = self::getSeatAvailability($seat_id, $today, date('Y-m-d', strtotime($today. ' +1 days')));
+            $slots_free_today_tmp = ( isset($slots_free[$today]) ? $slots_free[$today] : [] );
+            $slots_free_today = array_combine($slots_free_today_tmp, $slots_free_today_tmp); // set values to keys
+
+            foreach($slots_today as $timespan){
+                $data[$seat_id][$timespan] = (isset($slots_free_today[$timespan])?true:false);
+            }
+
         }
-
-        echo '</pre>';
-        exit;
-
         return $data;
     }
 
