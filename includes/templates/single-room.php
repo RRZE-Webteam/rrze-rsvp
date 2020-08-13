@@ -13,26 +13,13 @@ get_header();
 
 //TODO: Format embedded
 if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
-    echo '<style>
-    body {
-        width: 1820px;
-        height: 590px;
-        overflow-x: hidden;
-        overflow-y: hidden;
-        padding: 20px;
-    }
-    html .admin-bar {
-        margin-top: 0 !important;
-    }
-    div[role="navigation"],
-    #header {
-        display: none;
-    }
-    </style>';
 
     while ( have_posts() ) : the_post();
         echo Functions::getOccupancyByRoomIdHTML(get_the_ID());
     endwhile;
+
+    wp_enqueue_style('rrze-rsvp-shortcode');
+    get_footer();
 
     return;
 }
@@ -133,5 +120,7 @@ while ( have_posts() ) : the_post();
 endwhile;
 
 echo $div_close;
+
+wp_enqueue_style('rrze-rsvp-shortcode');
 
 get_footer();

@@ -75,18 +75,19 @@ class Functions
         $seats_slots = self::getOccupancyByRoomId($room_id);
 
         if ($seats_slots){
-            $output .= '<td>&nbsp;</td>';
+            $output .= '<th>&nbsp;</th>';
             foreach($seats_slots['room_slots'] as $room_slot){
-                $output .= '<td>' . $room_slot . '</td>';
+                $output .= '<th scope="col">' . str_replace('-', '<br />-', $room_slot) . '</th>';
             }
             $output .= '</tr>';
             unset($seats_slots['room_slots']);
 
             foreach($seats_slots as $seat_id => $aSlots){
                 $output .= '<tr>';
-                $output .= '<td>' . get_the_title( $seat_id ) . '</td>';
+                $output .= '<th scope="row">' . get_the_title( $seat_id ) . '</th>';
                 foreach($aSlots as $slot => $free){
-                    $output .= '<td>' . ($free?'available':'not available') . '</td>';
+                    $class = $free?'available':'not-available';
+                    $output .= '<td><span class="'.$class.'">' . ($free?'available':'not available') . '</span></td>';
                 }
                 $output .= '</tr>';
             }

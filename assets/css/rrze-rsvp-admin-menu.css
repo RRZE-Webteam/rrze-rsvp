@@ -1,1 +1,37 @@
-li.rrze-rsvp-submenu-hidden{display:none}
+li.rrze-rsvp-submenu-hidden {
+  display: none; }
+
+table.rsvp-room-occupancy {
+  border-collapse: collapse;
+  width: 100%;
+  outline: 10px solid #fff; }
+  table.rsvp-room-occupancy td, table.rsvp-room-occupancy th {
+    padding: 5px;
+    border: 1px solid darkgrey; }
+  table.rsvp-room-occupancy th {
+    max-width: 200px;
+    text-align: center;
+    background-color: #eaeef2; }
+  table.rsvp-room-occupancy td {
+    padding: 0;
+    max-width: 90px;
+    text-align: center; }
+    table.rsvp-room-occupancy td span {
+      padding: 7px;
+      display: block;
+      font-size: 0;
+      line-height: 0; }
+    table.rsvp-room-occupancy td span.available {
+      background-color: #dff0d8;
+      color: #3c763d; }
+      table.rsvp-room-occupancy td span.available:before {
+        font: normal normal normal 20px/1 FontAwesome;
+        content: '\f00c';
+        display: inline-block; }
+    table.rsvp-room-occupancy td span.not-available {
+      background-color: #f2dede;
+      color: #a94442; }
+      table.rsvp-room-occupancy td span.not-available:before {
+        font: normal normal normal 20px/1 FontAwesome;
+        content: '\f00d';
+        display: inline-block; }

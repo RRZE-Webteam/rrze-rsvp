@@ -34,6 +34,15 @@ class CPT extends Main
 
         add_action('admin_menu', [$this, 'bookingMenu']);
         add_filter('parent_file', [$this, 'filterParentMenu']);
+
+        if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
+            add_filter(
+                'body_class',
+                function ($classes) {
+                    return array_merge($classes, array('embedded'));
+                }
+            );
+        }
     }
 
     public function bookingMenu()

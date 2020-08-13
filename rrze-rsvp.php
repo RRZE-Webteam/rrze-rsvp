@@ -4,7 +4,7 @@
 Plugin Name:     RRZE-RSVP
 Plugin URI:      https://github.com/RRZE-Webteam/rrze-rsvp
 Description:     Booking system.
-Version:         0.3.4-2
+Version:         0.3.4-3
 Author:          RRZE-Webteam
 Author URI:      https://blogs.fau.de/webworking/
 License:         GNU General Public License v2
