@@ -35,6 +35,10 @@ class Main
 		$cpt = new CPT($this->pluginFile, $settings);
 		$cpt->onLoaded();
 
+		// CMB2
+		$metaboxes = new Metaboxes;
+		$metaboxes->onLoaded();
+
 		$actions = new Actions;
 		$actions->onLoaded();
 
