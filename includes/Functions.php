@@ -134,7 +134,7 @@ class Functions
         ]);
 
         foreach ($seatIds as $seat_id) {
-            $slots_free = self::getSeatAvailability($seat_id, $today, date('Y-m-d', strtotime($today. ' +1 days')));
+            $slots_free = self::getSeatAvailability($seat_id, $today, $today);
             $slots_free_today_tmp = ( isset($slots_free[$today]) ? $slots_free[$today] : [] );
             $slots_free_today = array_combine($slots_free_today_tmp, $slots_free_today_tmp); // set values to keys
 
