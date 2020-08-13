@@ -41,19 +41,23 @@ class Main
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();
 
-	    $printing = new Printing;
-	    $printing->onLoaded();
+		$bookingForm = new BookingForm;
+		$bookingForm->onLoaded();
 
-	    $schedule = new Schedule;
-        $schedule->onLoaded();
-        
-        $occupancy = new Occupancy;
-        $occupancy->onLoaded();
+		$printing = new Printing;
+		$printing->onLoaded();
 
-        $tools = new Tools($this->pluginFile);
-        $tools->onLoaded();
+		$schedule = new Schedule;
+		$schedule->onLoaded();
+
+		$occupancy = new Occupancy;
+		$occupancy->onLoaded();
+
+		$tools = new Tools($this->pluginFile);
+		$tools->onLoaded();
 
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
+		add_action('wp_enqueue_scripts', [$this, 'wpEnqueueScripts']);
 
 		add_action('rest_api_init', function () {
 			//$api = new API;
@@ -97,5 +101,17 @@ class Main
 			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
 			'ajaxurl' => admin_url('admin-ajax.php')
 		));
+	}
+
+	public function wpEnqueueScripts()
+	{
+		wp_register_style(
+			'rrze-rsvp-shortcode',
+			plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename())
+		);
+		wp_register_script(
+			'rrze-rsvp-shortcode',
+			plugins_url('assets/js/shortcode.js', plugin()->getBasename())
+		);
 	}
 }
