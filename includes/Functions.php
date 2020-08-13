@@ -216,6 +216,15 @@ class Functions
         return self::crypt($string, 'decrypt');
     }
 
+    /**
+     * getRoomAvailability
+     * Returns an array of dates/timeslots/seats available, for a defined period.
+     * Array structure: date => timeslot => seat IDs
+     * @param string $room the room's post id
+     * @param string $start start date of the period (format 'Y-m-d')
+     * @param string $end end date of the period (format 'Y-m-d')
+     * @return array ['date(Y-m-d)']['timeslot(H:i-H:i)'] = [seat_id, seat_id...]
+     */
     public static function getRoomAvailability($room_id, $start, $end)
     {
         $availability = [];
@@ -233,6 +242,9 @@ class Functions
         ]);
         $seat_ids = [];
         $seats_booked = [];
+        if ($start == $end) {
+            $end = date('Y-m-d H:i', strtotime($start . ' +23 hours, +59 minutes'));
+        }
         foreach ($seats as $seat) {
             $seat_ids[] = $seat->ID;
             $bookings = get_posts([
@@ -310,10 +322,10 @@ class Functions
      * getSeatAvailability
      * Returns an array of dates/timeslots where the seat is available, for a defined period.
      * Array structure: date => timeslot
-     * @param string $room the room's post id
+     * @param string $room the seat's post id
      * @param string $start start date of the period (format 'Y-m-d')
      * @param string $end end date of the period (format 'Y-m-d')
-     * @return array
+     * @return array ['date(Y-m-d)'] => ['start(H:i) - end(H:i)', 'start(H:i) - end(H:i)'...]
      */
     public static function getSeatAvailability($seat, $start, $end)
     {
@@ -325,6 +337,9 @@ class Functions
         $room_id = get_post_meta($seat, 'rrze-rsvp-seat-room', true);
         $slots = self::getRoomSchedule($room_id);
         // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
+        if ($start == $end) {
+            $end = date('Y-m-d H:i', strtotime($start . ' +23 hours, +59 minutes'));
+        }
         $bookings = get_posts([
             'post_type' => 'booking',
             'post_status' => 'publish',
@@ -386,7 +401,7 @@ class Functions
      * Returns an array of post_id => post_title that can be used by settings select callback.
      * Reduced version of wp_dropdown_pages()
      * @param array $args
-     * @return array
+     * @return array page_id => page_title
      */
     public static function getPagesDropdownOptions($args = '')
     {
@@ -416,6 +431,12 @@ class Functions
         return $output;
     }
 
+    /**
+     * getRoomSchedule
+     * Returns an array of timeslots per weekday for a specific room.
+     * @param int $room_id
+     * @return array [weekday_number(1-7)][starttime(H:i)] => endtime(H:i)
+     */
     public static function getRoomSchedule($room_id)
     {
         $schedule = [];
