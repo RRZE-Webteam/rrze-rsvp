@@ -25,7 +25,7 @@ class Shortcodes {
     }
 
     public function onLoaded() {
-        add_action('wp_enqueue_scripts', [$this, 'enqueueScripts']);
+        //add_action('wp_enqueue_scripts', [$this, 'enqueueScripts']);
         add_filter( 'single_template', [$this, 'includeSingleTemplate'] );
 
         $bookings_shortcode = new Bookings($this->pluginFile,  $this->settings);
