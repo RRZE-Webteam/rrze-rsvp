@@ -78,7 +78,15 @@ class Functions
         // get timeslots for today for this room
         $slots = self::getRoomSchedule($room_id); // liefert [wochentag-nummer][startzeit] = end-zeit;
 
+        echo '<pre>';
+        echo 'in getOccupancyByRoomId<br><br>';
+        echo '$slots = ';
+        var_dump($slots);
+
         $slots_today = (isset($slots[$today_weeknumber]) ? $slots[$today_weeknumber] : array());
+
+        echo '$slots_today = ';
+        var_dump($slots_today);
 
         // get seats for this room
         $seatIds = get_posts([
@@ -90,10 +98,22 @@ class Functions
             'fields' => 'ids'
         ]);
 
+        echo '$seatIds = ';
+        var_dump($seatIds);
+        
+
         foreach ($seatIds as $seat_id) {
             $slots_free = self::getSeatAvailability($seat_id, $today, $today); //   liefert ['Y-m-d'] => array('H:i - H:i', 'H:i - H:i' , ... );
+
+            echo '<br><br>$seat_id = ' . $seat_id . '<br>';
+            echo '$slots_free = ';
+            var_dump($slots_free);
+    
             $slots_today_free = (isset($slots_free[$today]) ? $slots_free[$today] : array());
         }
+
+        echo '</pre>';
+        exit;
 
         return $data;
     }
