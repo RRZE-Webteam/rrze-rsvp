@@ -35,6 +35,7 @@ class Bookings
         add_filter('manage_booking_posts_columns', [$this, 'booking_columns']);
         add_action('manage_booking_posts_custom_column', [$this, 'booking_column'], 10, 2);
         add_filter('manage_edit-booking_sortable_columns', [$this, 'booking_sortable_columns']);
+        add_action( 'wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots'] );
     }
 
     // Register Custom Post Type
@@ -105,6 +106,15 @@ class Bookings
         ));
 
         $cmb->add_field(array(
+                            'name'             => __('Seat', 'rrze-rsvp'),
+                            'id'               => 'rrze-rsvp-booking-seat',
+                            'type'             => 'select',
+                            'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
+                            'default'          => 'custom',
+                            'options_cb'       => [$this, 'post_select_options'],
+                        ));
+
+        $cmb->add_field(array(
             'name'             => __('Start', 'rrze-rsvp'),
             'id'               => 'rrze-rsvp-booking-start',
             //'type' => 'text_date_timestamp',
@@ -135,6 +145,7 @@ class Bookings
                         'stepMinute' => 10,
                     )
                 ),
+                'readonly' => 'readonly',
             )
         ));
 
@@ -151,15 +162,6 @@ class Bookings
                 'checked-in'     => __('Checked In', 'rrze-rsvp'),
                 'checked-out'     => __('Checked Out', 'rrze-rsvp'),
             ),
-        ));
-
-        $cmb->add_field(array(
-            'name'             => __('Seat', 'rrze-rsvp'),
-            'id'               => 'rrze-rsvp-booking-seat',
-            'type'             => 'select',
-            'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
-            'default'          => 'custom',
-            'options_cb'       => [$this, 'post_select_options'],
         ));
 
         $cmb->add_field(array(
@@ -400,5 +402,33 @@ class Bookings
             'name' => __('Name', 'rrze-rsvp'),
         );
         return $columns;
+    }
+
+    public function ajaxShowTimeslots() {
+        $output = '';
+        $seat = ((isset($_POST['seat']) && $_POST['seat'] > 0) ? (int)$_POST['seat'] : '');
+        $date_raw = (isset($_POST['date']) ? sanitize_text_field($_POST['date']) : false);
+        if (strpos($date_raw, '.') !== false) {
+            $date_parts = explode('.', $date_raw);
+            $date = $date_parts[2].'-'.$date_parts[1].'-'.$date_parts[0];
+        }
+        $availability = Functions::getSeatAvailability($seat, $date, $date);
+        $output .= '<div class="select_timeslot_container" style="display:inline-block;padding-left: 10px;">';
+        if (isset($availability[$date])) {
+            $output .= '<select class="select_timeslot">'
+            . '<option value="">' . __('Select timeslot', 'rrze-rsvp') . '</option>';
+
+            foreach($availability[$date] as $timeslot) {
+                $time_parts = explode('-', $timeslot);
+                $output .= '<option value="'.$time_parts[0].'" data-end="'.$time_parts[1].'">' . $timeslot . '</option>';
+            }
+            $output .= '</select>';
+//            wp_send_json($availability[$date]);
+        } else {
+            $output .= __('No timeslots available for this seat/day.', 'rrze-rsvp');
+        }
+        $output .= '</div>';
+        echo $output;
+        wp_die();
     }
 }
