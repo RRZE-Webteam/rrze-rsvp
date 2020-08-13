@@ -23,10 +23,8 @@ class Seats
 
 	public function onLoaded()
 	{
-		require_once(plugin_dir_path($this->pluginFile) . 'vendor/cmb2/init.php');
 		add_action('init', [$this, 'seats_post_type'], 0);
 		add_action('init', [$this, 'seats_taxonomies']);
-		add_action('cmb2_admin_init', [$this, 'seats_metaboxes']);
 	}
 
 	// Register Custom Post Type
@@ -101,53 +99,5 @@ class Seats
 			]
 		);
 		register_taxonomy('rrze-rsvp-equipment', 'seat', $args_equipment);
-	}
-
-	public function seats_metaboxes()
-	{
-		$cmb = new_cmb2_box(array(
-			'id'            => 'rrze-rsvp-seat-details-meta',
-			'title'         => __('Details', 'rrze-rsvp'),
-			'object_types'  => array('seat',), // Post type
-			'context'       => 'normal',
-			'priority'      => 'high',
-			'show_names'    => true, // Show field names on the left
-			// 'cmb_styles' => false, // false to disable the CMB stylesheet
-			// 'closed'     => true, // Keep the metabox closed by default
-		));
-
-
-
-
-
-		$cmb->add_field(array(
-			'name'             => __('Room', 'rrze-rsvp'),
-			//'desc'             => 'Select an option',
-			'id'               => 'rrze-rsvp-seat-room',
-			'type'             => 'select',
-			'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
-			'default'          => 'custom',
-			'options_cb'       => [$this, 'post_select_options'],
-		));
-	}
-
-	public function seats_metaboxes_save($post_id)
-	{
-	}
-
-	public function post_select_options($field)
-	{
-		$rooms = get_posts([
-			'post_type' => 'room',
-			'post_statue' => 'publish',
-			'nopaging' => true,
-			'orderby' => 'title',
-			'order' => 'ASC',
-		]);
-		$options = [];
-		foreach ($rooms as $room) {
-			$options[$room->ID] = $room->post_title;
-		}
-		return $options;
 	}
 }
