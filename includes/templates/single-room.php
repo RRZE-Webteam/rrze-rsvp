@@ -9,9 +9,11 @@ $settings = new Settings(plugin()->getFile());
 $options = (object) $settings->getOptions();
 global $post;
 
-//TODO: Format embedded
 get_header();
-echo '<style>
+
+//TODO: Format embedded
+if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
+    echo '<style>
     body {
         width: 1820px;
         height: 590px;
@@ -28,15 +30,12 @@ echo '<style>
     }
     </style>';
 
-if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
     while ( have_posts() ) : the_post();
         echo Functions::getOccupancyByRoomId(get_the_ID());
     endwhile;
 
     return;
 }
-
-get_header();
 
 if (Helper::isFauTheme()) {
     get_template_part('template-parts/hero', 'small');
