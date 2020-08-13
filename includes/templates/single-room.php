@@ -11,7 +11,6 @@ global $post;
 
 get_header();
 
-//TODO: Format embedded
 if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
 
     while ( have_posts() ) : the_post();
