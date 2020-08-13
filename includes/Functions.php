@@ -73,6 +73,7 @@ class Functions
         $output = '<table class="rsvp-room-occupancy"><tr>';
 
         $seats_slots = self::getOccupancyByRoomId($room_id);
+
         if ($seats_slots){
             $output .= '<td>&nbsp;</td>';
             foreach($seats_slots['room_slots'] as $room_slot){
@@ -101,7 +102,7 @@ class Functions
      * getOccupancyByRoomId
      * Returns an array('room_slots' with all timeslot-spans for this room, seat_id => array(timeslot-span => true/false)) for today
      * Example: given room has 2 seats; 1 seat is not available at 09:30-10:30 
-     *          array(2) { [2244487]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(true) ["11:05-12:10"]=> bool(true) } [1903]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(false) ["11:05-12:10"]=> bool(true) } }
+     *          returns: array(3) { ["room_slots"]=> array(3) { [0]=> string(13) "08:15 - 09:15" [1]=> string(13) "09:30 - 10:30" [2]=> string(13) "11:05 - 12:10" } [2244487]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(true) ["11:05-12:10"]=> bool(true) } [1903]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(false) ["11:05-12:10"]=> bool(true) } }
      * @param int $room_id (the room's post id)
      * @return array
      */
@@ -119,10 +120,7 @@ class Functions
         $slots_today = [];
         foreach($slots_today_tmp as $start => $end){
             $slots_today[] = $start . '-' . $end;
-        }
-
-        foreach($slots_today as $timespan){
-            $data['room_slots'][] = $timespan;
+            $data['room_slots'][] =  $start . ' - ' . $end;
         }
 
         // get seats for this room
