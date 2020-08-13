@@ -1,17 +1,18 @@
 "use strict";
 
 jQuery(document).ready(function($){
-    // var $loading = $('#loading').hide();
-    // $(document)
-    //     .ajaxStart(function () {
-    //         $loading.show();
-    //     })
-    //     .ajaxStop(function () {
-    //         $loading.hide();
-    //     });
+    var $loading = $('#loading').hide();
+    $(document)
+        .ajaxStart(function () {
+            $loading.show();
+        })
+        .ajaxStop(function () {
+            $loading.hide();
+        });
 
     $('select#rsvp_room_id').change(updateTable);
 });
+
 
 function updateTable() {
     var roomId = jQuery('#rsvp_room_id').val();

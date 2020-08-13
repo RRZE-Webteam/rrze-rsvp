@@ -61,9 +61,45 @@ class Functions
     }
 
 
+
+    /**
+     * getOccupancyByRoomIdHTML
+     * calls getOccupancyByRoomId and returns an HTML table with room's occupancy for today 
+     * @param int $room_id (the room's post id)
+     * @return string
+     */
+    public static function getOccupancyByRoomIdHTML(int $room_id): string
+    {
+        $output = '<table class="rsvp-room-occupancy"><tr>';
+
+        $seats_slots = self::getOccupancyByRoomId($room_id);
+        if ($seats_slots){
+            $output .= '<td>&nbsp;</td>';
+            foreach($seats_slots['room_slots'] as $room_slot){
+                $output .= '<td>' . $room_slot . '</td>';
+            }
+            $output .= '</tr>';
+            unset($seats_slots['room_slots']);
+
+            foreach($seats_slots as $seat_id => $aSlots){
+                $output .= '<tr>';
+                $output .= '<td>' . get_the_title( $seat_id ) . '</td>';
+                foreach($aSlots as $slot => $free){
+                    $output .= '<td>' . ($free?'available':'not available') . '</td>';
+                }
+                $output .= '</tr>';
+            }
+        }else{
+            $output .= '<td>' . __('this room has no seats', 'rrze-rsvp') . '</td>';
+        }
+        $output .= '</table>';
+
+        return $output;
+    }
+
     /**
      * getOccupancyByRoomId
-     * Returns an array(seat_id => array(timeslot-span => true/false)) for today
+     * Returns an array('room_slots' with all timeslot-spans for this room, seat_id => array(timeslot-span => true/false)) for today
      * Example: given room has 2 seats; 1 seat is not available at 09:30-10:30 
      *          array(2) { [2244487]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(true) ["11:05-12:10"]=> bool(true) } [1903]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(false) ["11:05-12:10"]=> bool(true) } }
      * @param int $room_id (the room's post id)
@@ -85,6 +121,10 @@ class Functions
             $slots_today[] = $start . '-' . $end;
         }
 
+        foreach($slots_today as $timespan){
+            $data['room_slots'][] = $timespan;
+        }
+
         // get seats for this room
         $seatIds = get_posts([
             'post_type' => 'seat',
@@ -96,7 +136,6 @@ class Functions
         ]);
 
         foreach ($seatIds as $seat_id) {
-
             $slots_free = self::getSeatAvailability($seat_id, $today, date('Y-m-d', strtotime($today. ' +1 days')));
             $slots_free_today_tmp = ( isset($slots_free[$today]) ? $slots_free[$today] : [] );
             $slots_free_today = array_combine($slots_free_today_tmp, $slots_free_today_tmp); // set values to keys

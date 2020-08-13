@@ -8,16 +8,14 @@ use RRZE\RSVP\Functions;
 // use RRZE\RSVP\Capabilities;
 
 
-if (isset($_POST['rsvp_room_id'])){
-    echo '<pre>';
-    echo 'echo rsvp_room_id posted';
-    $roomId = filter_input(INPUT_POST, 'rsvp_room_id', FILTER_VALIDATE_INT);
-    $response = Functions::getOccupancyByRoomId($roomId);
-
-    var_dump($response);
-
-    exit;
-}
+// if (isset($_POST['rsvp_room_id'])){
+//     echo '<pre>';
+//     echo 'echo rsvp_room_id posted';
+//     $roomId = filter_input(INPUT_POST, 'rsvp_room_id', FILTER_VALIDATE_INT);
+//     $response = Functions::getOccupancyByRoomIdHTML($roomId);
+//     var_dump($response);
+//     exit;
+// }
 
 class Occupancy{
     /**
@@ -38,8 +36,8 @@ class Occupancy{
     public function onLoaded(){
         add_action( 'admin_menu', [$this, 'registerOccupancyPage'] );
         add_action( 'admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
-        // add_action( 'wp_ajax_ShowOccupancy', [$this, 'ajaxGetOccupancy'] );
-        // add_action( 'wp_ajax_nopriv_ShowOccupancy', [$this, 'ajaxGetOccupancy'] );
+        add_action( 'wp_ajax_ShowOccupancy', [$this, 'ajaxGetOccupancy'] );
+        add_action( 'wp_ajax_nopriv_ShowOccupancy', [$this, 'ajaxGetOccupancy'] );
     }
 
     public function registerOccupancyPage(){
@@ -57,7 +55,6 @@ class Occupancy{
     }
 
     public function adminEnqueueScripts(){
-        // wp_register_style('rrze-rsvp-occupancy', plugins_url('assets/css/rrze-rsvp.css', plugin_basename($this->pluginFile)));
         wp_enqueue_script(
 			'rrze-rsvp-occupancy',
 			plugins_url('assets/js/occupancy.js', plugin()->getBasename()),
@@ -73,12 +70,10 @@ class Occupancy{
     }
 
     public function ajaxGetOccupancy() {
-        // check_ajax_referer( 'rsvp-ajax-nonce', 'nonce'  );
+        check_ajax_referer( 'rsvp-ajax-nonce', 'nonce'  );
         $roomId = filter_input(INPUT_POST, 'roomId', FILTER_VALIDATE_INT);
-        // echo "<script>console.log('in ajaxGetOccupancy roomId = " . $roomId . "' );</script>";
-        $response = Functions::getOccupancyByRoomId($roomId);
+        $response = Functions::getOccupancyByRoomIdHTML($roomId);
         wp_send_json($response);
-        // echo $response;
     }
 
 
@@ -89,8 +84,6 @@ class Occupancy{
         echo '<tr><th scope="row"><label for="select_room">' . __('Room','rrze-rsvp') . '</label></th>';
         echo '<td>'
             . '<form action="" method="post" class="occupancy">'
-            // . '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room">'
-            // . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>'
             . '<select id="rsvp_room_id" name="rsvp_room_id">'
             . '<option>&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;</option>';
 
@@ -106,9 +99,10 @@ class Occupancy{
             echo '<option value="' . $room->ID . '">' . $room->post_title . '</option>';
         }
 
-        // echo '</select></form></td></tr>';
-        echo '</select> <input type="submit" value="Submit"></form></td></tr>';
+        echo '</select></form></td></tr>';
+        // echo '</select> <input type="submit" value="Submit it"></form></td></tr>';
         echo '</tbody></table>';
+        echo '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
 
         echo '<div class="rsvp-occupancy-container"></div>';
         

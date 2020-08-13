@@ -30,7 +30,7 @@ echo '<style>
 
 if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
     while ( have_posts() ) : the_post();
-        echo Functions::getOccupancyByRoomId(get_the_ID());
+        echo Functions::getOccupancyByRoomIdHTML(get_the_ID());
     endwhile;
 
     return;
