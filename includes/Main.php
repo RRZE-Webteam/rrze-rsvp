@@ -99,7 +99,9 @@ class Main
 			'text_cancel' => __('Do you want to cancel?', 'rrze-rsvp'),
 			'text_cancelled' => _x('Cancelled', 'Booking', 'rrze-rsvp'),
 			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
-			'ajaxurl' => admin_url('admin-ajax.php')
+			'ajaxurl' => admin_url('admin-ajax.php'),
+            // Strings für CPT Booking Backend
+            'alert_no_seat_date' => __('Please select a seat and a date first.', 'rrze-rsvp')
 		));
 	}
 
