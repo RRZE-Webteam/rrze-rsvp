@@ -9,6 +9,7 @@ namespace RRZE\RSVP\CPT;
 defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Capabilities;
+use RRZE\RSVP\Functions;
 
 class Rooms
 {
@@ -88,6 +89,13 @@ class Rooms
 
     public function room_metaboxes()
     {
+        $roomId = null;
+        if (isset($_GET['post'])) {
+            $roomId = $_GET['post'];
+        } elseif (isset($_POST['post_ID'])) {
+            $roomId = $_POST['post_ID'];
+        }
+
         $cmb_timeslots = new_cmb2_box(array(
             'id'            => 'rrze-rsvp-room-timeslots_meta',
             'title'         => __('Timeslots', 'rrze-rsvp'),
@@ -172,6 +180,24 @@ class Rooms
             'type'    => 'text',
         ));
 
+        $cmb_general->add_field( array(
+            'name'             => __('Booking Form Page', 'rrze-rsvp'),
+            'desc'             => __('Select a current page to display the booking form. Please note that the current content of the page will be replaced by the booking form.', 'rrze-rsvp'),
+            'id'               => 'rrze-rsvp-room-form-page',
+            'type'             => 'select',
+            'show_option_none' => true,
+            'default'          => '-1',
+            'options'          => $this->getPages()
+        ) );        
+
+        $cmb_general->add_field(array(
+            'name' => __('SSO is required', 'rrze-rsvp'),
+            'desc' => __('If SSO is enabled then the customer must log in through SSO in order to use the booking form.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-sso-required',
+            'type' => 'checkbox',
+            'default' => '',
+        ));
+
         $cmb_general->add_field(array(
             'name' => __('Available days in advance', 'rrze-rsvp'),
             'desc' => __('Number of days for which bookings are available in advance.', 'rrze-rsvp'),
@@ -181,6 +207,7 @@ class Rooms
                 'type' => 'number',
                 'min' => '0',
             ),
+            'default' => 7
         ));
 
         $cmb_general->add_field(array(
@@ -220,6 +247,7 @@ class Rooms
             'desc' => 'If not checked, the comment text input will still be visible in the backend for booking admins for internal notes.',
             'id'   => 'rrze-rsvp-room-notes-check',
             'type' => 'checkbox',
+            'default' => '',
         ) );
 
         $cmb_general->add_field( array(
@@ -254,5 +282,19 @@ class Rooms
             ),
             'preview_size' => 'large', // Image size to use when previewing in the admin.
         ));
+    }
+
+    protected function getPages(): array
+    {
+        $pages = get_pages();
+        if (empty($pages)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($pages as $page) {
+            $result[$page->ID] = $page->post_title;
+        }
+        return $result;
     }
 }
