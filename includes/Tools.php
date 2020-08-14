@@ -254,8 +254,8 @@ class Tools
 
         echo '<tr>'
              . '<th scope="row"><strong>' . __('Rows Numbering System', 'rrze-rsvp') . '</strong></th>'
-             . '<td><input type="radio" id="schema_rows_numeric" name="schema_rows" value="num" required ' . checked($value_schema_rows, 'num', false) . '> <label for="schema_rows">' . __('Numeric (1 - 999)', 'rrze-rsvp') . '</label><br />'
-             . '<input type="radio" id="schema_rows_a-z" name="schema_rows" value="a-z" ' . checked($value_schema_rows, 'a-z', false) . '> <label  for="schema_rows">' . __('A-Z', 'rrze-rsvp') . '</label>'
+             . '<td><input type="radio" id="schema_rows_numeric" name="schema_rows" value="num" required ' . checked($value_schema_rows, 'num', false) . '> <label for="schema_rows_numeric">' . __('Numeric (1 - 999)', 'rrze-rsvp') . '</label><br />'
+             . '<input type="radio" id="schema_rows_a-z" name="schema_rows" value="a-z" ' . checked($value_schema_rows, 'a-z', false) . '> <label  for="schema_rows_a-z">' . __('A-Z', 'rrze-rsvp') . '</label>'
              . '</td>'
              . '</tr>';
 
@@ -268,8 +268,8 @@ class Tools
 
         echo '<tr>'
              . '<th scope="row"><strong>' . __('Seats Numbering System', 'rrze-rsvp') . '</strong></th>'
-             . '<td><input type="radio" id="schema_seats_numeric" name="schema_seats" value="num" required ' . checked($value_schema_seats, 'num', false) . '> <label  for="schema_seats">' . __('Numeric (1 - 999)', 'rrze-rsvp') . '</label><br />'
-             . '<input type="radio" id="schema_seats_a-z" name="schema_seats" value="a-z" ' . checked($value_schema_seats, 'a-z', false) . '> <label  for="schema_seats">' . __('A-Z', 'rrze-rsvp') . '</label></td>'
+             . '<td><input type="radio" id="schema_seats_numeric" name="schema_seats" value="num" required ' . checked($value_schema_seats, 'num', false) . '> <label  for="schema_seats_numeric">' . __('Numeric (1 - 999)', 'rrze-rsvp') . '</label><br />'
+             . '<input type="radio" id="schema_seats_a-z" name="schema_seats" value="a-z" ' . checked($value_schema_seats, 'a-z', false) . '> <label  for="schema_seats_a-z">' . __('A-Z', 'rrze-rsvp') . '</label></td>'
              . '</tr>';
 
         echo '<tr>'
@@ -285,7 +285,7 @@ class Tools
         if (!empty($equipments)) {
             foreach ($equipments as $equipment) {
                 $equi_out .= '<p><input type="checkbox" name="equipment[]" id="equipment_' . $equipment->term_id . '" value="' . $equipment->term_id . '" ' . checked(in_array($equipment->term_id, $value_equipment), true, false) . '>'
-                    . '<label for="' . $equipment->term_id . '">' . $equipment->name . '</label></p>';
+                    . '<label for="equipment_' . $equipment->term_id . '">' . $equipment->name . '</label></p>';
             }
         } else {
             $equi_out .= '<p>' . sprintf(__('No equipment found. You can add seat equipment on the %sEquipment screen%s.'), '<a href="'.admin_url('/edit-tags.php?taxonomy=rrze-rsvp-equipment">'), '</a>') . '</p>';
