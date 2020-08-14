@@ -453,4 +453,25 @@ class Functions
         }
         return $schedule;
     }
+
+    /**
+     * getSelectHTML
+     * Returns HTML <select ...><option ...>...
+     * @param string $sSelect : the id and name of <select
+     * @param string $sAll : the description of option  0 (f.e. --- all seats ---)
+     * @param array $aOptions : assoc array with options' values => descriptions
+     * @param string $sSelected : value of selected option (optional)
+     * @return string
+     */
+    public static function getSelectHTML(string $sSelect, string $sAll, array $aOptions, string $sSelected = ''): string
+    {
+        $output = '<select id="' . $sSelect . '" name="' . $sSelect . '">';
+        $output .= '<option value="0">' . $sAll . ' </option>';
+        foreach ($aOptions as $val => $desc){
+            $sel = ($val == $sSelected ? ' selected="selected"' : '');
+            $output .= '<option value="' . $val . '"' . $sel . '>' . $desc . ' </option>';
+        }
+        $output .= '</select>';
+        return $output;
+    }
 }
