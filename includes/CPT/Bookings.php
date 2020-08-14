@@ -16,11 +16,16 @@ class Bookings
 {
 
     protected $options;
+    protected $sDate;
+    protected $sRoom;
+
 
     public function __construct($pluginFile, $settings)
     {
         $this->pluginFile = $pluginFile;
         $this->settings = $settings;
+        $this->sDate = 'rsvp_booking_date';
+        $this->sRoom = 'rsvp_booking_room';
     }
 
     public function onLoaded()
@@ -32,6 +37,8 @@ class Bookings
         add_action('manage_booking_posts_custom_column', [$this, 'booking_column'], 10, 2);
         add_filter('manage_edit-booking_sortable_columns', [$this, 'booking_sortable_columns']);
         add_action( 'wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots'] );
+        add_action( 'restrict_manage_posts', [$this, 'addFilters'], 10, 1 );
+        add_filter( 'parse_query', [$this, 'filterQuery'], 10);
     }
 
     // Register Custom Post Type
@@ -290,4 +297,83 @@ class Bookings
         echo $output;
         wp_die();
     }
+
+
+    public function addFilters($post_type){
+        if ($post_type != 'booking'){
+          return;
+        }
+
+        $sAllDates = __( 'Show all dates', 'rrze-rsvp' );
+        $sAllRoomes = __( 'Show all rooms', 'rrze-rsvp' );
+        $sSelectedDate = (string) filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
+        $sSelectedRoom = (string) filter_input(INPUT_GET, $this->sRoom, FILTER_SANITIZE_STRING);
+
+        // 1. get all booking IDs
+        $aBookingIds = get_posts([
+            'post_type' => 'booking',
+            'nopaging' => true,
+            'fields' => 'ids'
+        ]);
+
+        $aBookingDates = [];
+        $aBookingRooms = [];
+
+        foreach ($aBookingIds as $bookingId){
+            // 2. get unique dates
+            $bookingDate = get_post_meta($bookingId, 'rrze-rsvp-booking-start', true);
+            $aBookingDates[$bookingDate] = Functions::dateFormat($bookingDate);
+            // 3. get unique rooms via seat
+            $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
+            $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
+            $aBookingRooms[$roomId] = get_the_title($roomId);
+        }
+
+        if ($aBookingDates){
+            // sort($aBookingDates);
+            echo Functions::getSelectHTML($this->sDate, $sAllDates, $aBookingDates, $sSelectedDate);
+        }
+        
+        if ($aBookingRooms){
+            // sort($aBookingRooms);
+            echo Functions::getSelectHTML($this->sRoom, $sAllRoomes, $aBookingRooms, $sSelectedRoom);
+        }
+    }
+
+    public function filterQuery($query){
+        if ( !(is_admin() AND $query->is_main_query()) ){ 
+          return $query;
+        }
+
+        $sSelectedDate = filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
+        $sSelectedRoom = filter_input(INPUT_GET, $this->sRoom, FILTER_SANITIZE_STRING);
+
+        if ( !('booking' === $query->query['post_type'] )){
+          return $query;
+        }
+
+        // default values are given (= "show all ...") => don't modify query_vars
+        if ($sSelectedDate == 0 && $sSelectedRoom == 0 ){
+          return $query;
+        }
+
+        if ($sSelectedDate){
+            $query->query_vars = array(array(
+                'field' => 'rrze-rsvp-booking-start',
+                'value' => $sSelectedDate,
+                'compare' => '=',
+                'type' => 'NUMBER'
+              ));
+        }
+
+        if ($sSelectedRoom){
+            $query->query_vars = array(array(
+                'field' => 'rrze-rsvp-seat-room',
+                'value' => $sSelectedRoom,
+                'compare' => '=',
+                'type' => 'STRING'
+              ));
+        }
+        return $query;
+      }
 }
