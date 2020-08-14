@@ -1,14 +1,14 @@
 <?php
 
-
 namespace RRZE\RSVP;
 
+defined('ABSPATH') || exit;
 
 class Tools
 {
 
-    function __construct() {
-
+    public function __construct() {
+        //
     }
 
     public function onLoaded() {
