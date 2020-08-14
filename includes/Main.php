@@ -57,7 +57,7 @@ class Main
 		$occupancy = new Occupancy;
 		$occupancy->onLoaded();
 
-		$tools = new Tools($this->pluginFile);
+		$tools = new Tools;
 		$tools->onLoaded();
 
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
