@@ -4,9 +4,11 @@ namespace RRZE\RSVP\Shortcodes;
 
 use RRZE\RSVP\Helper;
 use function RRZE\RSVP\Config\getShortcodeSettings;
-// use function RRZE\RSVP\Config\getShortcodeDefaults;
 
-require_once __DIR__ . '/../../vendor/tcpdf/tcpdf_barcodes_2d.php';
+use function RRZE\RSVP\plugin;
+
+require_once plugin()->getPath('vendor/tcpdf') . 'tcpdf_barcodes_2d.php';
+
 use TCPDF2DBarcode;
 
 

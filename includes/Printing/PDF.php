@@ -3,11 +3,13 @@ namespace RRZE\RSVP\Printing;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/../../vendor/tcpdf/tcpdf.php';
+use function RRZE\RSVP\plugin;
+
+require_once plugin()->getPath('vendor/tcpdf') . 'tcpdf.php';
+
 
 use TCPDF;
 use RRZE\RSVP\Settings;
-use function RRZE\RSVP\plugin;
 
 class PDF extends TCPDF{
 
