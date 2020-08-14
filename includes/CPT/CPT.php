@@ -82,7 +82,7 @@ class CPT extends Main
             __( 'Current room occupancy', 'rrze-rsvp' ),
             __( 'Room occupancy', 'rrze-rsvp' ),
             'edit_seats',
-            'rrze-rsvp',
+            'occupancy',
             [$this, 'getOccupancyPage']
         );
 
