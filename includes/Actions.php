@@ -4,8 +4,6 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Functions;
-
 class Actions
 {
 	protected $email;
@@ -245,7 +243,8 @@ class Actions
 			$this->email->bookingCancelledAdmin($bookingId);
 			$bookingCancelled = true;
 		} elseif (!$bookingCancelled && !$bookingCkeckedIn && $bookingConfirmed && $action == 'checkin') {
-			if ($start <= $now && $end >= $now) {
+			$offset = 15 * MINUTE_IN_SECONDS;
+			if (($start - $offset) <= $now && ($end - $offset) >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
 				$bookingCkeckedIn = true;
 			}
