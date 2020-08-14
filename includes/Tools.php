@@ -125,10 +125,10 @@ class Tools
                              'Cancel',
                              'rrze-rsvp'
                          ) . '</a>';
-                    $argv = str_replace('status=confirm', 'status=submit', $_SERVER[ 'argv' ][ 0 ]);
+                    $serverQueryString = str_replace('status=confirm', 'status=submit', $_SERVER['QUERY_STRING']);
                     echo '<a href="' . admin_url(
                             '/tools.php'
-                        ) . '?' . $argv . '" class="but, ton button-primary">' . __(
+                        ) . '?' . $serverQueryString . '" class="but, ton button-primary">' . __(
                              'Create seats',
                              'rrze-rsvp'
                          ) . '</a>';
