@@ -4,7 +4,7 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-require_once(plugin()->getPath('vendor/cmb2') . 'init.php');
+require_once plugin()->getPath('vendor/cmb2') . 'init.php';
 
 class Metaboxes
 {
