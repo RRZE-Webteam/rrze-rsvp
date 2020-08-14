@@ -277,7 +277,7 @@ class Metaboxes
 
         $cmb_general->add_field(array(
             'name' => __('Show notes/comment input in booking form', 'rrze-rsvp'),
-            'desc' => 'If not checked, the comment text input will still be visible in the backend for booking admins for internal notes.',
+            'desc' => __('If not checked, the comment text input will still be visible in the backend for booking admins for internal notes.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-notes-check',
             'type' => 'checkbox',
             'default' => '',
