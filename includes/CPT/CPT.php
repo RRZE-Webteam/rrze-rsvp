@@ -14,6 +14,7 @@ class CPT extends Main
 {
     protected $pluginFile;
     protected $settings;
+    public $occupancy;
 
     public function __construct($pluginFile, $settings)
     {
@@ -33,6 +34,15 @@ class CPT extends Main
 
         add_action('admin_menu', [$this, 'bookingMenu']);
         add_filter('parent_file', [$this, 'filterParentMenu']);
+
+        if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
+            add_filter(
+                'body_class',
+                function ($classes) {
+                    return array_merge($classes, array('embedded'));
+                }
+            );
+        }
     }
 
     public function bookingMenu()
@@ -66,6 +76,16 @@ class CPT extends Main
             'edit_seats',
             'edit-tags.php?taxonomy=rrze-rsvp-equipment&post_type=seat'
         );
+
+        add_submenu_page(
+            'edit.php?post_type=booking',
+            __( 'Current room occupancy', 'rrze-rsvp' ),
+            __( 'Room occupancy', 'rrze-rsvp' ),
+            'edit_seats',
+            'occupancy',
+            [$this, 'getOccupancyPage']
+        );
+
 
         remove_submenu_page('edit.php?post_type=booking', 'edit.php?post_type=booking');
         remove_submenu_page('edit.php?post_type=booking', 'post-new.php?post_type=booking');
@@ -116,4 +136,34 @@ class CPT extends Main
 
         return $parent_file;
     }
+
+    public function getOccupancyPage(){
+        echo '<div class="wrap">'
+            . '<h1>' . esc_html_x( 'Current room occupancy', 'admin page title', 'rrze-rsvp' ) . '</h1>'
+            . '<table class="form-table" role="presentation"><tbody>'
+            . '<tr><th scope="row"><label for="select_room">' . __('Room','rrze-rsvp') . '</label></th>'
+            . '<td>'
+            . '<form action="" method="post" class="occupancy">'
+            . '<select id="rsvp_room_id" name="rsvp_room_id">'
+            . '<option>&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;</option>';
+
+        $rooms = get_posts([
+            'post_type' => 'room',
+            'post_statue' => 'publish',
+            'nopaging' => true,
+            'orderby' => 'title',
+            'order' => 'ASC',
+        ]);
+
+        foreach ($rooms as $room) {
+            echo '<option value="' . $room->ID . '">' . $room->post_title . '</option>';
+        }
+
+        echo '</select></form></td></tr>'
+            . '</tbody></table>'
+            . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>'
+            . '<div class="rsvp-occupancy-container"></div>'
+            . '</div>';
+     }
+
 }

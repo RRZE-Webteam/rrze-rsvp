@@ -35,11 +35,18 @@ class Main
 		$cpt = new CPT($this->pluginFile, $settings);
 		$cpt->onLoaded();
 
+		// CMB2
+		$metaboxes = new Metaboxes;
+		$metaboxes->onLoaded();
+
 		$actions = new Actions;
 		$actions->onLoaded();
 
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();
+
+		$bookingForm = new BookingForm;
+		$bookingForm->onLoaded();
 
 		$printing = new Printing;
 		$printing->onLoaded();
@@ -47,10 +54,14 @@ class Main
 		$schedule = new Schedule;
 		$schedule->onLoaded();
 
-//        $tools = new Tools($this->pluginFile);
-//        $tools->onLoaded();
+		$occupancy = new Occupancy;
+		$occupancy->onLoaded();
+
+		$tools = new Tools;
+		$tools->onLoaded();
 
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
+		add_action('wp_enqueue_scripts', [$this, 'wpEnqueueScripts']);
 
 		add_action('rest_api_init', function () {
 			//$api = new API;
@@ -92,7 +103,21 @@ class Main
 			'text_cancel' => __('Do you want to cancel?', 'rrze-rsvp'),
 			'text_cancelled' => _x('Cancelled', 'Booking', 'rrze-rsvp'),
 			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
-			'ajaxurl' => admin_url('admin-ajax.php')
+			'ajaxurl' => admin_url('admin-ajax.php'),
+            // Strings für CPT Booking Backend
+            'alert_no_seat_date' => __('Please select a seat and a date first.', 'rrze-rsvp')
 		));
+	}
+
+	public function wpEnqueueScripts()
+	{
+		wp_register_style(
+			'rrze-rsvp-shortcode',
+			plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename())
+		);
+		wp_register_script(
+			'rrze-rsvp-shortcode',
+			plugins_url('assets/js/shortcode.js', plugin()->getBasename())
+		);
 	}
 }

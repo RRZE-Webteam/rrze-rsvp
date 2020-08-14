@@ -5,13 +5,10 @@ namespace RRZE\RSVP\Shortcodes;
 use RRZE\RSVP\Email;
 use RRZE\RSVP\IdM;
 use RRZE\RSVP\Functions;
-use RRZE\RSVP\Helper;
+use RRZE\RSVP\Template;
 
 use function RRZE\RSVP\Config\defaultOptions;
 use function RRZE\RSVP\Config\getShortcodeSettings;
-use function RRZE\RSVP\Config\getShortcodeDefaults;
-use function RRZE\RSVP\getRoomAvailability;
-
 
 defined('ABSPATH') || exit;
 
@@ -20,6 +17,7 @@ defined('ABSPATH') || exit;
  */
 class Bookings extends Shortcodes {
     protected $pluginFile;
+    protected $template;
     private $settings = '';
     private $shortcodesettings = '';
     private $options = '';
@@ -35,6 +33,7 @@ class Bookings extends Shortcodes {
         $this->options = (object) $settings->getOptions();
         $this->email = new Email;
         $this->idm = new IdM;
+        $this->template = new Template;
     }
 
 
@@ -57,336 +56,537 @@ class Bookings extends Shortcodes {
         }
     }
 
-
     public function shortcodeBooking($atts, $content = '', $tag) {
-        $output = '';
-        $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
-        $sso = ($shortcode_atts[ 'sso' ] == 'true');
+        wp_enqueue_style('rrze-rsvp-shortcode');
 
-        if (isset($_POST['rrze_rsvp_post_nonce_field']) && wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
-
-            array_walk_recursive(
-                    $_POST, function ( &$value ) {
-                    if ( is_string( $value ) ) {
-                        $value = wp_strip_all_tags( trim( $value ) );
-                    }
-                }
-            );
-
-            $posted_data = $_POST;
-//            echo Helper::get_html_var_dump($posted_data);
-            $booking_date = sanitize_text_field($posted_data['rsvp_date']);
-            $booking_start = sanitize_text_field($posted_data['rsvp_time']);
-            $booking_timestamp_start = strtotime($booking_date . ' ' . $booking_start);
-            $booking_seat = absint($posted_data['rsvp_seat']);
-            $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
-            $booking_instant = (isset($posted_data['rsvp_instant']) && $posted_data['rsvp_instant'] == '1');
-            $booking_comment = (isset($posted_data['rsvp_comment']) ? sanitize_textarea_field($posted_data['rsvp_comment']) : '');
-            $booking_dsgvo = (isset($posted_data['rsvp_dsgvo']) && $posted_data['rsvp_dsgvo'] == '1');
-
-            if ($sso) {
-                if ($this->idm->isAuthenticated()){
-                    $sso_data = $this->idm->getCustomerData();
-                    $booking_lastname  = $sso_data['customer_lastname'];
-                    $booking_firstname  = $sso_data['customer_firstname'];
-                    $booking_email  = $sso_data['customer_email'];
-                } else {
-                    return '<h2>' . __('SSO error', 'rrze-rsvp') . '</h2>'
-                        . '<div class="alert alert-danger" role="alert">' . __("Error retrieving your data from SSO. Please try again or contact the room's administrator.", 'rrze-rsvp') . '</div>';
-
-                }
-            } else {
-                $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
-                $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
-                $booking_email = sanitize_email($posted_data['rsvp_email']);
-            }
-
-            // Überprüfen ob bereits eine Buchung mit gleicher E-Mail-Adresse zur gleichen Zeit vorliegt
-            $check_args = [
-                'post_type' => 'booking',
-                'meta_query' => [
-                    'relation' => 'AND',
-                    [
-                        'key' => 'rrze-rsvp-booking-guest-email',
-                        'value' => $booking_email
-                    ],
-                    [
-                        'key' => 'rrze-rsvp-booking-start',
-                        'value' => $booking_timestamp_start
-                    ],
-                    [
-                        'key' => 'rrze-rsvp-booking-status',
-                        'value' => ['confirmed', 'checked-in'],
-                        'compare' => 'IN',
-                    ]
-                ],
-                'nopaging' => true,
-            ];
-            $check_bookings = get_posts($check_args);
-            if ($check_bookings !== false && !empty($check_bookings)) {
-                return '<h2>' . __('Multiple Booking', 'rrze-rsvp') . '</h2>'
-                    . '<div class="alert alert-danger" role="alert">' . sprintf('%sSie haben für den angegebenen Zeitraum bereits einen Sitzplatz gebucht.%s Wenn Sie Ihre Buchung ändern möchten, stornieren Sie bitte zuerst die bestehende Buchung. Den Link dazu finden Sie in Ihrer Bestätigungsmail.', '<strong>', '</strong><br />') . '</div>';
-            }
-
-            // Überprüfen ob der Platz in der Zwischenzeit bereits anderweitig gebucht wurde
-            $check_availability = Functions::getSeatAvailability($booking_seat, $booking_date, date('Y-m-d', strtotime($booking_date. ' +1 days')));
-            $seat_available = false;
-            foreach ($check_availability[$booking_date] as $timeslot) {
-                if (strpos($timeslot, $booking_start) == 0) {
-                    $seat_available = true;
-                }
-            }
-            if (!$seat_available) {
-                $permalink = get_permalink($this->options->general_booking_page);
-                $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
-                $url = "$permalink?room_id=$room_id&bookingdate=$booking_date&timeslot=$booking_start\"";
-
-                return '<h2>' . __('Seat already booked', 'rrze-rsvp') . '</h2>'
-                       . '<div class="alert alert-danger" role="alert">'
-                       . sprintf('%sSorry! The seat you selected has been booked by someone else in the mean time.%s Please try again. %s-> Back to booking form%s', '<strong>', '</strong><br />', "<a href=\"$url\">", '</a>')
-                       . '</div>';
-            }
-
-            $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
-            $room_autoconfirmation = get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true);
-            $roomForceToConfirm = get_post_meta($room_id, 'rrze-rsvp-room-force-to-confirm', true);
-            $room_timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
-            foreach ($room_timeslots as $week) {
-                foreach ($week['rrze-rsvp-room-weekday'] as $day) {
-                    $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
-                }
-            }
-            $weekday = date('N', $booking_timestamp_start);
-            $booking_end = array_key_exists($booking_start, $schedule[$weekday]) ? $schedule[$weekday][$booking_start] : $booking_start;
-            $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
-
-            //Buchung speichern
-            $new_draft = [
-                'post_status' => 'publish',
-                'post_type' => 'booking',
-            ];
-            if ($booking_id = wp_insert_post($new_draft)) {
-                update_post_meta($booking_id, 'rrze-rsvp-booking-start', $booking_timestamp_start);
-                $weekday = date_i18n('w', $booking_timestamp_start);
-                update_post_meta($booking_id, 'rrze-rsvp-booking-end', $booking_timestamp_end );
-                update_post_meta($booking_id, 'rrze-rsvp-booking-seat', $booking_seat);
-                update_post_meta($booking_id, 'rrze-rsvp-booking-guest-lastname', $booking_lastname);
-                update_post_meta($booking_id, 'rrze-rsvp-booking-guest-firstname', $booking_firstname);
-                update_post_meta($booking_id, 'rrze-rsvp-booking-guest-email', $booking_email);
-                update_post_meta($booking_id, 'rrze-rsvp-booking-guest-phone', $booking_phone);
-                if ($room_autoconfirmation == 'on') {
-                    $status = 'confirmed';
-                    $timestamp = current_time('timestamp');
-                    if ($booking_instant && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
-                        $status = 'checked-in';
-                    }
-                } else {
-                    $status = 'booked';
-                }
-                update_post_meta( $booking_id, 'rrze-rsvp-booking-status', $status );
-                update_post_meta($booking_id, 'rrze-rsvp-booking-notes', $booking_comment);
-                update_post_meta($booking_id, 'rrze-rsvp-booking-dsgvo', $booking_dsgvo);
-
-
-
-                // E-Mail senden
-                if ($roomForceToConfirm == 'on') {
-                    update_post_meta($booking_id, 'rrze-rsvp-customer-status', 'booked');
-                }
-                if ($room_autoconfirmation == 'on') {
-                    if ($roomForceToConfirm == 'on') {
-                        $this->email->bookingRequestedCustomer($booking_id);
-                    } else {
-                        $this->email->bookingConfirmedCustomer($booking_id);
-                    }
-                } else {
-                    if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
-                        $to = $this->options->email_notification_email;
-                        $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
-                        $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
-                    }                    
-                }
-
-                // Redirect zur Seat-Seite, falls
-                if ($status == 'checked-in') {
-                    echo'<script> window.location="' . get_permalink($booking_seat) . '"; </script> ';
-                    exit;
-                }
-
-            } else {
-                return '<div class="alert alert-danger" role="alert">' . __('Error saving the booking', 'rrze-rsvp') . '</div>';
-            }
-
-
-            $output .= '<h2>' . __('Your reservation has been submitted. Thank you for booking!', 'rrze-rsvp') . '</h2>';
-            if ($room_autoconfirmation == 'on') {
-                $output .= '<p>' . __('Your reservation:', 'rrze-rsvp') . '</p>';
-            } else {
-                $output .= '<p>' . __('Your reservation request:', 'rrze-rsvp') . '</p>';
-            }
-            $output .= '<ul>'
-                . '<li>'. __('Date', 'rrze-rsvp') . ': <strong>' . date_i18n(get_option('date_format'), $booking_timestamp_start) . '</strong></li>'
-                . '<li>'. __('Time', 'rrze-rsvp') . ': <strong>' . $booking_start . ' - ' . $booking_end . '</strong></li>'
-                . '<li>'. __('Room', 'rrze-rsvp') . ': <strong>' . get_the_title($room_id) . '</strong></li>'
-                . '<li>'. __('Seat', 'rrze-rsvp') . ': <strong>' . get_the_title($booking_seat) . '</strong></li>'
-                . '</ul>'
-                . '<p>' . sprintf(__('This data was also sent to your email %s .', 'rrze-rsvp'), '<strong>' . $booking_email . '</strong>') . '</p>'
-                . '<div class="alert alert-danger" role="alert">';
-            if ($room_autoconfirmation == 'on') {
-                $output .= sprintf(__('%sThis place has been reserved for you.%s You can cancel it at any time if you cannot keep the appointment. You can find information on this in your confirmation email.', 'rrze-rsvp'),'<strong>', '</strong><br />');
-            } else {
-                $output .= sprintf(__('%sPlease note that this is only a reservation request.%s It only becomes binding as soon as we confirm your booking by email.', 'rrze-rsvp'),'<strong>', '</strong><br />');
-            }
-            $output .= '</div>';
-
-        } else {
-
-            if ($sso == true && $this->sso == false)
-                return '<div class="alert alert-warning" role="alert">' . sprintf('%sSSO not available.%s Please activate SSO authentication or remove the SSO attribute from your shortcode.', '<strong>', '</strong><br />') . '</div>';
-
-//        var_dump($_GET);
-            $get_date = isset($_GET[ 'bookingdate' ]) ? sanitize_text_field($_GET[ 'bookingdate' ]) : false;
-            $get_time = isset($_GET[ 'timeslot' ]) ? sanitize_text_field($_GET[ 'timeslot' ]) : false;
-            $get_room = isset($_GET[ 'room_id' ]) ? absint($_GET[ 'room_id' ]) : false;
-            $get_seat = isset($_GET[ 'seat_id' ]) ? absint($_GET[ 'seat_id' ]) : false;
-            $get_instant = (isset($_GET[ 'instant' ]) && $_GET[ 'instant' ] == '1');
-
-            if ($get_room && $get_date) {
-                $availability = Functions::getRoomAvailability(
-                    $get_room,
-                    $get_date,
-                    date('Y-m-d', strtotime($get_date . ' +1 days'))
-                );
-            }
-
-            $days       = (int)$shortcode_atts[ 'days' ];
-            $input_room = sanitize_title($shortcode_atts[ 'room' ]);
-            if ($get_room) {
-                $input_room = $get_room;
-            }
-            if (is_numeric($input_room)) {
-                $post_room = get_post($input_room);
-                if ( ! $post_room) {
-                    return __('Room specified in shortcode does not exist.', 'rrze-rsvp');
-                }
-            }
-            $room = $input_room;
-            $comment = (get_post_meta($room, 'rrze-rsvp-room-notes-check', true) == 'on');
-
-            if (isset($post_room)) {
-                $today  = date('Y-m-d', current_time('timestamp'));
-                $endday = date('Y-m-d', strtotime($today . ' + ' . $days . ' days'));
-            }
-
-            $output .= '<div class="rrze-rsvp">';
-            $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room">'
-                       . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
-
-            if ($get_instant) {
-                $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
-            }
-
-            $output .= '<p><input type="hidden" value="' . $room . '" id="rsvp_room">'
-                       . wp_nonce_field('post_nonce', 'rrze_rsvp_post_nonce_field')
-                       . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($room) . '</strong>'
-                       . '</p>';
-
-            $output         .= '<div class="rsvp-datetime-container form-group clearfix"><legend>' . __(
-                    'Select date and time',
-                    'rrze-rsvp'
-                ) . '</legend>'
-                               . '<div class="rsvp-date-container">';
-            $dateComponents = getdate();
-            $month          = $dateComponents[ 'mon' ];
-            $year           = $dateComponents[ 'year' ];
-            $start          = date_create();
-            $end            = date_create();
-            date_modify($end, '+' . $days . ' days');
-            $output .= $this->buildCalendar($month, $year, $start, $end, $room, $get_date);
-//        $output .= $this->buildDateBoxes($days);
-            $output .= '</div>'; //.rsvp-date-container
-
-            $output .= '<div class="rsvp-time-container">'
-                       . '<h4>' . __('Available time slots:', 'rrze-rsvp') . '</h4>';
-            if ($get_date) {
-                $output .= $this->buildTimeslotSelect($room, $get_date, $get_time, $availability);
-            } else {
-                $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
-            }
-            $output .= '</div>'; //.rsvp-time-container
-
-            $output .= '</div>'; //.rsvp-datetime-container
-
-            $output .= '<div class="rsvp-seat-container">';
-            if ($get_date && $get_time) {
-                $output .= $this->buildSeatSelect($room, $get_date, $get_time, $get_seat, $availability);
-            } else {
-                $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
-            }
-            $output .= '</div>'; //.rsvp-seat-container
-
-            $output .= '<legend>' . __('Your data', 'rrze-rsvp') . '</legend>';
-            if ($sso) {
-                $data = $this->idm->getCustomerData();
-                $output .= '<div class="form-group">'
-                    . '<p>' . __('Last name', 'rrze-rsvp') . ': <strong>' . $data['customer_lastname'] . '</strong></p>'
-                    . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
-                    . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
-                    . '</div>';
-
-
-            } else {
-                $output .= '<div class="form-group"><label for="rsvp_lastname">'
-                    . __('Last name', 'rrze-rsvp') . ' *</label>'
-                    . "<input type=\"text\" name=\"rsvp_lastname\" id=\"rsvp_lastname\" required aria-required=\"true\">"
-                    . '</div>';
-
-                $output .= '<div class="form-group"><label for="rsvp_firstname">'
-                    . __('First name', 'rrze-rsvp') . ' *</label>'
-                    . "<input type=\"text\" name=\"rsvp_firstname\" id=\"rsvp_firstname\" required aria-required=\"true\">"
-                    . '</div>';
-
-                $output .= '<div class="form-group"><label for="rsvp_email">'
-                    . __('Email', 'rrze-rsvp') . ' *</label>'
-                    . "<input type=\"text\" name=\"rsvp_email\" id=\"rsvp_email\" required aria-required=\"true\">"
-                    . '</div>';
-            }
-
-            $output .= '<div class="form-group"><label for="rsvp_phone">'
-                . __('Phone Number', 'rrze-rsvp') . ' *</label>'
-                . '<input type="tel" name="rsvp_phone" id="rsvp_phone" required aria-required="true">'
-                . '<p class="description">'
-                . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
-                . '</div>';
-            $defaults = defaultOptions();
-            if ($comment) {
-                $label = get_post_meta($room, 'rrze-rsvp-room-notes-label', true);
-                if ($label == '') {
-                    $label = $defaults['room-notes-label'];
-                }
-                $output .= '<div class="form-group">'
-                    . '<label for="rsvp_comment">' . $label . '</label>'
-                    . '<textarea name="rsvp_comment" id="rsvp_comment"></textarea>';
-            }
-
-            $output .= '<div class="form-group">'
-                       . '<input type="checkbox" value="1" id="rsvp_dsgvo" name="rsvp_dsgvo" required> '
-                       . '<label for="rsvp_dsgvo">' . $defaults['dsgvo-declaration'] . '</label>'
-                       . '</div>';
-
-            $output .= '<button type="submit" class="btn btn-primary">' . __('Submit booking', 'rrze-rsvp') . '</button>
-                </form>
-            </div>';
+        if ($output = $this->ssoAuthenticationError()) {
+            return $output;
+        }
+        if ($output = $this->postDataError()) {
+            return $output;
+        }        
+        if ($output = $this->saveError()) {
+            return $output;
+        }
+        if ($output = $this->multipleBookingError()) {
+            return $output;
+        }                  
+        if ($output = $this->seatUnavailableError()) {
+            return $output;
+        }        
+        if ($output = $this->bookedNotice()) {
+            return $output;
         }
 
-        wp_enqueue_style('rrze-rsvp-shortcode');
+        $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
+
+        if ($output = $this->bookingSubmitted($shortcode_atts)) {
+            return $output;
+        }
+
         wp_enqueue_script('rrze-rsvp-shortcode');
         wp_localize_script('rrze-rsvp-shortcode', 'rsvp_ajax', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce( 'rsvp-ajax-nonce' ),
         ]);
+                
+        $output = '';
+        $sso = ($shortcode_atts[ 'sso' ] == 'true');        
+        if ($sso == true && $this->sso == false)
+            return '<div class="alert alert-warning" role="alert">' . sprintf('%sSSO not available.%s Please activate SSO authentication or remove the SSO attribute from your shortcode.', '<strong>', '</strong><br />') . '</div>';
+
+        // var_dump($_GET);
+        $get_date = isset($_GET[ 'bookingdate' ]) ? sanitize_text_field($_GET[ 'bookingdate' ]) : false;
+        $get_time = isset($_GET[ 'timeslot' ]) ? sanitize_text_field($_GET[ 'timeslot' ]) : false;
+        $get_room = isset($_GET[ 'room_id' ]) ? absint($_GET[ 'room_id' ]) : false;
+        $get_seat = isset($_GET[ 'seat_id' ]) ? absint($_GET[ 'seat_id' ]) : false;
+        $get_instant = (isset($_GET[ 'instant' ]) && $_GET[ 'instant' ] == '1');
+
+        if ($get_room && $get_date) {
+            $availability = Functions::getRoomAvailability(
+                $get_room,
+                $get_date,
+                date('Y-m-d', strtotime($get_date . ' +1 days'))
+            );
+        }
+
+        $days       = (int)$shortcode_atts[ 'days' ];
+        $input_room = sanitize_title($shortcode_atts[ 'room' ]);
+        if ($get_room) {
+            $input_room = $get_room;
+        }
+        if (is_numeric($input_room)) {
+            $post_room = get_post($input_room);
+            if ( ! $post_room) {
+                return __('Room specified in shortcode does not exist.', 'rrze-rsvp');
+            }
+        }
+        $room = $input_room;
+        $comment = (get_post_meta($room, 'rrze-rsvp-room-notes-check', true) == 'on');
+
+        if (isset($post_room)) {
+            $today  = date('Y-m-d', current_time('timestamp'));
+            $endday = date('Y-m-d', strtotime($today . ' + ' . $days . ' days'));
+        }
+
+        $output .= '<div class="rrze-rsvp">';
+        $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room">'
+                    . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
+
+        if ($get_instant) {
+            $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
+        }
+
+        $output .= '<p><input type="hidden" value="' . $room . '" id="rsvp_room">'
+                    . wp_nonce_field('post_nonce', 'rrze_rsvp_post_nonce_field')
+                    . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($room) . '</strong>'
+                    . '</p>';
+
+        $output         .= '<div class="rsvp-datetime-container form-group clearfix"><legend>' . __(
+                'Select date and time',
+                'rrze-rsvp'
+            ) . '</legend>'
+                            . '<div class="rsvp-date-container">';
+        $dateComponents = getdate();
+        $month          = $dateComponents[ 'mon' ];
+        $year           = $dateComponents[ 'year' ];
+        $start          = date_create();
+        $end            = date_create();
+        date_modify($end, '+' . $days . ' days');
+        $output .= $this->buildCalendar($month, $year, $start, $end, $room, $get_date);
+//        $output .= $this->buildDateBoxes($days);
+        $output .= '</div>'; //.rsvp-date-container
+
+        $output .= '<div class="rsvp-time-container">'
+                    . '<h4>' . __('Available time slots:', 'rrze-rsvp') . '</h4>';
+        if ($get_date) {
+            $output .= $this->buildTimeslotSelect($room, $get_date, $get_time, $availability);
+        } else {
+            $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
+        }
+        $output .= '</div>'; //.rsvp-time-container
+
+        $output .= '</div>'; //.rsvp-datetime-container
+
+        $output .= '<div class="rsvp-seat-container">';
+        if ($get_date && $get_time) {
+            $output .= $this->buildSeatSelect($room, $get_date, $get_time, $get_seat, $availability);
+        } else {
+            $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
+        }
+        $output .= '</div>'; //.rsvp-seat-container
+
+        $output .= '<legend>' . __('Your data', 'rrze-rsvp') . '</legend>';
+        if ($sso) {
+            $data = $this->idm->getCustomerData();
+            $output .= '<div class="form-group">'
+                . '<p>' . __('Last name', 'rrze-rsvp') . ': <strong>' . $data['customer_lastname'] . '</strong></p>'
+                . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
+                . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
+                . '</div>';
+
+
+        } else {
+            $output .= '<div class="form-group"><label for="rsvp_lastname">'
+                . __('Last name', 'rrze-rsvp') . ' *</label>'
+                . "<input type=\"text\" name=\"rsvp_lastname\" id=\"rsvp_lastname\" required aria-required=\"true\">"
+                . '</div>';
+
+            $output .= '<div class="form-group"><label for="rsvp_firstname">'
+                . __('First name', 'rrze-rsvp') . ' *</label>'
+                . "<input type=\"text\" name=\"rsvp_firstname\" id=\"rsvp_firstname\" required aria-required=\"true\">"
+                . '</div>';
+
+            $output .= '<div class="form-group"><label for="rsvp_email">'
+                . __('Email', 'rrze-rsvp') . ' *</label>'
+                . "<input type=\"text\" name=\"rsvp_email\" id=\"rsvp_email\" required aria-required=\"true\">"
+                . '</div>';
+        }
+
+        $output .= '<div class="form-group"><label for="rsvp_phone">'
+            . __('Phone Number', 'rrze-rsvp') . ' *</label>'
+            . '<input type="tel" name="rsvp_phone" id="rsvp_phone" required aria-required="true">'
+            . '<p class="description">'
+            . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
+            . '</div>';
+        $defaults = defaultOptions();
+        if ($comment) {
+            $label = get_post_meta($room, 'rrze-rsvp-room-notes-label', true);
+            if ($label == '') {
+                $label = $defaults['room-notes-label'];
+            }
+            $output .= '<div class="form-group">'
+                . '<label for="rsvp_comment">' . $label . '</label>'
+                . '<textarea name="rsvp_comment" id="rsvp_comment"></textarea>';
+        }
+
+        $output .= '<div class="form-group">'
+                    . '<input type="checkbox" value="1" id="rsvp_dsgvo" name="rsvp_dsgvo" required> '
+                    . '<label for="rsvp_dsgvo">' . $defaults['dsgvo-declaration'] . '</label>'
+                    . '</div>';
+
+        $output .= '<button type="submit" class="btn btn-primary">' . __('Submit booking', 'rrze-rsvp') . '</button>
+            </form>
+        </div>';
 
         return $output;
+    }
+
+    protected function ssoAuthenticationError()
+    {
+        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'sso_authentication')) {
+            return '';
+        }
+
+        $data = [];
+        $data['sso_authentication_error'] = true;
+        $data['sso_authentication'] = __('SSO error', 'rrze-rsvp');
+        $data['message'] = __("Error retrieving your data from SSO. Please try again or contact the website administrator.", 'rrze-rsvp');
+
+        return $this->template->getContent('shortcode/booking-error', $data);
+    }
+
+    protected function postDataError()
+    {
+        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'post_data')) {
+            return '';
+        }
+
+        $data = [];
+        $data['booking_data_error'] = true;
+        $data['booking_data'] =  __('Booking data', 'rrze-rsvp');
+        $data['message'] =  __('Invalid or missing booking data.', 'rrze-rsvp');
+
+        return $this->template->getContent('shortcode/booking-error', $data);
+    }
+
+    protected function saveError()
+    {
+        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'save_error')) {
+            return '';
+        }
+
+        $data = [];
+        $data['booking_save_error'] = true;
+        $data['booking_save'] =  __('Save booking', 'rrze-rsvp');
+        $data['message'] =  __('Error saving the booking.', 'rrze-rsvp');
+
+        return $this->template->getContent('shortcode/booking-error', $data);
+    }
+
+    protected function multipleBookingError()
+    {
+        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'multiple_booking')) {
+            return '';
+        }
+
+        $data = [];
+        $data['multiple_booking_error'] = true;        
+        $data['multiple_booking'] = __('Multiple Booking', 'rrze-rsvp');
+        $data['message'] = __('<strong>You have already booked a seat for the specified time slot.</strong><br>If you want to change your booking, please cancel the existing booking first. You will find the link to do so in your confirmation email.', 'rrze-rsvp');
+
+        return $this->template->getContent('shortcode/booking-error', $data);
+    }
+
+    protected function seatUnavailableError()
+    {
+        if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'seat_unavailable')) {
+            return '';
+        }
+
+        $url = $_GET['url'];
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return '';
+        }
+
+        $data = [];
+        $data['seat_unavailable_error'] = true;
+        $data['seat_already_booked'] = __('Seat already booked', 'rrze-rsvp');
+        $data['message'] = __('<strong>Sorry! The seat you selected is no longer available.</strong><br>Please try again.', 'rrze-rsvp');
+        $data['backlink'] = sprintf(__('<a href="%s">Back to booking form &rarr;</a>', 'rrze-rsvp'), $url);
+
+        return $this->template->getContent('shortcode/booking-error', $data);
+    }
+
+    protected function bookedNotice()
+    {
+        if (!isset($_GET['id']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'booked')) {
+            return '';
+        }
+
+        $bookingId = absint($_GET['id']);
+        $booking = Functions::getBooking($bookingId);
+        if (!$booking) {
+            return '';
+        }
+
+        $data = [];
+        $roomId = $booking['room'];
+        $autoconfirmation = get_post_meta($roomId, 'rrze-rsvp-room-auto-confirmation', true) == 'on' ? true : false;
+        $forceToConfirm = get_post_meta($roomId, 'rrze-rsvp-room-force-to-confirm', true) == 'on' ? true : false;
+        $forceToCheckin = get_post_meta($roomId, 'rrze-rsvp-room-force-to-checkin', true) == 'on' ? true : false;
+        if ($autoconfirmation) {
+            $data['autoconfirmation'] = true;
+        }
+        if ($forceToConfirm) {
+            $data['force_to_confirm'] = true;
+        }        
+        if ($forceToCheckin) {
+            $data['force_to_checkin'] = true;
+        }
+
+        $data['date'] = $booking['date'];
+        $data['date_label'] = __('Date', 'rrze-rsvp');
+        $data['time'] = $booking['time'];
+        $data['time_label'] = __('Time', 'rrze-rsvp');
+        $data['room_name'] = $booking['room_name'];
+        $data['room_label'] = __('Room', 'rrze-rsvp');
+        $data['seat_name'] = $booking['seat_name'];
+        $data['seat_label'] = __('Seat', 'rrze-rsvp');        
+        $data['customer']['name'] = sprintf('%s %s', $booking['guest_firstname'], $booking['guest_lastname']);
+        $data['customer']['email'] = $booking['guest_email'];
+
+        $data['data_sent_to_customer_email'] = sprintf(__('These data were also sent to your email address <strong>%s</strong>.', 'rrze-rsvp'), $booking['guest_email']);
+
+        // forceToConfirm
+        $data['confirm_your_booking'] = __('Your reservation has been submitted. Please confirm your booking!', 'rrze-rsvp');
+        $data['confirmation_request_sent'] = __('An email with the confirmation link and your booking information has been sent to your email address.<br><strong>Please note that unconfirmed bookings automatically expire after one hour.</strong>', 'rrze-rsvp');
+        // !forceToConfirm
+        $data['reservation_submitted'] = __('Your reservation has been submitted. Thank you for booking!', 'rrze-rsvp');
+
+        // autoconfirmation
+        $data['your_reservation'] = __('Your reservation:', 'rrze-rsvp');
+        // !autoconfirmation
+        $data['your_reservation_request'] = __('Your reservation request:', 'rrze-rsvp');
+
+        // !forceToConfirm && autoconfirmation
+        $data['place_has_been_reserved'] = __('<strong>This seat has been reserved for you.</strong><br>You can cancel it at any time if you cannot keep the appointment. You can find information on this in your confirmation email.', 'rrze-rsvp');
+        // !forceToConfirm && !autoconfirmation
+        $data['reservation_request'] = __('<strong>Please note that this is only a reservation request.</strong><br>It only becomes binding as soon as we confirm your booking by email.', 'rrze-rsvp');
+
+        // forceToCheckin
+        $data['check_in_when_arrive'] = __('Please remember to <strong>check in</strong> to your seat when you arrive!', 'rrze-rsvp');
+
+        return $this->template->getContent('shortcode/booking-booked', $data);
+    }
+
+    protected function bookingSubmitted(array $shortcodeAtts)
+    {
+        if (!isset($_POST['rrze_rsvp_post_nonce_field']) || !wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
+            return '';
+        }        
+
+        $sso = ($shortcodeAtts['sso'] == 'true');
+
+        array_walk_recursive(
+            $_POST, function ( &$value ) {
+            if ( is_string( $value ) ) {
+                $value = wp_strip_all_tags( trim( $value ) );
+            }
+            }
+        );
+
+        $posted_data = $_POST;
+        // echo Helper::get_html_var_dump($posted_data);
+        $booking_date = sanitize_text_field($posted_data['rsvp_date']);
+        $booking_start = sanitize_text_field($posted_data['rsvp_time']);
+        $booking_timestamp_start = strtotime($booking_date . ' ' . $booking_start);
+        $booking_seat = absint($posted_data['rsvp_seat']);
+        $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
+        $booking_instant = (isset($posted_data['rsvp_instant']) && $posted_data['rsvp_instant'] == '1');
+        $booking_comment = (isset($posted_data['rsvp_comment']) ? sanitize_textarea_field($posted_data['rsvp_comment']) : '');
+        $booking_dsgvo = (isset($posted_data['rsvp_dsgvo']) && $posted_data['rsvp_dsgvo'] == '1');
+
+        if ($sso) {
+            if ($this->idm->isAuthenticated()){
+                $sso_data = $this->idm->getCustomerData();
+                $booking_lastname  = $sso_data['customer_lastname'];
+                $booking_firstname  = $sso_data['customer_firstname'];
+                $booking_email  = $sso_data['customer_email'];
+            } else {
+                $redirectUrl = add_query_arg(
+                    [
+                        'booking' => wp_create_nonce('sso_authentication')
+                    ],
+                    get_permalink()
+                );
+                wp_redirect($redirectUrl);
+                exit;
+            }
+        } else {
+            $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
+            $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
+            $booking_email = sanitize_email($posted_data['rsvp_email']);
+        }
+
+        // Postdaten überprüfen
+        if (!$booking_dsgvo
+            || !Functions::validateDate($booking_date)
+            || !Functions::validateTime($booking_start, 'H:i')
+            || !get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true)
+            || empty($booking_lastname)
+            || empty($booking_firstname)
+            || !filter_var($booking_email, FILTER_VALIDATE_EMAIL)
+            || empty($booking_phone))
+        {
+            $redirectUrl = add_query_arg(
+                [
+                    'booking' => wp_create_nonce('post_data')
+                ],
+                get_permalink()
+            );
+            wp_redirect($redirectUrl);
+            exit;  
+        }
+
+        // Überprüfen ob bereits eine Buchung mit gleicher E-Mail-Adresse zur gleichen Zeit vorliegt
+        $check_args = [
+            'post_type' => 'booking',
+            'meta_query' => [
+                'relation' => 'AND',
+                [
+                    'key' => 'rrze-rsvp-booking-guest-email',
+                    'value' => $booking_email
+                ],
+                [
+                    'key' => 'rrze-rsvp-booking-start',
+                    'value' => $booking_timestamp_start
+                ],
+                [
+                    'key' => 'rrze-rsvp-booking-status',
+                    'value' => ['booked', 'confirmed', 'checked-in'],
+                    'compare' => 'IN',
+                ]
+            ],
+            'nopaging' => true,
+        ];
+        $check_bookings = get_posts($check_args);      
+        if (!empty($check_bookings)) {
+            $redirectUrl = add_query_arg(
+                [
+                    'booking' => wp_create_nonce('multiple_booking')
+                ],
+                get_permalink()
+            );
+            wp_redirect($redirectUrl);
+            exit;            
+        }
+
+        // Überprüfen ob der Platz in der Zwischenzeit bereits anderweitig gebucht wurde
+        $check_availability = Functions::getSeatAvailability($booking_seat, $booking_date, date('Y-m-d', strtotime($booking_date. ' +1 days')));
+        $seat_available = false;
+        foreach ($check_availability[$booking_date] as $timeslot) {
+            if (strpos($timeslot, $booking_start) == 0) {
+                $seat_available = true;
+                break;
+            }
+        }
+        if (!$seat_available) {
+            $permalink = get_permalink($this->options->general_booking_page);
+            $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
+
+            $redirectUrl = add_query_arg(
+                [
+                    'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', $permalink, $room_id, $booking_date, $booking_start),
+                    'booking' => wp_create_nonce('seat_unavailable')
+                ],
+                get_permalink()
+            );
+            wp_redirect($redirectUrl);
+            exit;                
+        }
+
+        $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
+        $room_meta = get_post_meta($room_id);
+        $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : '';
+
+        $autoconfirmation = get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true) == 'on' ? true : false;
+        $forceToConfirm = get_post_meta($room_id, 'rrze-rsvp-room-force-to-confirm', true) == 'on' ? true : false;
+        $forceToCheckin = get_post_meta($room_id, 'rrze-rsvp-room-force-to-checkin', true) == 'on' ? true : false;
+
+        foreach ($room_timeslots as $week) {
+            foreach ($week['rrze-rsvp-room-weekday'] as $day) {
+                $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+            }
+        }
+        $weekday = date('N', $booking_timestamp_start);
+        $booking_end = array_key_exists($booking_start, $schedule[$weekday]) ? $schedule[$weekday][$booking_start] : $booking_start;
+        $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
+
+        //Buchung speichern
+        $new_draft = [
+            'post_status' => 'publish',
+            'post_type' => 'booking',
+        ];
+        $booking_id = wp_insert_post($new_draft);
+
+        // Booking save error
+        if (!$booking_id || is_wp_error($booking_id)) {
+            $redirectUrl = add_query_arg(
+                [
+                    'booking' => wp_create_nonce('save_error')
+                ],
+                get_permalink()
+            );
+            wp_redirect($redirectUrl);
+            exit;            
+        }
+
+        // Successful booking saved
+        update_post_meta($booking_id, 'rrze-rsvp-booking-start', $booking_timestamp_start);
+        $weekday = date_i18n('w', $booking_timestamp_start);
+        update_post_meta($booking_id, 'rrze-rsvp-booking-end', $booking_timestamp_end );
+        update_post_meta($booking_id, 'rrze-rsvp-booking-seat', $booking_seat);
+        update_post_meta($booking_id, 'rrze-rsvp-booking-guest-lastname', $booking_lastname);
+        update_post_meta($booking_id, 'rrze-rsvp-booking-guest-firstname', $booking_firstname);
+        update_post_meta($booking_id, 'rrze-rsvp-booking-guest-email', $booking_email);
+        update_post_meta($booking_id, 'rrze-rsvp-booking-guest-phone', $booking_phone);
+        if ($autoconfirmation) {
+            $status = 'confirmed';
+            $timestamp = current_time('timestamp');
+            if ($booking_instant && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+                $status = 'checked-in';
+            }
+        } else {
+            $status = 'booked';
+        }
+        update_post_meta( $booking_id, 'rrze-rsvp-booking-status', $status );
+        update_post_meta($booking_id, 'rrze-rsvp-booking-notes', $booking_comment);
+        update_post_meta($booking_id, 'rrze-rsvp-booking-dsgvo', $booking_dsgvo);
+        if ($forceToConfirm) {
+            update_post_meta($booking_id, 'rrze-rsvp-customer-status', 'booked');
+        }
+
+        // E-Mail senden
+        if ($autoconfirmation) {
+            if ($forceToConfirm) {
+                $this->email->bookingRequestedCustomer($booking_id);
+            } else {
+                $this->email->bookingConfirmedCustomer($booking_id);
+            }
+        } else {
+            if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
+                $to = $this->options->email_notification_email;
+                $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
+                $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
+            }
+        }
+
+        // Redirect zur Seat-Seite, falls
+        if ($status == 'checked-in') {
+            wp_redirect(get_permalink($booking_seat));
+            exit;
+        }
+
+        $redirectUrl = add_query_arg(
+            [
+                'id' => $booking_id,
+                'booking' => wp_create_nonce('booked')
+            ],
+            get_permalink()
+        );
+        wp_redirect($redirectUrl);
+        exit;
     }
 
     /*

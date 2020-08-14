@@ -74,7 +74,7 @@ function getConstants() {
             // 'room_floorplan' => 'off',
             'seat_equipment' => 'off',
             'room-notes-label' => __('Additional informations', 'rrze-rsvp'),
-            'dsgvo-declaration' => __('Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a DSGVO.', 'rrze-rsvp'),
+            'dsgvo-declaration' => __('Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden erfasst.', 'rrze-rsvp'),
         ];
     }
     
@@ -90,24 +90,6 @@ function getMenuSettings()
         'capability'    => 'manage_options',
         'menu_slug'     => 'rrze-rsvp',
         'title'         => __('RRZE RSVP Settings', 'rrze-rsvp'),
-    ];
-}
-
-/**
- * Gibt die Einstellungen der Inhaltshilfe zurück.
- * @return array [description]
- */
-function getHelpTab()
-{
-    return [
-        [
-            'id'        => 'rrze-rsvp-help',
-            'content'   => [
-                '<p>' . __('Here comes the Context Help content.', 'rrze-rsvp') . '</p>'
-            ],
-            'title'     => __('Overview', 'rrze-rsvp'),
-            'sidebar'   => sprintf('<p><strong>%1$s:</strong></p><p><a href="https://blogs.fau.de/webworking">RRZE Webworking</a></p><p><a href="https://github.com/RRZE Webteam">%2$s</a></p>', __('For more information', 'rrze-rsvp'), __('RRZE Webteam on Github', 'rrze-rsvp'))
-        ]
     ];
 }
 

@@ -4,47 +4,10 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
+use DateTime;
+
 class Functions
 {
-    public static function actionUrl($atts = [])
-    {
-        $atts = array_merge(
-            [
-                'page' => 'rrze-rsvp'
-            ],
-            $atts
-        );
-        if (isset($atts['action'])) {
-            switch ($atts['action']) {
-                case 'add':
-                    $atts['_wpnonce'] = wp_create_nonce('add');
-                    break;
-                case 'edit':
-                    $atts['_wpnonce'] = wp_create_nonce('edit');
-                    break;
-                case 'delete':
-                    $atts['_wpnonce'] = wp_create_nonce('delete');
-                    break;
-                default:
-                    break;
-            }
-        }
-        return add_query_arg($atts, get_admin_url(null, 'admin.php'));
-    }
-
-    public static function requestVar($param, $default = '')
-    {
-        if (isset($_POST[$param])) {
-            return $_POST[$param];
-        }
-
-        if (isset($_GET[$param])) {
-            return $_GET[$param];
-        }
-
-        return $default;
-    }
-
     public static function dateFormat(int $timestamp): string
     {
         return date_i18n(get_option('date_format'), $timestamp);
@@ -53,6 +16,17 @@ class Functions
     public static function timeFormat(int $timestamp): string
     {
         return date_i18n(get_option('time_format'), $timestamp);
+    }
+
+    public static function validateDate(string $date, string $format = 'Y-m-d'): bool
+    {
+        $dt = DateTime::createFromFormat($format, $date);
+        return $dt && $dt->format($format) === $date;
+    }
+
+    public static function validateTime(string $date, string $format = 'H:i:s'): bool
+    {
+        return self::validateDate($date, $format);
     }
 
     public static function isLocaleEnglish()
@@ -85,6 +59,94 @@ class Functions
         }
         return false;
     }
+
+
+
+    /**
+     * getOccupancyByRoomIdHTML
+     * calls getOccupancyByRoomId and returns an HTML table with room's occupancy for today 
+     * @param int $room_id (the room's post id)
+     * @return string
+     */
+    public static function getOccupancyByRoomIdHTML(int $room_id): string
+    {
+        $output = '<table class="rsvp-room-occupancy"><tr>';
+
+        $seats_slots = self::getOccupancyByRoomId($room_id);
+
+        if ($seats_slots){
+            $output .= '<th>&nbsp;</th>';
+            foreach($seats_slots['room_slots'] as $room_slot){
+                $output .= '<th scope="col">' . str_replace('-', '<br />-', $room_slot) . '</th>';
+            }
+            $output .= '</tr>';
+            unset($seats_slots['room_slots']);
+
+            foreach($seats_slots as $seat_id => $aSlots){
+                $output .= '<tr>';
+                $output .= '<th scope="row">' . get_the_title( $seat_id ) . '</th>';
+                foreach($aSlots as $slot => $free){
+                    $class = $free?'available':'not-available';
+                    $output .= '<td><span class="'.$class.'">' . ($free?'available':'not available') . '</span></td>';
+                }
+                $output .= '</tr>';
+            }
+        }else{
+            $output .= '<td>' . __('This room has no seats.', 'rrze-rsvp') . '</td>';
+        }
+        $output .= '</table>';
+
+        return $output;
+    }
+
+    /**
+     * getOccupancyByRoomId
+     * Returns an array('room_slots' with all timeslot-spans for this room, seat_id => array(timeslot-span => true/false)) for today
+     * Example: given room has 2 seats; 1 seat is not available at 09:30-10:30 
+     *          returns: array(3) { ["room_slots"]=> array(3) { [0]=> string(13) "08:15 - 09:15" [1]=> string(13) "09:30 - 10:30" [2]=> string(13) "11:05 - 12:10" } [2244487]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(true) ["11:05-12:10"]=> bool(true) } [1903]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(false) ["11:05-12:10"]=> bool(true) } }
+     * @param int $room_id (the room's post id)
+     * @return array
+     */
+    public static function getOccupancyByRoomId(int $room_id): array
+    {
+        $data = [];
+
+        $timestamp = current_time('timestamp');
+        $today = date('Y-m-d', $timestamp);
+        $today_weeknumber = date('N', $timestamp);
+
+        // get timeslots for today for this room
+        $slots = self::getRoomSchedule($room_id); // liefert [wochentag-nummer][startzeit] = end-zeit;
+        $slots_today_tmp = (isset($slots[$today_weeknumber]) ? $slots[$today_weeknumber] : []);
+        $slots_today = [];
+        foreach($slots_today_tmp as $start => $end){
+            $slots_today[] = $start . '-' . $end;
+            $data['room_slots'][] =  $start . ' - ' . $end;
+        }
+
+        // get seats for this room
+        $seatIds = get_posts([
+            'post_type' => 'seat',
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'meta_key' => 'rrze-rsvp-seat-room',
+            'meta_value' => $room_id,
+            'fields' => 'ids'
+        ]);
+
+        foreach ($seatIds as $seat_id) {
+            $slots_free = self::getSeatAvailability($seat_id, $today, $today);
+            $slots_free_today_tmp = ( isset($slots_free[$today]) ? $slots_free[$today] : [] );
+            $slots_free_today = array_combine($slots_free_today_tmp, $slots_free_today_tmp); // set values to keys
+
+            foreach($slots_today as $timespan){
+                $data[$seat_id][$timespan] = (isset($slots_free_today[$timespan])?true:false);
+            }
+
+        }
+        return $data;
+    }
+
 
     public static function getBooking(int $bookingId): array
     {
@@ -155,6 +217,15 @@ class Functions
         return self::crypt($string, 'decrypt');
     }
 
+    /**
+     * getRoomAvailability
+     * Returns an array of dates/timeslots/seats available, for a defined period.
+     * Array structure: date => timeslot => seat IDs
+     * @param string $room the room's post id
+     * @param string $start start date of the period (format 'Y-m-d')
+     * @param string $end end date of the period (format 'Y-m-d')
+     * @return array ['date(Y-m-d)']['timeslot(H:i-H:i)'] = [seat_id, seat_id...]
+     */
     public static function getRoomAvailability($room_id, $start, $end)
     {
         $availability = [];
@@ -172,6 +243,9 @@ class Functions
         ]);
         $seat_ids = [];
         $seats_booked = [];
+        if ($start == $end) {
+            $end = date('Y-m-d H:i', strtotime($start . ' +23 hours, +59 minutes'));
+        }
         foreach ($seats as $seat) {
             $seat_ids[] = $seat->ID;
             $bookings = get_posts([
@@ -249,10 +323,10 @@ class Functions
      * getSeatAvailability
      * Returns an array of dates/timeslots where the seat is available, for a defined period.
      * Array structure: date => timeslot
-     * @param string $room the room's post id
+     * @param string $room the seat's post id
      * @param string $start start date of the period (format 'Y-m-d')
      * @param string $end end date of the period (format 'Y-m-d')
-     * @return array
+     * @return array ['date(Y-m-d)'] => ['start(H:i) - end(H:i)', 'start(H:i) - end(H:i)'...]
      */
     public static function getSeatAvailability($seat, $start, $end)
     {
@@ -264,6 +338,9 @@ class Functions
         $room_id = get_post_meta($seat, 'rrze-rsvp-seat-room', true);
         $slots = self::getRoomSchedule($room_id);
         // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
+        if ($start == $end) {
+            $end = date('Y-m-d H:i', strtotime($start . ' +23 hours, +59 minutes'));
+        }
         $bookings = get_posts([
             'post_type' => 'booking',
             'post_status' => 'publish',
@@ -325,7 +402,7 @@ class Functions
      * Returns an array of post_id => post_title that can be used by settings select callback.
      * Reduced version of wp_dropdown_pages()
      * @param array $args
-     * @return array
+     * @return array page_id => page_title
      */
     public static function getPagesDropdownOptions($args = '')
     {
@@ -355,6 +432,12 @@ class Functions
         return $output;
     }
 
+    /**
+     * getRoomSchedule
+     * Returns an array of timeslots per weekday for a specific room.
+     * @param int $room_id
+     * @return array [weekday_number(1-7)][starttime(H:i)] => endtime(H:i)
+     */
     public static function getRoomSchedule($room_id)
     {
         $schedule = [];

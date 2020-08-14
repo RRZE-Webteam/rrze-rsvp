@@ -1,5 +1,6 @@
 <?php
 
+use RRZE\RSVP\Functions;
 use RRZE\RSVP\Helper;
 use RRZE\RSVP\Settings;
 use function RRZE\RSVP\plugin;
@@ -9,6 +10,18 @@ $options = (object) $settings->getOptions();
 global $post;
 
 get_header();
+
+if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
+
+    while ( have_posts() ) : the_post();
+        echo Functions::getOccupancyByRoomIdHTML(get_the_ID());
+    endwhile;
+
+    wp_enqueue_style('rrze-rsvp-shortcode');
+    get_footer();
+
+    return;
+}
 
 if (Helper::isFauTheme()) {
     get_template_part('template-parts/hero', 'small');
@@ -106,5 +119,7 @@ while ( have_posts() ) : the_post();
 endwhile;
 
 echo $div_close;
+
+wp_enqueue_style('rrze-rsvp-shortcode');
 
 get_footer();

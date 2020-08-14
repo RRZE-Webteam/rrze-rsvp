@@ -12,8 +12,6 @@ use RRZE\RSVP\Capabilities;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Carbon;
 
-use function RRZE\RSVP\Config\defaultOptions;
-
 class Bookings
 {
 
@@ -27,14 +25,13 @@ class Bookings
 
     public function onLoaded()
     {
-        require_once(plugin_dir_path($this->pluginFile) . 'vendor/cmb2/init.php');
         add_action('init', [$this, 'booking_post_type'], 0);
-        add_action('cmb2_admin_init', [$this, 'booking_metaboxes']);
         add_action( 'add_meta_boxes', [$this, 'not_cmb_metabox'] );
         //add_filter( 'manage_edit-booking_columns', [$this, 'booking_filter_posts_columns'] );
         add_filter('manage_booking_posts_columns', [$this, 'booking_columns']);
         add_action('manage_booking_posts_custom_column', [$this, 'booking_column'], 10, 2);
         add_filter('manage_edit-booking_sortable_columns', [$this, 'booking_sortable_columns']);
+        add_action( 'wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots'] );
     }
 
     // Register Custom Post Type
@@ -89,124 +86,6 @@ class Bookings
     {
     }
 
-    public function booking_metaboxes()
-    {
-        $defaults = defaultOptions();
-
-        $cmb = new_cmb2_box(array(
-            'id'            => 'rrze-rsvp-booking-details',
-            'title'         => __('Details', 'rrze-rsvp'),
-            'object_types'  => array('booking',), // Post type
-            'context'       => 'normal',
-            'priority'      => 'high',
-            'show_names'    => true, // Show field names on the left
-            // 'cmb_styles' => false, // false to disable the CMB stylesheet
-            // 'closed'     => true, // Keep the metabox closed by default
-        ));
-
-        $cmb->add_field(array(
-            'name'             => __('Start', 'rrze-rsvp'),
-            'id'               => 'rrze-rsvp-booking-start',
-            //'type' => 'text_date_timestamp',
-            'type' => 'text_datetime_timestamp',
-            'date_format' => 'd.m.Y',
-            'time_format' => 'H:i',
-            'attributes' => array(
-                'data-timepicker' => json_encode(
-                    array(
-                        'timeFormat' => 'HH:mm',
-                        'stepMinute' => 10,
-                    )
-                ),
-            )
-        ));
-
-        $cmb->add_field(array(
-            'name'             => __('End', 'rrze-rsvp'),
-            'id'               => 'rrze-rsvp-booking-end',
-            //'type' => 'text_date_timestamp',
-            'type' => 'text_datetime_timestamp',
-            'date_format' => 'd.m.Y',
-            'time_format' => 'H:i',
-            'attributes' => array(
-                'data-timepicker' => json_encode(
-                    array(
-                        'timeFormat' => 'HH:mm',
-                        'stepMinute' => 10,
-                    )
-                ),
-            )
-        ));
-
-        $cmb->add_field(array(
-            'name'             => __('Status', 'rrze-rsvp'),
-            'id'               => 'rrze-rsvp-booking-status',
-            'type'             => 'select',
-            'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
-            'default'          => 'custom',
-            'options'          => array(
-                'booked' => __('Booked', 'rrze-rsvp'),
-                'confirmed'   => __('Confirmed', 'rrze-rsvp'),
-                'cancelled'     => _x('Cancelled', 'Booking', 'rrze-rsvp'),
-                'checked-in'     => __('Checked In', 'rrze-rsvp'),
-                'checked-out'     => __('Checked Out', 'rrze-rsvp'),
-            ),
-        ));
-
-        $cmb->add_field(array(
-            'name'             => __('Seat', 'rrze-rsvp'),
-            'id'               => 'rrze-rsvp-booking-seat',
-            'type'             => 'select',
-            'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
-            'default'          => 'custom',
-            'options_cb'       => [$this, 'post_select_options'],
-        ));
-
-        $cmb->add_field(array(
-            'name'    => __('Last name', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-guest-lastname',
-            'type'    => 'text',
-        ));
-
-        $cmb->add_field(array(
-            'name'    => __('First name', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-guest-firstname',
-            'type'    => 'text',
-        ));
-
-        $cmb->add_field(array(
-            'name'    => __('Email', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-guest-email',
-            'type'    => 'text_email',
-        ));
-
-        $cmb->add_field(array(
-            'name'    => __('Phone', 'rrze-rsvp'),
-            'id'      => 'rrze-rsvp-booking-guest-phone',
-            'type'    => 'text_medium',
-            'attributes' => array(
-                'type' => 'tel',
-            ),
-        ));
-
-        $cmb->add_field(array(
-            'name' => __('Notes', 'rrze-rsvp'),
-            'id' => 'rrze-rsvp-booking-notes',
-            'type' => 'textarea',
-            'desc' => __("This textarea contains the 'Additional Information' field content if this option is activated in the room settings. It can also be used for notes for internal use.", 'rrze-rsvp'),
-        ));
-
-        $cmb->add_field( array(
-            'name' => __('DSGVO', 'rrze-rsvp'),
-            'desc' => __('[readonly] – ', 'rrze-rsvp') . $defaults['dsgvo-declaration'],
-            'id'   => 'rrze-rsvp-booking-dsgvo',
-            'type' => 'checkbox',
-            'attributes' => array(
-                'onclick' => 'return false;',
-            ),
-        ) );
-    }
-
     public function not_cmb_metabox()
     {
         add_meta_box( 'rrze-rsvp-room-shortcode-helper', esc_html__( 'Shortcode', 'rrze-rsvp' ), [$this, 'not_cmb_metabox_callback'], 'room', 'side', 'high' );
@@ -227,24 +106,6 @@ class Bookings
             '<code>',
             '</code>',
             '</p>');
-    }
-
-    public function post_select_options($field)
-    {
-        $seats = get_posts([
-            'post_type' => 'seat',
-            'post_statue' => 'publish',
-            'nopaging' => true,
-            'orderby' => 'title',
-            'order' => 'ASC',
-        ]);
-        $options = [];
-        foreach ($seats as $seat) {
-            $room = get_post_meta($seat->ID, 'rrze-rsvp-seat-room', true);
-            $room_title = get_the_title($room);
-            $options[$seat->ID] = $room_title . ' – ' . $seat->post_title;
-        }
-        return $options;
     }
 
     /*
@@ -400,5 +261,33 @@ class Bookings
             'name' => __('Name', 'rrze-rsvp'),
         );
         return $columns;
+    }
+
+    public function ajaxShowTimeslots() {
+        $output = '';
+        $seat = ((isset($_POST['seat']) && $_POST['seat'] > 0) ? (int)$_POST['seat'] : '');
+        $date_raw = (isset($_POST['date']) ? sanitize_text_field($_POST['date']) : false);
+        if (strpos($date_raw, '.') !== false) {
+            $date_parts = explode('.', $date_raw);
+            $date = $date_parts[2].'-'.$date_parts[1].'-'.$date_parts[0];
+        }
+        $availability = Functions::getSeatAvailability($seat, $date, $date);
+        $output .= '<div class="select_timeslot_container" style="display:inline-block;padding-left: 10px;">';
+        if (isset($availability[$date])) {
+            $output .= '<select class="select_timeslot">'
+            . '<option value="">' . __('Select timeslot', 'rrze-rsvp') . '</option>';
+
+            foreach($availability[$date] as $timeslot) {
+                $time_parts = explode('-', $timeslot);
+                $output .= '<option value="'.$time_parts[0].'" data-end="'.$time_parts[1].'">' . $timeslot . '</option>';
+            }
+            $output .= '</select>';
+//            wp_send_json($availability[$date]);
+        } else {
+            $output .= __('No timeslots available for this seat/day.', 'rrze-rsvp');
+        }
+        $output .= '</div>';
+        echo $output;
+        wp_die();
     }
 }

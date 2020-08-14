@@ -1,0 +1,38 @@
+{{force_to_confirm}}
+    <h2>{{=confirm_your_booking}}</h2>
+    <div class="alert alert-danger" role="alert">{{=confirmation_request_sent}}</div>
+{{:force_to_confirm}}
+    <h2>{{=reservation_submitted}}</h2>
+{{/force_to_confirm}}
+
+{{autoconfirmation}}
+    <p>{{=your_reservation}}</p>
+{{:autoconfirmation}}
+    <p>{{=your_reservation_request}}</p>
+{{/autoconfirmation}}
+
+<ul>
+    <li>{{=date_label}}: <strong>{{=date}}</strong></li>
+    <li>{{=time_label}}: <strong>{{=time}}</strong></li>
+    <li>{{=room_label}}: <strong>{{=room_name}}</strong></li>
+    <li>{{=seat_label}}: <strong>{{=seat_name}}</strong></li>
+</ul>
+
+<p>{{=data_sent_to_customer_email}}</p>
+
+{{!force_to_confirm}}
+    <div class="alert alert-info" role="alert">
+    {{autoconfirmation}}
+        {{=place_has_been_reserved}}
+    {{:autoconfirmation}}
+        {{=reservation_request}}
+    {{/autoconfirmation}}
+    </div>
+{{/!force_to_confirm}}
+
+{{force_to_checkin}}
+    <br><br>
+    <div class="alert alert-warning" role="alert">
+        {{=check_in_when_arrive}}
+    </div>
+{{/force_to_checkin}}

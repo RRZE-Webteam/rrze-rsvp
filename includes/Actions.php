@@ -185,12 +185,22 @@ class Actions
 		$customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
 		$customerPhone = sprintf('%s: %s', __('Phone', 'rrze-rsvp'), $booking['guest_phone']);
 
+		$siteUrl = site_url();
+		$siteName = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
+
 		$data = [];
+		if (has_header_image()) {
+			$data['header_image'] = get_header_image();
+			$data['image_width'] = get_custom_header()->width;
+			$data['image_height'] = get_custom_header()->height;
+		}
+		$data['site_name'] = $siteName;
+
+		$data['booking_title'] = __('Booking', 'rrze-rsvp');
+
 		if ($processed) {
 			$data['processed'] = true;
 		}
-
-		$data['booking_title'] = __('Booking', 'rrze-rsvp');
 
 		$data['booking_has_already_been'] = sprintf(__('The booking has already been %s.', 'rrze-rsvp'), $action);
 		$data['booking_has_been'] = sprintf(__('The booking has been %s.', 'rrze-rsvp'), $action);
@@ -205,9 +215,8 @@ class Actions
 
 		$data['customer']['name'] = $customerName;
 		$data['customer']['email'] = $customerEmail;
-		$data['customer']['phone'] = $customerPhone;
 
-		$data['backlink'] = sprintf('<a class="backlink" href="%s">&larr; %s</a>', get_bloginfo('url'), get_bloginfo('name'));
+		$data['backlink'] = sprintf('<a class="backlink" href="%s">&larr; %s</a>', $siteUrl, $siteName);
 
 		wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
 
@@ -248,9 +257,16 @@ class Actions
 		}
 
 		$siteUrl = site_url();
-		$siteName = get_bloginfo('name');
+		$siteName = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
 
 		$data = [];
+		if (has_header_image()) {
+			$data['header_image'] = get_header_image();
+			$data['image_width'] = get_custom_header()->width;
+			$data['image_height'] = get_custom_header()->height;
+		}
+		$data['site_name'] = $siteName;
+
 		$isLocaleEnglish = Functions::isLocaleEnglish();
 		if (!$isLocaleEnglish) $data['is_locale_not_english'] = true;
 

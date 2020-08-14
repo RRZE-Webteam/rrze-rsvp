@@ -4,7 +4,7 @@
 Plugin Name:     RRZE-RSVP
 Plugin URI:      https://github.com/RRZE-Webteam/rrze-rsvp
 Description:     Booking system.
-Version:         0.3.3
+Version:         0.3.4
 Author:          RRZE-Webteam
 Author URI:      https://blogs.fau.de/webworking/
 License:         GNU General Public License v2
@@ -17,16 +17,26 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Plugin;
-use RRZE\RSVP\Main;
-use RRZE\RSVP\CF\CustomField;
-
-
 // Laden der Konfigurationsdatei
 require_once __DIR__ . '/config/config.php';
 
 // Autoloader (PSR-4)
-require 'vendor/autoload.php';
+spl_autoload_register(function ($class) {
+    $prefix = __NAMESPACE__;
+    $base_dir = __DIR__ . '/includes/';
+
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
+
+    $relativeClass = substr($class, $len);
+    $file = $base_dir . str_replace('\\', '/', $relativeClass) . '.php';
+
+    if (file_exists($file)) {
+        require $file;
+    }
+});
 
 const RRZE_PHP_VERSION = '7.4';
 const RRZE_WP_VERSION = '5.4';

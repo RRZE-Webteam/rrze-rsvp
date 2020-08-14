@@ -13,3 +13,5 @@ includes/Printing/.DS_Store
 includes/Printing/tcpdf/.DS_Store
 assets/img/.DS_Store
 *.po~
+includes/templates/.DS_Store
+src/js/.DS_Store

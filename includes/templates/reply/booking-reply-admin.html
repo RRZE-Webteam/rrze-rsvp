@@ -1,5 +1,13 @@
 <div class="rrze-rsvp-booking-reply">
 	<div class="container">
+		{{header_image}}
+		<img alt="" src="{{=header_image}}" width="{{=image_width}}" height="{{=image_height}}"><br>
+		{{=site_name}}
+		{{:header_image}}
+		<h1>{{=site_name}}</h1>
+		{{/header_image}}
+		<p class='lang-hr'>&nbsp;</p>
+
 		<h1>{{=booking_title}}</h1>
 
 		{{processed}}
@@ -19,8 +27,7 @@
 		</p>
 		<p class="customer">
 			{{=customer.name}}<br>
-			{{=customer.email}}<br>
-			{{=customer.phone}}
+			{{=customer.email}}
 		</p>
 
 		{{/processed}}
