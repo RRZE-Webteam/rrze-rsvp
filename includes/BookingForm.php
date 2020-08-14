@@ -95,8 +95,9 @@ class BookingForm
 
         $content = '';
 
-        if ($this->ssoRequired && !$this->sso)
-            return '<div class="alert alert-warning" role="alert">' . sprintf('%sSSO not available.%s Please activate SSO authentication or remove the SSO attribute from your shortcode.', '<strong>', '</strong><br />') . '</div>';
+        if ($this->ssoRequired && !$this->sso) {
+            return '<div class="alert alert-warning" role="alert">' . sprintf('%sSSO not available.%s Please activate SSO authentication or remove the SSO option from the room.', '<strong>', '</strong><br />') . '</div>';
+        }
 
         // var_dump($_GET);
         $get_date = isset($_GET['bookingdate']) ? sanitize_text_field($_GET['bookingdate']) : false;
