@@ -15,9 +15,9 @@ class Metaboxes
 
     public function onLoaded()
     {
-        add_action('cmb2_init', [$this, 'booking']);
-        add_action('cmb2_init', [$this, 'room']);
-        add_action('cmb2_init', [$this, 'seat']);
+        add_action('cmb2_admin_init', [$this, 'booking']);
+        add_action('cmb2_admin_init', [$this, 'room']);
+        add_action('cmb2_admin_init', [$this, 'seat']);
     }
 
     public function booking()
