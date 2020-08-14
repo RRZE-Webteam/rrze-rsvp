@@ -92,7 +92,7 @@ class Functions
                 $output .= '</tr>';
             }
         }else{
-            $output .= '<td>' . __('this room has no seats', 'rrze-rsvp') . '</td>';
+            $output .= '<td>' . __('This room has no seats.', 'rrze-rsvp') . '</td>';
         }
         $output .= '</table>';
 

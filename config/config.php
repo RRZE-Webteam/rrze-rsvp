@@ -94,24 +94,6 @@ function getMenuSettings()
 }
 
 /**
- * Gibt die Einstellungen der Inhaltshilfe zurück.
- * @return array [description]
- */
-function getHelpTab()
-{
-    return [
-        [
-            'id'        => 'rrze-rsvp-help',
-            'content'   => [
-                '<p>' . __('Here comes the Context Help content.', 'rrze-rsvp') . '</p>'
-            ],
-            'title'     => __('Overview', 'rrze-rsvp'),
-            'sidebar'   => sprintf('<p><strong>%1$s:</strong></p><p><a href="https://blogs.fau.de/webworking">RRZE Webworking</a></p><p><a href="https://github.com/RRZE Webteam">%2$s</a></p>', __('For more information', 'rrze-rsvp'), __('RRZE Webteam on Github', 'rrze-rsvp'))
-        ]
-    ];
-}
-
-/**
  * Gibt die Einstellungen der Optionsbereiche zurück.
  * @return array [description]
  */

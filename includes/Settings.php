@@ -6,7 +6,6 @@ defined('ABSPATH') || exit;
 
 use function RRZE\RSVP\Config\getOptionName;
 use function RRZE\RSVP\Config\getMenuSettings;
-use function RRZE\RSVP\Config\getHelpTab;
 use function RRZE\RSVP\Config\getSections;
 use function RRZE\RSVP\Config\getFields;
 
@@ -311,35 +310,6 @@ class Settings
     }
 
     /**
-     * Erstellt die Kontexthilfe der Einstellungsseite.
-     */
-    public function adminHelpTab()
-    {
-        $screen = get_current_screen();
-
-        if (!method_exists($screen, 'add_help_tab') || $screen->id != $this->optionsPage) {
-            return;
-        }
-
-        $helpTab = getHelpTab();
-
-        if (empty($helpTab)) {
-            return;
-        }
-
-        foreach ($helpTab as $help) {
-            $screen->add_help_tab(
-                [
-                    'id' => $help['id'],
-                    'title' => $help['title'],
-                    'content' => implode(PHP_EOL, $help['content'])
-                ]
-            );
-            $screen->set_help_sidebar($help['sidebar']);
-        }
-    }
-
-    /**
      * Initialisierung und Registrierung der Bereiche und Felder.
      */
     public function adminInit()
@@ -418,8 +388,6 @@ class Settings
             $this->settingsMenu['menu_slug'],
             [$this, 'pageOutput']
         );
-
-        add_action('load-' . $this->optionsPage, [$this, 'adminHelpTab']);
     }
 
     /**
