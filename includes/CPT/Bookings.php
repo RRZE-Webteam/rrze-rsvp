@@ -330,12 +330,12 @@ class Bookings
         }
 
         if ($aBookingDates){
-            // sort($aBookingDates);
+            Functions::sortArrayKeepKeys($aBookingDates);
             echo Functions::getSelectHTML($this->sDate, $sAllDates, $aBookingDates, $sSelectedDate);
         }
         
         if ($aBookingRooms){
-            // sort($aBookingRooms);
+            Functions::sortArrayKeepKeys($aBookingRooms);
             echo Functions::getSelectHTML($this->sRoom, $sAllRoomes, $aBookingRooms, $sSelectedRoom);
         }
     }
@@ -345,35 +345,50 @@ class Bookings
           return $query;
         }
 
-        $sSelectedDate = filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
-        $sSelectedRoom = filter_input(INPUT_GET, $this->sRoom, FILTER_SANITIZE_STRING);
-
-        if ( !('booking' === $query->query['post_type'] )){
-          return $query;
+        // don't modify query_vars because it's not our post_type
+        if ( !( $query->query['post_type'] === 'booking' ) ){
+            return $query;
         }
 
-        // default values are given (= "show all ...") => don't modify query_vars
-        if ($sSelectedDate == 0 && $sSelectedRoom == 0 ){
-          return $query;
+        $filterDate = filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
+        $roomId = filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
+
+        // don't modify query_vars because only default values are given (= "show all ...")
+        if ( !( $filterDate || $roomId ) ){
+            return $query;
         }
 
-        if ($sSelectedDate){
-            $query->query_vars = array(array(
-                'field' => 'rrze-rsvp-booking-start',
-                'value' => $sSelectedDate,
-                'compare' => '=',
-                'type' => 'NUMBER'
-              ));
+        $meta_query = [];
+        if ($roomId){
+            // get 1 seatId for given room
+            $sSeatIds = get_posts([
+                'post_type' => 'seat',
+                'meta_key' => 'rrze-rsvp-seat-room',
+                'meta_value' => $roomId,
+                'numberposts' => 1,
+                'fields' => 'ids'
+            ]);
+        
+            if (isset($sSeatIds[0])){
+                $meta_query[] = array(
+                    'key' => 'rrze-rsvp-booking-seat',
+                    'value' => $sSeatIds[0]
+                );
+            }
         }
 
-        if ($sSelectedRoom){
-            $query->query_vars = array(array(
-                'field' => 'rrze-rsvp-seat-room',
-                'value' => $sSelectedRoom,
-                'compare' => '=',
-                'type' => 'STRING'
-              ));
+        if ($filterDate){
+            $meta_query[] = array(
+                'key' => 'rrze-rsvp-booking-start',
+                'value' => $filterDate
+            );
         }
+
+        if ($meta_query){
+            $meta_query['relation'] = 'AND';
+            $query->query_vars['meta_query'] = $meta_query;
+        }
+
         return $query;
       }
 }

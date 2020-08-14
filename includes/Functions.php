@@ -474,4 +474,19 @@ class Functions
         $output .= '</select>';
         return $output;
     }
+
+    /**
+     * sortArrayKeepKeys
+     * Returns sorted assoc array but keeps the keys
+     * @param array $aInput : assoc array
+     * @return no return but $aInput is passed by reference
+     */
+    public static function sortArrayKeepKeys(array &$aInput)
+    {
+        uasort($aInput, function ($a, $b) {
+            if ($a == $b) { return 0;}
+            return ($a < $b) ? -1 : 1;
+        });
+
+    }
 }
