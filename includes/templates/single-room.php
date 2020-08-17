@@ -104,6 +104,9 @@ while ( have_posts() ) : the_post();
 
     }
 
+    echo '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
+    echo Functions::getOccupancyByRoomIdHTML($postID);
+
     if ($options->general_single_room_availability_table != 'no') {
         $booking_link = '';
         if ($options->general_single_room_availability_table == 'yes_link') {
@@ -119,7 +122,6 @@ while ( have_posts() ) : the_post();
         echo '<a href="' . wp_get_attachment_image_src( $img_src[0], 'full') .'" class="lightbox">' . wp_get_attachment_image( $meta['rrze-rsvp-room-floorplan_id'][0], 'large') . '</a>';
     }
 
-    echo Functions::getOccupancyByRoomIdHTML($postID);
 
 endwhile;
 
