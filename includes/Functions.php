@@ -270,6 +270,12 @@ class Functions
         return $data;
     }
 
+    public static function getOccupancyLinks(int $roomId): string
+    {
+        $url = esc_url(get_permalink($roomId));
+        return '<span class="rrze-rsvp-occupancylinktitle">' . __('Links to display the current room occupancy', 'rrze-rsvp') . '</span>: <span class="rrze-rsvp-occupancylink"><a href="' . $url . '" target="_blank">' . __('Normal website', 'rrze-rsvp') . '</a></span> <span class="rrze-rsvp-occupancylink"><a href="' . $url . '?format=embedded" target="_blank">' . __('Website for public displays', 'rrze-rsvp') . '</a></span>';
+    }
+    
 
     public static function getBooking(int $bookingId): array
     {
