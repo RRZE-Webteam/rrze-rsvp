@@ -75,9 +75,9 @@ class Functions
         $seats_slots = self::getOccupancyByRoomId($room_id);
 
         if ($seats_slots){
-            $output .= '<th>&nbsp;</th>';
+            $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
             foreach($seats_slots['room_slots'] as $room_slot){
-                $output .= '<th scope="col">' . str_replace('-', '<br />-', $room_slot) . '</th>';
+                $output .= '<th scope="col"><span class="rrze-rsvp-timespan">' . $room_slot . '</span></th>';
             }
             $output .= '</tr>';
             unset($seats_slots['room_slots']);
@@ -131,7 +131,9 @@ class Functions
             'nopaging' => true,
             'meta_key' => 'rrze-rsvp-seat-room',
             'meta_value' => $room_id,
-            'fields' => 'ids'
+            'fields' => 'ids',
+            'orderby'=> 'title', 
+            'order' => 'ASC'
         ]);
 
         foreach ($seatIds as $seat_id) {
