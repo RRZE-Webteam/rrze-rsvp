@@ -37,7 +37,7 @@ class Occupancy{
     public function ajaxGetOccupancy() {
         check_ajax_referer( 'rsvp-ajax-nonce', 'nonce'  );
         $roomId = filter_input(INPUT_POST, 'roomId', FILTER_VALIDATE_INT);
-        $response = Functions::getOccupancyByRoomIdHTML($roomId);
+        $response = Functions::getOccupancyByRoomIdHTMLAdmin($roomId);
         wp_send_json($response);
     }
 }

@@ -77,17 +77,18 @@ class Functions
         if ($seats_slots){
             $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
             foreach($seats_slots['room_slots'] as $room_slot){
-                $output .= '<th scope="col"><span class="rrze-rsvp-timespan">' . $room_slot . '</span></th>';
+                $output .= '<th scope="col"><span class="rrze-rsvp-timespan">' . str_replace('-', ' - ', $room_slot) . '</span></th>';
             }
             $output .= '</tr>';
+            $aRoomSlots = $seats_slots['room_slots'];
             unset($seats_slots['room_slots']);
 
             foreach($seats_slots as $seat_id => $aSlots){
                 $output .= '<tr>';
                 $output .= '<th scope="row">' . get_the_title( $seat_id ) . '</th>';
-                foreach($aSlots as $slot => $free){
-                    $class = $free?'available':'not-available';
-                    $output .= '<td><span class="'.$class.'">' . ($free?'available':'not available') . '</span></td>';
+                foreach($aRoomSlots as $slot){
+                    $class = ( $aSlots[$slot] ? 'available' : 'not-available' );
+                    $output .= '<td><span class="'.$class.'">' . ( $aSlots[$slot] ? 'available' : 'not-available' ) . '</span></td>';
                 }
                 $output .= '</tr>';
             }
@@ -121,7 +122,7 @@ class Functions
         $slots_today = [];
         foreach($slots_today_tmp as $start => $end){
             $slots_today[] = $start . '-' . $end;
-            $data['room_slots'][] =  $start . ' - ' . $end;
+            $data['room_slots'][] =  $start . '-' . $end;
         }
 
         // get seats for this room
@@ -145,6 +146,126 @@ class Functions
                 $data[$seat_id][$timespan] = (isset($slots_free_today[$timespan])?true:false);
             }
 
+        }
+        return $data;
+    }
+
+
+    /**
+     * getOccupancyByRoomIdHTMLAdmin
+     * calls getOccupancyByRoomIdAdmin and returns an HTML table with room's occupancy for today 
+     * Note: css-classes are identical to status: confirmed, checked-in, available
+     * @param int $room_id (the room's post id)
+     * @return string
+     */
+    public static function getOccupancyByRoomIdHTMLAdmin(int $room_id): string
+    {
+        $output = '<table class="rsvp-room-occupancy"><tr>';
+
+        $seats_slots = self::getOccupancyByRoomIdAdmin($room_id);
+
+        if ($seats_slots){
+            $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
+            foreach($seats_slots['room_slots'] as $room_slot){
+                $output .= '<th scope="col"><span class="rrze-rsvp-timespan">' . $room_slot . '</span></th>';
+            }
+            $output .= '</tr>';
+            $aRoomSlots = $seats_slots['room_slots'];
+            unset($seats_slots['room_slots']);
+
+            foreach($seats_slots as $seat_id => $aSlots){
+                $output .= '<tr>';
+                $output .= '<th scope="row">' . get_the_title( $seat_id ) . '</th>';
+                foreach($aRoomSlots as $slot){
+                    $output .= '<td><span class="' . $aSlots[$slot] . '">' . $aSlots[$slot] . '</span></td>';
+                }
+                $output .= '</tr>';
+            }
+        }else{
+            $output .= '<td>' . __('This room has no seats for today.', 'rrze-rsvp') . '</td>';
+        }
+        $output .= '</table>';
+
+        return $output;
+    }
+
+
+    /**
+     * getOccupancyByRoomIdAdmin
+     * Returns an array('room_slots' with all timeslot-spans for given room, post_id of seat => array(timeslot-span => 'confirmed', 'checked-in' or 'available )) for today
+     * Example: given room has 3 seats; 1 seat is "confirmed" at 12:30-13:00 
+     * array(4) { ["room_slots"]=> array(3) { [0]=> string(13) "11:00 - 12:15" [1]=> string(13) "12:30 - 13:00" [2]=> string(13) "12:45 - 15:00" } [2244521]=> array(3) { ["11:00-12:15"]=> string(9) "available" ["12:30-13:00"]=> string(9) "available" ["12:45-15:00"]=> string(9) "available" } [2244522]=> array(3) { ["12:30-13:00"]=> string(9) "confirmed" ["11:00-12:15"]=> string(9) "available" ["12:45-15:00"]=> string(9) "available" } [2244523]=> array(3) { ["11:00-12:15"]=> string(9) "available" ["12:30-13:00"]=> string(9) "available" ["12:45-15:00"]=> string(9) "available" } }
+     * @param int $roomId (the room's post id)
+     * @return array
+     */
+    public static function getOccupancyByRoomIdAdmin(int $roomId): array
+    {
+        $data = [];
+
+        $timestamp = current_time('timestamp');
+        $today = date('Y-m-d', $timestamp);
+        $today_weeknumber = date('N', $timestamp);
+
+        // get timeslots for today for this room
+        $slots = self::getRoomSchedule($roomId); // liefert [wochentag-nummer][startzeit] = end-zeit;
+        $slots_today_tmp = (isset($slots[$today_weeknumber]) ? $slots[$today_weeknumber] : []);
+        $slots_today = [];
+        foreach($slots_today_tmp as $start => $end){
+            $slots_today[] = $start . ' - ' . $end;
+            $data['room_slots'][] =  $start . ' - ' . $end;
+        }
+
+        // get seats for this room
+        $aSeatIds = get_posts([
+            'post_type' => 'seat',
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'meta_key' => 'rrze-rsvp-seat-room',
+            'meta_value' => $roomId,
+            'fields' => 'ids',
+            'orderby'=> 'title', 
+            'order' => 'ASC'
+        ]);
+
+        $end = date('Y-m-d H:i', strtotime($today . ' +23 hours, +59 minutes'));
+
+        foreach ($aSeatIds as $seatId) {
+            // get bookingIds for each seat that are confirmed oder checked-in
+            $aBookingIds = get_posts([
+                'post_type' => 'booking',
+                'post_status' => 'publish',
+                'fields' => 'ids',
+                'meta_query' => [
+                    [
+                        'key' => 'rrze-rsvp-booking-seat',
+                        'value'   => $seatId,
+                    ],
+                    [
+                        'key' => 'rrze-rsvp-booking-status',
+                        'value'   => ['confirmed', 'checked-in'],
+                        'compare' => 'IN'
+                    ],
+                    [
+                        'key'     => 'rrze-rsvp-booking-start',
+                        'value' => array(strtotime($today), strtotime($end)),
+                        'compare' => 'BETWEEN',
+                        'type' => 'numeric'
+                    ],
+                ],
+            ]);
+
+            if ($aBookingIds){
+                foreach ( $aBookingIds as $bookingId ){
+                    // set booking-status as value of key "startTime-endTime"
+                    $aBookingMeta = get_post_meta($bookingId);
+                    $timespan = date('H:i', $aBookingMeta['rrze-rsvp-booking-start'][0]) . ' - ' . date('H:i', $aBookingMeta['rrze-rsvp-booking-end'][0]);
+                    $data[$seatId][$timespan] = $aBookingMeta['rrze-rsvp-booking-status'][0];
+                }
+            }
+
+            foreach($slots_today as $timespan){
+                $data[$seatId][$timespan] = (isset($data[$seatId][$timespan])?$data[$seatId][$timespan]:'available');
+            }
         }
         return $data;
     }
