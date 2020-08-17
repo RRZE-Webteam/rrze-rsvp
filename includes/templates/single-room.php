@@ -56,7 +56,9 @@ echo $div_open;
 
 while ( have_posts() ) : the_post();
 
-    $meta = get_post_meta(get_the_ID());
+    $postID = get_the_ID();
+
+    $meta = get_post_meta($postID);
     if (has_post_thumbnail()) {
         the_post_thumbnail('medium', array( "class" => "alignright" ));
     }
@@ -65,7 +67,7 @@ while ( have_posts() ) : the_post();
     if (isset($meta['rrze-rsvp-room-timeslots']) && !empty($meta['rrze-rsvp-room-timeslots'])) {
         $schedule = [];
         echo '<h2>'. __('Schedule','rrze-rsvp') . '</h2>';
-        $timeslots = get_post_meta(get_the_ID(), 'rrze-rsvp-room-timeslots', true);
+        $timeslots = get_post_meta($postID, 'rrze-rsvp-room-timeslots', true);
         $weekdays = [
             1 => __('Monday', 'rrze-rsvp'),
             2 => __('Tuesday', 'rrze-rsvp'),
@@ -116,6 +118,9 @@ while ( have_posts() ) : the_post();
         echo '<h2>'. __('Floor Plan','rrze-rsvp') . '</h2>';
         echo '<a href="' . wp_get_attachment_image_src( $img_src[0], 'full') .'" class="lightbox">' . wp_get_attachment_image( $meta['rrze-rsvp-room-floorplan_id'][0], 'large') . '</a>';
     }
+
+    echo Functions::getOccupancyByRoomIdHTML($postID);
+
 endwhile;
 
 echo $div_close;
