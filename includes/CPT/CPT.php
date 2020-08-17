@@ -79,7 +79,7 @@ class CPT extends Main
 
         add_submenu_page(
             'edit.php?post_type=booking',
-            __( 'Current room occupancy', 'rrze-rsvp' ),
+            __( 'Room occupancy for today', 'rrze-rsvp' ),
             __( 'Room occupancy', 'rrze-rsvp' ),
             'edit_seats',
             'occupancy',
@@ -139,7 +139,7 @@ class CPT extends Main
 
     public function getOccupancyPage(){
         echo '<div class="wrap">'
-            . '<h1>' . esc_html_x( 'Current room occupancy', 'admin page title', 'rrze-rsvp' ) . '</h1>'
+            . '<h1>' . esc_html_x( 'Room occupancy for today', 'admin page title', 'rrze-rsvp' ) . '</h1>'
             . '<table class="form-table" role="presentation"><tbody>'
             . '<tr><th scope="row"><label for="select_room">' . __('Room','rrze-rsvp') . '</label></th>'
             . '<td>'
