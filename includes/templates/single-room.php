@@ -80,8 +80,13 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
                 echo do_shortcode('[rsvp-availability room=' . $postID . ' days=10]');
                 break;
             case 'occupancy':
-            default:
                 echo Functions::getOccupancyByRoomIdHTML($postID);
+                break;
+            case 'occupancy_now':
+                echo Functions::getOccupancyByRoomIdHTML($postID, true);
+                break;
+            default:
+                echo Functions::getOccupancyByRoomIdHTML($postID, true);
                 break;
         }
     }
