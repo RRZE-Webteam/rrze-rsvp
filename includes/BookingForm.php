@@ -32,6 +32,7 @@ class BookingForm
     public function onLoaded()
     {
         add_action('template_redirect', [$this, 'ssoLogin']);
+        add_action('template_redirect', [$this, 'bookingSubmitted']);
         add_filter('the_content', [$this, 'form']);
         add_action('wp_ajax_UpdateCalendar', [$this, 'ajaxUpdateCalendar']);
         add_action('wp_ajax_nopriv_UpdateCalendar', [$this, 'ajaxUpdateCalendar']);
@@ -44,7 +45,7 @@ class BookingForm
     public function ssoLogin()
     {
         global $post;
-        if (is_a($post, '\WP_Post') && is_page() && ($this->roomId = $this->getRoomId($post->ID))) {
+        if (is_a($post, '\WP_Post') && is_page() && ($this->roomId = Functions::getRoomIdByFormPageId($post->ID))) {
             $this->ssoRequired = (get_post_meta($this->roomId, 'rrze-rsvp-room-sso-required', true) == 'on');
             if ($this->ssoRequired) {
                 $this->sso = $this->idm->tryLogIn(true);
@@ -56,7 +57,7 @@ class BookingForm
     {
         global $post;
 
-        if (!is_page() || !($this->roomId = $this->getRoomId($post->ID))) {
+        if (!is_page() || !($this->roomId = Functions::getRoomIdByFormPageId($post->ID))) {
             return $content;
         }
 
@@ -80,10 +81,6 @@ class BookingForm
             return $content;
         }
         if ($content = $this->bookedNotice()) {
-            return $content;
-        }
-
-        if ($content = $this->bookingSubmitted()) {
             return $content;
         }
 
@@ -140,11 +137,11 @@ class BookingForm
 
         // Booking date
         $data['booking_date'] = $getDate;
-        $data['select_timeslot'] = $this->buildTimeslotSelect($this->roomId, $getDate, $getTime, $availability);
+        $data['select_timeslot'] = $getDate ? $this->buildTimeslotSelect($this->roomId, $getDate, $getTime, $availability) : '';
 
         // Booking timeslot
-        $data['booking_timeslot'] = (($getDate && $getTime));
-        $data['select_seat'] = $this->buildSeatSelect($this->roomId, $getDate, $getTime, $getSeat, $availability);
+        $data['booking_timeslot'] = ($getDate && $getTime);
+        $data['select_seat'] = ($getDate && $getTime) ? $this->buildSeatSelect($this->roomId, $getDate, $getTime, $getSeat, $availability) : '';
 
         // SSO enabled?
         $data['sso_enabled'] = $this->sso;
@@ -309,10 +306,10 @@ class BookingForm
         return $this->template->getContent('form/booking-booked', $data);
     }
 
-    protected function bookingSubmitted()
+    public function bookingSubmitted()
     {
         if (!isset($_POST['rrze_rsvp_post_nonce_field']) || !wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
-            return '';
+            return;
         }
 
         array_walk_recursive(
@@ -325,7 +322,6 @@ class BookingForm
         );
 
         $posted_data = $_POST;
-        // echo Helper::get_html_var_dump($posted_data);
         $booking_date = sanitize_text_field($posted_data['rsvp_date']);
         $booking_start = sanitize_text_field($posted_data['rsvp_time']);
         $booking_timestamp_start = strtotime($booking_date . ' ' . $booking_start);
@@ -781,26 +777,5 @@ class BookingForm
             $seatSelects = __('Please select a date and a time slot.', 'rrze-rsvp');
         }
         return '<h4>' . __('Available seats:', 'rrze-rsvp') . '</h4><div class="rsvp-seat-select">' . $seatSelects . '</div>';
-    }
-
-    protected function getRoomId(int $postId)
-    {
-        $args = [
-            'numberposts' => -1,
-            'post_type' => 'room'
-        ];
-
-        $posts = get_posts($args);
-        if (empty($posts)) {
-            return null;
-        }
-
-        foreach ($posts as $post) {
-            if (get_post_meta($post->ID, 'rrze-rsvp-room-form-page', true) == $postId) {
-                return $post->ID;
-            }
-        }
-
-        return null;
     }
 }

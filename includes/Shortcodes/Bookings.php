@@ -40,6 +40,7 @@ class Bookings extends Shortcodes {
     public function onLoaded()
     {
         add_action('template_redirect', [$this, 'ssoLogin']);
+        add_action('template_redirect', [$this, 'bookingSubmitted']);
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         add_action( 'wp_ajax_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
         add_action( 'wp_ajax_nopriv_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
@@ -79,10 +80,6 @@ class Bookings extends Shortcodes {
         }
 
         $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
-
-        if ($output = $this->bookingSubmitted($shortcode_atts)) {
-            return $output;
-        }
 
         wp_enqueue_script('rrze-rsvp-shortcode');
         wp_localize_script('rrze-rsvp-shortcode', 'rsvp_ajax', [
@@ -370,13 +367,11 @@ class Bookings extends Shortcodes {
         return $this->template->getContent('shortcode/booking-booked', $data);
     }
 
-    protected function bookingSubmitted(array $shortcodeAtts)
+    public function bookingSubmitted()
     {
         if (!isset($_POST['rrze_rsvp_post_nonce_field']) || !wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
-            return '';
-        }        
-
-        $sso = ($shortcodeAtts['sso'] == 'true');
+            return;
+        }
 
         array_walk_recursive(
             $_POST, function ( &$value ) {
@@ -397,7 +392,7 @@ class Bookings extends Shortcodes {
         $booking_comment = (isset($posted_data['rsvp_comment']) ? sanitize_textarea_field($posted_data['rsvp_comment']) : '');
         $booking_dsgvo = (isset($posted_data['rsvp_dsgvo']) && $posted_data['rsvp_dsgvo'] == '1');
 
-        if ($sso) {
+        if ($this->sso) {
             if ($this->idm->isAuthenticated()){
                 $sso_data = $this->idm->getCustomerData();
                 $booking_lastname  = $sso_data['customer_lastname'];

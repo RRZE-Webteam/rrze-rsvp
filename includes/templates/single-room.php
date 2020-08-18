@@ -49,8 +49,8 @@ if (!empty($schedule_data)) {
 
 // Floorplan
 if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id'] != '') {
-    $img_src = wp_get_attachment_image_src( $meta['rrze-rsvp-room-floorplan_id'][0]);
-    $floorplan = '<a href="' . wp_get_attachment_image_src( $img_src[0], 'full') .'" class="lightbox">' . wp_get_attachment_image( $meta['rrze-rsvp-room-floorplan_id'][0], 'large') . '</a>';
+    $img_id = $meta['rrze-rsvp-room-floorplan_id'][0];
+    $floorplan = wp_get_attachment_image( $img_id, 'large');
 } else {
     $floorplan = __('No floorplan available.', 'rrze-rsvp');
 }
@@ -62,6 +62,12 @@ get_header();
  * Ausgabe ?format=embedded&show=xyz für Public Displays
  */
 if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
+    $width = isset($_GET['width']) ? absint($_GET['width']) : '1820';
+    $height = isset($_GET['height']) ? absint($_GET['height']) : '790';
+    $innerwidth = (int)$width - 20;
+    $innerheight = (int)$height - 20;
+    echo '<style> body.embedded {width:' . $width . 'px; height:' . $height . 'px;} </style>';
+
     if (isset($_GET['show'])) {
         switch ($_GET['show']) {
             case 'info':
@@ -163,7 +169,8 @@ while ( have_posts() ) : the_post();
 
     if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id'] != '') {
         echo '<h2>'. __('Floor Plan','rrze-rsvp') . '</h2>';
-        echo $floorplan;
+        $img_src = wp_get_attachment_image_src( $img_id, 'full');
+        echo '<a href="' . $img_src[0] .'" class="lightbox">' . $floorplan . '</a>';
     }
 
 

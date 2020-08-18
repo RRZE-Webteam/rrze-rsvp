@@ -137,12 +137,9 @@ class Actions
 
 			if (($action == 'confirm' || $action == 'cancel') && $isAdmin) {
 				return $this->bookingReplyAdminTemplate($bookingId, $booking, $action);
-			} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel' || $action == 'ics') && $isCustomer) {
+			} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel') && $isCustomer) {
 				if ($bookingCancelled) {
 					$action = 'cancel';
-				} elseif ($action == 'ics') {
-					ICS::generate($bookingId);
-					exit;
 				}
 				return $this->bookingReplyCustomer($bookingId, $booking, $action);
 			}

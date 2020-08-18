@@ -664,4 +664,27 @@ class Functions
         });
 
     }
+
+    public static function isFormPage(int $postId): bool
+    {
+        return !is_null(self::getRoomIdByFormPageId($postId)) ? true : false;
+    }
+
+    public static function getRoomIdByFormPageId(int $postId)
+    {
+        $args = [
+            'numberposts' => -1,
+            'post_type' => 'room'
+        ];
+        $posts = get_posts($args);
+        if (empty($posts)) {
+            return null;
+        }
+        foreach ($posts as $post) {
+            if (get_post_meta($post->ID, 'rrze-rsvp-room-form-page', true) == $postId) {
+                return $post->ID;
+            }
+        }
+        return null;
+    }    
 }
