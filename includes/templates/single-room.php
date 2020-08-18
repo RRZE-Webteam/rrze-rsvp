@@ -155,8 +155,8 @@ while ( have_posts() ) : the_post();
         echo $schedule;
     }
 
-    echo '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
-    echo Functions::getOccupancyByRoomIdHTML($postID);
+    // echo '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
+    echo Functions::getOccupancyByRoomIdNextHTML($postID);
 
     if ($options->general_single_room_availability_table != 'no') {
         $booking_link = '';

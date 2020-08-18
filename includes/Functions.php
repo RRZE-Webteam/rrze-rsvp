@@ -84,7 +84,8 @@ class Functions
 
         if (isset($aRoomAvailability[$today])){
             // we have a seat for today
-            $output = self::getOccupancyByRoomIdHTML($room_id, true);
+            $output = '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
+            $output .= self::getOccupancyByRoomIdHTML($room_id, true);
         } else {
             // return the next available timeslots
             $nextAvailableDay = array_key_first($aRoomAvailability);
