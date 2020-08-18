@@ -67,3 +67,9 @@ table.rsvp-schedule {
         }
     }
 }
+
+table.rsvp-room-availability {
+    td:last-child {
+        border-right: 1px solid #e9edf2;
+    }
+}
