@@ -85,6 +85,9 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
             case 'occupancy_now':
                 echo Functions::getOccupancyByRoomIdHTML($postID, true);
                 break;
+            case 'occupancy_nextavailable':
+                echo Functions::getOccupancyByRoomIdNextHTML($postID);
+                break;
             default:
                 echo Functions::getOccupancyByRoomIdHTML($postID, true);
                 break;
