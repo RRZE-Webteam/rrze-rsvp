@@ -60,19 +60,18 @@ class Functions
         return false;
     }
 
-
-
     /**
      * getOccupancyByRoomIdHTML
      * calls getOccupancyByRoomId and returns an HTML table with room's occupancy for today 
      * @param int $room_id (the room's post id)
+     * @param boolean $from_now (optional) : return timeslot-spans which end-time (H:i) is in the future
      * @return string
      */
-    public static function getOccupancyByRoomIdHTML(int $room_id): string
+    public static function getOccupancyByRoomIdHTML(int $room_id, bool $from_now = NULL): string
     {
         $output = '<table class="rsvp-room-occupancy"><tr>';
 
-        $seats_slots = self::getOccupancyByRoomId($room_id);
+        $seats_slots = self::getOccupancyByRoomId($room_id, $from_now);
 
         if ($seats_slots){
             $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
@@ -106,12 +105,12 @@ class Functions
      * Example: given room has 2 seats; 1 seat is not available at 09:30-10:30 
      *          returns: array(3) { ["room_slots"]=> array(3) { [0]=> string(13) "08:15 - 09:15" [1]=> string(13) "09:30 - 10:30" [2]=> string(13) "11:05 - 12:10" } [2244487]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(true) ["11:05-12:10"]=> bool(true) } [1903]=> array(3) { ["08:15-09:15"]=> bool(true) ["09:30-10:30"]=> bool(false) ["11:05-12:10"]=> bool(true) } }
      * @param int $room_id (the room's post id)
+     * @param boolean $from_now (optional) : return timeslot-spans which end-time (H:i) is in the future
      * @return array
      */
-    public static function getOccupancyByRoomId(int $room_id): array
+    public static function getOccupancyByRoomId(int $room_id, bool $from_now = NULL): array
     {
         $data = [];
-
         $timestamp = current_time('timestamp');
         $today = date('Y-m-d', $timestamp);
         $today_weeknumber = date('N', $timestamp);
@@ -119,10 +118,19 @@ class Functions
         // get timeslots for today for this room
         $slots = self::getRoomSchedule($room_id); // liefert [wochentag-nummer][startzeit] = end-zeit;
         $slots_today_tmp = (isset($slots[$today_weeknumber]) ? $slots[$today_weeknumber] : []);
+
         $slots_today = [];
         foreach($slots_today_tmp as $start => $end){
-            $slots_today[] = $start . '-' . $end;
-            $data['room_slots'][] =  $start . '-' . $end;
+            $end_timestamp = strtotime($today . ' ' . $end);
+            if ($from_now){
+                if ($end_timestamp > $timestamp){
+                    $slots_today[] = $start . '-' . $end;
+                    $data['room_slots'][] =  $start . '-' . $end;
+                }
+            } else {
+                $slots_today[] = $start . '-' . $end;
+                $data['room_slots'][] =  $start . '-' . $end;
+            }
         }
 
         // get seats for this room
