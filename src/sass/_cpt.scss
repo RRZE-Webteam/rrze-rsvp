@@ -59,3 +59,13 @@ table.rsvp-room-occupancy {
         }
     }
 }
+
+table.rsvp-schedule {
+    width: auto;
+    td {
+        min-width: 150px;
+        &:last-child {
+            border-right: 1px solid #e9edf2;
+        }
+    }
+}

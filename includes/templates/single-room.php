@@ -9,13 +9,82 @@ $settings = new Settings(plugin()->getFile());
 $options = (object) $settings->getOptions();
 global $post;
 
+$postID = $post->ID;
+$meta = get_post_meta($postID);
+
+// Schedule
+$schedule_data = Functions::getRoomSchedule($postID);
+$schedule = '';
+$weekdays = [
+    1 => __('Monday', 'rrze-rsvp'),
+    2 => __('Tuesday', 'rrze-rsvp'),
+    3 => __('Wednesday', 'rrze-rsvp'),
+    4 => __('Thursday', 'rrze-rsvp'),
+    5 => __('Friday', 'rrze-rsvp'),
+    6 => __('Saturday', 'rrze-rsvp'),
+    7 => __('Sunday', 'rrze-rsvp')
+];
+if (!empty($schedule_data)) {
+    $schedule .= '<table class="rsvp-schedule">';
+    $schedule .= '<tr>'
+        . '<th>'. __('Weekday', 'rrze-rsvp') . '</th>'
+        . '<th>'. __('Time slots', 'rrze-rsvp') . '</th>';
+    $schedule .= '</tr>';
+    foreach ($schedule_data as $weekday => $daily_slots) {
+        $schedule .= '<tr>'
+            .'<td>' . $weekdays[$weekday] . '</td>'
+            . '<td>';
+        $ts = [];
+        foreach ($daily_slots as $start => $end) {
+            $ts[] = $start . ' - ' . $end;
+        }
+        $schedule .= implode('<br />', $ts);
+        $schedule .= '</td>'
+            . '</tr>';
+    }
+    $schedule .= "</table>";
+} else {
+    $schedule .= '<p>' . __('No schedule available.') . '</p>';
+}
+
+// Floorplan
+if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id'] != '') {
+    $img_src = wp_get_attachment_image_src( $meta['rrze-rsvp-room-floorplan_id'][0]);
+    $floorplan = '<a href="' . wp_get_attachment_image_src( $img_src[0], 'full') .'" class="lightbox">' . wp_get_attachment_image( $meta['rrze-rsvp-room-floorplan_id'][0], 'large') . '</a>';
+} else {
+    $floorplan = __('No floorplan available.', 'rrze-rsvp');
+}
+
+
 get_header();
 
+/*
+ * Ausgabe ?format=embedded&show=xyz für Public Displays
+ */
 if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
-
-    while ( have_posts() ) : the_post();
-        echo Functions::getOccupancyByRoomIdHTML(get_the_ID());
-    endwhile;
+    if (isset($_GET['show'])) {
+        switch ($_GET['show']) {
+            case 'info':
+                if (has_post_thumbnail()) {
+                    echo get_the_post_thumbnail($postID, 'medium', array( "class" => "alignright" ));
+                }
+                echo get_the_content(null, false, $postID);
+                break;
+            case 'floorplan':
+                echo $floorplan;
+                break;
+            case 'schedule':
+                echo $schedule;
+                break;
+            case 'availability':
+                echo do_shortcode('[rsvp-availability room=' . $postID . ' days=10]');
+                break;
+            case 'occupancy':
+            default:
+                echo Functions::getOccupancyByRoomIdHTML($postID);
+                break;
+        }
+    }
 
     wp_enqueue_style('rrze-rsvp-shortcode');
     get_footer();
@@ -23,6 +92,9 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
     return;
 }
 
+/*
+ * div-/Seitenstruktur für FAU- und andere Themes
+ */
 if (Helper::isFauTheme()) {
     get_template_part('template-parts/hero', 'small');
     $div_open = '<div id="content">
@@ -52,56 +124,21 @@ if (Helper::isFauTheme()) {
     </div>';
 }
 
+
+/*
+ * Eigentlicher Content
+ */
 echo $div_open;
 
 while ( have_posts() ) : the_post();
 
-    $postID = get_the_ID();
-
-    $meta = get_post_meta($postID);
     if (has_post_thumbnail()) {
         the_post_thumbnail('medium', array( "class" => "alignright" ));
     }
     the_content();
 
     if (isset($meta['rrze-rsvp-room-timeslots']) && !empty($meta['rrze-rsvp-room-timeslots'])) {
-        $schedule = [];
-        echo '<h2>'. __('Schedule','rrze-rsvp') . '</h2>';
-        $timeslots = get_post_meta($postID, 'rrze-rsvp-room-timeslots', true);
-        $weekdays = [
-            1 => __('Monday', 'rrze-rsvp'),
-            2 => __('Tuesday', 'rrze-rsvp'),
-            3 => __('Wednesday', 'rrze-rsvp'),
-            4 => __('Thursday', 'rrze-rsvp'),
-            5 => __('Friday', 'rrze-rsvp'),
-            6 => __('Saturday', 'rrze-rsvp'),
-            7 => __('Sunday', 'rrze-rsvp')
-        ];
-        foreach ($timeslots as $timeslot) {
-            foreach ($timeslot['rrze-rsvp-room-weekday'] as $day) {
-                if (isset($timeslot['rrze-rsvp-room-starttime']) && isset($timeslot['rrze-rsvp-room-endtime'])) {
-                    $schedule[$weekdays[$day]][] = $timeslot['rrze-rsvp-room-starttime'] . ' - ' . $timeslot['rrze-rsvp-room-endtime'];
-                }
-            }
-        }
-        if (!empty($schedule)) {
-            echo '<table class="rsvp-schedule">';
-            echo '<tr>'
-                . '<th>'. __('Weekday', 'rrze-rsvp') . '</th>'
-                . '<th>'. __('Time slots', 'rrze-rsvp') . '</th>';
-
-            echo '</tr>';
-            foreach ($schedule as $weekday => $daily_slots) {
-                echo '<tr>'
-                    .'<td>' . $weekday . '</td>'
-                    . '<td>' . implode('<br />', $daily_slots) . '</td>'
-                    . '</tr>';
-            }
-            echo "</table>";
-        } else {
-            echo '<p>' . __('No schedule available.') . '</p>';
-        }
-
+        echo $schedule;
     }
 
     echo '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
@@ -113,13 +150,12 @@ while ( have_posts() ) : the_post();
             $booking_link = 'booking_link=true';
         }
         echo '<h3>' . __('Availability', 'rrze-rsvp') . '</h3>';
-        echo do_shortcode('[rsvp-availability room=' . $post->ID . ' days=10 '.$booking_link.']');
+        echo do_shortcode('[rsvp-availability room=' . $postID . ' days=10 '.$booking_link.']');
     }
 
     if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id'] != '') {
-        $img_src = wp_get_attachment_image_src( $meta['rrze-rsvp-room-floorplan_id'][0]);
         echo '<h2>'. __('Floor Plan','rrze-rsvp') . '</h2>';
-        echo '<a href="' . wp_get_attachment_image_src( $img_src[0], 'full') .'" class="lightbox">' . wp_get_attachment_image( $meta['rrze-rsvp-room-floorplan_id'][0], 'large') . '</a>';
+        echo $floorplan;
     }
 
 
