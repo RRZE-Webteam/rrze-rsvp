@@ -264,7 +264,8 @@ table.rsvp-seat-availability a {
 
 .rsvp-occupancy-container {
   background: #fff;
-  padding: 10px; }
+  padding: 10px;
+  margin-top: 6px; }
 
 body.embedded {
   padding: 10px; }
@@ -308,3 +309,10 @@ table.rsvp-room-occupancy {
         font: normal normal normal 20px/1 FontAwesome;
         content: '\f00d';
         display: inline-block; }
+
+table.rsvp-schedule {
+  width: auto; }
+  table.rsvp-schedule td {
+    min-width: 150px; }
+    table.rsvp-schedule td:last-child {
+      border-right: 1px solid #e9edf2; }

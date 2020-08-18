@@ -16,11 +16,16 @@ class Bookings
 {
 
     protected $options;
+    protected $sDate;
+    protected $sRoom;
+
 
     public function __construct($pluginFile, $settings)
     {
         $this->pluginFile = $pluginFile;
         $this->settings = $settings;
+        $this->sDate = 'rsvp_booking_date';
+        $this->sRoom = 'rsvp_booking_room';
     }
 
     public function onLoaded()
@@ -32,6 +37,8 @@ class Bookings
         add_action('manage_booking_posts_custom_column', [$this, 'booking_column'], 10, 2);
         add_filter('manage_edit-booking_sortable_columns', [$this, 'booking_sortable_columns']);
         add_action( 'wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots'] );
+        add_action( 'restrict_manage_posts', [$this, 'addFilters'], 10, 1 );
+        add_filter( 'parse_query', [$this, 'filterQuery'], 10);
     }
 
     // Register Custom Post Type
@@ -290,4 +297,98 @@ class Bookings
         echo $output;
         wp_die();
     }
+
+
+    public function addFilters($post_type){
+        if ($post_type != 'booking'){
+          return;
+        }
+
+        $sAllDates = __( 'Show all dates', 'rrze-rsvp' );
+        $sAllRoomes = __( 'Show all rooms', 'rrze-rsvp' );
+        $sSelectedDate = (string) filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
+        $sSelectedRoom = (string) filter_input(INPUT_GET, $this->sRoom, FILTER_SANITIZE_STRING);
+
+        // 1. get all booking IDs
+        $aBookingIds = get_posts([
+            'post_type' => 'booking',
+            'nopaging' => true,
+            'fields' => 'ids'
+        ]);
+
+        $aBookingDates = [];
+        $aBookingRooms = [];
+
+        foreach ($aBookingIds as $bookingId){
+            // 2. get unique dates
+            $bookingDate = get_post_meta($bookingId, 'rrze-rsvp-booking-start', true);
+            $aBookingDates[$bookingDate] = Functions::dateFormat($bookingDate);
+            // 3. get unique rooms via seat
+            $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
+            $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
+            $aBookingRooms[$roomId] = get_the_title($roomId);
+        }
+
+        if ($aBookingDates){
+            Functions::sortArrayKeepKeys($aBookingDates);
+            echo Functions::getSelectHTML($this->sDate, $sAllDates, $aBookingDates, $sSelectedDate);
+        }
+        
+        if ($aBookingRooms){
+            Functions::sortArrayKeepKeys($aBookingRooms);
+            echo Functions::getSelectHTML($this->sRoom, $sAllRoomes, $aBookingRooms, $sSelectedRoom);
+        }
+    }
+
+    public function filterQuery($query){
+        if ( !(is_admin() AND $query->is_main_query()) ){ 
+          return $query;
+        }
+
+        // don't modify query_vars because it's not our post_type
+        if ( !( $query->query['post_type'] === 'booking' ) ){
+            return $query;
+        }
+
+        $filterDate = filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
+        $roomId = filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
+
+        // don't modify query_vars because only default values are given (= "show all ...")
+        if ( !( $filterDate || $roomId ) ){
+            return $query;
+        }
+
+        $meta_query = [];
+        if ($roomId){
+            // get 1 seatId for given room
+            $sSeatIds = get_posts([
+                'post_type' => 'seat',
+                'meta_key' => 'rrze-rsvp-seat-room',
+                'meta_value' => $roomId,
+                'numberposts' => 1,
+                'fields' => 'ids'
+            ]);
+        
+            if (isset($sSeatIds[0])){
+                $meta_query[] = array(
+                    'key' => 'rrze-rsvp-booking-seat',
+                    'value' => $sSeatIds[0]
+                );
+            }
+        }
+
+        if ($filterDate){
+            $meta_query[] = array(
+                'key' => 'rrze-rsvp-booking-start',
+                'value' => $filterDate
+            );
+        }
+
+        if ($meta_query){
+            $meta_query['relation'] = 'AND';
+            $query->query_vars['meta_query'] = $meta_query;
+        }
+
+        return $query;
+      }
 }

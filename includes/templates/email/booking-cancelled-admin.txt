@@ -1,0 +1,12 @@
+{{=text}}
+
+{{=date}}
+{{=time}}
+
+{{=room_name}}
+{{seat_name}}
+{{=seat_name}}
+{{/seat_name}}
+
+{{=customer.name}}
+{{=customer.email}}

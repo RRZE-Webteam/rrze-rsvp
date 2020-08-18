@@ -4,8 +4,6 @@
 }
 
 body.embedded {
-    //width: 1820px;
-    //height: 590px;
     padding: 10px;
     &.admin-bar {
         margin-top: 0 !important;
@@ -56,6 +54,16 @@ table.rsvp-room-occupancy {
                 content: '\f00d';
                 display: inline-block;
             }
+        }
+    }
+}
+
+table.rsvp-schedule {
+    width: auto;
+    td {
+        min-width: 150px;
+        &:last-child {
+            border-right: 1px solid #e9edf2;
         }
     }
 }

@@ -17,6 +17,8 @@ class Occupancy{
         add_action( 'admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
         add_action( 'wp_ajax_ShowOccupancy', [$this, 'ajaxGetOccupancy'] );
         add_action( 'wp_ajax_nopriv_ShowOccupancy', [$this, 'ajaxGetOccupancy'] );
+        add_action( 'wp_ajax_ShowOccupancyLinks', [$this, 'ajaxGetOccupancyLinks'] );
+        add_action( 'wp_ajax_nopriv_ShowOccupancyLinks', [$this, 'ajaxGetOccupancyLinks'] );
     }
 
     public function adminEnqueueScripts(){
@@ -37,7 +39,15 @@ class Occupancy{
     public function ajaxGetOccupancy() {
         check_ajax_referer( 'rsvp-ajax-nonce', 'nonce'  );
         $roomId = filter_input(INPUT_POST, 'roomId', FILTER_VALIDATE_INT);
-        $response = Functions::getOccupancyByRoomIdHTML($roomId);
+        $response = Functions::getOccupancyByRoomIdHTMLAdmin($roomId);
         wp_send_json($response);
     }
+
+    public function ajaxGetOccupancyLinks() {
+        check_ajax_referer( 'rsvp-ajax-nonce', 'nonce'  );
+        $roomId = filter_input(INPUT_POST, 'roomId', FILTER_VALIDATE_INT);
+        $response = Functions::getOccupancyLinks($roomId);
+        wp_send_json($response);
+    }
+
 }

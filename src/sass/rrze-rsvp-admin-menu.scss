@@ -5,7 +5,8 @@ li.rrze-rsvp-submenu-hidden {
 table.rsvp-room-occupancy {
 	border-collapse: collapse;
 	width: 100%;
-	outline: 10px solid #fff;
+    outline: 10px solid #fff;
+    margin-top: 28px;
 	td, th {
 		padding: 5px;
 		border: 1px solid darkgrey;
@@ -34,12 +35,21 @@ table.rsvp-room-occupancy {
 				display: inline-block;
 			}
 		}
-		span.not-available {
+		span.not-available, span.checked-in {
 			background-color: #f2dede;
 			color: #a94442;
 			&:before {
 				font: normal normal normal 20px/1 FontAwesome;
 				content: '\f00d';
+				display: inline-block;
+			}
+		}
+		span.confirmed {
+			background-color: #fcf8e3;
+			color: #8a6d3b;
+			&:before {
+				font: normal normal normal 20px/1 FontAwesome;
+				content: '\f12a';
 				display: inline-block;
 			}
 		}

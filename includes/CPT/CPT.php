@@ -79,7 +79,7 @@ class CPT extends Main
 
         add_submenu_page(
             'edit.php?post_type=booking',
-            __( 'Current room occupancy', 'rrze-rsvp' ),
+            __( 'Room occupancy for today', 'rrze-rsvp' ),
             __( 'Room occupancy', 'rrze-rsvp' ),
             'edit_seats',
             'occupancy',
@@ -139,13 +139,14 @@ class CPT extends Main
 
     public function getOccupancyPage(){
         echo '<div class="wrap">'
-            . '<h1>' . esc_html_x( 'Current room occupancy', 'admin page title', 'rrze-rsvp' ) . '</h1>'
-            . '<table class="form-table" role="presentation"><tbody>'
-            . '<tr><th scope="row"><label for="select_room">' . __('Room','rrze-rsvp') . '</label></th>'
-            . '<td>'
+            . '<h1>' . esc_html_x( 'Room occupancy for today', 'admin page title', 'rrze-rsvp' ) . '</h1>'
+
+            . '<div class="tablenav top">'
+            . '<div class="alignleft actions bulkactions">'
+            . '<label for="select_room" class="screen-reader-text">' . __('Room','rrze-rsvp') . '</label>'
             . '<form action="" method="post" class="occupancy">'
             . '<select id="rsvp_room_id" name="rsvp_room_id">'
-            . '<option>&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;</option>';
+            . '<option>&mdash; ' . __('Please select room', 'rrze-rsvp') . ' &mdash;</option>';
 
         $rooms = get_posts([
             'post_type' => 'room',
@@ -158,12 +159,12 @@ class CPT extends Main
         foreach ($rooms as $room) {
             echo '<option value="' . $room->ID . '">' . $room->post_title . '</option>';
         }
-
-        echo '</select></form></td></tr>'
-            . '</tbody></table>'
+            echo '</select></form>'
             . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>'
-            . '<div class="rsvp-occupancy-container"></div>'
-            . '</div>';
+            . '</div>'
+            . '<div class="rsvp-occupancy-links"></div>' 
+            . '<div class="rsvp-occupancy-container"></div>' 
+            . '</div>'; 
      }
 
 }

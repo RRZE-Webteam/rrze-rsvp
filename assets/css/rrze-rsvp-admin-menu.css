@@ -28,10 +28,17 @@ table.rsvp-room-occupancy {
         font: normal normal normal 20px/1 FontAwesome;
         content: '\f00c';
         display: inline-block; }
-    table.rsvp-room-occupancy td span.not-available {
+    table.rsvp-room-occupancy td span.not-available, table.rsvp-room-occupancy td span.checked-in {
       background-color: #f2dede;
       color: #a94442; }
-      table.rsvp-room-occupancy td span.not-available:before {
+      table.rsvp-room-occupancy td span.not-available:before, table.rsvp-room-occupancy td span.checked-in:before {
         font: normal normal normal 20px/1 FontAwesome;
         content: '\f00d';
+        display: inline-block; }
+    table.rsvp-room-occupancy td span.confirmed {
+      background-color: #fcf8e3;
+      color: #8a6d3b; }
+      table.rsvp-room-occupancy td span.confirmed:before {
+        font: normal normal normal 20px/1 FontAwesome;
+        content: '\f12a';
         display: inline-block; }
