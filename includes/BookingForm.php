@@ -137,11 +137,11 @@ class BookingForm
 
         // Booking date
         $data['booking_date'] = $getDate;
-        $data['select_timeslot'] = $this->buildTimeslotSelect($this->roomId, $getDate, $getTime, $availability);
+        $data['select_timeslot'] = $getDate ? $this->buildTimeslotSelect($this->roomId, $getDate, $getTime, $availability) : '';
 
         // Booking timeslot
-        $data['booking_timeslot'] = (($getDate && $getTime));
-        $data['select_seat'] = $this->buildSeatSelect($this->roomId, $getDate, $getTime, $getSeat, $availability);
+        $data['booking_timeslot'] = ($getDate && $getTime);
+        $data['select_seat'] = ($getDate && $getTime) ? $this->buildSeatSelect($this->roomId, $getDate, $getTime, $getSeat, $availability) : '';
 
         // SSO enabled?
         $data['sso_enabled'] = $this->sso;
