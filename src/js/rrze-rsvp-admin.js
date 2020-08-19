@@ -1,6 +1,6 @@
 "use strict";
 
-jQuery(document).ready(function () {
+jQuery(document).ready(function ($) {
     var DATE_FORMAT = rrze_rsvp_admin.dateformat,
         TEXT_CANCEL = rrze_rsvp_admin.text_cancel,
         TEXT_CANCELLED = rrze_rsvp_admin.text_cancelled,
@@ -40,13 +40,13 @@ jQuery(document).ready(function () {
 
 	}
 
-    jQuery('.rrze-rsvp-confirm').click(function(e) {
+    $('.rrze-rsvp-confirm').click(function(e) {
         e.preventDefault();
         bookingAction('confirm', jQuery(this));
         return false;
     });
 
-    jQuery('.rrze-rsvp-cancel').click(function(e) {
+    $('.rrze-rsvp-cancel').click(function(e) {
         e.preventDefault();
         if (confirm(TEXT_CANCEL)) {
             bookingAction('cancel', jQuery(this));
@@ -95,7 +95,7 @@ jQuery(document).ready(function () {
 		}
 	});
 
-	jQuery('div.cmb2-id-rrze-rsvp-booking-start').on('change', 'select.select_timeslot', (function() {
+	$('div.cmb2-id-rrze-rsvp-booking-start').on('change', 'select.select_timeslot', (function() {
 		var select_start = jQuery(this).val();
 		var select_end   = jQuery(this).find(':selected').data('end');
 		console.log(select_start);
@@ -104,5 +104,19 @@ jQuery(document).ready(function () {
 		endtime.val(select_end);
 	}));
 
+
+    /* trigger reservations' details - see https://github.com/RRZE-Webteam/rrze-rsvp/issues/92 */
+    $('div.cmb2-id-rrze-rsvp-room-instant-check-in').hide();
+    $('#rrze-rsvp-room-auto-confirmation').click(function() {
+        if( $(this).is(':checked')) {
+            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').show(500);
+        } else {
+            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').hide(500);
+            if( $('#rrze-rsvp-room-instant-check-in').is(':checked')) {
+                $('#rrze-rsvp-room-instant-check-in').prop('checked', false)
+            }
+        }
+    }); 
+    
 });
 
