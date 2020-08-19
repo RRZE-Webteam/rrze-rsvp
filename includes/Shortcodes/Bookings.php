@@ -52,7 +52,12 @@ class Bookings extends Shortcodes {
 
     public function ssoLogin()
     {
-        if (is_page() && Functions::hasShortcodeSSO('rsvp-booking')) {
+        if (is_page() 
+        && (Functions::hasShortcodeSSO('rsvp-booking')
+            || (isset($_GET['room_id'])
+                && ($roomId = absint($_GET['room_id']))
+                && (get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true) == 'on')))
+        ) {
             $this->sso = $this->idm->tryLogIn(true);
         }
     }
