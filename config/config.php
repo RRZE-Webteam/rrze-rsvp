@@ -41,9 +41,10 @@ function getConstants() {
     
  function  defaultOptions()  {
         return [
+            'single_room_availability_table' => 'yes_link',
             'notification_email' => '',
-            'notification_if_new' => 1,
-            'notification_if_cancel' => 1,
+            'notification_if_new' => 'yes',
+            'notification_if_cancel' => 'yes',
             'sender_name' => '',
             'sender_email' => '',
             'received_subject' => __('Thank you for booking', 'rrze-rsvp'),
@@ -62,7 +63,6 @@ function getConstants() {
             'cancel_subject_en' => 'Your booking has been cancelled',
             'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp'),
             'cancel_text_en' => 'Unfortunately we have to cancel your booking on {{date_en}} at {{time_en}}.',
-            'single_room_availability_table' => 'yes_link',
             'fau_logo' => 'on',
             'website_logo' => 'off',
             'website_url' => 'on',
@@ -214,6 +214,7 @@ function getFields(){
                 'label'   => __('Show Availability table on Room page.', 'rrze-rsvp'),
                 'desc'    => __('If \'Yes (with link)\' you need to specify the booking page (see above).', 'rrze-rsvp'),
                 'type'    => 'radio',
+                'default' => $defaults['single_room_availability_table'],
                 'options' => [
                     'yes_link' => __('Yes (with seats linked to booking form)', 'rrze-rsvp'),
                     'yes' => __('Yes (no link)', 'rrze-rsvp'),
