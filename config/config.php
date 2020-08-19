@@ -53,6 +53,7 @@ function getConstants() {
     }
 
         return [
+            'booking_page_title' => __('RSVP Booking', 'rrze-rsvp'),
             'single_room_availability_table' => 'yes_link',
             'notification_email' => $notification_email,
             'notification_if_new' => 'yes',
@@ -215,11 +216,12 @@ function getFields(){
  */
         'general' => [
             [
-                'name'    => 'booking_page',
-                'label'   => __('Booking Page', 'rrze-rsvp'),
-                'desc'    => __('Select the page that contains your booking form shortcode. You can find a shortcode hint on each room edit page.', 'rrze-rsvp'),
-                'type'    => 'select',
-                'options' => Functions::getPagesDropdownOptions(['show_option_none'=> '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;']),
+                'name'    => 'booking_page_title',
+                'label'   => __('Booking Page Title', 'rrze-rsvp'),
+                'desc'    => __('Enter the title of the default booking form page.', 'rrze-rsvp'),
+                'type'    => 'text',
+                'default' =>  $defaults['booking_page_title'],
+                'sanitize_callback' => 'sanitize_text_field'                
             ],
             [
                 'name'    => 'single_room_availability_table',

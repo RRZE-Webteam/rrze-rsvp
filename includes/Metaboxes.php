@@ -215,7 +215,7 @@ class Metaboxes
 
         $cmb_general->add_field(array(
             'name'             => __('Booking Form Page', 'rrze-rsvp'),
-            'desc'             => __('Select a current page to display the booking form. Please note that the current content of the page will be replaced by the booking form.', 'rrze-rsvp'),
+            'desc'             => __('The shortcode for the booking form must be inserted on this page.', 'rrze-rsvp'),
             'id'               => 'rrze-rsvp-room-form-page',
             'type'             => 'select',
             'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',

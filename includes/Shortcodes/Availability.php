@@ -63,15 +63,14 @@ class Availability extends Shortcodes {
                             $booking_link_close = '';
                             $glue = ', ';
                             if ($booking_link) {
-                                $roomBookingPage = get_post_meta($room, 'rrze-rsvp-room-form-page', true);
-                                if ($roomBookingPage == '')
-                                    $roomBookingPage = $this->options->general_booking_page;
-                                if ($roomBookingPage != '') {
+                                if ($roomBookingPage = get_post_meta($room, 'rrze-rsvp-room-form-page', true)) {
                                     $permalink = get_permalink($roomBookingPage);
-                                    $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$starttime\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "' class='seat-link'>";
-                                    $booking_link_close = '</a>';
-                                    $glue = '';
+                                } else {
+                                    $permalink = site_url('/rsvp-booking/');
                                 }
+                                $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$starttime\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "' class='seat-link'>";
+                                $booking_link_close = '</a>';
+                                $glue = '';
                             }
                             $seat_names[] = $booking_link_open . $seat_name . $booking_link_close;
                         }
