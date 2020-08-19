@@ -186,7 +186,7 @@ class Metaboxes
 
         $cmb_general = new_cmb2_box(array(
             'id'            => 'rrze_rsvp_general-meta',
-            'title'         => __('Details', 'rrze-rsvp'),
+            'title'         => __('Address', 'rrze-rsvp'),
             'object_types'  => array('room',), // Post type
             'context'       => 'normal',
             'priority'      => 'high',
@@ -194,6 +194,7 @@ class Metaboxes
             // 'cmb_styles' => false, // false to disable the CMB stylesheet
             // 'closed'     => true, // Keep the metabox closed by default
         ));
+
 
         $cmb_general->add_field(array(
             'name'    => __('Street', 'rrze-rsvp'),
@@ -211,84 +212,6 @@ class Metaboxes
             'name'    => __('City', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-room-city',
             'type'    => 'text',
-        ));
-
-        $cmb_general->add_field(array(
-            'name'             => __('Booking Form Page', 'rrze-rsvp'),
-            'desc'             => __('The shortcode for the booking form must be inserted on this page.', 'rrze-rsvp'),
-            'id'               => 'rrze-rsvp-room-form-page',
-            'type'             => 'select',
-            'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
-            'default'          => '-1',
-            'options'          => $this->getPosts('page')
-        ));
-
-        $cmb_general->add_field(array(
-            'name' => __('SSO is required', 'rrze-rsvp'),
-            'desc' => __('If SSO is enabled then the customer must log in through SSO in order to use the booking form.', 'rrze-rsvp'),
-            'id'   => 'rrze-rsvp-room-sso-required',
-            'type' => 'checkbox',
-            'default' => '',
-        ));
-
-        $cmb_general->add_field(array(
-            'name' => __('Available days in advance', 'rrze-rsvp'),
-            'desc' => __('Number of days for which bookings are available in advance.', 'rrze-rsvp'),
-            'id'   => 'rrze-rsvp-room-days-in-advance',
-            'type' => 'text',
-            'attributes' => array(
-                'type' => 'number',
-                'min' => '0',
-            ),
-            'default' => 7
-        ));
-
-        $cmb_general->add_field(array(
-            'name' => __('Automatic confirmation', 'rrze-rsvp'),
-            'desc' => __('If the automatic confirmation is not activated, the booking must be confirmed manually.', 'rrze-rsvp'),
-            'id'   => 'rrze-rsvp-room-auto-confirmation',
-            'type' => 'checkbox',
-            'default' => 'on',
-        ));
-
-        $cmb_general->add_field(array(
-            'name' => __('Allow Instant Check-In', 'rrze-rsvp'),
-            'desc' => __('Seats can be booked and checked-in in one step. This only works if automatic confirmation activated!', 'rrze-rsvp'),
-            'id'   => 'rrze-rsvp-room-instant-check-in',
-            'type' => 'checkbox',
-            'default' => '',
-        ));
-
-        $cmb_general->add_field(array(
-            'name' => __('Force to confirm', 'rrze-rsvp'),
-            'desc' => __('The customer is forced to confirm his booking within a period of one hour. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
-            'id'   => 'rrze-rsvp-room-force-to-confirm',
-            'type' => 'checkbox',
-            'default' => '',
-        ));
-
-        $cmb_general->add_field(array(
-            'name' => __('Check-in is required', 'rrze-rsvp'),
-            'desc' => __('The customer must check-in their booking within 15 minutes from the start of the event. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
-            'id'   => 'rrze-rsvp-room-force-to-checkin',
-            'type' => 'checkbox',
-            'default' => '',
-        ));
-
-        $cmb_general->add_field(array(
-            'name' => __('Show notes/comment input in booking form', 'rrze-rsvp'),
-            'desc' => __('If not checked, the comment text input will still be visible in the backend for booking admins for internal notes.', 'rrze-rsvp'),
-            'id'   => 'rrze-rsvp-room-notes-check',
-            'type' => 'checkbox',
-            'default' => '',
-        ));
-
-        $cmb_general->add_field(array(
-            'name' => __('Comment input label', 'rrze-rsvp'),
-            'desc' => __("Choose a label for the text input on the booking form. E.g. 'Additional information' or 'Main interests'", 'rrze-rsvp'),
-            'type' => 'text',
-            'id'   => 'rrze-rsvp-room-notes-label',
-            'default' => __('Additional information', 'rrze-rsvp'),
         ));
 
         $cmb_general->add_field(array(
@@ -315,6 +238,96 @@ class Metaboxes
             ),
             'preview_size' => 'large', // Image size to use when previewing in the admin.
         ));
+
+        $cmb_reservation = new_cmb2_box(array(
+            'id'            => 'rrze_rsvp_reservation-meta',
+            'title'         => __('Reservations\'s details', 'rrze-rsvp'),
+            'object_types'  => array('room',), // Post type
+            'context'       => 'normal',
+            'priority'      => 'high',
+            'show_names'    => true, // Show field names on the left
+            // 'cmb_styles' => false, // false to disable the CMB stylesheet
+            'closed'     => true, // Keep the metabox closed by default
+        ));
+
+        $cmb_reservation->add_field(array(
+            'name'             => __('Booking Form Page', 'rrze-rsvp'),
+            'desc'             => __('The shortcode for the booking form must be inserted on this page.', 'rrze-rsvp'),
+            'id'               => 'rrze-rsvp-room-form-page',
+            'type'             => 'select',
+            'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
+            'default'          => '-1',
+            'options'          => $this->getPosts('page')
+        ));
+
+        $cmb_reservation->add_field(array(
+            'name' => __('SSO is required', 'rrze-rsvp'),
+            'desc' => __('If SSO is enabled then the customer must log in through SSO in order to use the booking form.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-sso-required',
+            'type' => 'checkbox',
+            'default' => '',
+        ));
+
+        $cmb_reservation->add_field(array(
+            'name' => __('Available days in advance', 'rrze-rsvp'),
+            'desc' => __('Number of days for which bookings are available in advance.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-days-in-advance',
+            'type' => 'text',
+            'attributes' => array(
+                'type' => 'number',
+                'min' => '0',
+            ),
+            'default' => 7
+        ));
+
+        $cmb_reservation->add_field(array(
+            'name' => __('Automatic confirmation', 'rrze-rsvp'),
+            'desc' => __('If the automatic confirmation is not activated, the booking must be confirmed manually.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-auto-confirmation',
+            'type' => 'checkbox',
+            'default' => 'on',
+        ));
+
+        $cmb_reservation->add_field(array(
+            'name' => __('Allow Instant Check-In', 'rrze-rsvp'),
+            'desc' => __('Seats can be booked and checked-in in one step. This only works if automatic confirmation activated!', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-instant-check-in',
+            'type' => 'checkbox',
+            'default' => '',
+        ));
+
+        $cmb_reservation->add_field(array(
+            'name' => __('Force to confirm', 'rrze-rsvp'),
+            'desc' => __('The customer is forced to confirm his booking within a period of one hour. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-force-to-confirm',
+            'type' => 'checkbox',
+            'default' => '',
+        ));
+
+        $cmb_reservation->add_field(array(
+            'name' => __('Check-in is required', 'rrze-rsvp'),
+            'desc' => __('The customer must check-in their booking within 15 minutes from the start of the event. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-force-to-checkin',
+            'type' => 'checkbox',
+            'default' => '',
+        ));
+
+        $cmb_reservation->add_field(array(
+            'name' => __('Show notes/comment input in booking form', 'rrze-rsvp'),
+            'desc' => __('If not checked, the comment text input will still be visible in the backend for booking admins for internal notes.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-notes-check',
+            'type' => 'checkbox',
+            'default' => '',
+        ));
+
+        $cmb_reservation->add_field(array(
+            'name' => __('Comment input label', 'rrze-rsvp'),
+            'desc' => __("Choose a label for the text input on the booking form. E.g. 'Additional information' or 'Main interests'", 'rrze-rsvp'),
+            'type' => 'text',
+            'id'   => 'rrze-rsvp-room-notes-label',
+            'default' => __('Additional information', 'rrze-rsvp'),
+        ));
+
     }
 
     public function seat()
