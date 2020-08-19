@@ -165,7 +165,7 @@ while ( have_posts() ) : the_post();
                 . '[collapse title="'.__('Schedule','rrze-rsvp').'" name="schedule" load="open"]'
                 . $schedule
                 . '[/collapse]'
-                . '[collapse title="'.__('Room occupancy for today', 'rrze-rsvp').'" name="occupancy"]'
+                . '[collapse title="'.__('Current Room Occupancy', 'rrze-rsvp').'" name="occupancy"]'
                 . Functions::getOccupancyByRoomIdNextHTML($postID)
                 . '[/collapse]';
             if ($options->general_single_room_availability_table != 'no') {
