@@ -359,7 +359,7 @@ class BookingForm
             || empty($booking_lastname)
             || empty($booking_firstname)
             || !filter_var($booking_email, FILTER_VALIDATE_EMAIL)
-            || empty($booking_phone)
+            || !Functions::validatePhone($booking_phone)
         ) {
             $redirectUrl = add_query_arg(
                 [

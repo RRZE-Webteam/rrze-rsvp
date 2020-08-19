@@ -196,7 +196,7 @@ class Bookings extends Shortcodes {
 
         $output .= '<div class="form-group"><label for="rsvp_phone">'
             . __('Phone Number', 'rrze-rsvp') . ' *</label>'
-            . '<input type="tel" name="rsvp_phone" id="rsvp_phone" required aria-required="true">'
+            . '<input type="tel" name="rsvp_phone" pattern="^[0-9-+\s()]*$" id="rsvp_phone" required aria-required="true">'
             . '<p class="description">'
             . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
             . '</div>';
@@ -436,6 +436,7 @@ class Bookings extends Shortcodes {
             $booking_email = sanitize_email($posted_data['rsvp_email']);
         }
 
+
         // Postdaten überprüfen
         if (!$booking_dsgvo
             || !Functions::validateDate($booking_date)
@@ -444,7 +445,7 @@ class Bookings extends Shortcodes {
             || empty($booking_lastname)
             || empty($booking_firstname)
             || !filter_var($booking_email, FILTER_VALIDATE_EMAIL)
-            || empty($booking_phone))
+            || !Functions::validatePhone($booking_phone))
         {
             $redirectUrl = add_query_arg(
                 [
