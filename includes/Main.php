@@ -98,6 +98,16 @@ class Main
 			plugin()->getVersion()
 		);
 
+		wp_localize_script('rrze-rsvp-admin', 'rrze_rsvp_admin', array(
+			'dateformat' => get_option('date_format'),
+			'text_cancel' => __('Do you want to cancel?', 'rrze-rsvp'),
+			'text_cancelled' => _x('Cancelled', 'Booking', 'rrze-rsvp'),
+			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
+			'ajaxurl' => admin_url('admin-ajax.php'),
+			// Strings für CPT Booking Backend
+			'alert_no_seat_date' => __('Please select a seat and a date first.', 'rrze-rsvp')
+		));
+
         if ($post_type == 'seat'){
             wp_enqueue_script(
                 'rrze-rsvp-seat',
@@ -108,17 +118,7 @@ class Main
 
             wp_localize_script( 'rrze-rsvp-seat', 'button_label', __('Create Seats', 'rrze-rsvp'));
         }
-
-		wp_localize_script('rrze-rsvp-admin', 'rrze_rsvp_admin', array(
-			'dateformat' => get_option('date_format'),
-			'text_cancel' => __('Do you want to cancel?', 'rrze-rsvp'),
-			'text_cancelled' => _x('Cancelled', 'Booking', 'rrze-rsvp'),
-			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
-			'ajaxurl' => admin_url('admin-ajax.php'),
-			// Strings für CPT Booking Backend
-			'alert_no_seat_date' => __('Please select a seat and a date first.', 'rrze-rsvp')
-		));
-	}
+    }
 
 	public function wpEnqueueScripts()
 	{
