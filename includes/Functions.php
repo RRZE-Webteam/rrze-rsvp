@@ -29,6 +29,13 @@ class Functions
         return self::validateDate($date, $format);
     }
 
+    // phone must be at least 10 figures
+    public static function validatePhone(string $phone): bool
+    {
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        return (strlen($phone) > 9);
+    }
+
     public static function isLocaleEnglish()
     {
         $locale = get_locale();
