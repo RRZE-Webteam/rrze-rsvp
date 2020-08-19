@@ -42,7 +42,7 @@ class Availability extends Shortcodes {
 
         if (isset($shortcode_atts['room']) && $shortcode_atts['room'] != '') {
             $room = (int)$shortcode_atts['room'];
-            $availability = Functions::getRoomAvailability($room, $today, date('Y-m-d', strtotime($today. ' +'.$days.' days')));
+            $availability = Functions::getRoomAvailability($room, $today, date('Y-m-d', strtotime($today. ' +'.$days.' days')), false);
             if (!empty($availability)) {
                 $output .= '<table class="rsvp-room-availability">';
                 $output .= '<tr>'
@@ -107,7 +107,7 @@ class Availability extends Shortcodes {
             }
             $room_id = get_post_meta($seat_id, 'rrze-rsvp-seat-room', true);
 
-            $availability = Functions::getSeatAvailability($seat_id, $today, date('Y-m-d', strtotime($today. ' +'.$days.' days')));
+            $availability = Functions::getSeatAvailability($seat_id, $today, date('Y-m-d', strtotime($today. ' +'.$days.' days')), false);
 
             if (empty($availability)) {
                 return __( 'No timeslots available for this seat.', 'rrze-rsvp' );

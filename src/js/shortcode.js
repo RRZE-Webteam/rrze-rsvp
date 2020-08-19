@@ -10,8 +10,7 @@ jQuery(document).ready(function($){
             $loading.hide();
         });
 
-    $('div.rsvp-datetime-container').on('click', 'input', updateForm);
-    $('select#rsvp_room').change(updateForm);
+    $('div.rsvp-datetime-container, div.rsvp-seat-container').on('click', 'input', updateForm);
 
     $('div.rsvp-seat-container').on('click', 'input', function(){
         var id = $(this).val();
@@ -53,6 +52,7 @@ function updateForm() {
     var room = jQuery('#rsvp_room').val();
     var date = jQuery('table.rsvp_calendar input[name="rsvp_date"]:checked').val();
     var time = jQuery('div.rsvp-time-container input[name="rsvp_time"]:checked').val();
+    var seat = jQuery('div.rsvp-seat-container input[name="rsvp_seat"]:checked').val();
     // console.log(room);
     // console.log(date);
     // console.log(time);
@@ -64,6 +64,7 @@ function updateForm() {
         room: room,                  //data
         date: date,          //data
         time: time,          //data
+        seat: seat,          //data
     }, function(result) {                 //callback
         //console.log(result);
         jQuery('div.rsvp-time-container').append(result['time']);
