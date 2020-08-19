@@ -109,9 +109,9 @@ jQuery(document).ready(function ($) {
     $('div.cmb2-id-rrze-rsvp-room-instant-check-in').hide();
     $('#rrze-rsvp-room-auto-confirmation').click(function() {
         if( $(this).is(':checked')) {
-            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').show(500);
+            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideDown(500);
         } else {
-            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').hide(500);
+            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideUp(500);
             if( $('#rrze-rsvp-room-instant-check-in').is(':checked')) {
                 $('#rrze-rsvp-room-instant-check-in').prop('checked', false)
             }
