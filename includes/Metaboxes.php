@@ -285,7 +285,7 @@ class Metaboxes
             'desc' => __('If the automatic confirmation is not activated, the booking must be confirmed manually.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-auto-confirmation',
             'type' => 'checkbox',
-            'default' => 'on',
+            'default' => '',
         ));
 
         $cmb_reservation->add_field(array(
