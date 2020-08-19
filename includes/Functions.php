@@ -397,12 +397,13 @@ class Functions
      * getRoomAvailability
      * Returns an array of dates/timeslots/seats available, for a defined period.
      * Array structure: date => timeslot => seat IDs
-     * @param string $room the room's post id
+     * @param string $room_id the room's post id
      * @param string $start start date of the period (format 'Y-m-d')
      * @param string $end end date of the period (format 'Y-m-d')
+     * @param bool $showPast include timeslots that ended in the past?
      * @return array ['date(Y-m-d)']['timeslot(H:i-H:i)'] = [seat_id, seat_id...]
      */
-    public static function getRoomAvailability($room_id, $start, $end)
+    public static function getRoomAvailability($room_id, $start, $end, $showPast = true)
     {
         $availability = [];
         $room_availability = [];
@@ -488,7 +489,13 @@ class Functions
             $weekday = (date('w', $timestamp));
             $start = date('H:i', $timestamp);
             $end = $slots[$weekday][$start];
-
+            // remove past timeslots from today if needed
+            if ($showPast == false) {
+                $endTimestamp = strtotime(date('Y-m-d', $timestamp). ' ' . $end);
+                if ($endTimestamp <= current_time('timestamp')) {
+                    continue;
+                }
+            }
             $availability[date('Y-m-d', $timestamp)][$start . '-' . $end] = $v;
         }
 
@@ -502,9 +509,10 @@ class Functions
      * @param string $room the seat's post id
      * @param string $start start date of the period (format 'Y-m-d')
      * @param string $end end date of the period (format 'Y-m-d')
+     * @param bool $showPast include timeslots that ended in the past?
      * @return array ['date(Y-m-d)'] => ['start(H:i) - end(H:i)', 'start(H:i) - end(H:i)'...]
      */
-    public static function getSeatAvailability($seat, $start, $end)
+    public static function getSeatAvailability($seat, $start, $end, $showPast = true)
     {
         $availability = [];
         $seat_availability = [];
@@ -567,6 +575,9 @@ class Functions
 
         // Für Ausgabe Timestamp zwei Ebenen (Tag / Zeit) machen
         foreach ($seat_availability as $timestamp => $timestamp_end) {
+            if ($showPast == false && $timestamp_end <= current_time('timestamp')) {
+                continue;
+            }
             $availability[date('Y-m-d', $timestamp)][] = date('H:i', $timestamp) . '-' . date('H:i', $timestamp_end);
         }
 
