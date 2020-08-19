@@ -92,33 +92,29 @@ class Bookings extends Shortcodes {
         if ($sso == true && $this->sso == false)
             return '<div class="alert alert-warning" role="alert">' . sprintf('%sSSO not available.%s Please activate SSO authentication or remove the SSO attribute from your shortcode.', '<strong>', '</strong><br />') . '</div>';
 
-        // var_dump($_GET);
-        $get_date = isset($_GET[ 'bookingdate' ]) ? sanitize_text_field($_GET[ 'bookingdate' ]) : false;
-        $get_time = isset($_GET[ 'timeslot' ]) ? sanitize_text_field($_GET[ 'timeslot' ]) : false;
-        $get_room = isset($_GET[ 'room_id' ]) ? absint($_GET[ 'room_id' ]) : false;
-        $get_seat = isset($_GET[ 'seat_id' ]) ? absint($_GET[ 'seat_id' ]) : false;
-        $get_instant = (isset($_GET[ 'instant' ]) && $_GET[ 'instant' ] == '1');
-
-        if ($get_room && $get_date) {
-            $availability = Functions::getRoomAvailability(
-                $get_room,
-                $get_date,
-                date('Y-m-d', strtotime($get_date . ' +1 days'))
-            );
-        }
-
         $days       = (int)$shortcode_atts[ 'days' ];
         $input_room = sanitize_title($shortcode_atts[ 'room' ]);
-        if ($get_room) {
-            $input_room = $get_room;
-        }
         if (is_numeric($input_room)) {
             $post_room = get_post($input_room);
             if ( ! $post_room) {
                 return __('Room specified in shortcode does not exist.', 'rrze-rsvp');
             }
         }
-        $room = $input_room;
+
+        $get_date = isset($_GET[ 'bookingdate' ]) ? sanitize_text_field($_GET[ 'bookingdate' ]) : date('Y-m-d', current_time('timestamp'));
+        $get_time = isset($_GET[ 'timeslot' ]) ? sanitize_text_field($_GET[ 'timeslot' ]) : false;
+        $get_room = isset($_GET[ 'room_id' ]) ? absint($_GET[ 'room_id' ]) : $input_room;
+        $get_seat = isset($_GET[ 'seat_id' ]) ? absint($_GET[ 'seat_id' ]) : false;
+        $get_instant = (isset($_GET[ 'instant' ]) && $_GET[ 'instant' ] == '1');
+
+        $availability = Functions::getRoomAvailability(
+            $get_room,
+            $get_date,
+            date('Y-m-d', strtotime($get_date . ' +1 days')),
+            false
+        );
+
+        $room = $get_room;
         $comment = (get_post_meta($room, 'rrze-rsvp-room-notes-check', true) == 'on');
 
         if (isset($post_room)) {
@@ -169,7 +165,7 @@ class Bookings extends Shortcodes {
         if ($get_date && $get_time) {
             $output .= $this->buildSeatSelect($room, $get_date, $get_time, $get_seat, $availability);
         } else {
-            $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
+            $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
         }
         $output .= '</div>'; //.rsvp-seat-container
 
@@ -620,7 +616,7 @@ class Bookings extends Shortcodes {
         $startDate = date_format($bookingDaysStart, 'Y-m-d');
         $link_next = '<a href="#" class="cal-skip cal-next" data-direction="next">&gt;&gt;</a>';
         $link_prev = '<a href="#" class="cal-skip cal-prev" data-direction="prev">&lt;&lt;</a>';
-        $availability = Functions::getRoomAvailability($room, $startDate, $endDate);
+        $availability = Functions::getRoomAvailability($room, $startDate, $endDate, false);
 
         // Create the table tag opener and day headers
         $calendar = '<table class="rsvp_calendar" data-period="'.date_i18n('Y-m', $firstDayOfMonth).'" data-end="'.$endDate.'">';
@@ -756,8 +752,7 @@ class Bookings extends Shortcodes {
         if (!$date || !$time) {
             $response['seat'] = '<div class="rsvp-seat-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
         }
-        $availability = Functions::getRoomAvailability($room, $date, date('Y-m-d', strtotime($date. ' +1 days')));
-//        var_dump($availability);
+        $availability = Functions::getRoomAvailability($room, $date, date('Y-m-d', strtotime($date. ' +1 days')), false);
 
         if ($date) {
             $response['time'] = $this->buildTimeslotSelect($room, $date, $time, $availability);

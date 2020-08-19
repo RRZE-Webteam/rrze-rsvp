@@ -56,7 +56,6 @@ class BookingForm
     public function form(string $content)
     {
         global $post;
-
         if (!is_page() || !($this->roomId = Functions::getRoomIdByFormPageId($post->ID))) {
             return $content;
         }
@@ -94,21 +93,19 @@ class BookingForm
             return '<div class="alert alert-warning" role="alert">' . sprintf('%sSSO not available.%s Please activate SSO authentication or remove the SSO option from the room.', '<strong>', '</strong><br />') . '</div>';
         }
 
-        $getDate = isset($_GET['bookingdate']) ? sanitize_text_field($_GET['bookingdate']) : false;
+        $getDate = isset($_GET['bookingdate']) ? Functions::validateDate($_GET['bookingdate']) : current_time('Y-m-d');
         $getTime = isset($_GET['timeslot']) ? sanitize_text_field($_GET['timeslot']) : false;
-        $getRoom = isset($_GET['room_id']) ? absint($_GET['room_id']) : false;
         $getSeat = isset($_GET['seat_id']) ? absint($_GET['seat_id']) : false;
         $getInstant = (isset($_GET['instant']) && $_GET['instant'] == '1');
 
         $CommentEnabled = (get_post_meta($this->roomId, 'rrze-rsvp-room-notes-check', true) == 'on');
 
-        if ($getRoom && $getDate) {
-            $availability = Functions::getRoomAvailability(
-                $getRoom,
-                $getDate,
-                date('Y-m-d', strtotime($getDate . ' +1 days'))
-            );
-        }
+        $availability = Functions::getRoomAvailability(
+            $this->roomId,
+            $getDate,
+            date('Y-m-d', strtotime($getDate . ' +1 days')),
+            false
+        );
 
         $days = absint(get_post_meta($this->roomId, 'rrze-rsvp-room-days-in-advance', true));
 
@@ -123,10 +120,10 @@ class BookingForm
         $data['room_id'] = $this->roomId;
         $data['room_name'] = get_the_title($this->roomId);
         $data['action_link'] = get_permalink();
-        $data['post_nonce'] = wp_nonce_field('post_nonce', 'rrze_rsvp_post_nonce_field');
+        $data['post_nonce'] = wp_nonce_field('post_nonce', 'rrze_rsvp_booking_form_nonce_field');
         $data['book_a_seat_at'] = sprintf(__('Book a seat at: <strong>%s</strong>', 'rrze-rsvp'), $data['room_name']);
-        $data['select_data_and_time'] = __('Select date and time', 'rrze-rsvp');
-        $data['select_a_date'] = __('Please select a date.', 'rrze-rsvp');
+        $data['select_date_and_time_legend'] = __('Select date and time', 'rrze-rsvp');
+        $data['select_date_and_time'] = __('Please select a date and a time slot.', 'rrze-rsvp');
         $data['available_timeslots'] = __('Available time slots:', 'rrze-rsvp');
 
         // Instant check-in
@@ -153,7 +150,7 @@ class BookingForm
         $data['customer']['email'] = $customerData['customer_email'];
 
         // Customer input data
-        $data['customer_data_title'] = __('Your data', 'rrze-rsvp');
+        $data['customer_data_legend'] = __('Your data', 'rrze-rsvp');
         $data['customer_lastname'] = __('Last name', 'rrze-rsvp');
         $data['customer_firstname'] = __('First name', 'rrze-rsvp');
         $data['customer_email'] = __('Email', 'rrze-rsvp');
@@ -308,7 +305,7 @@ class BookingForm
 
     public function bookingSubmitted()
     {
-        if (!isset($_POST['rrze_rsvp_post_nonce_field']) || !wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
+        if (!isset($_POST['rrze_rsvp_booking_form_nonce_field']) || !wp_verify_nonce($_POST['rrze_rsvp_booking_form_nonce_field'], 'post_nonce')) {
             return;
         }
 
@@ -561,7 +558,7 @@ class BookingForm
         $startDate = date_format($bookingDaysStart, 'Y-m-d');
         $link_next = '<a href="#" class="cal-skip cal-next" data-direction="next">&gt;&gt;</a>';
         $link_prev = '<a href="#" class="cal-skip cal-prev" data-direction="prev">&lt;&lt;</a>';
-        $availability = Functions::getRoomAvailability($room, $startDate, $endDate);
+        $availability = Functions::getRoomAvailability($room, $startDate, $endDate, false);
 
         // Create the table tag opener and day headers
         $calendar = '<table class="rsvp_calendar" data-period="' . date_i18n('Y-m', $firstDayOfMonth) . '" data-end="' . $endDate . '">';
@@ -699,7 +696,7 @@ class BookingForm
         if (!$date || !$time) {
             $response['seat'] = '<div class="rsvp-seat-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
         }
-        $availability = Functions::getRoomAvailability($room, $date, date('Y-m-d', strtotime($date . ' +1 days')));
+        $availability = Functions::getRoomAvailability($room, $date, date('Y-m-d', strtotime($date . ' +1 days')), false);
         //        var_dump($availability);
 
         if ($date) {

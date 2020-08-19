@@ -1,50 +1,40 @@
 <div class="rrze-rsvp">
     <form action="{{=action_link}}" method="post" id="rsvp_by_room">
-        <div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>
-
+        {{=post_nonce}}
+        <input type="hidden" value="{{=room_id}}" id="rsvp_room">
         {{instant_checkin}}
-            <div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>
-        {{/instant_checkin}}
-
-        <p><input type="hidden" value="{{=room_id}}" id="rsvp_room">
-            {{=post_nonce}}
+        <input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant">
+        {{/instant_checkin}}        
+        <div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>
+        <p>
             {{=book_a_seat_at}}
         </p>
-
         <div class="rsvp-datetime-container form-group clearfix">
-            <legend>{{=select_data_and_time}}</legend>
-
+            <legend>{{=select_date_and_time_legend}}</legend>
             <div class="rsvp-date-container">
                 {{=calendar}}
             </div> <!-- /.rsvp-date-container -->
-
             <div class="rsvp-time-container">
                 <h4>{{=available_timeslots}}</h4>
-
                 {{booking_date}}
                     {{=select_timeslot}}
                 {{:booking_date}}
                     <div class="rsvp-time-select error">
-                        {{=select_a_date}}
+                        {{=select_date_and_time}}
                     </div>
                 {{/booking_date}}
-        
             </div> <!-- /.rsvp-time-container -->
-
         </div> <!-- /.rsvp-datetime-container -->
-
         <div class="rsvp-seat-container">
             {{booking_timeslot}}
                 {{=select_seat}}
             {{:booking_timeslot}}
                 <div class="rsvp-time-select error">
-                    {{=select_a_date}}
+                    {{=select_date_and_time}}
                 </div>
             {{/booking_timeslot}}
         </div> <!-- /.rsvp-seat-container -->
-
-        <legend>{{=customer_data_title}}</legend>
-
+        <legend>{{=customer_data_legend}}</legend>
         {{sso_enabled}}
             <div class="form-group">
                 <p>{{=customer_lastname}}: <strong>{{=customer.lastname}}</strong></p>
@@ -56,35 +46,30 @@
                 <label for="rsvp_lastname">{{=customer_lastname}} *</label>
                 <input type="text" name="rsvp_lastname" id="rsvp_lastname" required aria-required="true">
             </div>
-
             <div class="form-group">
                 <label for="rsvp_firstname">{{=customer_firstname}} *</label>
                 <input type="text" name="rsvp_firstname" id="rsvp_firstname" required aria-required="true">
             </div>
-
             <div class="form-group">
                 <label for="rsvp_email">{{=customer_email}} *</label>
                 <input type="text" name="rsvp_email" id="rsvp_email" required aria-required="true">
             </div>
         {{/sso_enabled}}
-
         <div class="form-group">
             <label for="rsvp_phone">{{=customer_phone}} *</label>
             <input type="tel" name="rsvp_phone" id="rsvp_phone" required aria-required="true">
             <p class="description">{{=customer_phone_description}}</p>
         </div>
-
         {{comment_enabled}}
-            <div class="form-group">
-                <label for="rsvp_comment">{{=comment_label}}</label>
-                <textarea name="rsvp_comment" id="rsvp_comment"></textarea>
+        <div class="form-group">
+            <label for="rsvp_comment">{{=comment_label}}</label>
+            <textarea name="rsvp_comment" id="rsvp_comment"></textarea>
+        </div>
         {{/comment_enabled}}
-
         <div class="form-group">
             <input type="checkbox" value="1" id="rsvp_dsgvo" name="rsvp_dsgvo" required>
             <label for="rsvp_dsgvo">{{=dsvgo_text}}</label>
         </div>
-
         <button type="submit" class="btn btn-primary">{{=submit_booking}}</button>
     </form>
 </div>
