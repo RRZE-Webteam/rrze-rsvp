@@ -40,13 +40,25 @@ function getConstants() {
 
     
  function  defaultOptions()  {
+
+    $sender_name = '';
+    $notification_email = '';
+    $sender_email = '';
+
+    $blogAdminUsers = get_users( 'role=Administrator' );
+    if ($blogAdminUsers){
+        $sender_name = $blogAdminUsers[0]->display_name;
+        $sender_email = $blogAdminUsers[0]->user_email;
+        $notification_email = $blogAdminUsers[0]->user_email;
+    }
+
         return [
             'single_room_availability_table' => 'yes_link',
-            'notification_email' => '',
+            'notification_email' => $notification_email,
             'notification_if_new' => 'yes',
             'notification_if_cancel' => 'yes',
-            'sender_name' => '',
-            'sender_email' => '',
+            'sender_name' => $sender_name,
+            'sender_email' => $sender_email,
             'received_subject' => __('Thank you for booking', 'rrze-rsvp'),
             'received_subject_en' => 'Thank you for booking',
             'received_text' => __('We received your booking and we will notify you once it has been confirmed.', 'rrze-rsvp'),
