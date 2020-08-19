@@ -79,18 +79,18 @@ class Functions
         $aRoomAvailability = self::getRoomAvailability($room_id, $start, $end);
 
         if (!$aRoomAvailability){
-            return sprintf(__('This room has no available seat within %u days.', 'rrze-rsvp'), $duration);
+            return '<span class="rrze-rsvp-occupancy-title">' . sprintf(__('This room has no available seat within %u days.', 'rrze-rsvp'), $duration) . '</span>';
         }
 
         if (isset($aRoomAvailability[$today])){
             // we have a seat for today
-            $output = '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
+            $output = '<span class="rrze-rsvp-occupancy-title">' . __('Room occupancy for today', 'rrze-rsvp') . '</span>';
             $output .= self::getOccupancyByRoomIdHTML($room_id, true);
         } else {
             // return the next available timeslots
             $nextAvailableDay = array_key_first($aRoomAvailability);
             $countSeats = count(array_values($aRoomAvailability[$nextAvailableDay])[0]);
-            $output = '<h3>' . __('This room has no available seat for today.', 'rrze-rsvp') . ' ' . _n('The next available seat is on', 'The next available seats are on', $countSeats, 'rrze-rsvp') . ' ' . self::dateFormat(strtotime($nextAvailableDay)) . '.</h3>';
+            $output = '<span class="rrze-rsvp-occupancy-title">' . __('This room has no available seat for today.', 'rrze-rsvp') . ' ' . _n('The next available seat is on', 'The next available seats are on', $countSeats, 'rrze-rsvp') . ' ' . self::dateFormat(strtotime($nextAvailableDay)) . '</span>';
             $output .= self::getOccupancyByRoomIdHTML($room_id, true, strtotime($nextAvailableDay) );
         }
         return $output;
