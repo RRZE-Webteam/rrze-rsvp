@@ -241,7 +241,7 @@ class Metaboxes
 
         $cmb_reservation = new_cmb2_box(array(
             'id'            => 'rrze_rsvp_reservation-meta',
-            'title'         => __('Reservations\'s details', 'rrze-rsvp'),
+            'title'         => __('Reservations\' details', 'rrze-rsvp'),
             'object_types'  => array('room',), // Post type
             'context'       => 'normal',
             'priority'      => 'high',
