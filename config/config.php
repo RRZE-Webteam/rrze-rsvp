@@ -481,7 +481,7 @@ function getShortcodeSettings(){
                 'message' => __( 'Find the settings on the right side', 'rrze-rsvp' ) // erscheint bei Auswahl des Blocks, wenn "show_block" auf 'right' gesetzt ist
             ],
             'days' => [
-                'default' => 14,
+                'default' => '',
                 'field_type' => 'text', // Art des Feldes im Gutenberg Editor
                 'label' => __( 'Days in advance', 'rrze-rsvp' ),
                 'type' => 'number' // Variablentyp der Eingabe
@@ -498,22 +498,6 @@ function getShortcodeSettings(){
                 'type' => 'boolean',
                 'default'   => false
             ],
-//            'multiple' => [
-//                'field_type' => 'toggle',
-//                'label' => __( 'Multiple choice available', 'rrze-rsvp' ),
-//                'type' => 'boolean',
-//                'default'   => false // Vorauswahl: ausgewählt
-//            ],
-//            'date-select' => [
-//                'values' => [
-//                    'calendar' => __( 'Kalender', 'rrze-rsvp' ),
-//                    'boxes' => __( 'Boxen', 'rrze-rsvp' )
-//                ],
-//                'default' => 'calendar', // vorausgewählter Wert: Achtung: string, kein array!
-//                'field_type' => 'select',
-//                'label' => __( 'Datumsauswahl', 'rrze-rsvp' ),
-//                'type' => 'string' // Variablentyp des auswählbaren Werts
-//            ],
         ],
         'rsvp-availability' => [
             'block' => [

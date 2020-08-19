@@ -232,7 +232,7 @@ class Tools
             . '<option value="">&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;</option>';
         $rooms = get_posts([
             'post_type' => 'room',
-            'post_statue' => 'publish',
+            'post_status' => 'publish',
             'nopaging' => true,
             'orderby' => 'title',
             'order' => 'ASC',
