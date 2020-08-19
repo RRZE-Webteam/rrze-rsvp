@@ -98,6 +98,17 @@ class Main
 			plugin()->getVersion()
 		);
 
+        if ($post_type == 'seat'){
+            wp_enqueue_script(
+                'rrze-rsvp-seat',
+                plugins_url('assets/js/rrze-rsvp-seat.js', plugin()->getBasename()),
+                ['jquery'],
+                plugin()->getVersion()
+            );
+
+            wp_localize_script( 'rrze-rsvp-seat', 'button_label', __('Create Seats', 'rrze-rsvp'));
+        }
+
 		wp_localize_script('rrze-rsvp-admin', 'rrze_rsvp_admin', array(
 			'dateformat' => get_option('date_format'),
 			'text_cancel' => __('Do you want to cancel?', 'rrze-rsvp'),
