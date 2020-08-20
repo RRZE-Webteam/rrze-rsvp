@@ -106,12 +106,22 @@ jQuery(document).ready(function ($) {
 
 
     /* trigger reservations' details - see https://github.com/RRZE-Webteam/rrze-rsvp/issues/92 */
+    $('div#additional-reservation-functions').hide();
     $('div.cmb2-id-rrze-rsvp-room-instant-check-in').hide();
+
+    $('select#rrze-rsvp-room-bookingmode').on('change', function() {        
+        if ($('select#rrze-rsvp-room-bookingmode option:checked').val() == 'additional-reservation-functions'){
+            $('div#additional-reservation-functions').slideDown(400);
+        }else{
+            $('div#additional-reservation-functions').slideUp(400);
+        }
+    });
+
     $('#rrze-rsvp-room-auto-confirmation').click(function() {
         if( $(this).is(':checked')) {
-            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideDown(500);
+            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideDown(400);
         } else {
-            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideUp(500);
+            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideUp(400);
             if( $('#rrze-rsvp-room-instant-check-in').is(':checked')) {
                 $('#rrze-rsvp-room-instant-check-in').prop('checked', false)
             }
