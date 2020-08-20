@@ -226,7 +226,6 @@ function getFields(){
             [
                 'name'    => 'single_room_availability_table',
                 'label'   => __('Show Availability table on Room page.', 'rrze-rsvp'),
-                'desc'    => __('If \'Yes (with link)\' you need to specify the booking page (see above).', 'rrze-rsvp'),
                 'type'    => 'radio',
                 'default' => $defaults['single_room_availability_table'],
                 'options' => [
@@ -489,7 +488,7 @@ function getShortcodeSettings(){
             'block' => [
                 'blocktype' => 'rrze-rsvp/rsvp-booking', // dieser Wert muss angepasst werden
                 'blockname' => 'rsvp_booking', // dieser Wert muss angepasst werden
-                'title' => 'RSVP Booking', // Der Titel, der in der Blockauswahl im Gutenberg Editor angezeigt wird
+                'title' => __('RSVP Booking', 'rrze-rsvp'), // Der Titel, der in der Blockauswahl im Gutenberg Editor angezeigt wird
                 'category' => 'widgets', // Die Kategorie, in der der Block im Gutenberg Editor angezeigt wird
                 'icon' => 'admin-users',  // Das Icon des Blocks
                 'show_block' => 'content', // 'right' or 'content' : Anzeige des Blocks im Content-Bereich oder in der rechten Spalte
@@ -518,7 +517,7 @@ function getShortcodeSettings(){
             'block' => [
                 'blocktype' => 'rrze-rsvp/rsvp-availability', // dieser Wert muss angepasst werden
                 'blockname' => 'rsvp-availability', // dieser Wert muss angepasst werden
-                'title' => 'RSVP Availability', // Der Titel, der in der Blockauswahl im Gutenberg Editor angezeigt wird
+                'title' => __('RSVP Availability', 'rrze-rsvp'), // Der Titel, der in der Blockauswahl im Gutenberg Editor angezeigt wird
                 'category' => 'widgets', // Die Kategorie, in der der Block im Gutenberg Editor angezeigt wird
                 'icon' => 'admin-users',  // Das Icon des Blocks
                 'show_block' => 'content', // 'right' or 'content' : Anzeige des Blocks im Content-Bereich oder in der rechten Spalte
