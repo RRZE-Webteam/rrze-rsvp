@@ -70,7 +70,6 @@ class IdM
             $login_url = $this->simplesamlAuth->getLoginURL();
             $message .= '<h3>' . __('Access to the requested page is denied', 'rrze-rsvp') . '</h3>';
             $message .= '<p>' . sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $login_url) . '</p>';
-            $message .= '<p>' . sprintf(__('<a href="%s">Login through Single Sign-On (central login service of the University Erlangen-Nürnberg)</a>.', 'rrze-rsvp'), $login_url) . '</p>';
             return $message;
         }
 
