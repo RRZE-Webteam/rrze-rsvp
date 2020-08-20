@@ -223,7 +223,7 @@ class Tools
          */
 
         echo '<form id="rsvp-create-seats" method="get">';
-        echo '<input type="hidden" name="page" value="rrze-rsvp">';
+        echo '<input type="hidden" name="page" value="rrze-rsvp-tools">';
         echo '<input type="hidden" name="status" value="confirm">';
         echo '<table class="form-table" role="presentation"><tbody>';
         echo '<tr><th scope="row"><label for="room_id">' . __('Room','rrze-rsvp') . '</label></th>';
