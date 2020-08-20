@@ -196,6 +196,7 @@ class Metaboxes
         ));
 
 
+
         $cmb_general->add_field(array(
             'name'             => __('Booking mode', 'rrze-rsvp'),
             // 'desc'             => __('', 'rrze-rsvp'),
@@ -204,9 +205,9 @@ class Metaboxes
             'default'          => '',
             'options' => array(
                 '0' => __('Check-in and check-out only on site', 'rrze-rsvp'), // Nur Ein- und Auschecken vor Ort
-                'additional-reservation-functions' => __('Activate additional reservation functions', 'rrze-rsvp'), // Zusätzliche Reservierungsfunktionen aktivieren
+                'rrze-rsvp-additionals' => __('Activate additional reservation functions', 'rrze-rsvp'), // Zusätzliche Reservierungsfunktionen aktivieren
             ),
-            'after_row' => '<div id="additional-reservation-functions">'
+            'after_row' => '<div id="rrze-rsvp-additionals">'
         ));
 
 
