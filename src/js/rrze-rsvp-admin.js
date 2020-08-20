@@ -115,7 +115,7 @@ jQuery(document).ready(function ($) {
     }
 
     function triggerInstant(t){
-        if($('#rrze-rsvp-room-auto-confirmation').is(':checked')) {
+        if ($('#rrze-rsvp-room-auto-confirmation').is(':checked')) {
             $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideDown(t);
         } else {
             $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideUp(t);
