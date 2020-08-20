@@ -120,7 +120,7 @@ class Tools
                     echo '</strong></p>';
                     echo '<p>';
                     echo '<a href="' . admin_url(
-                            '/tools.php?page=rrze-rsvp'
+                            '/tools.php?page=rrze-rsvp-tools'
                         ) . '" class="button button-secondary" style="margin-right: 20px;">' . __(
                              'Cancel',
                              'rrze-rsvp'

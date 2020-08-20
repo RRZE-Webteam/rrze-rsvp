@@ -1,1 +1,1 @@
-"use strict";jQuery(document).ready(function(t){t(".wrap .page-title-action").after("<a class='page-title-action' href='tools.php?page=rrze-rsvp'>"+button_label+"</a>")});
+"use strict";jQuery(document).ready(function(t){t(".wrap .page-title-action").after("<a class='page-title-action' href='tools.php?page=rrze-rsvp-tools'>"+button_label+"</a>")});
