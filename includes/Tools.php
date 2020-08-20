@@ -21,7 +21,7 @@ class Tools
             _x( 'Create Seats', 'admin page title', 'rrze-rsvp' ),
             _x( 'RSVP Create Seats', 'admin menu entry title', 'rrze-rsvp' ),
             'manage_options',
-            'rrze-rsvp',
+            'rrze-rsvp-tools',
             array( $this, 'admin_page' )
         );
     }
