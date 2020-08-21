@@ -24,7 +24,7 @@ class Actions
 		add_action('wp_ajax_booking_action', [$this, 'ajaxBookingAction']);
 		add_action('transition_post_status', [$this, 'transitionPostStatus'], 10, 3);
         add_action('template_include', [$this, 'bookingReplyTemplate']);
-        add_action('updated_post_meta', [$this, 'storeUserTracking'], 10, 4 );
+        // add_action('updated_post_meta', [$this, 'storeUserTracking'], 10, 4 );
 	}
 
 
@@ -45,23 +45,30 @@ class Actions
                 $room_zip = get_post_meta($room_post_id, 'rrze-rsvp-room-zip', true);
                 $room_city = get_post_meta($room_post_id, 'rrze-rsvp-room-city', true);
 
-                $newData = [
-                    'start' => Carbon::createFromTimestamp($aBookingData['start'])->format('Y-m-d'),
-                    'end' => Carbon::createFromTimestamp($aBookingData['end'])->format('Y-m-d'),
-                    'email' => strtolower($aBookingData['guest_email']),
-                    'phone' => $aBookingData['guest_phone'],
-                    'firstname' => $aBookingData['guest_firstname'],
-                    'lastname' => $aBookingData['guest_lastname'],
-                    'room_post_id' => $room_post_id, // because $room_name is not unique
-                    'room_name' => $room_name,
-                    'room_street' => $room_street,
-                    'room_zip' => $room_zip,
-                    'room_city' => $room_city,
-                ];
-
+                // add an entry for each day as we are searching for 1.date-span then if 2.user is given to find 3.room to return all users in room 
+                // 2DO: find out how to fix "carbon Uncaught InvalidArgumentException: Unexpected data found." which occurs 
+                // even in example Carbon::create('2020-11-29')->daysUntil('2020-12-24')->forEach(function (Carbon $date) {echo $date->diffInDays('2020-12-25')." days before Christmas!\n";});
+                $start = Carbon::createFromTimestamp($aBookingData['start'])->format('Y-m-d');
+                $end = Carbon::createFromTimestamp($aBookingData['end'])->format('Y-m-d');
+                Carbon::create($start)->daysUntil($end)->forEach(function ($date) {
+                    $newData[$thisDate][] = [
+                        'email' => strtolower($aBookingData['guest_email']),
+                        'phone' => $aBookingData['guest_phone'],
+                        'name' => $aBookingData['guest_firstname'] . ' ' . $aBookingData['guest_lastname'],
+                        'room_post_id' => $room_post_id, // because $room_name is not unique
+                        'room_name' => $room_name,
+                        'room_street' => $room_street,
+                        'room_zip' => $room_zip,
+                        'room_city' => $room_city,
+                    ];
+                });
+                
                 $preData = get_site_option('usertracking');
                 $newData = ( $preData ? array_merge($preData, $newData) : $newData );
                 update_site_option('usertracking', $newData);
+
+                // $test = get_site_option('usertracking');
+                // echo "<script>console.log('BK test = " . json_encode($test) . "' );</script>";
             }
         }
     }

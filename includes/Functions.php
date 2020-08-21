@@ -680,5 +680,29 @@ class Functions
             }
         }
         return null;
-    }    
+    }  
+    
+    // used for tracking to find users 
+    public function getUsersInRoomAtDate(string $startdate, string $enddate, string $user_email = '', string $user_name = ''){
+        $bFound = false;
+
+        if (!$user_email && !$user_name){
+            // we have nothing to search for
+            return false;
+        }
+
+        $data = get_site_option('usertracking');
+        $aSearch = [];
+
+        if ($user_email){
+            // fill $aSearch by emails
+            // set $bFound
+        }
+        if (!$bFound){
+            // either no $user_email was given or not found by $user_email
+            if ($user_name){
+            }
+
+        }
+    }
 }
