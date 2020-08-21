@@ -15,9 +15,9 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"POT-Creation-Date: 2020-08-20 10:29+0000\n"
-"PO-Revision-Date: 2020-08-20 10:29+0000\n"
-"Last-Translator: Barbara\n"
+"POT-Creation-Date: 2020-08-21 14:37+0000\n"
+"PO-Revision-Date: 2020-08-21 14:43+0000\n"
+"Last-Translator: RRZE Webteam <webmaster@fau.de>\n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
 "X-Generator: Loco https://localise.biz/\n"
@@ -340,7 +340,7 @@ msgid "Days in advance"
 msgstr "Zeitraum für Vorabreservierung (Tage)."
 
 #: config/config.php:506 includes/Tools.php:105 includes/Tools.php:229
-#: includes/Metaboxes.php:347 includes/CPT/CPT.php:146
+#: includes/Metaboxes.php:351 includes/CPT/CPT.php:146
 #: includes/CPT/Bookings.php:127 includes/CPT/Bookings.php:141
 #: includes/CPT/Bookings.php:266 includes/CPT/Rooms.php:60
 #: includes/Printing/Printing.php:128 includes/Shortcodes/Bookings.php:412
@@ -440,123 +440,120 @@ msgstr "Kein Name"
 msgid "no@email"
 msgstr "keine@email"
 
-#: includes/Email.php:128 includes/Email.php:168 includes/Actions.php:179
+#: includes/Email.php:120 includes/Email.php:170 includes/Actions.php:228
 #: includes/CPT/Bookings.php:129 includes/CPT/Bookings.php:143
 #: includes/CPT/Bookings.php:268
 msgid "Name"
 msgstr "Name"
 
-#: includes/Email.php:129 includes/Email.php:169 includes/Actions.php:180
+#: includes/Email.php:121 includes/Email.php:171 includes/Actions.php:229
 #: includes/Metaboxes.php:108 includes/CPT/Bookings.php:130
 #: includes/CPT/Bookings.php:144 includes/Shortcodes/Bookings.php:206
 #: includes/Shortcodes/Bookings.php:222
 msgid "Email"
 msgstr "E-Mail"
 
-#: includes/Email.php:134
+#: includes/Email.php:129
 msgid "You received a new request for a booking."
 msgstr "Sie erhielten eine neue Reservierungsanfrage."
 
-#: includes/Email.php:142
-msgid "Confirm Booking"
-msgstr "Buchung bestätigen"
+#: includes/Email.php:138 includes/Email.php:254
+msgctxt "Booking"
+msgid "Confirm"
+msgstr "Bestätigen"
 
-#: includes/Email.php:144 includes/ICS.php:48
-msgid "Cancel Booking"
-msgstr "Buchung stornieren"
+#: includes/Email.php:139
+msgid "Confirm the booking."
+msgstr "Bestätigen Sie die Buchung."
 
-#: includes/Email.php:166
+#: includes/Email.php:142 includes/Email.php:262 includes/Email.php:337
+#: includes/CPT/Bookings.php:239
+msgctxt "Booking"
+msgid "Cancel"
+msgstr "Stornieren"
+
+#: includes/Email.php:143
+msgid "Cancel the booking."
+msgstr "Stornierung der Buchung."
+
+#: includes/Email.php:168
 msgid "Booking has been cancelled"
-msgstr "Die Buchung wurde storniert."
+msgstr "Die Buchung wurde storniert"
 
-#: includes/Email.php:171
+#: includes/Email.php:173
 msgid "A booking has been cancelled by the customer."
 msgstr "Eine Reservierung wurde durch den Bucher storniert."
 
-#: includes/Email.php:244
-#, php-format
-msgid "Please <a href=\"%s\">confirm your booking now</a>."
-msgstr "Bitte <a href=\"%s\">bestätigen Sie Ihre Buchung jetzt</a>."
-
-#: includes/Email.php:246
+#: includes/Email.php:256 includes/Email.php:258
 msgid "Please confirm your booking now."
 msgstr "Bitte bestätigen Sie Ihre Buchung jetzt."
 
-#: includes/Email.php:250 includes/Email.php:317
-#, php-format
-msgid ""
-"Please <a href=\"%s\">cancel your booking</a> in time if your plans change."
-msgstr ""
-"Bitte <a href=\"%s\">stornieren Sie Ihre Buchung</a> rechtzeitig, falls sich "
-"Ihre Pläne ändern."
-
-#: includes/Email.php:252 includes/Email.php:319
+#: includes/Email.php:264 includes/Email.php:266 includes/Email.php:339
+#: includes/Email.php:341
 msgid "Please cancel your booking in time if your plans change."
 msgstr ""
 "Bitte stornieren Sie Ihre Buchung rechtzeitig, wenn sich Ihre Pläne ändern."
 
-#: includes/Email.php:305
-#, php-format
-msgid "Please <a href=\"%s\">check-in your booking</a> on site."
-msgstr "Bitte <a href=\"%s\">checken Sie Ihre Buchung</a> vor Ort ein."
+#: includes/Email.php:321
+msgid "Check In"
+msgstr "Einchecken"
 
-#: includes/Email.php:307
+#: includes/Email.php:323 includes/Email.php:325
 msgid "Please check-in your booking on site."
 msgstr "Bitte checken Sie Ihre Buchung vor Ort ein."
 
-#: includes/Email.php:311
-#, php-format
-msgid "Please <a href=\"%s\">check out</a> when you leave the site."
-msgstr "Bitte <a href=\"%s\">checken Sie aus</a>, wenn Sie den Raum verlassen."
+#: includes/Email.php:329
+msgid "Check Out"
+msgstr "Auschecken"
 
-#: includes/Email.php:313
+#: includes/Email.php:331 includes/Email.php:333
 msgid "Please check out when you leave the site."
 msgstr "Bitte checken Sie aus, wenn Sie den Raum verlassen."
 
-#: includes/Actions.php:162 includes/Actions.php:176
+#: includes/Actions.php:211 includes/Actions.php:225
 msgid "confirmed"
 msgstr "bestätigt"
 
-#: includes/Actions.php:170 includes/Actions.php:176
+#: includes/Actions.php:219 includes/Actions.php:225
 msgid "cancelled"
 msgstr "storniert"
 
-#: includes/Actions.php:181 includes/Metaboxes.php:114
+#: includes/Actions.php:230 includes/Metaboxes.php:114
 #: includes/CPT/Bookings.php:148
 msgid "Phone"
 msgstr "Telefon"
 
-#: includes/Actions.php:194 includes/Actions.php:269
+#: includes/Actions.php:243 includes/Actions.php:318
 #: includes/CPT/Bookings.php:68
 msgid "Booking"
 msgstr "Buchung"
 
-#: includes/Actions.php:200
+#: includes/Actions.php:249
 #, php-format
 msgid "The booking has already been %s."
 msgstr "Die Buchung wurde bereits %s."
 
-#: includes/Actions.php:201
+#: includes/Actions.php:250
 #, php-format
 msgid "The booking has been %s."
 msgstr "Die Buchung wurde %s."
 
-#: includes/Actions.php:202
+#: includes/Actions.php:251
 msgid "Your customer has received an email confirmation."
 msgstr "Der Bucher erhielt eine E-Mail-Bestätigung. "
 
-#: includes/Actions.php:275
+#: includes/Actions.php:324
 msgid "Do you really want to cancel your booking?"
 msgstr "Wollen Sie wirklich Ihre Buchung stornieren?"
 
-#: includes/Actions.php:286
+#: includes/Actions.php:335
 #, php-format
 msgid "<a href=\"%s\" class=\"button button-cancel\">Cancel Your Booking</a>."
 msgstr ""
 "<a href=\"%s\" class=\"button button-cancel\">Stornieren Sie Ihre Buchung</a>"
 "."
 
-#: includes/Actions.php:289
+#: includes/Actions.php:338
 msgid ""
 "Your booking has been cancelled. Please contact us to find a different "
 "arrangement."
@@ -564,27 +561,27 @@ msgstr ""
 "Ihre Buchung wurde storniert. Bitte setzen Sie sich mit uns in Verbindung um "
 "eine alternative Terminmöglichkeit zu finden."
 
-#: includes/Actions.php:292
+#: includes/Actions.php:341
 msgid "Thank you for confirming your booking."
 msgstr "Vielen Dank für die Bestätigung der Buchung."
 
-#: includes/Actions.php:295
+#: includes/Actions.php:344
 msgid "Check-in is not possible at this time."
 msgstr "Check-In ist derzeit nicht möglich."
 
-#: includes/Actions.php:298
+#: includes/Actions.php:347
 msgid "Check-in has been completed."
 msgstr "Der Check-in wurde erfolgreich ausgeführt."
 
-#: includes/Actions.php:301
+#: includes/Actions.php:350
 msgid "Check-out is not possible at this time."
 msgstr "Auschecken ist derzeit nicht möglich."
 
-#: includes/Actions.php:304
+#: includes/Actions.php:353
 msgid "Check-out has been completed."
 msgstr "Sie wurden erfolgreich ausgecheckt."
 
-#: includes/Actions.php:307
+#: includes/Actions.php:356
 msgid "No action was taken."
 msgstr "Es wurde keine Änderung vorgenommen."
 
@@ -682,7 +679,7 @@ msgid "%s existing seats have been updated."
 msgstr "%s Plätze wurden aktualisiert."
 
 #: includes/Tools.php:232 includes/Metaboxes.php:40 includes/Metaboxes.php:84
-#: includes/Metaboxes.php:258 includes/Metaboxes.php:351
+#: includes/Metaboxes.php:219 includes/Metaboxes.php:355
 msgid "Please select"
 msgstr "Bitte wählen"
 
@@ -755,7 +752,8 @@ msgstr ""
 "die Ausstattung später individuell bei den Sitzplätzen anpassen, oder "
 "mehrere zugleich über die Mehrfachaktionen in der Sitzplatz-Tabelle zuweisen."
 
-#: includes/Metaboxes.php:27 includes/Metaboxes.php:337
+#: includes/Metaboxes.php:27 includes/Metaboxes.php:189
+#: includes/Metaboxes.php:341
 msgid "Details"
 msgstr "Details"
 
@@ -860,44 +858,32 @@ msgstr "Startzeit"
 msgid "End time"
 msgstr "Endzeit"
 
-#: includes/Metaboxes.php:189
-msgid "Address"
-msgstr "Adresse"
+#: includes/Metaboxes.php:201
+msgid "Booking mode"
+msgstr "Buchungsmodus"
 
-#: includes/Metaboxes.php:200
-msgid "Street"
-msgstr "Straße"
+#: includes/Metaboxes.php:207
+msgid "Check-in and check-out only on site"
+msgstr "Ein- und Auschecken nur vor Ort"
 
-#: includes/Metaboxes.php:206
-msgid "ZIP"
-msgstr "PLZ"
+#: includes/Metaboxes.php:208
+msgid "Activate additional reservation functions"
+msgstr "Aktivieren Sie zusätzliche Buchungsfunktionen"
 
-#: includes/Metaboxes.php:212
-msgid "City"
-msgstr "Stadt"
-
-#: includes/Metaboxes.php:218
-msgid "Floor plan"
-msgstr "Grundriss"
-
-#: includes/Metaboxes.php:244
-msgid "Reservations' details"
-msgstr "Reservierungs-Optionen"
-
-#: includes/Metaboxes.php:254
+#: includes/Metaboxes.php:215
 msgid "Booking Form Page"
 msgstr "Buchungsformular-Seite"
 
-#: includes/Metaboxes.php:255
+#: includes/Metaboxes.php:216
 msgid "The shortcode for the booking form must be inserted on this page."
 msgstr ""
 "In dieser Seite muss der Shortcode für das Buchungsformular eingefügt werden."
 
-#: includes/Metaboxes.php:264
+#: includes/Metaboxes.php:225
 msgid "SSO is required"
 msgstr "SSO erforderlich"
 
-#: includes/Metaboxes.php:265
+#: includes/Metaboxes.php:226
 msgid ""
 "If SSO is enabled then the customer must log in through SSO in order to use "
 "the booking form."
@@ -905,19 +891,19 @@ msgstr ""
 "Wenn SSO aktiviert ist, muss sich der Kunde über SSO anmelden, um das "
 "Buchungsformular verwenden zu können."
 
-#: includes/Metaboxes.php:272
+#: includes/Metaboxes.php:233
 msgid "Available days in advance"
 msgstr "Zeitraum für Vorabreservierung"
 
-#: includes/Metaboxes.php:273
+#: includes/Metaboxes.php:234
 msgid "Number of days for which bookings are available in advance."
 msgstr "Anzahl der Tage, bis zu denen eine Reservierung im voraus möglich ist."
 
-#: includes/Metaboxes.php:284
+#: includes/Metaboxes.php:245
 msgid "Automatic confirmation"
 msgstr "Automatische Bestätigung"
 
-#: includes/Metaboxes.php:285
+#: includes/Metaboxes.php:246
 msgid ""
 "If the automatic confirmation is not activated, the booking must be "
 "confirmed manually."
@@ -925,11 +911,11 @@ msgstr ""
 "Wenn die automatische Bestätigung nicht aktiviert wurde, müssen "
 "Reservierungen jeweils manuell bestätigt werden."
 
-#: includes/Metaboxes.php:292
+#: includes/Metaboxes.php:253
 msgid "Allow Instant Check-In"
 msgstr "Erlaube das Einchecken ohne vorherige Platzreservierung"
 
-#: includes/Metaboxes.php:293
+#: includes/Metaboxes.php:254
 msgid ""
 "Seats can be booked and checked-in in one step. This only works if automatic "
 "confirmation activated!"
@@ -938,11 +924,11 @@ msgstr ""
 "beachten Sie, dass hierzu die automatische Sitzplatzbestätigung aktiviert "
 "sein muss!"
 
-#: includes/Metaboxes.php:300
+#: includes/Metaboxes.php:261
 msgid "Force to confirm"
 msgstr "Bestätigung verlangen"
 
-#: includes/Metaboxes.php:301
+#: includes/Metaboxes.php:262
 msgid ""
 "The customer is forced to confirm his booking within a period of one hour. "
 "Otherwise the system will cancel the booking."
@@ -950,11 +936,11 @@ msgstr ""
 "Der Bucher muss die Reservierung innerhalb einer Stunde bestätigen. "
 "Andernfalls wird die Reservierung automatisch storniert."
 
-#: includes/Metaboxes.php:308
+#: includes/Metaboxes.php:269
 msgid "Check-in is required"
 msgstr "Check-in erforderlich"
 
-#: includes/Metaboxes.php:309
+#: includes/Metaboxes.php:270
 msgid ""
 "The customer must check-in their booking within 15 minutes from the start of "
 "the event. Otherwise the system will cancel the booking."
@@ -962,11 +948,11 @@ msgstr ""
 "Der Bucher muss innerhalb von 15 Minuten nach Beginn des Termins einchecken. "
 "Andernfalls wird die Buchung automatisch storniert."
 
-#: includes/Metaboxes.php:316
+#: includes/Metaboxes.php:277
 msgid "Show notes/comment input in booking form"
 msgstr "Notizen / Kommentareingabe im Buchungsformular anzeigen"
 
-#: includes/Metaboxes.php:317
+#: includes/Metaboxes.php:278
 msgid ""
 "If not checked, the comment text input will still be visible in the backend "
 "for booking admins for internal notes."
@@ -974,11 +960,11 @@ msgstr ""
 "Wenn diese Option nicht aktiviert ist, wird die Kommentareingabe für "
 "Administratoren für interne Notizen weiterhin im Backend angezeigt."
 
-#: includes/Metaboxes.php:324
+#: includes/Metaboxes.php:285
 msgid "Comment input label"
 msgstr "Beschriftung für Kommentarfeld"
 
-#: includes/Metaboxes.php:325
+#: includes/Metaboxes.php:286
 msgid ""
 "Choose a label for the text input on the booking form. E.g. 'Additional "
 "information' or 'Main interests'"
@@ -986,9 +972,25 @@ msgstr ""
 "Wählen Sie eine Beschriftung für die Texteingabe auf dem Buchungsformular, z."
 "B. \"Weitere Informationen\" oder \"Hauptinteressen\"."
 
-#: includes/Metaboxes.php:328
+#: includes/Metaboxes.php:289
 msgid "Additional information"
 msgstr "Weitere Informationen"
+
+#: includes/Metaboxes.php:294
+msgid "Street"
+msgstr "Straße"
+
+#: includes/Metaboxes.php:300
+msgid "ZIP"
+msgstr "PLZ"
+
+#: includes/Metaboxes.php:306
+msgid "City"
+msgstr "Stadt"
+
+#: includes/Metaboxes.php:312
+msgid "Floor plan"
+msgstr "Grundriss"
 
 #: includes/Users.php:82
 msgid "Booking Agent"
@@ -997,6 +999,10 @@ msgstr "Buchungsbearbeiter"
 #: includes/Schedule.php:52
 msgid "Every five minutes"
 msgstr "Alle fünf Minuten"
+
+#: includes/ICS.php:48
+msgid "Cancel Booking"
+msgstr "Buchung stornieren"
 
 #: includes/ICS.php:49
 msgid "Generated"
@@ -1284,11 +1290,6 @@ msgstr "Ausgecheckt"
 #: includes/CPT/Bookings.php:226
 msgid "Delete"
 msgstr "Löschen"
-
-#: includes/CPT/Bookings.php:239
-msgctxt "Booking"
-msgid "Cancel"
-msgstr "Stornieren"
 
 #: includes/CPT/Bookings.php:253
 msgid "Confirm"
