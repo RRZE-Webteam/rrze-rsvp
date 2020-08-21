@@ -683,47 +683,47 @@ class Functions
     }  
     
     // used for tracking to find users 
-    public function getUsersInRoomAtDate(string $startdate, string $enddate, string $user_email = '', string $user_name = ''){
-        $bFound = false;
+    // public function getUsersInRoomAtDate(string $startdate, string $enddate, string $user_email = '', string $user_name = ''){
+    //     $bFound = false;
 
-        if (!$user_email && !$user_name){
-            // we have nothing to search for
-            return false;
-        }
+    //     if (!$user_email && !$user_name){
+    //         // we have nothing to search for
+    //         return false;
+    //     }
 
-        $data = get_site_option('usertracking');
-        $aSearch = [];
+    //     $data = get_site_option('usertracking');
+    //     $aSearch = [];
 
-        // $newData[$thisDate][] = [
-        //     'email' => strtolower($aBookingData['guest_email']),
-        //     'phone' => $aBookingData['guest_phone'],
-        //     'name' => $aBookingData['guest_firstname'] . ' ' . $aBookingData['guest_lastname'],
-        //     'room_post_id' => $room_post_id, // because $room_name is not unique
-        //     'room_name' => $room_name,
-        //     'room_street' => $room_street,
-        //     'room_zip' => $room_zip,
-        //     'room_city' => $room_city,
-        // ];
+    //     // $newData[$thisDate][] = [
+    //     //     'email' => strtolower($aBookingData['guest_email']),
+    //     //     'phone' => $aBookingData['guest_phone'],
+    //     //     'name' => $aBookingData['guest_firstname'] . ' ' . $aBookingData['guest_lastname'],
+    //     //     'room_post_id' => $room_post_id, // because $room_name is not unique
+    //     //     'room_name' => $room_name,
+    //     //     'room_street' => $room_street,
+    //     //     'room_zip' => $room_zip,
+    //     //     'room_city' => $room_city,
+    //     // ];
 
-        Carbon::create($start)->daysUntil($end)->forEach(function ($date) {
-            $aSearch[] = $data[$date];
-        });
+    //     Carbon::create($start)->daysUntil($end)->forEach(function ($date) {
+    //         $aSearch[] = $data[$date];
+    //     });
 
-        if(!$aSearch){
-            // no data in given date-span
-            return false;
-        }
+    //     if(!$aSearch){
+    //         // no data in given date-span
+    //         return false;
+    //     }
 
-        if ($user_email){
+    //     if ($user_email){
 
-            // fill $aSearch by emails
-            // set $bFound
-        }
-        if (!$bFound){
-            // either no $user_email was given or not found by $user_email
-            if ($user_name){
-            }
+    //         // fill $aSearch by emails
+    //         // set $bFound
+    //     }
+    //     if (!$bFound){
+    //         // either no $user_email was given or not found by $user_email
+    //         if ($user_name){
+    //         }
 
-        }
-    }
+    //     }
+    // }
 }
