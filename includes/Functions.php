@@ -682,48 +682,77 @@ class Functions
         return null;
     }  
     
+
+    public static function searchArrayByKey(array $aInput, string $key, string $value): array
+    {
+        $aResults = [];
+        foreach ($aInput as $row) {
+            if ($row[$field] == $value){
+                $aResults[] = $row;
+            }
+        }
+        return $aResults;
+    }
+
+
+    // used for tracking to find users
+    public static function createCSV(array $aInput): string
+    {
+
+    }
+
     // used for tracking to find users 
-    // public function getUsersInRoomAtDate(string $startdate, string $enddate, string $user_email = '', string $user_name = ''){
-    //     $bFound = false;
+    public function getUsersInRoomAtDate(string $startdate, string $enddate, string $guest_email = '', string $guest_name = ''): array
+    {
+        if (!$guest_email && !$guest_name){
+            // we have nothing to search for
+            return [];
+        }
 
-    //     if (!$user_email && !$user_name){
-    //         // we have nothing to search for
-    //         return false;
-    //     }
+        $data = get_site_option('usertracking');
+        $aSearch = [];
 
-    //     $data = get_site_option('usertracking');
-    //     $aSearch = [];
+        // $newData[$thisDate][] = [
+        //     'guest_email' => strtolower($aBookingData['guest_email']),
+        //     'guest_phone' => $aBookingData['guest_phone'],
+        //     'guest_name' => $aBookingData['guest_firstname'] . ' ' . $aBookingData['guest_lastname'],
+        //     'room_post_id' => $room_post_id, // because $room_name is not unique
+        //     'room_name' => $room_name,
+        //     'room_street' => $room_street,
+        //     'room_zip' => $room_zip,
+        //     'room_city' => $room_city,
+        // ];
 
-    //     // $newData[$thisDate][] = [
-    //     //     'email' => strtolower($aBookingData['guest_email']),
-    //     //     'phone' => $aBookingData['guest_phone'],
-    //     //     'name' => $aBookingData['guest_firstname'] . ' ' . $aBookingData['guest_lastname'],
-    //     //     'room_post_id' => $room_post_id, // because $room_name is not unique
-    //     //     'room_name' => $room_name,
-    //     //     'room_street' => $room_street,
-    //     //     'room_zip' => $room_zip,
-    //     //     'room_city' => $room_city,
-    //     // ];
+        Carbon::create($startdate)->daysUntil($enddate)->forEach(function ($date) {
+            $aSearch[] = $data[$date];
+        });
 
-    //     Carbon::create($start)->daysUntil($end)->forEach(function ($date) {
-    //         $aSearch[] = $data[$date];
-    //     });
+        if(!$aSearch){
+            // no data in given date-span
+            return [];
+        }
 
-    //     if(!$aSearch){
-    //         // no data in given date-span
-    //         return false;
-    //     }
+        $aMatches = [];
+        if ($guest_email){
+            $aMatches = self::searchArrayByKey($aSearch, 'guest_email', $guest_email);
+        }
+        if (!$aMatches && $user_name){
+            // either $guest_email was not given or not found
+            $aMatches = self::searchArrayByKey($aSearch, 'guest_name', $user_name);
+        }
 
-    //     if ($user_email){
+        $aRooms = [];
+        if (!$aMatches){
+            // we didn't find guest 
+        }
 
-    //         // fill $aSearch by emails
-    //         // set $bFound
-    //     }
-    //     if (!$bFound){
-    //         // either no $user_email was given or not found by $user_email
-    //         if ($user_name){
-    //         }
+        $aOtherUsers = [];
+        foreach($aMatches['room_post_id'] as $room_post_id){
+            // get all users that where in the same rooms
+            $aOtherUsers[] = self::searchArrayByKey($aSearch, 'room_post_id', $room_post_id);
+        }
 
-    //     }
-    // }
+        // return data of guest-needle + guests in these rooms within the given date-span
+        return array_merge($aMatches, $aOtherUsers);
+    }
 }
