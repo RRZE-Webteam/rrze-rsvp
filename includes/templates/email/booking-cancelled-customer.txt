@@ -14,10 +14,8 @@
 {{=seat_name}}
 {{/seat_name}}
 
-{{site_url}}
-{{=site_url_text}}
+{{=site_name}}
 {{=site_url}}
-{{/site_url}}
 
 {{is_locale_not_english}}
 ----------------------------------------------------------------------------
@@ -33,8 +31,6 @@
 {{=seat_name}}
 {{/seat_name}}
 
-{{site_url}}
-{{=site_url_text}}
+{{=site_name}}
 {{=site_url}}
-{{/site_url}}
 {{/is_locale_not_english}}

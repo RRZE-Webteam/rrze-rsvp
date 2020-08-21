@@ -14,23 +14,17 @@
 {{=seat_name}}
 {{/seat_name}}
 
-{{alt_checkin_booking}}
-{{=alt_checkin_booking}}
-{{=checkin_booking_url}}
-{{/alt_checkin_booking}}
-{{alt_checkout_booking}}
-{{=alt_checkout_booking}}
-{{=checkout_booking_url}}
-{{/alt_checkout_booking}}
-{{alt_cancel_booking}}
-{{=alt_cancel_booking}}
-{{=cancel_booking_url}}
-{{/alt_cancel_booking}}
+{{=alt_checkin_text}}
+{{=checkin_url}}
 
-{{site_url}}
-{{=site_url_text}}
+{{=alt_checkout_text}}
+{{=checkout_url}}
+
+{{=alt_cancel_text}}
+{{=cancel_url}}
+
+{{=site_name}}
 {{=site_url}}
-{{/site_url}}
 
 {{is_locale_not_english}}
 ----------------------------------------------------------------------------
@@ -46,21 +40,15 @@
 {{=seat_name}}
 {{/seat_name}}
 
-{{alt_checkin_booking_en}}
-{{=alt_checkin_booking_en}}
-{{=checkin_booking_url}}
-{{/alt_checkin_booking_en}}
-{{alt_checkout_booking_en}}
-{{=alt_checkout_booking_en}}
-{{=checkout_booking_url}}
-{{/alt_checkout_booking_en}}
-{{alt_cancel_booking_en}}
-{{=alt_cancel_booking_en}}
-{{=cancel_booking_url}}
-{{/alt_cancel_booking_en}}
+{{=alt_checkin_text_en}}
+{{=checkin_url}}
 
-{{site_url}}
-{{=site_url_text}}
+{{=alt_checkout_text_en}}
+{{=checkout_url}}
+
+{{=alt_cancel_text_en}}
+{{=cancel_url}}
+
+{{=site_name}}
 {{=site_url}}
-{{/site_url}}
 {{/is_locale_not_english}}
