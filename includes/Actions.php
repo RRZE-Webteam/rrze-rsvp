@@ -4,6 +4,8 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
+// use RRZE\RSVP\Carbon;
+
 class Actions
 {
 	protected $email;
@@ -21,9 +23,49 @@ class Actions
 		add_action('admin_init', [$this, 'handleActions']);
 		add_action('wp_ajax_booking_action', [$this, 'ajaxBookingAction']);
 		add_action('transition_post_status', [$this, 'transitionPostStatus'], 10, 3);
-		add_action('template_include', [$this, 'bookingReplyTemplate']);
+        add_action('template_include', [$this, 'bookingReplyTemplate']);
+        add_action('updated_post_meta', [$this, 'storeUserTracking'], 10, 4 );
 	}
 
+
+    // used for tracking: stores date, user-data and room-data for each user that is checked-in
+    // 2DO: storeUserTracking() must fire on change of 
+    // - rrze-rsvp-booking-seat (=> includes ROOM) 
+    // - rrze-rsvp-booking-start_date
+    // - rrze-rsvp-booking-end_date
+    // - rrze-rsvp-booking-status
+    public function storeUserTracking($meta_id, $object_id, $meta_key, $_meta_value) {
+        if ($meta_key == 'rrze-rsvp-booking-status') {
+            if ($_meta_value == 'checked-in'){
+                // get user data
+                $aBookingData = Functions::getBooking($object_id);
+                $room_post_id = $aBookingData['room'];
+                $room_name = get_the_title($room_post_id);
+                $room_street = get_post_meta($room_post_id, 'rrze-rsvp-room-street', true);
+                $room_zip = get_post_meta($room_post_id, 'rrze-rsvp-room-zip', true);
+                $room_city = get_post_meta($room_post_id, 'rrze-rsvp-room-city', true);
+
+                $newData = [
+                    'start' => Carbon::createFromTimestamp($aBookingData['start'])->format('Y-m-d'),
+                    'end' => Carbon::createFromTimestamp($aBookingData['end'])->format('Y-m-d'),
+                    'email' => strtolower($aBookingData['guest_email']),
+                    'phone' => $aBookingData['guest_phone'],
+                    'firstname' => $aBookingData['guest_firstname'],
+                    'lastname' => $aBookingData['guest_lastname'],
+                    'room_post_id' => $room_post_id, // because $room_name is not unique
+                    'room_name' => $room_name,
+                    'room_street' => $room_street,
+                    'room_zip' => $room_zip,
+                    'room_city' => $room_city,
+                ];
+
+                $preData = get_site_option('usertracking');
+                $newData = ( $preData ? array_merge($preData, $newData) : $newData );
+                update_site_option('usertracking', $newData);
+            }
+        }
+    }
+    
 	public function ajaxBookingAction()
 	{
 		$bookingId = absint($_POST['id']);
