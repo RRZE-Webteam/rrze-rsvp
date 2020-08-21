@@ -35,8 +35,23 @@ class Actions
     // - rrze-rsvp-booking-end_date
     // - rrze-rsvp-booking-status
     public function storeUserTracking($meta_id, $object_id, $meta_key, $_meta_value) {
-        if ($meta_key == 'rrze-rsvp-booking-status') {
-            if ($_meta_value == 'checked-in'){
+        $aMetaKeys = [
+            'rrze-rsvp-booking-status',
+            'rrze-rsvp-booking-seat',
+            'rrze-rsvp-booking-start',
+            'rrze-rsvp-booking-end'
+        ];
+        if (!in_array($meta_key, $aMetaKeys)) {
+            return;
+        }else{
+            if ($meta_key == 'rrze-rsvp-booking-status'){
+                $status = $_meta_value;
+            }else{
+                $status = get_post_meta($room_post_id, 'rrze-rsvp-room-status', true);
+            }
+        }
+
+        if ($status == 'checked-in'){
                 // get user data
                 $aBookingData = Functions::getBooking($object_id);
                 $room_post_id = $aBookingData['room'];
