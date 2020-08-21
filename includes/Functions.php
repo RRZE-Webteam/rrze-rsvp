@@ -694,7 +694,28 @@ class Functions
         $data = get_site_option('usertracking');
         $aSearch = [];
 
+        // $newData[$thisDate][] = [
+        //     'email' => strtolower($aBookingData['guest_email']),
+        //     'phone' => $aBookingData['guest_phone'],
+        //     'name' => $aBookingData['guest_firstname'] . ' ' . $aBookingData['guest_lastname'],
+        //     'room_post_id' => $room_post_id, // because $room_name is not unique
+        //     'room_name' => $room_name,
+        //     'room_street' => $room_street,
+        //     'room_zip' => $room_zip,
+        //     'room_city' => $room_city,
+        // ];
+
+        Carbon::create($start)->daysUntil($end)->forEach(function ($date) {
+            $aSearch[] = $data[$date];
+        });
+
+        if(!$aSearch){
+            // no data in given date-span
+            return false;
+        }
+
         if ($user_email){
+
             // fill $aSearch by emails
             // set $bFound
         }

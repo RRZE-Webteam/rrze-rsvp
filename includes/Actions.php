@@ -85,7 +85,6 @@ class Actions
                 // $test = get_site_option('usertracking');
                 // echo "<script>console.log('BK test = " . json_encode($test) . "' );</script>";
             }
-        }
     }
     
 	public function ajaxBookingAction()
