@@ -29,10 +29,10 @@ class Actions
 
 
     // used for tracking: stores date, user-data and room-data for each user that is checked-in
-    // 2DO: storeUserTracking() must fire on change of 
+    // storeUserTracking() must be called on change of 
     // - rrze-rsvp-booking-seat (=> includes ROOM) 
-    // - rrze-rsvp-booking-start_date
-    // - rrze-rsvp-booking-end_date
+    // - rrze-rsvp-booking-start
+    // - rrze-rsvp-booking-end
     // - rrze-rsvp-booking-status
     public function storeUserTracking($meta_id, $object_id, $meta_key, $_meta_value) {
         $aMetaKeys = [
