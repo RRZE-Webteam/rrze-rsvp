@@ -1,3 +1,5 @@
+{{=subject}}
+
 {{=text}}
 
 {{=date}}
@@ -11,8 +13,11 @@
 {{=customer.name}}
 {{=customer.email}}
 
-{{=confirm_link_text}}
+{{=alt_confirm_text}}
 {{=confirm_url}}
 
-{{=cancel_link_text}}
+{{=alt_cancel_text}}
 {{=cancel_url}}
+
+{{=site_name}}
+{{=site_url}}

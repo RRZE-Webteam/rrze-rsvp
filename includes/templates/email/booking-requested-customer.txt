@@ -15,18 +15,15 @@
 {{/seat_name}}
 
 {{force_to_confirm}}
-{{=alt_confirm_booking}}
-{{=confirm_booking_url}}
+{{=alt_confirm_text}}
+{{=confirm_url}}
 {{/force_to_confirm}}
-{{alt_cancel_booking}}
-{{=alt_cancel_booking}}
-{{=cancel_booking_url}}
-{{/alt_cancel_booking}}
 
-{{site_url}}
-{{=site_url_text}}
+{{=alt_cancel_text}}
+{{=cancel_url}}
+
+{{=site_name}}
 {{=site_url}}
-{{/site_url}}
 
 {{is_locale_not_english}}
 ----------------------------------------------------------------------------
@@ -43,16 +40,13 @@
 {{/seat_name}}
 
 {{force_to_confirm}}
-{{=alt_confirm_booking_en}}
-{{=confirm_booking_url}}
+{{=alt_confirm_text_en}}
+{{=confirm_url}}
 {{/force_to_confirm}}
-{{alt_cancel_booking_en}}
-{{=alt_cancel_booking_en}}
-{{=cancel_booking_url}}
-{{/alt_cancel_booking_en}}
 
-{{site_url}}
-{{=site_url_text}}
+{{=alt_cancel_text_en}}
+{{=cancel_url}}
+
+{{=site_name}}
 {{=site_url}}
-{{/site_url}}
 {{/is_locale_not_english}}
