@@ -15,9 +15,6 @@ class ICS
 			return '';
 		}
 
-		header('Content-type: text/calendar; charset=utf-8');
-		header('Content-Disposition: attachment; filename=' . $filename);
-
 		$output = '';
 		$output .= "BEGIN:VCALENDAR\r\n";
 		$output .= "VERSION:2.0\r\n";
