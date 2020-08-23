@@ -90,6 +90,7 @@ class Schedule
     {
         $this->deleteOldBookings();
         $this->deleteCancelledBookings();
+        $this->deleteOldTrackingData();
     }
 
     /**
@@ -303,5 +304,22 @@ class Schedule
             }
             wp_reset_postdata();
         }
+    }
+
+    /**
+     * deleteOldTrackingData
+     * Delete all tracking data whose datetime is older than 4 weeks.
+     * @return void
+     */    
+    protected function deleteOldTrackingData()
+    {
+        global $wpdb;
+        $dbTable = Tracking::getDbTableName();
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM $dbTable WHERE date < %s - interval 4 WEEK",
+                current_time('mysql')
+            )
+        );
     }
 }
