@@ -1,19 +1,10 @@
 .rrze-rsvp-booking-reply {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100vw;
-	height: 100vh;
 	overflow-x: hidden;
 	overflow-y: scroll;
-	display: flex;
-	flex-flow: column;
 	justify-content: center;
-	background-color: #f3f3f3;
 	text-align: center;
 	word-wrap: break-word;
-	z-index: 99998;
-
+	
 	.container {
 		width: 100%;
 		max-width: 600px;
@@ -35,8 +26,6 @@
 			font-size: 2em;
 			line-height: 1.2em;
 			font-weight: 300;
-			margin: 1em 0 .5em 0;
-			border-top: 1px solid #ddd;
 			padding-top: 1em;
 
 			&.cancelled {
@@ -45,7 +34,7 @@
 		}
 
 		.button {
-			color: white;
+			color: #eeeeee;
 			padding: 10px 15px;
 			text-decoration: none;
 			margin: 10px 5px 5px;
@@ -54,32 +43,21 @@
 			border-radius: 3px;
 			display: inline-block;
 
-			&.button-accept {
-				background-color: #009900;
-			}
-
-			&.button-delete {
-				background-color: #aa1818;
+			&.button-cancel {
+				background-color: #444444;
 			}
 		}
 
         .english-version {
 			font-size: 14px;
 			display: block;
-			color: #bbb;			
+			color: #bbb;		
 		} 
 		       
         .lang-hr {
-            margin: 1em 0 0 0;
+            margin: 3em 0 0 0;
             border-top: 1px solid #dddddd;
             padding-top: 0.5em;            
         }		
-	}
-
-	a.backlink {
-		display: block;
-		color: #bbb;
-		text-decoration: none;
-		margin-bottom: 30px;
 	}
 }
