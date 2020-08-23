@@ -23,7 +23,7 @@ class Actions
 		add_action('admin_init', [$this, 'handleActions']);
 		add_action('wp_ajax_booking_action', [$this, 'ajaxBookingAction']);
 		add_action('transition_post_status', [$this, 'transitionPostStatus'], 10, 3);
-        add_action('template_include', [$this, 'bookingReplyTemplate']);
+		add_action('wp', [$this, 'bookingReply']);
         // add_action('updated_post_meta', [$this, 'storeUserTracking'], 10, 4 );
 	}
 
@@ -183,88 +183,100 @@ class Actions
 		}
 	}
 
-	public function bookingReplyTemplate($template)
+	public function bookingReply()
 	{
+        global $post;
+        if (!is_a($post, '\WP_Post') || !is_page() || $post->post_name != "rsvp-booking") {
+            return;
+		}
+
 		$bookingId = isset($_GET['id']) ? absint($_GET['id']) : false;
 		$action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : false;
-		$hash = isset($_GET['rrze-rsvp-booking-reply']) ? sanitize_text_field($_GET['rrze-rsvp-booking-reply']) : false;
+		$hash = isset($_GET['booking-reply']) ? sanitize_text_field($_GET['booking-reply']) : false;
 
-		if ($hash !== false && $bookingId !== false && $action !== false) {
-			$booking = Functions::getBooking($bookingId);
-			$nonce = $booking ? sprintf('%s-%s', $bookingId, $booking['start']) : '';
-			$decryptedHash = Functions::decrypt($hash);
-			$isAdmin =  $decryptedHash == $nonce ? true : false;
-			$isCustomer =  $decryptedHash == $nonce . '-customer' ? true : false;
+		if (!$hash || !$bookingId || !$action) {
+			return;
+		}
+		
+		wp_enqueue_style(
+			'rrze-rsvp-booking-reply', 
+			plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename()), 
+			[], 
+			plugin()->getVersion()
+		);
 
-			$bookingCancelled = ($booking['status'] == 'cancelled');
+		$booking = Functions::getBooking($bookingId);
+		$nonce = $booking ? sprintf('%s-%s', $bookingId, $booking['start']) : '';
+		$decryptedHash = Functions::decrypt($hash);
+		$isAdmin =  $decryptedHash == $nonce ? true : false;
+		$isCustomer =  $decryptedHash == $nonce . '-customer' ? true : false;
 
-			if (($action == 'confirm' || $action == 'cancel') && $isAdmin) {
-				return $this->bookingReplyAdminTemplate($bookingId, $booking, $action);
-			} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel') && $isCustomer) {
-				if ($bookingCancelled) {
-					$action = 'cancel';
-				}
-				return $this->bookingReplyCustomer($bookingId, $booking, $action);
+		$bookingCancelled = ($booking['status'] == 'cancelled');
+
+		if (($action == 'confirm' || $action == 'cancel') && $isAdmin) {
+			$this->bookingReplyAdmin($bookingId, $booking, $action);
+		} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel') && $isCustomer) {
+			if ($bookingCancelled) {
+				$action = 'cancel';
 			}
-
+			$this->bookingReplyCustomer($bookingId, $booking, $action);
+		} else {
 			header('HTTP/1.0 403 Forbidden');
 			wp_redirect(get_site_url());
 			exit;
 		}
-
-		return $template;
 	}
 
-	protected function bookingReplyAdminTemplate(int $bookingId, array $booking, string $action)
+	protected function bookingReplyAdmin(int $bookingId, array $booking, string $action)
 	{
+		$bookingBooked = ($booking['status'] == 'booked');
+		$bookingConfirmed = ($booking['status'] == 'confirmed');
+		$bookingCancelled = ($booking['status'] == 'cancelled');
+		$alreadyDone = false;
+
 		$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
-		if ($booking['status'] == 'booked') {
-			if ($action == 'confirm') {
-				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
-				$action = __('confirmed', 'rrze-rsvp');
-				if ($forceToConfirm) {
-					$this->email->bookingRequestedCustomer($bookingId);
-				} else {
-					$this->email->bookingConfirmedCustomer($bookingId);
-				}
-			} else if ($action == 'cancel') {
-				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
-				$action = __('cancelled', 'rrze-rsvp');
-				$this->email->bookingCancelledCustomer($bookingId);
-			}
-			$processed = false;
+		if ($bookingBooked && $action == 'confirm') {
+			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
+			$bookingConfirmed = true;
+			if ($forceToConfirm) {
+				$this->email->bookingRequestedCustomer($bookingId);
+			} else {
+				$this->email->bookingConfirmedCustomer($bookingId);
+			}			
+		} elseif ($bookingBooked && $action == 'cancel') {
+			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
+			$bookingCancelled = true;
+			$this->email->bookingCancelledCustomer($bookingId);
 		} else {
-			$processed = true;
-			$action = ($booking['status'] == 'confirmed') ? __('confirmed', 'rrze-rsvp') : __('cancelled', 'rrze-rsvp');
+			$alreadyDone = true;
+		}
+
+		if (!$alreadyDone && $bookingConfirmed) {
+			$response = 'confirmed';
+		} elseif (!$alreadyDone && $bookingCancelled) {
+			$response = 'cancelled';
+		} elseif ($alreadyDone && $bookingConfirmed) {
+			$response = 'already-confirmed';
+		} elseif ($alreadyDone && $bookingCancelled) {
+			$response = 'already-cancelled';
+		} else {
+			$response = 'no-action';
 		}
 
 		$customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
 		$customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
-		$customerPhone = sprintf('%s: %s', __('Phone', 'rrze-rsvp'), $booking['guest_phone']);
-
-		$siteUrl = site_url();
-		$siteName = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
 
 		$data = [];
-		if (has_header_image()) {
-			$data['header_image'] = get_header_image();
-			$data['image_width'] = get_custom_header()->width;
-			$data['image_height'] = get_custom_header()->height;
-		}
-		$data['site_name'] = $siteName;
-
 		$data['booking_title'] = __('Booking', 'rrze-rsvp');
 
-		if ($processed) {
-			$data['processed'] = true;
-		}
-
-		$data['booking_has_already_been'] = sprintf(__('The booking has already been %s.', 'rrze-rsvp'), $action);
-		$data['booking_has_been'] = sprintf(__('The booking has been %s.', 'rrze-rsvp'), $action);
+		$data['already_done'] = $alreadyDone;
+		$responseText = in_array($response, ['confirmed', 'already-confirmed']) ? _x('confirmed', 'Booking', 'rrze-rsvp') : _x('cancelled', 'Booking', 'rrze-rsvp');
+		$data['booking_has_already_been'] = sprintf(__('The booking has already been %s', 'rrze-rsvp'), $responseText);
+		$data['booking_has_been'] = sprintf(__('The booking has been %s', 'rrze-rsvp'), $responseText);
 		$data['customer_has_received_an_email'] = __('Your customer has received an email confirmation.', 'rrze-rsvp');
 
-		$data['class_cancelled'] = ($action == 'canncel') ? 'cancelled' : '';
+		$data['class_cancelled'] = in_array($response, ['cancelled', 'already-cancelled']) ? 'cancelled' : '';
 
 		$data['room_name'] = $booking['room_name'];
 
@@ -274,13 +286,12 @@ class Actions
 		$data['customer']['name'] = $customerName;
 		$data['customer']['email'] = $customerEmail;
 
-		$data['backlink'] = sprintf('<a class="backlink" href="%s">&larr; %s</a>', $siteUrl, $siteName);
-
-		wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
-
-		get_header();
-		echo $this->template->getContent('reply/booking-reply-admin', $data);
-		get_footer();
+		add_filter('the_title', function($title) {
+			return __('Booking', 'rrze-rsvp');
+		});		
+		add_filter('the_content', function($content) use ($data) {
+			return $this->template->getContent('reply/booking-admin', $data);
+		});
 	}
 
 	protected function bookingReplyCustomer(int $bookingId, array $booking, string $action)
@@ -304,10 +315,11 @@ class Actions
 			$bookingCancelled = true;
 		} elseif (!$bookingCancelled && !$bookingCkeckedIn && $bookingConfirmed && $action == 'checkin') {
 			$offset = 15 * MINUTE_IN_SECONDS;
-			if (($start - $offset) <= $now && ($end - $offset) >= $now) {
+			//if (($start - $offset) <= $now && ($end - $offset) >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
 				$bookingCkeckedIn = true;
-			}
+				do_action('rrze-rsvp-ckecked-in', get_current_blog_id(), $bookingId);
+			//}
 		} elseif (!$bookingCancelled && !$bookingCkeckedOut && $bookingCkeckedIn && $action == 'checkout') {
 			if ($start <= $now && $end >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-out');
@@ -315,67 +327,97 @@ class Actions
 			}
 		}
 
-		$siteUrl = site_url();
-		$siteName = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
+		if (!$bookingCancelled && !$bookingCkeckedIn && $action == 'cancel') {
+			$response = 'maybe-cancelled';
+		} elseif ($bookingCancelled && $action == 'cancel') {
+			$response = 'cancelled';
+		} elseif ($userConfirmed && $action == 'confirm') {
+			$response = 'confirmed';
+		} elseif (!$bookingCkeckedIn && $action == 'checkin') {
+			$response = 'cannot-checked-in';
+		} elseif ($bookingCkeckedIn && $action == 'checkin') {
+			$response = 'already-checked-in';
+		} elseif (!$bookingCkeckedOut && $action == 'checkout') {
+			$response = 'cannot-checked-out';
+		} elseif ($bookingCkeckedOut && $action == 'checkout') {
+			$response = 'already-checked-out';
+		} else {
+			$response = 'no-action';
+		}
 
 		$data = [];
-		if (has_header_image()) {
-			$data['header_image'] = get_header_image();
-			$data['image_width'] = get_custom_header()->width;
-			$data['image_height'] = get_custom_header()->height;
-		}
-		$data['site_name'] = $siteName;
+        // Is locale not english?
+		$data['is_locale_not_english'] = !Functions::isLocaleEnglish() ? true : false;
+		
+		$data['room_name'] = $booking['room_name'];
 
-		$isLocaleEnglish = Functions::isLocaleEnglish();
-		if (!$isLocaleEnglish) $data['is_locale_not_english'] = true;
+		$data['date'] = $booking['date'];
+		$data['time'] = $booking['time'];
+		$data['date_en'] = $booking['date_en'];
+		$data['time_en'] = $booking['time_en'];
 
-		$data['booking_title'] = __('Booking', 'rrze-rsvp');
-		$data['booking_title_en'] = 'Booking';
+		$cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
+		$data['cancel_btn'] = sprintf(__('<a href="%s" class="button button-cancel">Cancel Your Booking</a>', 'rrze-rsvp'), $cancelUrl);
+		$data['cancel_btn_en'] = sprintf('<a href="%s" class="button button-cancel">Cancel Your Booking</a>', $cancelUrl);
 
-		$data['backlink'] = sprintf('<a class="backlink" href="%s">&larr; %s</a>', $siteUrl, $siteName);
+		switch ($response) {
+			case 'maybe-cancelled':
+				$data['booking_cancel'] = __('Cancel Booking', 'rrze-rsvp');
+				$data['really_want_to_cancel_the_booking'] = __('Do you really want to cancel your booking?', 'rrze-rsvp');
+				$data['booking_cancel_en'] = 'Cancel Booking';
+				$data['really_want_to_cancel_the_booking_en'] = 'Do you really want to cancel your booking?';
+				$data['class_cancelled'] = ($action == 'cancel') ? 'cancelled' : '';
+				break;
+			case 'cancelled':
+				$data['booking_cancelled'] = __('Booking Cancelled', 'rrze-rsvp');
+				$data['booking_has_been_cancelled'] = __('Your booking has been cancelled. Please contact us to find a different arrangement.', 'rrze-rsvp');
+				$data['booking_cancelled_en'] = 'Booking Cancelled';
+				$data['booking_has_been_cancelled_en'] = 'Your booking has been cancelled. Please contact us to find a different arrangement.';
+				$data['class_cancelled'] = ($action == 'cancel') ? 'cancelled' : '';
+				break;
+			case 'confirmed':
+				$data['booking_confirmed'] = __('Booking Confirmed', 'rrze-rsvp');
+				$data['thank_for_confirming'] = __('Thank you for confirming your booking.', 'rrze-rsvp');
+				$data['booking_confirmed_en'] = 'Booking Confirmed';
+				$data['thank_for_confirming_en'] = 'Thank you for confirming your booking.';
+				break;
+			case 'cannot-checked-in':
+				$data['booking_check_in'] = __('Booking Check In', 'rrze-rsvp');
+				$data['checkin_is_not_possible'] = __('Check in is not possible at this time.', 'rrze-rsvp');
+				$data['booking_check_in_en'] = 'Booking Check In';
+				$data['checkin_is_not_possible_en'] = 'Check in is not possible at this time.';
+				break;
+			case 'already-checked-in':
+				$data['booking_checked_in'] = __('Booking Checked In', 'rrze-rsvp');
+				$data['checkin_has_been_completed'] = __('Check in has been completed.', 'rrze-rsvp');
+				$data['booking_checked_in_en'] = 'Booking Checked In';
+				$data['checkin_has_been_completed_en'] = 'Check in has been completed.';
+				break;
+			case 'cannot-checked-out':
+				$data['booking_check_out'] = __('Booking Check Out', 'rrze-rsvp');
+				$data['checkout_is_not_possible'] = __('Check-out is not possible at this time.', 'rrze-rsvp');
+				$data['booking_check_out_en'] = 'Booking Check Out';
+				$data['checkout_is_not_possible_en'] = 'Check-out is not possible at this time.';
+				break;
+			case 'already-checked-out':
+				$data['booking_checked_out'] = __('Booking Checked Out', 'rrze-rsvp');
+				$data['checkout_has_been_completed'] = __('Check-out has been completed.', 'rrze-rsvp');
+				$data['booking_checked_out_en'] = 'Booking Checked Out';
+				$data['checkout_has_been_completed_en'] = 'Check-out has been completed.';
+				break;
+			default:
+				$data['action_not_available'] = __('Action not available', 'rrze-rsvp');
+				$data['no_action_was_taken'] = __('No action was taken.', 'rrze-rsvp');
+				$data['action_not_available_en'] = 'Action not available';
+				$data['no_action_was_taken_en'] = 'No action was taken.';
+		}		
 
-		if (!$bookingCancelled && !$bookingCkeckedIn && $action == 'cancel') {
-			$data['really_want_to_cancel_the_booking'] = __('Do you really want to cancel your booking?', 'rrze-rsvp');
-			$data['class_cancelled'] = ($action == 'canncel') ? 'cancelled' : '';
-
-			$data['room_name'] = $booking['room_name'];
-
-			$data['date'] = $booking['date'];
-			$data['time'] = $booking['time'];
-			$data['date_en'] = $booking['date_en'];
-			$data['time_en'] = $booking['time_en'];
-
-			$cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
-			$data['cancel_booking'] = sprintf(__('<a href="%s" class="button button-cancel">Cancel Your Booking</a>.', 'rrze-rsvp'), $cancelUrl);
-			$data['cancel_booking_en'] = sprintf('<a href="%s" class="button button-cancel">Cancel Your Booking</a>.', $cancelUrl);
-		} elseif ($bookingCancelled && $action == 'cancel') {
-			$data['booking_has_been_cancelled'] = __('Your booking has been cancelled. Please contact us to find a different arrangement.', 'rrze-rsvp');
-			$data['booking_has_been_cancelled_en'] = 'Your booking has been cancelled. Please contact us to find a different arrangement.';
-		} elseif ($userConfirmed && $action == 'confirm') {
-			$data['thank_for_confirming'] = __('Thank you for confirming your booking.', 'rrze-rsvp');
-			$data['thank_for_confirming_en'] = 'Thank you for confirming your booking.';
-		} elseif (!$bookingCkeckedIn && $action == 'checkin') {
-			$data['checkin_is_not_possible'] = __('Check-in is not possible at this time.', 'rrze-rsvp');
-			$data['checkin_is_not_possible_en'] = 'Check-in is not possible at this time.';
-		} elseif ($bookingCkeckedIn && $action == 'checkin') {
-			$data['checkin_has_been_completed'] = __('Check-in has been completed.', 'rrze-rsvp');
-			$data['checkin_has_been_completed_en'] = 'Check-in has been completed.';
-		} elseif (!$bookingCkeckedOut && $action == 'checkout') {
-			$data['checkout_is_not_possible'] = __('Check-out is not possible at this time.', 'rrze-rsvp');
-			$data['checkout_is_not_possible_en'] = 'Check-out is not possible at this time.';
-		} elseif ($bookingCkeckedOut && $action == 'checkout') {
-			$data['checkout_has_been_completed'] = __('Check-out has been completed.', 'rrze-rsvp');
-			$data['checkout_has_been_completed_en'] = 'Check-out has been completed.';
-		} else {
-			$data['no_action_was_taken'] = __('No action was taken.', 'rrze-rsvp');
-			$data['no_action_was_taken_en'] = 'No action was taken.';
-		}
-
-		wp_enqueue_style('rrze-rsvp-booking-reply', plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename(), [], plugin()->getVersion()));
-
-		get_header();
-		echo $this->template->getContent('reply/booking-reply-customer', $data);
-		get_footer();
+		add_filter('the_title', function($title) {
+			return __('Booking', 'rrze-rsvp');
+		});
+		add_filter('the_content', function($content) use ($data) {
+			return $this->template->getContent('reply/booking-customer', $data);
+		});
 	}
 
 	protected function ajaxResult(array $returnAry)
@@ -383,4 +425,5 @@ class Actions
 		echo json_encode($returnAry);
 		exit;
 	}
+
 }
