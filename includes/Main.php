@@ -27,7 +27,8 @@ class Main
 	}
 
 	public function onLoaded()
-	{
+	{	
+		// Settings
 		$settings = new Settings($this->pluginFile);
 		$settings->onLoaded();
 
@@ -38,6 +39,10 @@ class Main
 		// CMB2
 		$metaboxes = new Metaboxes;
 		$metaboxes->onLoaded();
+
+		// Tracking
+		$tracking = new Tracking;
+		$tracking->onLoaded();
 
 		$actions = new Actions;
 		$actions->onLoaded();
