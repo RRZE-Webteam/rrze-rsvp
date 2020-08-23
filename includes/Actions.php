@@ -315,11 +315,11 @@ class Actions
 			$bookingCancelled = true;
 		} elseif (!$bookingCancelled && !$bookingCkeckedIn && $bookingConfirmed && $action == 'checkin') {
 			$offset = 15 * MINUTE_IN_SECONDS;
-			//if (($start - $offset) <= $now && ($end - $offset) >= $now) {
+			if (($start - $offset) <= $now && ($end - $offset) >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
 				$bookingCkeckedIn = true;
 				do_action('rrze-rsvp-ckecked-in', get_current_blog_id(), $bookingId);
-			//}
+			}
 		} elseif (!$bookingCancelled && !$bookingCkeckedOut && $bookingCkeckedIn && $action == 'checkout') {
 			if ($start <= $now && $end >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-out');
