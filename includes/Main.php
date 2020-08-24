@@ -41,8 +41,8 @@ class Main
 		$metaboxes->onLoaded();
 
 		// Tracking
-		$tracking = new Tracking;
-		$tracking->onLoaded();
+		//$tracking = new Tracking;
+		//$tracking->onLoaded();
 
 		$actions = new Actions;
 		$actions->onLoaded();
