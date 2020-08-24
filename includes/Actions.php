@@ -24,68 +24,7 @@ class Actions
 		add_action('wp_ajax_booking_action', [$this, 'ajaxBookingAction']);
 		add_action('transition_post_status', [$this, 'transitionPostStatus'], 10, 3);
 		add_action('wp', [$this, 'bookingReply']);
-        // add_action('updated_post_meta', [$this, 'storeUserTracking'], 10, 4 );
 	}
-
-
-    // used for tracking: stores date, user-data and room-data for each user that is checked-in
-    // storeUserTracking() must be called on change of 
-    // - rrze-rsvp-booking-seat (=> includes ROOM) 
-    // - rrze-rsvp-booking-start
-    // - rrze-rsvp-booking-end
-    // - rrze-rsvp-booking-status
-    public function storeUserTracking($meta_id, $object_id, $meta_key, $_meta_value) {
-        $aMetaKeys = [
-            'rrze-rsvp-booking-status',
-            'rrze-rsvp-booking-seat',
-            'rrze-rsvp-booking-start',
-            'rrze-rsvp-booking-end'
-        ];
-        if (!in_array($meta_key, $aMetaKeys)) {
-            return;
-        }else{
-            if ($meta_key == 'rrze-rsvp-booking-status'){
-                $status = $_meta_value;
-            }else{
-                $status = get_post_meta($room_post_id, 'rrze-rsvp-room-status', true);
-            }
-        }
-
-        if ($status == 'checked-in'){
-                // get user data
-                $aBookingData = Functions::getBooking($object_id);
-                $room_post_id = $aBookingData['room'];
-                $room_name = get_the_title($room_post_id);
-                $room_street = get_post_meta($room_post_id, 'rrze-rsvp-room-street', true);
-                $room_zip = get_post_meta($room_post_id, 'rrze-rsvp-room-zip', true);
-                $room_city = get_post_meta($room_post_id, 'rrze-rsvp-room-city', true);
-
-                // add an entry for each day as we are searching for 1.date-span then if 2.user is given to find 3.room to return all users in room 
-                // 2DO: find out how to fix "carbon Uncaught InvalidArgumentException: Unexpected data found." which occurs 
-                // even in example Carbon::create('2020-11-29')->daysUntil('2020-12-24')->forEach(function (Carbon $date) {echo $date->diffInDays('2020-12-25')." days before Christmas!\n";});
-                $start = Carbon::createFromTimestamp($aBookingData['start'])->format('Y-m-d');
-                $end = Carbon::createFromTimestamp($aBookingData['end'])->format('Y-m-d');
-                Carbon::create($start)->daysUntil($end)->forEach(function ($date) {
-                    $newData[$thisDate][] = [
-                        'guest_email' => strtolower($aBookingData['guest_email']),
-                        'guest_phone' => $aBookingData['guest_phone'],
-                        'guest_name' => $aBookingData['guest_firstname'] . ' ' . $aBookingData['guest_lastname'],
-                        'room_post_id' => $room_post_id, // because $room_name is not unique
-                        'room_name' => $room_name,
-                        'room_street' => $room_street,
-                        'room_zip' => $room_zip,
-                        'room_city' => $room_city,
-                    ];
-                });
-                
-                $preData = get_site_option('usertracking');
-                $newData = ( $preData ? array_merge($preData, $newData) : $newData );
-                update_site_option('usertracking', $newData);
-
-                // $test = get_site_option('usertracking');
-                // echo "<script>console.log('BK test = " . json_encode($test) . "' );</script>";
-            }
-    }
     
 	public function ajaxBookingAction()
 	{
