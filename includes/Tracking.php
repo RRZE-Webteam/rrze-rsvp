@@ -116,6 +116,7 @@ class Tracking
 
     public static function getDbTableName()
     {
-        return static::DB_TABLE;
+        global $wpdb;
+        return $wpdb->base_prefix . static::DB_TABLE;
     }
 }
