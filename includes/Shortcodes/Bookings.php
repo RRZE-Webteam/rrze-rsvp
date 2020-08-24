@@ -57,7 +57,7 @@ class Bookings extends Shortcodes {
     public function maybeAuthenticate()
     {
         global $post;
-        if (!is_a($post, '\WP_Post') || !is_page()) {
+        if (!is_a($post, '\WP_Post') || !is_page() || isset($_GET['require-sso-auth'])) {
             return;
         }
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
@@ -67,7 +67,7 @@ class Bookings extends Shortcodes {
                 && ($roomId = absint($_GET['room_id']))
                 && (get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true) == 'on'))
         ) {
-            $this->sso = $this->idm->tryLogIn(true);
+            $this->sso = $this->idm->tryLogIn();
         }     
     }
 
