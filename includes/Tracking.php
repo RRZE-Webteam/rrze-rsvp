@@ -130,8 +130,17 @@ class Tracking
 
             // 2DO separate Methode für CSV falls andere Formate gefordert werden & Layout-Trennung 
 
+            // cool wäre aber 
 
+            // SELECT * INTO OUTFILE "c:/mydata.csv"
+            // FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+            // LINES TERMINATED BY "\n"
+            // FROM my_table;
             
+            // oder 
+            // INTO DUMPFILE 'file_name'
+
+            // https://dev.mysql.com/doc/refman/8.0/en/select.html
         }
     }
 
