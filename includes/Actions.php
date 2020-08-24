@@ -4,8 +4,6 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Carbon;
-
 class Actions
 {
 	protected $email;
