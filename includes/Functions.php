@@ -29,35 +29,17 @@ class Functions
         return self::validateDate($date, $format);
     }
 
+    // phone must be at least 10 figures
+    public static function validatePhone(string $phone): bool
+    {
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        return (strlen($phone) > 9);
+    }
+
     public static function isLocaleEnglish()
     {
         $locale = get_locale();
         return (strpos($locale, 'en_') === 0);
-    }
-
-    public static function hasShortcodeSSO(string $shortcode): bool
-    {
-        global $post;
-        if (is_a($post, '\WP_Post') && has_shortcode($post->post_content, $shortcode)) {
-            $result = [];
-            $pattern = get_shortcode_regex();
-            if (preg_match_all('/' . $pattern . '/s', $post->post_content, $matches)) {
-                $keys = [];
-                $result = [];
-                foreach ($matches[0] as $key => $value) {
-                    $get = str_replace(" ", "&", $matches[3][$key]);
-                    parse_str($get, $output);
-                    $keys = array_unique(array_merge($keys, array_keys($output)));
-                    $result[][$matches[2][$key]] = $output;
-                }
-            }
-            foreach ($result as $key => $value) {
-                if (isset($value[$shortcode]) && !empty($value[$shortcode]['sso'])) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**
@@ -79,18 +61,18 @@ class Functions
         $aRoomAvailability = self::getRoomAvailability($room_id, $start, $end);
 
         if (!$aRoomAvailability){
-            return sprintf(__('This room has no available seat within %u days.', 'rrze-rsvp'), $duration);
+            return '<span class="rrze-rsvp-occupancy-title">' . sprintf(__('This room has no available seat within %u days.', 'rrze-rsvp'), $duration) . '</span>';
         }
 
         if (isset($aRoomAvailability[$today])){
             // we have a seat for today
-            $output = '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
+            $output = '<span class="rrze-rsvp-occupancy-title">' . __('Room occupancy for today', 'rrze-rsvp') . '</span>';
             $output .= self::getOccupancyByRoomIdHTML($room_id, true);
         } else {
             // return the next available timeslots
             $nextAvailableDay = array_key_first($aRoomAvailability);
             $countSeats = count(array_values($aRoomAvailability[$nextAvailableDay])[0]);
-            $output = '<h3>' . __('This room has no available seat for today.', 'rrze-rsvp') . ' ' . _n('The next available seat is on', 'The next available seats are on', $countSeats, 'rrze-rsvp') . ' ' . self::dateFormat(strtotime($nextAvailableDay)) . '.</h3>';
+            $output = '<span class="rrze-rsvp-occupancy-title">' . __('This room has no available seat for today.', 'rrze-rsvp') . ' ' . _n('The next available seat is on', 'The next available seats are on', $countSeats, 'rrze-rsvp') . ' ' . self::dateFormat(strtotime($nextAvailableDay)) . '</span>';
             $output .= self::getOccupancyByRoomIdHTML($room_id, true, strtotime($nextAvailableDay) );
         }
         return $output;
@@ -351,6 +333,9 @@ class Functions
 
         $data['room'] = get_post_meta($data['seat'], 'rrze-rsvp-seat-room', true);
         $data['room_name'] = get_the_title($data['room']);
+        $data['room_street'] = get_post_meta($data['room'], 'rrze-rsvp-room-street', true);
+        $data['room_zip'] = get_post_meta($data['room'], 'rrze-rsvp-room-street', true);
+        $data['room_city'] = get_post_meta($data['room'], 'rrze-rsvp-room-scity', true);
 
         $data['notes'] = get_post_meta($post->ID, 'rrze-rsvp-booking-notes', true);
 
@@ -364,10 +349,9 @@ class Functions
 
     public static function bookingReplyUrl(string $action, string $password, int $id): string
     {
-        //$hash = password_hash($password, PASSWORD_DEFAULT);
         $hash = self::crypt($password);
-        return get_site_url() . "/?rrze-rsvp-booking-reply=" . $hash . "&id=" . $id . "&action=" . $action;
-    }
+        return get_site_url() . "/rsvp-booking/?booking-reply=" . $hash . "&id=" . $id . "&action=" . $action;
+    }    
 
     public static function crypt(string $string, string $action = 'encrypt')
     {
@@ -698,5 +682,79 @@ class Functions
             }
         }
         return null;
-    }    
+    }  
+    
+
+    public static function searchArrayByKey(array $aInput, string $key, string $value): array
+    {
+        $aResults = [];
+        foreach ($aInput as $row) {
+            if ($row[$field] == $value){
+                $aResults[] = $row;
+            }
+        }
+        return $aResults;
+    }
+
+
+    // used for tracking to find users
+    public static function createCSV(array $aInput): string
+    {
+
+    }
+
+    // used for tracking to find users 
+    public function getUsersInRoomAtDate(string $startdate, string $enddate, string $guest_email = '', string $guest_name = ''): array
+    {
+        if (!$guest_email && !$guest_name){
+            // we have nothing to search for
+            return [];
+        }
+
+        $data = get_site_option('usertracking');
+        $aSearch = [];
+
+        // $newData[$thisDate][] = [
+        //     'guest_email' => strtolower($aBookingData['guest_email']),
+        //     'guest_phone' => $aBookingData['guest_phone'],
+        //     'guest_name' => $aBookingData['guest_firstname'] . ' ' . $aBookingData['guest_lastname'],
+        //     'room_post_id' => $room_post_id, // because $room_name is not unique
+        //     'room_name' => $room_name,
+        //     'room_street' => $room_street,
+        //     'room_zip' => $room_zip,
+        //     'room_city' => $room_city,
+        // ];
+
+        Carbon::create($startdate)->daysUntil($enddate)->forEach(function ($date) {
+            $aSearch[] = $data[$date];
+        });
+
+        if(!$aSearch){
+            // no data in given date-span
+            return [];
+        }
+
+        $aMatches = [];
+        if ($guest_email){
+            $aMatches = self::searchArrayByKey($aSearch, 'guest_email', $guest_email);
+        }
+        if (!$aMatches && $user_name){
+            // either $guest_email was not given or not found
+            $aMatches = self::searchArrayByKey($aSearch, 'guest_name', $user_name);
+        }
+
+        $aRooms = [];
+        if (!$aMatches){
+            // we didn't find guest 
+        }
+
+        $aOtherUsers = [];
+        foreach($aMatches['room_post_id'] as $room_post_id){
+            // get all users that where in the same rooms
+            $aOtherUsers[] = self::searchArrayByKey($aSearch, 'room_post_id', $room_post_id);
+        }
+
+        // return data of guest-needle + guests in these rooms within the given date-span
+        return array_merge($aMatches, $aOtherUsers);
+    }
 }

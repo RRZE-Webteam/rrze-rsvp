@@ -60,7 +60,7 @@ class Rooms
             'label' => __('Room', 'rrze-rsvp'),
             'description' => __('Add and edit room informations', 'rrze-rsvp'),
             'labels' => $labels,
-            'supports' => ['title', 'editor', 'revisions', 'author', 'excerpt', 'thumbnail'],
+            'supports' => ['title', 'editor', 'revisions', 'author', 'thumbnail'],
             'hierarchical'                 => false,
             'public'                     => true,
             'show_ui'                     => true,

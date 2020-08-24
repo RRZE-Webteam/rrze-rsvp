@@ -53,14 +53,6 @@ class Email
             'alt_message' => $altMessage
         ];
 
-        if (has_header_image()) {
-            $data['header_image'] = get_header_image();
-            $data['image_width'] = get_custom_header()->width;
-            $data['image_height'] = get_custom_header()->height;
-        }
-
-        $data['site_name'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
-
         $body = $this->template->getContent('email/email-body', $data);
         $altBody = $this->template->getContent('email/email-body.txt', $data);
 
@@ -69,7 +61,7 @@ class Email
             'Content-Transfer-Encoding: 8bit'
         ];
 
-        add_action('phpmailer_init', function ($phpmailer) use ($altBody)  {
+        add_action('phpmailer_init', function ($phpmailer) use ($altBody) {
             $phpmailer->AltBody = $altBody;
         });
 
@@ -128,9 +120,12 @@ class Email
         $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
         $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
         $confirmUrl = Functions::bookingReplyUrl('confirm', sprintf('%s-%s', $bookingId, $booking['start']), $bookingId);
-        $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s%-s', $bookingId, $booking['start']), $bookingId);
+        $cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s', $bookingId, $booking['start']), $bookingId);
 
         $data = [];
+        $data['header_image'] = has_header_image() ? get_header_image() : false;
+
+        $data['subject'] = $subject;
         $data['text'] = __('You received a new request for a booking.', 'rrze-rsvp');
         $data['date'] = $booking['date'];
         $data['time'] = $booking['time'];
@@ -138,10 +133,17 @@ class Email
         $data['seat_name'] = $booking['seat_name'];
         $data['customer']['name'] = $customerName;
         $data['customer']['email'] = $customerEmail;
+        // Confirm booking
         $data['confirm_url'] = $confirmUrl;
-        $data['confirm_link_text'] = __('Confirm Booking', 'rrze-rsvp');
+        $data['confirm_btn'] = _x('Confirm', 'Booking', 'rrze-rsvp');
+        $data['alt_confirm_text'] = __('Confirm the booking.', 'rrze-rsvp');
+        // Cancel booking
         $data['cancel_url'] = $cancelUrl;
-        $data['cancel_link_text'] = __('Cancel Booking', 'rrze-rsvp');
+        $data['cancel_btn'] = _x('Cancel', 'Booking', 'rrze-rsvp');
+        $data['alt_cancel_text'] = __('Cancel the booking.', 'rrze-rsvp');
+        // Site URL
+        $data['site_url'] = site_url();
+        $data['site_name'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
 
         $message = $this->template->getContent('email/booking-requested-admin', $data);
         $altMessage = $this->template->getContent('email/booking-requested-admin.txt', $data);
@@ -171,6 +173,9 @@ class Email
         $text = __('A booking has been cancelled by the customer.', 'rrze-rsvp');
 
         $data = [];
+        $data['header_image'] = has_header_image() ? get_header_image() : false;
+
+        $data['subject'] = $subject;
         $data['text'] = $this->placeholderParser($text, $booking);
         $data['date'] = $booking['date'];
         $data['time'] = $booking['time'];
@@ -178,6 +183,9 @@ class Email
         $data['seat_name'] = $booking['seat_name'];
         $data['customer']['name'] = $customerName;
         $data['customer']['email'] = $customerEmail;
+        // Site URL
+        $data['site_url'] = site_url();
+        $data['site_name'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
 
         $message = $this->template->getContent('email/booking-cancelled-admin', $data);
         $altMessage = $this->template->getContent('email/booking-cancelled-admin.txt', $data);
@@ -225,6 +233,8 @@ class Email
         $data = [];
         // Is locale not english?
         $data['is_locale_not_english'] = !$this->isLocaleEnglish ? true : false;
+        // Header Image
+        $data['header_image'] = has_header_image() ? get_header_image() : false;
         // Force to confirm
         $data['force_to_confirm'] = $forceToConfirm ? true : false;
 
@@ -240,20 +250,24 @@ class Email
         $data['seat_name'] = $booking['seat_name'];
 
         // Confirm booking
-        $data['confirm_booking_url'] = $confirmUrl;
-        $data['confirm_booking'] = sprintf(__('Please <a href="%s">confirm your booking now</a>.', 'rrze-rsvp'), $confirmUrl);
-        $data['confirm_booking_en'] = sprintf('Please <a href="%s">confirm your booking now</a>.', $confirmUrl);
-        $data['alt_confirm_booking'] = __('Please confirm your booking now.', 'rrze-rsvp');
-        $data['alt_confirm_booking_en'] = 'Please confirm your booking now.';
+        $data['confirm_url'] = $confirmUrl;
+        $data['confirm_btn'] = _x('Confirm', 'Booking', 'rrze-rsvp');
+        $data['confirm_btn_en'] = 'Confirm';
+        $data['confirm_text'] = __('Please confirm your booking now.', 'rrze-rsvp');
+        $data['confirm_text_en'] = 'Please confirm your booking now.';
+        $data['alt_confirm_text'] = __('Please confirm your booking now.', 'rrze-rsvp');
+        $data['alt_confirm_text_en'] = 'Please confirm your booking now.';
         // Cancel booking
-        $data['cancel_booking_url'] = $cancelUrl;
-        $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rrze-rsvp'), $cancelUrl);
-        $data['cancel_booking_en'] = sprintf('Please <a href="%s">cancel your booking</a> in time if your plans change.', $cancelUrl);
-        $data['alt_cancel_booking'] = __('Please cancel your booking in time if your plans change.', 'rrze-rsvp');
-        $data['alt_cancel_booking_en'] = 'Please cancel your booking in time if your plans change.';
+        $data['cancel_url'] = $cancelUrl;
+        $data['cancel_btn'] = _x('Cancel', 'Booking', 'rrze-rsvp');
+        $data['cancel_btn_en'] = 'Cancel';
+        $data['cancel_text'] = __('Please cancel your booking in time if your plans change.', 'rrze-rsvp');
+        $data['cancel_text_en'] = 'Please cancel your booking in time if your plans change.';
+        $data['alt_cancel_text'] = __('Please cancel your booking in time if your plans change.', 'rrze-rsvp');
+        $data['alt_cancel_text_en'] = 'Please cancel your booking in time if your plans change.';
         // Site URL
         $data['site_url'] = site_url();
-        $data['site_url_text'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
+        $data['site_name'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
 
         $message = $this->template->getContent('email/booking-requested-customer', $data);
         $altMessage = $this->template->getContent('email/booking-requested-customer.txt', $data);
@@ -290,6 +304,8 @@ class Email
         // Is locale not english?
         $data['is_locale_not_english'] = !$this->isLocaleEnglish ? true : false;
 
+        $data['header_image'] = has_header_image() ? get_header_image() : false;
+
         $data['subject'] = $subject;
         $data['subject_en'] = $subjectEnglish;
         $data['text'] = $this->placeholderParser($text, $booking);
@@ -301,26 +317,32 @@ class Email
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
         // Check in booking
-        $data['checkin_booking_url'] = $checkInUrl;
-        $data['checkin_booking'] = sprintf(__('Please <a href="%s">check-in your booking</a> on site.', 'rrze-rsvp'), $checkInUrl);
-        $data['checkin_booking_en'] = sprintf('Please <a href="%s">check-in your booking</a> on site.', $checkInUrl);
-        $data['alt_checkin_booking'] = __('Please check-in your booking on site.', 'rrze-rsvp');
-        $data['alt_checkin_booking_en'] = 'Please check-in your booking on site.';
+        $data['checkin_url'] = $checkInUrl;
+        $data['checkin_btn'] = __('Check In', 'rrze-rsvp');
+        $data['checkin_btn_en'] = 'Check In';
+        $data['checkin_text'] = __('Please check-in your booking on site.', 'rrze-rsvp');
+        $data['checkin_text_en'] = 'Please check-in your booking on site.';
+        $data['alt_checkin_text'] = __('Please check-in your booking on site.', 'rrze-rsvp');
+        $data['alt_checkin_text_en'] = 'Please check-in your booking on site.';
         // Check out booking
-        $data['checkout_booking_url'] = $checkOutUrl;
-        $data['checkout_booking'] = sprintf(__('Please <a href="%s">check out</a> when you leave the site.', 'rrze-rsvp'), $checkOutUrl);
-        $data['checkout_booking_en'] = sprintf('Please <a href="%s">check out</a> when you leave the site.', $checkOutUrl);
-        $data['alt_checkout_booking'] = __('Please check out when you leave the site.', 'rrze-rsvp');
-        $data['alt_checkout_booking_en'] = 'Please check out when you leave the site.';
+        $data['checkout_url'] = $checkOutUrl;
+        $data['checkout_btn'] = __('Check Out', 'rrze-rsvp');
+        $data['checkout_btn_en'] = 'Check Out';
+        $data['checkout_text'] = __('Please check out when you leave the site.', 'rrze-rsvp');
+        $data['checkout_text_en'] = 'Please check out when you leave the site.';
+        $data['alt_checkout_text'] = __('Please check out when you leave the site.', 'rrze-rsvp');
+        $data['alt_checkout_text_en'] = 'Please check out when you leave the site.';
         // Cancel booking
-        $data['cancel_booking_url'] = $cancelUrl;
-        $data['cancel_booking'] = sprintf(__('Please <a href="%s">cancel your booking</a> in time if your plans change.', 'rrze-rsvp'), $cancelUrl);
-        $data['cancel_booking_en'] = sprintf('Please <a href="%s">cancel your booking</a> in time if your plans change.', $cancelUrl);
-        $data['alt_cancel_booking'] = __('Please cancel your booking in time if your plans change.', 'rrze-rsvp');
-        $data['alt_cancel_booking_en'] = 'Please cancel your booking in time if your plans change.';        
+        $data['cancel_url'] = $cancelUrl;
+        $data['cancel_btn'] = _x('Cancel', 'Booking', 'rrze-rsvp');
+        $data['cancel_btn_en'] = 'Cancel';
+        $data['cancel_text'] = __('Please cancel your booking in time if your plans change.', 'rrze-rsvp');
+        $data['cancel_text_en'] = 'Please cancel your booking in time if your plans change.';
+        $data['alt_cancel_text'] = __('Please cancel your booking in time if your plans change.', 'rrze-rsvp');
+        $data['alt_cancel_text_en'] = 'Please cancel your booking in time if your plans change.';
         // Site URL
         $data['site_url'] = site_url();
-        $data['site_url_text'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
+        $data['site_name'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
 
         $message = $this->template->getContent('email/booking-confirmed-customer', $data);
         $altMessage = $this->template->getContent('email/booking-confirmed-customer.txt', $data);
@@ -355,7 +377,11 @@ class Email
         $textEnglish = $this->options->email_cancel_text_en;
 
         $data = [];
+        // Is locale not english?
         $data['is_locale_not_english'] = !$this->isLocaleEnglish ? true : false;
+
+        $data['header_image'] = has_header_image() ? get_header_image() : false;
+
         $data['subject'] = $subject;
         $data['subject_en'] = $subjectEnglish;
         $data['text'] = $this->placeholderParser($text, $booking);
@@ -366,8 +392,9 @@ class Email
         $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
+        // Site URL
         $data['site_url'] = site_url();
-        $data['site_url_text'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
+        $data['site_name'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
 
         $message = $this->template->getContent('email/booking-cancelled-customer', $data);
         $altMessage = $this->template->getContent('email/booking-cancelled-customer.txt', $data);

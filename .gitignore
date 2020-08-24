@@ -15,3 +15,6 @@ assets/img/.DS_Store
 *.po~
 includes/templates/.DS_Store
 src/js/.DS_Store
+package.json
+*.DS_Store
+*.pot~

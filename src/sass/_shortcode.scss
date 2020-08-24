@@ -154,6 +154,19 @@
     .rsvp-seat-container {
         margin-bottom: 1em;
     }
+    input#rsvp_dsgvo {
+        display: block;
+        float: left;
+        margin-right: 10px;
+    }
+    label[for="rsvp_dsgvo"] {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 20px;
+        padding-top: 2px;
+        line-height: 1.3;
+        hyphens: auto
+    }
 }
 
 .alert {

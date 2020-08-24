@@ -27,7 +27,8 @@ class Main
 	}
 
 	public function onLoaded()
-	{
+	{	
+		// Settings
 		$settings = new Settings($this->pluginFile);
 		$settings->onLoaded();
 
@@ -39,14 +40,15 @@ class Main
 		$metaboxes = new Metaboxes;
 		$metaboxes->onLoaded();
 
+		// Tracking
+		//$tracking = new Tracking;
+		//$tracking->onLoaded();
+
 		$actions = new Actions;
 		$actions->onLoaded();
 
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();
-
-		$bookingForm = new BookingForm;
-		$bookingForm->onLoaded();
 
 		$printing = new Printing;
 		$printing->onLoaded();
@@ -59,6 +61,9 @@ class Main
 
 		$tools = new Tools;
 		$tools->onLoaded();
+
+		$formPage = new FormPage('rsvp-booking', '[rsvp-booking]');
+		$formPage->onLoaded();
 
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
 		add_action('wp_enqueue_scripts', [$this, 'wpEnqueueScripts']);
@@ -104,20 +109,35 @@ class Main
 			'text_cancelled' => _x('Cancelled', 'Booking', 'rrze-rsvp'),
 			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
 			'ajaxurl' => admin_url('admin-ajax.php'),
-            // Strings für CPT Booking Backend
-            'alert_no_seat_date' => __('Please select a seat and a date first.', 'rrze-rsvp')
+			// Strings für CPT Booking Backend
+			'alert_no_seat_date' => __('Please select a seat and a date first.', 'rrze-rsvp')
 		));
-	}
+
+        if ($post_type == 'seat'){
+            wp_enqueue_script(
+                'rrze-rsvp-seat',
+                plugins_url('assets/js/rrze-rsvp-seat.js', plugin()->getBasename()),
+                ['jquery'],
+                plugin()->getVersion()
+            );
+
+            wp_localize_script( 'rrze-rsvp-seat', 'button_label', __('Create Seats', 'rrze-rsvp'));
+        }
+    }
 
 	public function wpEnqueueScripts()
 	{
 		wp_register_style(
 			'rrze-rsvp-shortcode',
-			plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename())
+			plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename()),
+			[],
+			plugin()->getVersion()
 		);
 		wp_register_script(
 			'rrze-rsvp-shortcode',
-			plugins_url('assets/js/shortcode.js', plugin()->getBasename())
+			plugins_url('assets/js/shortcode.js', plugin()->getBasename()),
+			['jquery'],
+			plugin()->getVersion()
 		);
 	}
 }

@@ -40,12 +40,26 @@ function getConstants() {
 
     
  function  defaultOptions()  {
+
+    $sender_name = '';
+    $notification_email = '';
+    $sender_email = '';
+
+    $blogAdminUsers = get_users( 'role=Administrator' );
+    if ($blogAdminUsers){
+        $sender_name = $blogAdminUsers[0]->display_name;
+        $sender_email = $blogAdminUsers[0]->user_email;
+        $notification_email = $blogAdminUsers[0]->user_email;
+    }
+
         return [
-            'notification_email' => '',
-            'notification_if_new' => 1,
-            'notification_if_cancel' => 1,
-            'sender_name' => '',
-            'sender_email' => '',
+            'booking_page_title' => __('RSVP Booking', 'rrze-rsvp'),
+            'single_room_availability_table' => 'yes_link',
+            'notification_email' => $notification_email,
+            'notification_if_new' => 'yes',
+            'notification_if_cancel' => 'yes',
+            'sender_name' => $sender_name,
+            'sender_email' => $sender_email,
             'received_subject' => __('Thank you for booking', 'rrze-rsvp'),
             'received_subject_en' => 'Thank you for booking',
             'received_text' => __('We received your booking and we will notify you once it has been confirmed.', 'rrze-rsvp'),
@@ -62,7 +76,6 @@ function getConstants() {
             'cancel_subject_en' => 'Your booking has been cancelled',
             'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp'),
             'cancel_text_en' => 'Unfortunately we have to cancel your booking on {{date_en}} at {{time_en}}.',
-            'single_room_availability_table' => 'yes_link',
             'fau_logo' => 'on',
             'website_logo' => 'off',
             'website_url' => 'on',
@@ -203,17 +216,18 @@ function getFields(){
  */
         'general' => [
             [
-                'name'    => 'booking_page',
-                'label'   => __('Booking Page', 'rrze-rsvp'),
-                'desc'    => __('Select the page that contains your booking form shortcode. You can find a shortcode hint on each room edit page.', 'rrze-rsvp'),
-                'type'    => 'select',
-                'options' => Functions::getPagesDropdownOptions(['show_option_none'=> '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;']),
+                'name'    => 'booking_page_title',
+                'label'   => __('Booking Page Title', 'rrze-rsvp'),
+                'desc'    => __('Enter the title of the default booking form page.', 'rrze-rsvp'),
+                'type'    => 'text',
+                'default' =>  $defaults['booking_page_title'],
+                'sanitize_callback' => 'sanitize_text_field'                
             ],
             [
                 'name'    => 'single_room_availability_table',
                 'label'   => __('Show Availability table on Room page.', 'rrze-rsvp'),
-                'desc'    => __('If \'Yes (with link)\' you need to specify the booking page (see above).', 'rrze-rsvp'),
                 'type'    => 'radio',
+                'default' => $defaults['single_room_availability_table'],
                 'options' => [
                     'yes_link' => __('Yes (with seats linked to booking form)', 'rrze-rsvp'),
                     'yes' => __('Yes (no link)', 'rrze-rsvp'),
@@ -474,14 +488,14 @@ function getShortcodeSettings(){
             'block' => [
                 'blocktype' => 'rrze-rsvp/rsvp-booking', // dieser Wert muss angepasst werden
                 'blockname' => 'rsvp_booking', // dieser Wert muss angepasst werden
-                'title' => 'RSVP Booking', // Der Titel, der in der Blockauswahl im Gutenberg Editor angezeigt wird
+                'title' => __('RSVP Booking', 'rrze-rsvp'), // Der Titel, der in der Blockauswahl im Gutenberg Editor angezeigt wird
                 'category' => 'widgets', // Die Kategorie, in der der Block im Gutenberg Editor angezeigt wird
                 'icon' => 'admin-users',  // Das Icon des Blocks
                 'show_block' => 'content', // 'right' or 'content' : Anzeige des Blocks im Content-Bereich oder in der rechten Spalte
                 'message' => __( 'Find the settings on the right side', 'rrze-rsvp' ) // erscheint bei Auswahl des Blocks, wenn "show_block" auf 'right' gesetzt ist
             ],
             'days' => [
-                'default' => 14,
+                'default' => '',
                 'field_type' => 'text', // Art des Feldes im Gutenberg Editor
                 'label' => __( 'Days in advance', 'rrze-rsvp' ),
                 'type' => 'number' // Variablentyp der Eingabe
@@ -498,28 +512,12 @@ function getShortcodeSettings(){
                 'type' => 'boolean',
                 'default'   => false
             ],
-//            'multiple' => [
-//                'field_type' => 'toggle',
-//                'label' => __( 'Multiple choice available', 'rrze-rsvp' ),
-//                'type' => 'boolean',
-//                'default'   => false // Vorauswahl: ausgewählt
-//            ],
-//            'date-select' => [
-//                'values' => [
-//                    'calendar' => __( 'Kalender', 'rrze-rsvp' ),
-//                    'boxes' => __( 'Boxen', 'rrze-rsvp' )
-//                ],
-//                'default' => 'calendar', // vorausgewählter Wert: Achtung: string, kein array!
-//                'field_type' => 'select',
-//                'label' => __( 'Datumsauswahl', 'rrze-rsvp' ),
-//                'type' => 'string' // Variablentyp des auswählbaren Werts
-//            ],
         ],
         'rsvp-availability' => [
             'block' => [
                 'blocktype' => 'rrze-rsvp/rsvp-availability', // dieser Wert muss angepasst werden
                 'blockname' => 'rsvp-availability', // dieser Wert muss angepasst werden
-                'title' => 'RSVP Availability', // Der Titel, der in der Blockauswahl im Gutenberg Editor angezeigt wird
+                'title' => __('RSVP Availability', 'rrze-rsvp'), // Der Titel, der in der Blockauswahl im Gutenberg Editor angezeigt wird
                 'category' => 'widgets', // Die Kategorie, in der der Block im Gutenberg Editor angezeigt wird
                 'icon' => 'admin-users',  // Das Icon des Blocks
                 'show_block' => 'content', // 'right' or 'content' : Anzeige des Blocks im Content-Bereich oder in der rechten Spalte

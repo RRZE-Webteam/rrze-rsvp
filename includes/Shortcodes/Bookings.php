@@ -39,25 +39,42 @@ class Bookings extends Shortcodes {
 
     public function onLoaded()
     {
-        add_action('template_redirect', [$this, 'ssoLogin']);
+        global $post;
+        if (is_a($post, '\WP_Post') && is_page()) {
+            add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
+        }
+        add_action('template_redirect', [$this, 'maybeAuthenticate']);
         add_action('template_redirect', [$this, 'bookingSubmitted']);
-        add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
+
         add_action( 'wp_ajax_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
         add_action( 'wp_ajax_nopriv_UpdateCalendar', [$this, 'ajaxUpdateCalendar'] );
         add_action( 'wp_ajax_UpdateForm', [$this, 'ajaxUpdateForm'] );
         add_action( 'wp_ajax_nopriv_UpdateForm', [$this, 'ajaxUpdateForm'] );
         add_action( 'wp_ajax_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );
-        add_action( 'wp_ajax_nopriv_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );
+        add_action( 'wp_ajax_nopriv_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );     
     }
 
-    public function ssoLogin()
+    public function maybeAuthenticate()
     {
-        if (is_page() && Functions::hasShortcodeSSO('rsvp-booking')) {
-            $this->sso = $this->idm->tryLogIn(true);
+        global $post;
+        if (!is_a($post, '\WP_Post') || !is_page()) {
+            return;
         }
+        add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
+        if ($this->hasShortcodeSSO($post->post_content, 'rsvp-booking')
+            || ($post->ID < 0
+                && isset($_GET['room_id'])
+                && ($roomId = absint($_GET['room_id']))
+                && (get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true) == 'on'))
+        ) {
+            $this->sso = $this->idm->tryLogIn(true);
+        }     
     }
 
-    public function shortcodeBooking($atts, $content = '', $tag) {
+    public function shortcodeBooking($atts, $content = '', $tag) { 
+        global $post;
+        $isFormPage = ($post->ID < 0);
+
         wp_enqueue_style('rrze-rsvp-shortcode');
 
         if ($output = $this->ssoAuthenticationError()) {
@@ -75,24 +92,14 @@ class Bookings extends Shortcodes {
         if ($output = $this->seatUnavailableError()) {
             return $output;
         }        
+        if ($output = $this->timeslotUnavailableError()) {
+            return $output;
+        }
         if ($output = $this->bookedNotice()) {
             return $output;
         }
 
         $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
-
-        wp_enqueue_script('rrze-rsvp-shortcode');
-        wp_localize_script('rrze-rsvp-shortcode', 'rsvp_ajax', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce( 'rsvp-ajax-nonce' ),
-        ]);
-                
-        $output = '';
-        $sso = ($shortcode_atts[ 'sso' ] == 'true');        
-        if ($sso == true && $this->sso == false)
-            return '<div class="alert alert-warning" role="alert">' . sprintf('%sSSO not available.%s Please activate SSO authentication or remove the SSO attribute from your shortcode.', '<strong>', '</strong><br />') . '</div>';
-
-        $days       = (int)$shortcode_atts[ 'days' ];
         $input_room = sanitize_title($shortcode_atts[ 'room' ]);
         if (is_numeric($input_room)) {
             $post_room = get_post($input_room);
@@ -101,41 +108,59 @@ class Bookings extends Shortcodes {
             }
         }
 
+        if ($output = $this->selectRoom($input_room)) {
+            return $output;
+        }
+
+        wp_enqueue_script('rrze-rsvp-shortcode');
+        wp_localize_script('rrze-rsvp-shortcode', 'rsvp_ajax', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce( 'rsvp-ajax-nonce' ),
+        ]);
+                
+        $output = '';
+
+        $roomID = isset($_GET[ 'room_id' ]) ? absint($_GET[ 'room_id' ]) : $input_room;
+        $roomMeta = get_post_meta($roomID);
+        $days = $shortcode_atts[ 'days' ] != '' ? (int)$shortcode_atts[ 'days' ] : $roomMeta['rrze-rsvp-room-days-in-advance'][0];
+        $comment = (isset($roomMeta['rrze-rsvp-room-notes-check']) && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on');
+        
+        if ($isFormPage) {
+            $ssoRequired = (get_post_meta($roomID, 'rrze-rsvp-room-sso-required', true) == 'on');
+        } else {
+            $ssoRequired = ($shortcode_atts['sso'] == 'true');
+        }
+
+        if ($ssoRequired && !$this->sso) {
+            return '<div class="alert alert-warning" role="alert">' . sprintf('%sSSO not available.%s Please activate SSO authentication or remove the SSO attribute from your shortcode.', '<strong>', '</strong><br />') . '</div>';
+        }
+
         $get_date = isset($_GET[ 'bookingdate' ]) ? sanitize_text_field($_GET[ 'bookingdate' ]) : date('Y-m-d', current_time('timestamp'));
         $get_time = isset($_GET[ 'timeslot' ]) ? sanitize_text_field($_GET[ 'timeslot' ]) : false;
-        $get_room = isset($_GET[ 'room_id' ]) ? absint($_GET[ 'room_id' ]) : $input_room;
         $get_seat = isset($_GET[ 'seat_id' ]) ? absint($_GET[ 'seat_id' ]) : false;
         $get_instant = (isset($_GET[ 'instant' ]) && $_GET[ 'instant' ] == '1');
 
         $availability = Functions::getRoomAvailability(
-            $get_room,
+            $roomID,
             $get_date,
             date('Y-m-d', strtotime($get_date . ' +1 days')),
             false
         );
 
-        $room = $get_room;
-        $comment = (get_post_meta($room, 'rrze-rsvp-room-notes-check', true) == 'on');
-
-        if (isset($post_room)) {
-            $today  = date('Y-m-d', current_time('timestamp'));
-            $endday = date('Y-m-d', strtotime($today . ' + ' . $days . ' days'));
-        }
-
         $output .= '<div class="rrze-rsvp">';
-        $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room">'
+        $output .= '<form action="' . $this->getRequestLink() . '" method="post" id="rsvp_by_room">'
                     . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
 
         if ($get_instant) {
             $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
         }
 
-        $output .= '<p><input type="hidden" value="' . $room . '" id="rsvp_room">'
+        $output .= '<p><input type="hidden" value="' . $roomID . '" id="rsvp_room">'
                     . wp_nonce_field('post_nonce', 'rrze_rsvp_post_nonce_field')
-                    . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($room) . '</strong>'
+                    . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($roomID) . '</strong>'
                     . '</p>';
 
-        $output         .= '<div class="rsvp-datetime-container form-group clearfix"><legend>' . __(
+        $output .= '<div class="rsvp-datetime-container form-group clearfix"><legend>' . __(
                 'Select date and time',
                 'rrze-rsvp'
             ) . '</legend>'
@@ -146,14 +171,13 @@ class Bookings extends Shortcodes {
         $start          = date_create();
         $end            = date_create();
         date_modify($end, '+' . $days . ' days');
-        $output .= $this->buildCalendar($month, $year, $start, $end, $room, $get_date);
-//        $output .= $this->buildDateBoxes($days);
+        $output .= $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date);
         $output .= '</div>'; //.rsvp-date-container
 
         $output .= '<div class="rsvp-time-container">'
                     . '<h4>' . __('Available time slots:', 'rrze-rsvp') . '</h4>';
         if ($get_date) {
-            $output .= $this->buildTimeslotSelect($room, $get_date, $get_time, $availability);
+            $output .= $this->buildTimeslotSelect($roomID, $get_date, $get_time, $availability);
         } else {
             $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
         }
@@ -163,15 +187,19 @@ class Bookings extends Shortcodes {
 
         $output .= '<div class="rsvp-seat-container">';
         if ($get_date && $get_time) {
-            $output .= $this->buildSeatSelect($room, $get_date, $get_time, $get_seat, $availability);
+            $output .= $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability);
         } else {
             $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
         }
         $output .= '</div>'; //.rsvp-seat-container
 
         $output .= '<legend>' . __('Your data', 'rrze-rsvp') . '</legend>';
-        if ($sso) {
+        if ($ssoRequired) {
             $data = $this->idm->getCustomerData();
+            $output .= '<input type="hidden" value="' . $data['customer_lastname'] . '" id="rsvp_lastname" name="rsvp_lastname">';
+            $output .= '<input type="hidden" value="' . $data['customer_firstname'] . '" id="rsvp_firstname" name="rsvp_firstname">';
+            $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
+
             $output .= '<div class="form-group">'
                 . '<p>' . __('Last name', 'rrze-rsvp') . ': <strong>' . $data['customer_lastname'] . '</strong></p>'
                 . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
@@ -198,13 +226,13 @@ class Bookings extends Shortcodes {
 
         $output .= '<div class="form-group"><label for="rsvp_phone">'
             . __('Phone Number', 'rrze-rsvp') . ' *</label>'
-            . '<input type="tel" name="rsvp_phone" id="rsvp_phone" required aria-required="true">'
+            . '<input type="tel" name="rsvp_phone" pattern="^[0-9-+\s()]*$" id="rsvp_phone" required aria-required="true">'
             . '<p class="description">'
             . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
             . '</div>';
         $defaults = defaultOptions();
         if ($comment) {
-            $label = get_post_meta($room, 'rrze-rsvp-room-notes-label', true);
+            $label = $roomMeta['rrze-rsvp-room-notes-label'][0];
             if ($label == '') {
                 $label = $defaults['room-notes-label'];
             }
@@ -301,6 +329,53 @@ class Bookings extends Shortcodes {
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
+    protected function timeslotUnavailableError()
+    {
+        if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'timeslot_unavailable')) {
+            return '';
+        }
+
+        $url = $_GET['url'];
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return '';
+        }
+
+        $data = [];
+        $data['timeslot_unavailable_error'] = true;
+        $data['timeslot_in_past'] = __('Timeslot not available.', 'rrze-rsvp');
+        $data['message'] = __('<strong>The timeslot you selected lies in the past.</strong><br>Please try again.', 'rrze-rsvp');
+        $data['backlink'] = sprintf(__('<a href="%s">Back to booking form &rarr;</a>', 'rrze-rsvp'), $url);
+
+        return $this->template->getContent('shortcode/booking-error', $data);
+    }
+
+    protected function selectRoom($input_room = '')
+    {
+        $get_room = isset($_GET[ 'room_id' ]) ? absint($_GET[ 'room_id' ]) : '';
+        if ($input_room != '' || $get_room != '') {
+            return '';
+        }
+        $selectRoom = '';
+        $rooms = get_posts([
+            'post_type' => 'room',
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'orderby' => 'title',
+            'order' => 'ASC',
+        ]);
+
+        $selectRoom .= '<form action="' . $this->getRequestLink() . '" method="get" id="rsvp_select_room">';
+        $selectRoom .= '<p>' . __('Please select a room.', 'rrze-rsvp') . '</p>';
+        $selectRoom .= '<select id="rsvp-room-select" name="room_id">';
+        foreach ($rooms as $room) {
+            $selectRoom .= '<option value="' . $room->ID . '">' . $room->post_title . '</option>';
+        }
+        $selectRoom .= '</select>';
+        $selectRoom .= '<button type="submit" class="btn btn-primary">' . __('Continue booking', 'rrze-rsvp') . '</button>';
+        $selectRoom .= '</form>';
+        return $selectRoom;
+    }
+
     protected function bookedNotice()
     {
         if (!isset($_GET['id']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'booked')) {
@@ -315,9 +390,10 @@ class Bookings extends Shortcodes {
 
         $data = [];
         $roomId = $booking['room'];
-        $autoconfirmation = get_post_meta($roomId, 'rrze-rsvp-room-auto-confirmation', true) == 'on' ? true : false;
-        $forceToConfirm = get_post_meta($roomId, 'rrze-rsvp-room-force-to-confirm', true) == 'on' ? true : false;
-        $forceToCheckin = get_post_meta($roomId, 'rrze-rsvp-room-force-to-checkin', true) == 'on' ? true : false;
+        $roomMeta = get_post_meta($roomId);
+        $autoconfirmation = (isset($roomMeta['rrze-rsvp-room-auto-confirmation']) && $roomMeta['rrze-rsvp-room-auto-confirmation'][0] == 'on') ? true : false;
+        $forceToConfirm = (isset($roomMeta['rrze-rsvp-room-force-to-confirm']) && $roomMeta['rrze-rsvp-room-force-to-confirm'][0] == 'on') ? true : false;
+        $forceToCheckin = (isset($roomMeta['rrze-rsvp-room-force-to-checkin']) && $roomMeta['rrze-rsvp-room-force-to-checkin'][0] == 'on') ? true : false;
         if ($autoconfirmation) {
             $data['autoconfirmation'] = true;
         }
@@ -399,7 +475,7 @@ class Bookings extends Shortcodes {
                     [
                         'booking' => wp_create_nonce('sso_authentication')
                     ],
-                    get_permalink()
+                    $this->getRequestLink()
                 );
                 wp_redirect($redirectUrl);
                 exit;
@@ -410,6 +486,7 @@ class Bookings extends Shortcodes {
             $booking_email = sanitize_email($posted_data['rsvp_email']);
         }
 
+
         // Postdaten überprüfen
         if (!$booking_dsgvo
             || !Functions::validateDate($booking_date)
@@ -418,13 +495,13 @@ class Bookings extends Shortcodes {
             || empty($booking_lastname)
             || empty($booking_firstname)
             || !filter_var($booking_email, FILTER_VALIDATE_EMAIL)
-            || empty($booking_phone))
+            || !Functions::validatePhone($booking_phone))
         {
             $redirectUrl = add_query_arg(
                 [
                     'booking' => wp_create_nonce('post_data')
                 ],
-                get_permalink()
+                $this->getRequestLink()
             );
             wp_redirect($redirectUrl);
             exit;  
@@ -457,10 +534,36 @@ class Bookings extends Shortcodes {
                 [
                     'booking' => wp_create_nonce('multiple_booking')
                 ],
-                get_permalink()
+                $this->getRequestLink()
             );
             wp_redirect($redirectUrl);
             exit;            
+        }
+
+        // Überprüfen ob Timeslot in der Vergangenheit liegt
+        $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
+        $room_meta = get_post_meta($room_id);
+        $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : '';
+        foreach ($room_timeslots as $week) {
+            foreach ($week['rrze-rsvp-room-weekday'] as $day) {
+                $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+            }
+        }
+        $weekday = date('N', $booking_timestamp_start);
+        $booking_end = array_key_exists($booking_start, $schedule[$weekday]) ? $schedule[$weekday][$booking_start] : $booking_start;
+        $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
+
+        if ($booking_timestamp_end < current_time('timestamp')) {
+            $permalink = get_permalink($this->options->general_booking_page);
+            $redirectUrl = add_query_arg(
+                [
+                    'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', $permalink, $room_id, $booking_date, $booking_start),
+                    'booking' => wp_create_nonce('timeslot_unavailable')
+                ],
+                $this->getRequestLink()
+            );
+            wp_redirect($redirectUrl);
+            exit;
         }
 
         // Überprüfen ob der Platz in der Zwischenzeit bereits anderweitig gebucht wurde
@@ -474,35 +577,21 @@ class Bookings extends Shortcodes {
         }
         if (!$seat_available) {
             $permalink = get_permalink($this->options->general_booking_page);
-            $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
 
             $redirectUrl = add_query_arg(
                 [
                     'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', $permalink, $room_id, $booking_date, $booking_start),
                     'booking' => wp_create_nonce('seat_unavailable')
                 ],
-                get_permalink()
+                $this->getRequestLink()
             );
             wp_redirect($redirectUrl);
             exit;                
         }
 
-        $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
-        $room_meta = get_post_meta($room_id);
-        $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : '';
-
         $autoconfirmation = get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true) == 'on' ? true : false;
         $forceToConfirm = get_post_meta($room_id, 'rrze-rsvp-room-force-to-confirm', true) == 'on' ? true : false;
         $forceToCheckin = get_post_meta($room_id, 'rrze-rsvp-room-force-to-checkin', true) == 'on' ? true : false;
-
-        foreach ($room_timeslots as $week) {
-            foreach ($week['rrze-rsvp-room-weekday'] as $day) {
-                $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
-            }
-        }
-        $weekday = date('N', $booking_timestamp_start);
-        $booking_end = array_key_exists($booking_start, $schedule[$weekday]) ? $schedule[$weekday][$booking_start] : $booking_start;
-        $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
 
         //Buchung speichern
         $new_draft = [
@@ -517,7 +606,7 @@ class Bookings extends Shortcodes {
                 [
                     'booking' => wp_create_nonce('save_error')
                 ],
-                get_permalink()
+                $this->getRequestLink()
             );
             wp_redirect($redirectUrl);
             exit;            
@@ -574,7 +663,7 @@ class Bookings extends Shortcodes {
                 'id' => $booking_id,
                 'booking' => wp_create_nonce('booked')
             ],
-            get_permalink()
+            $this->getRequestLink()
         );
         wp_redirect($redirectUrl);
         exit;
@@ -584,13 +673,13 @@ class Bookings extends Shortcodes {
      * Inspirationsquelle:
      * https://css-tricks.com/snippets/php/build-a-calendar-table/
      */
-    public function buildCalendar($month, $year, $start = '', $end = '', $room = '', $bookingdate_selected = '') {
+    public function buildCalendar($month, $year, $start = '', $end = '', $roomID = '', $bookingdate_selected = '') {
         if ($start == '')
             $start = date_create();
         if (!is_object($end))
             $end = date_create($end);
-        if ($room == 'select')
-            $room = '';
+        if ($roomID == 'select')
+            $roomID = '';
         // Create array containing abbreviations of days of week.
         $daysOfWeek = array('Mo','Di','Mi','Do','Fr','Sa','So');
         // What is the first day of the month in question?
@@ -616,7 +705,7 @@ class Bookings extends Shortcodes {
         $startDate = date_format($bookingDaysStart, 'Y-m-d');
         $link_next = '<a href="#" class="cal-skip cal-next" data-direction="next">&gt;&gt;</a>';
         $link_prev = '<a href="#" class="cal-skip cal-prev" data-direction="prev">&lt;&lt;</a>';
-        $availability = Functions::getRoomAvailability($room, $startDate, $endDate, false);
+        $availability = Functions::getRoomAvailability($roomID, $startDate, $endDate, false);
 
         // Create the table tag opener and day headers
         $calendar = '<table class="rsvp_calendar" data-period="'.date_i18n('Y-m', $firstDayOfMonth).'" data-end="'.$endDate.'">';
@@ -665,7 +754,7 @@ class Bookings extends Shortcodes {
                 $active = false;
                 $class = 'soldout';
                 $title = __('Not bookable (soldout or room blocked)','rrze-rsvp');
-                if ($room == '') {
+                if ($roomID == '') {
 
                 } else {
                     if (isset($availability[$date])) {
@@ -733,18 +822,19 @@ class Bookings extends Shortcodes {
         $mod = ($_POST['direction'] == 'next' ? 1 : -1);
         $start = date_create();
         $end = sanitize_text_field($_POST['end']);
-        $room = (int)$_POST['room'];
+        $roomID = (int)$_POST['room'];
         $output = '';
-        $output .= $this->buildCalendar($period[1] + $mod, $period[0], $start, $end, $room);
+        $output .= $this->buildCalendar($period[1] + $mod, $period[0], $start, $end, $roomID);
         echo $output;
         wp_die();
     }
 
     public function ajaxUpdateForm() {
         check_ajax_referer( 'rsvp-ajax-nonce', 'nonce'  );
-        $room = ((isset($_POST['room']) && $_POST['room'] > 0) ? (int)$_POST['room'] : '');
+        $roomID = ((isset($_POST['room']) && $_POST['room'] > 0) ? (int)$_POST['room'] : '');
         $date = (isset($_POST['date']) ? sanitize_text_field($_POST['date']) : false);
         $time = (isset($_POST['time']) ? sanitize_text_field($_POST['time']) : false);
+        $seat = (isset($_POST['seat']) ? sanitize_text_field($_POST['seat']) : false);
         $response = [];
         if ($date !== false) {
             $response['time'] = '<div class="rsvp-time-select error">'.__('Please select a date.', 'rrze-rsvp').'</div>';
@@ -752,12 +842,12 @@ class Bookings extends Shortcodes {
         if (!$date || !$time) {
             $response['seat'] = '<div class="rsvp-seat-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
         }
-        $availability = Functions::getRoomAvailability($room, $date, date('Y-m-d', strtotime($date. ' +1 days')), false);
+        $availability = Functions::getRoomAvailability($roomID, $date, date('Y-m-d', strtotime($date. ' +1 days')), false);
 
         if ($date) {
-            $response['time'] = $this->buildTimeslotSelect($room, $date, $time, $availability);
+            $response['time'] = $this->buildTimeslotSelect($roomID, $date, $time, $availability);
             if ($time) {
-                $response['seat'] = $this->buildSeatSelect($room, $date, $time, false, $availability);
+                $response['seat'] = $this->buildSeatSelect($roomID, $date, $time, $seat, $availability);
             }
         }
         wp_send_json($response);
@@ -786,15 +876,17 @@ class Bookings extends Shortcodes {
         wp_die();
     }
 
-    private function buildTimeslotSelect($room, $date, $time = false, $availability) {
+    private function buildTimeslotSelect($roomID, $date, $time = false, $availability) {
         $slots = [];
         $timeSelects = '';
-        $slots = array_keys($availability[$date]);
-        foreach ($slots as $slot) {
-            $slot_value = explode('-', $slot)[0];
-            $id = 'rsvp_time_' . sanitize_title($slot_value);
-            $checked = checked($time !== false && $time == $slot_value, true, false);
-            $timeSelects .= "<div class='form-group'><input type='radio' id='$id' value='$slot_value' name='rsvp_time' " . $checked . " required aria-required='true'><label for='$id'>$slot</label></div>";
+        if (!empty($availability) && isset($availability[$date])) {
+            $slots = array_keys($availability[$date]);
+            foreach ($slots as $slot) {
+                $slot_value = explode('-', $slot)[0];
+                $id = 'rsvp_time_' . sanitize_title($slot_value);
+                $checked = checked($time !== false && $time == $slot_value, true, false);
+                $timeSelects .= "<div class='form-group'><input type='radio' id='$id' value='$slot_value' name='rsvp_time' " . $checked . " required aria-required='true'><label for='$id'>$slot</label></div>";
+            }
         }
         if ($timeSelects == '') {
             $timeSelects .= __('No time slots available.', 'rrze-rsvp');
@@ -802,7 +894,7 @@ class Bookings extends Shortcodes {
         return '<div class="rsvp-time-select">' . $timeSelects . '</div>';
     }
 
-    private function buildSeatSelect($room, $date, $time, $seat_id, $availability) {
+    private function buildSeatSelect($roomID, $date, $time, $seat_id, $availability) {
         foreach ($availability as $xdate => $xtime) {
             foreach ($xtime as $k => $v) {
                 $k_new = explode('-', $k)[0];
@@ -828,4 +920,33 @@ class Bookings extends Shortcodes {
         return '<h4>' . __('Available seats:', 'rrze-rsvp') . '</h4><div class="rsvp-seat-select">' . $seatSelects . '</div>';
     }
 
+    protected function getRequestLink()
+    {
+        global $wp;
+        return site_url($wp->request);
+    }
+
+    protected function hasShortcodeSSO(string $content, string $shortcode): bool
+    {
+        if (has_shortcode($content, $shortcode)) {
+            $result = [];
+            $pattern = get_shortcode_regex();
+            if (preg_match_all('/' . $pattern . '/s', $content, $matches)) {
+                $keys = [];
+                $result = [];
+                foreach ($matches[0] as $key => $value) {
+                    $get = str_replace(' ', '&', $matches[3][$key]);
+                    parse_str($get, $output);
+                    $keys = array_unique(array_merge($keys, array_keys($output)));
+                    $result[][$matches[2][$key]] = $output;
+                }
+            }
+            foreach ($result as $key => $value) {
+                if (isset($value[$shortcode]['sso']) && $value[$shortcode]['sso'] == 'true') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    } 
 }

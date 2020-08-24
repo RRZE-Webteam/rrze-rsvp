@@ -21,7 +21,7 @@ class Tools
             _x( 'Create Seats', 'admin page title', 'rrze-rsvp' ),
             _x( 'RSVP Create Seats', 'admin menu entry title', 'rrze-rsvp' ),
             'manage_options',
-            'rrze-rsvp',
+            'rrze-rsvp-tools',
             array( $this, 'admin_page' )
         );
     }
@@ -120,7 +120,7 @@ class Tools
                     echo '</strong></p>';
                     echo '<p>';
                     echo '<a href="' . admin_url(
-                            '/tools.php?page=rrze-rsvp'
+                            '/tools.php?page=rrze-rsvp-tools'
                         ) . '" class="button button-secondary" style="margin-right: 20px;">' . __(
                              'Cancel',
                              'rrze-rsvp'
@@ -223,7 +223,7 @@ class Tools
          */
 
         echo '<form id="rsvp-create-seats" method="get">';
-        echo '<input type="hidden" name="page" value="rrze-rsvp">';
+        echo '<input type="hidden" name="page" value="rrze-rsvp-tools">';
         echo '<input type="hidden" name="status" value="confirm">';
         echo '<table class="form-table" role="presentation"><tbody>';
         echo '<tr><th scope="row"><label for="room_id">' . __('Room','rrze-rsvp') . '</label></th>';
@@ -232,7 +232,7 @@ class Tools
             . '<option value="">&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;</option>';
         $rooms = get_posts([
             'post_type' => 'room',
-            'post_statue' => 'publish',
+            'post_status' => 'publish',
             'nopaging' => true,
             'orderby' => 'title',
             'order' => 'ASC',

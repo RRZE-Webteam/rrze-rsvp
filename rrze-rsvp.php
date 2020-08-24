@@ -1,10 +1,10 @@
 <?php
 
 /*
-Plugin Name:     RRZE-RSVP
+Plugin Name:     RRZE RSVP
 Plugin URI:      https://github.com/RRZE-Webteam/rrze-rsvp
 Description:     Booking system.
-Version:         0.3.6
+Version:         0.3.7
 Author:          RRZE-Webteam
 Author URI:      https://blogs.fau.de/webworking/
 License:         GNU General Public License v2

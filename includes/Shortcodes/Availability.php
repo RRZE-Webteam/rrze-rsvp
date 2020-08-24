@@ -42,7 +42,7 @@ class Availability extends Shortcodes {
 
         if (isset($shortcode_atts['room']) && $shortcode_atts['room'] != '') {
             $room = (int)$shortcode_atts['room'];
-            $availability = Functions::getRoomAvailability($room, $today, date('Y-m-d', strtotime($today. ' +'.$days.' days')));
+            $availability = Functions::getRoomAvailability($room, $today, date('Y-m-d', strtotime($today. ' +'.$days.' days')), false);
             if (!empty($availability)) {
                 $output .= '<table class="rsvp-room-availability">';
                 $output .= '<tr>'
@@ -62,8 +62,12 @@ class Availability extends Shortcodes {
                             $booking_link_open = '';
                             $booking_link_close = '';
                             $glue = ', ';
-                            if ($booking_link && $this->options->general_booking_page != '') {
-                                $permalink = get_permalink($this->options->general_booking_page);
+                            if ($booking_link) {
+                                if ($roomBookingPage = get_post_meta($room, 'rrze-rsvp-room-form-page', true)) {
+                                    $permalink = get_permalink($roomBookingPage);
+                                } else {
+                                    $permalink = site_url('/rsvp-booking/');
+                                }
                                 $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$starttime\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "' class='seat-link'>";
                                 $booking_link_close = '</a>';
                                 $glue = '';
@@ -103,7 +107,7 @@ class Availability extends Shortcodes {
             }
             $room_id = get_post_meta($seat_id, 'rrze-rsvp-seat-room', true);
 
-            $availability = Functions::getSeatAvailability($seat_id, $today, date('Y-m-d', strtotime($today. ' +'.$days.' days')));
+            $availability = Functions::getSeatAvailability($seat_id, $today, date('Y-m-d', strtotime($today. ' +'.$days.' days')), false);
 
             if (empty($availability)) {
                 return __( 'No timeslots available for this seat.', 'rrze-rsvp' );
@@ -118,11 +122,16 @@ class Availability extends Shortcodes {
                         $booking_link_open = '';
                         $booking_link_close = '';
                         $glue = ', &nbsp; ';
-                        if ( $booking_link && $this->options->general_booking_page != '' ) {
-                            $permalink = get_permalink( $this->options->general_booking_page );
-                            $booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$time\" title='" . __( 'Book this seat/timeslot now', 'rrze-rsvp' ) . "'>";
-                            $booking_link_close = '</a>';
-                            $glue = '';
+                        if ($booking_link) {
+                            $roomBookingPage = get_post_meta($room_id, 'rrze-rsvp-room-form-page', true);
+                            if ($roomBookingPage == '')
+                                $roomBookingPage = $this->options->general_booking_page;
+                            if ($roomBookingPage != '') {
+                                $permalink = get_permalink($roomBookingPage);
+                                $booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$time\" title='" . __( 'Book this seat/timeslot now', 'rrze-rsvp' ) . "'>";
+                                $booking_link_close = '</a>';
+                                $glue = '';
+                            }
                         }
                         $time_output[] = $booking_link_open . $time . $booking_link_close;
                     }
