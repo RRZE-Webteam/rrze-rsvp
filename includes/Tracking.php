@@ -119,7 +119,7 @@ class Tracking
         ];
 
         $results = $wpdb->get_results( 
-                    $wpdb->prepare("SELECT surrounds.room_post_id, surrounds.guest_email, surrounds.guest_phone, surrounds.guest_firstname, surrounds.guest_lastname FROM {$this->dbTable} AS surrounds WHERE surrounds.hash_room_name IN 
+                    $wpdb->prepare("SELECT surrounds.room_post_id, surrounds.room_name, surrounds.room_street, surrounds.room_zip, surrounds.room_city, surrounds.guest_email, surrounds.guest_phone, surrounds.guest_firstname, surrounds.guest_lastname FROM {$this->dbTable} AS surrounds WHERE surrounds.hash_room_name IN 
             (SELECT needle.hash_room_name FROM {$this->dbTable} AS needle WHERE 
             (needle.start BETWEEN DATE_SUB(%s  $searchdate, INTERVAL %d $delta DAY) AND DATE_ADD(%s  $searchdate, INTERVAL %d  $delta DAY)) AND 
             (needle.end BETWEEN DATE_SUB(%s $searchdate, INTERVAL %d $delta DAY) AND DATE_ADD(%s $searchdate, INTERVAL %d $delta DAY)) AND 
@@ -127,15 +127,11 @@ class Tracking
             (needle.hash_guest_email = %s $hash_guest_email) OR (needle.hash_guest_phone = %s $hash_guest_phone))", $prepare_vals), ARRAY_A);
 
         if ($results){
+
+            // 2DO separate Methode für CSV falls andere Formate gefordert werden & Layout-Trennung 
+
+
             
-            // 2DO: distinct room_post_id => get following details
-
-            $room_name = get_the_title($room_post_id);
-            $room_street = get_post_meta($room_post_id, 'rrze-rsvp-room-street', true);
-            $room_zip = get_post_meta($room_post_id, 'rrze-rsvp-room-zip', true);
-            $room_city = get_post_meta($room_post_id, 'rrze-rsvp-room-city', true);
-
-            // 2DO: 
         }
     }
 
