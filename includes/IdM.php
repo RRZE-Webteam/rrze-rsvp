@@ -26,29 +26,29 @@ class IdM
 
     protected $eduPersonEntitlement = null;
 
+    protected $template;
+
     public function __construct()
     {
-        //
+        $this->template = new Template;
+        add_action('wp', [$this, 'requireAuth']);
     }
 
-    public function tryLogIn(bool $message = false)
+    public function tryLogIn()
     {
-        if (! $this->simplesamlAuth()) {
+        if (!$this->simplesamlAuth()) {
             return false;
         }
 
         if (!$this->simplesamlAuth->isAuthenticated()) {
-            if ($message) {
-                wp_die(
-                    $this->getMessage(),
-                    __('Forbidden', 'rrze-rsvp'),
-                    [
-                        'response' => '403',
-                        'back_link' => false
-                    ]
-                );
-            }
-            $this->simplesamlAuth->requireAuth();
+            global $wp;
+            $redirectTo = site_url($wp->request);
+            $nonce = wp_create_nonce('require-sso-auth');
+            $room = isset($_GET['room_id']) ? '&room_id=' . absint($_GET['room_id']) : '';
+            $redirectUrl = sprintf('%s/rsvp-booking/?require-sso-auth=%s&redirect-to=%s%s', get_site_url(), $nonce, $redirectTo, $room);
+            header('HTTP/1.0 403 Forbidden');
+            wp_redirect($redirectUrl);
+            exit;
         }
 
         $this->personAttributes = $this->simplesamlAuth->getAttributes();
@@ -62,19 +62,56 @@ class IdM
         return true;
     }
 
-    protected function getMessage()
+    public function requireAuth()
     {
-        $message = '';
-
-        if ($this->simplesamlAuth) {
-            $login_url = $this->simplesamlAuth->getLoginURL();
-            $message .= '<h3>' . __('Access to the requested page is denied', 'rrze-rsvp') . '</h3>';
-            $message .= '<p>' . sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $login_url) . '</p>';
-            return $message;
+        global $post;
+        if (!is_a($post, '\WP_Post') || !is_page() || $post->post_name != "rsvp-booking") {
+            return;
         }
 
-        $message .= '<h3>' . __('Access is denied', 'rrze-rsvp') . '</h3>';
-        return $message;
+        $nonce = isset($_GET['require-sso-auth']) ? sanitize_text_field($_GET['require-sso-auth']) : false;
+        $redirectTo = isset($_GET['redirect-to']) ? sanitize_text_field($_GET['redirect-to']) : false;
+
+        if (!$nonce) {
+            return;
+        }
+        if (!$redirectTo || !wp_verify_nonce($nonce, 'require-sso-auth')) {
+            header('HTTP/1.0 403 Forbidden');
+            wp_redirect(get_site_url());
+            exit;            
+        }
+
+        if ($this->simplesamlAuth() && $this->simplesamlAuth->isAuthenticated()) {
+            $room = isset($_GET['room_id']) ? '?room_id=' . absint($_GET['room_id']) : '';
+            $redirectUrl = sprintf('%s%s', $redirectTo, $room);
+            wp_redirect($redirectUrl);
+            exit;
+        }
+
+        wp_enqueue_style(
+            'rrze-rsvp-require-auth',
+            plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename()),
+            [],
+            plugin()->getVersion()
+        );
+
+        $data = [];
+        if ($this->simplesamlAuth()) {
+            $loginUrl = $this->simplesamlAuth->getLoginURL();
+            $data['access_denied'] = __('Access to the requested page is denied', 'rrze-rsvp');
+            $data['please_login'] = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
+        } else {
+            header('HTTP/1.0 403 Forbidden');
+            wp_redirect(get_site_url());
+            exit;
+        }
+
+        add_filter('the_title', function ($title) {
+            return __('Authentication Required', 'rrze-rsvp');
+        });
+        add_filter('the_content', function ($content) use ($data) {
+            return $this->template->getContent('auth/require-sso-auth', $data);
+        });
     }
 
     public function isAuthenticated()
@@ -125,9 +162,9 @@ class IdM
             return false;
         }
 
-        if (! class_exists('\SimpleSAML\Auth\Simple')) {
+        if (!class_exists('\SimpleSAML\Auth\Simple')) {
             require_once(WP_CONTENT_DIR . $options['simplesaml_include']);
-        }       
+        }
         $this->simplesamlAuth = new SimpleSAMLAuthSimple($options['simplesaml_auth_source']);
         return true;
     }

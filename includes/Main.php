@@ -41,10 +41,10 @@ class Main
 		$metaboxes->onLoaded();
 
 		// Tracking
-		//$tracking = new Tracking;
-		//$tracking->onLoaded();
+		// $tracking = new Tracking;
+		// $tracking->onLoaded();
 
-		$actions = new Actions;
+        $actions = new Actions;
 		$actions->onLoaded();
 
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
@@ -62,7 +62,7 @@ class Main
 		$tools = new Tools;
 		$tools->onLoaded();
 
-		$formPage = new FormPage('rsvp-booking', '[rsvp-booking]');
+		$formPage = new VirtualPage('rsvp-booking', '[rsvp-booking]');
 		$formPage->onLoaded();
 
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);

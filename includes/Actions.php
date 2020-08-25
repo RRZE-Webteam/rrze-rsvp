@@ -4,8 +4,6 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Carbon;
-
 class Actions
 {
 	protected $email;
@@ -257,7 +255,7 @@ class Actions
 			if (($start - $offset) <= $now && ($end - $offset) >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
 				$bookingCkeckedIn = true;
-				do_action('rrze-rsvp-ckecked-in', get_current_blog_id(), $bookingId);
+				do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
 			}
 		} elseif (!$bookingCancelled && !$bookingCkeckedOut && $bookingCkeckedIn && $action == 'checkout') {
 			if ($start <= $now && $end >= $now) {

@@ -16,7 +16,7 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"POT-Creation-Date: 2020-08-23 19:21+0000\n"
+"POT-Creation-Date: 2020-08-25 09:39+0000\n"
 "Language: \n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: Loco https://localise.biz/"
@@ -390,38 +390,34 @@ msgstr ""
 msgid "Website for public displays"
 msgstr ""
 
-#: includes/IdM.php:44
-msgid "Forbidden"
-msgstr ""
-
-#: includes/IdM.php:71
+#: includes/IdM.php:101
 msgid "Access to the requested page is denied"
 msgstr ""
 
-#: includes/IdM.php:72
+#: includes/IdM.php:102
 #, php-format
 msgid "<a href=\"%s\">Please login with your IdM username</a>."
 msgstr ""
 
-#: includes/IdM.php:76
-msgid "Access is denied"
+#: includes/IdM.php:110
+msgid "Authentication Required"
 msgstr ""
 
-#: includes/IdM.php:97
+#: includes/IdM.php:134
 msgid "No name"
 msgstr ""
 
-#: includes/IdM.php:104
+#: includes/IdM.php:141
 msgid "no@email"
 msgstr ""
 
-#: includes/Email.php:120 includes/Email.php:170 includes/Actions.php:267
+#: includes/Email.php:120 includes/Email.php:170 includes/Actions.php:204
 #: includes/CPT/Bookings.php:129 includes/CPT/Bookings.php:143
 #: includes/CPT/Bookings.php:268
 msgid "Name"
 msgstr ""
 
-#: includes/Email.php:121 includes/Email.php:171 includes/Actions.php:268
+#: includes/Email.php:121 includes/Email.php:171 includes/Actions.php:205
 #: includes/Metaboxes.php:108 includes/CPT/Bookings.php:130
 #: includes/CPT/Bookings.php:144 includes/Shortcodes/Bookings.php:206
 #: includes/Shortcodes/Bookings.php:222
@@ -484,103 +480,103 @@ msgstr ""
 msgid "Please check out when you leave the site."
 msgstr ""
 
-#: includes/Actions.php:271 includes/Actions.php:290 includes/Actions.php:416
+#: includes/Actions.php:208 includes/Actions.php:227 includes/Actions.php:353
 #: includes/CPT/Bookings.php:68
 msgid "Booking"
 msgstr ""
 
-#: includes/Actions.php:274
+#: includes/Actions.php:211
 msgctxt "Booking"
 msgid "confirmed"
 msgstr ""
 
-#: includes/Actions.php:274
+#: includes/Actions.php:211
 msgctxt "Booking"
 msgid "cancelled"
 msgstr ""
 
-#: includes/Actions.php:275
+#: includes/Actions.php:212
 #, php-format
 msgid "The booking has already been %s"
 msgstr ""
 
-#: includes/Actions.php:276
+#: includes/Actions.php:213
 #, php-format
 msgid "The booking has been %s"
 msgstr ""
 
-#: includes/Actions.php:277
+#: includes/Actions.php:214
 msgid "Your customer has received an email confirmation."
 msgstr ""
 
-#: includes/Actions.php:360
+#: includes/Actions.php:297
 #, php-format
 msgid "<a href=\"%s\" class=\"button button-cancel\">Cancel Your Booking</a>"
 msgstr ""
 
-#: includes/Actions.php:365 includes/ICS.php:45
+#: includes/Actions.php:302 includes/ICS.php:45
 msgid "Cancel Booking"
 msgstr ""
 
-#: includes/Actions.php:366
+#: includes/Actions.php:303
 msgid "Do you really want to cancel your booking?"
 msgstr ""
 
-#: includes/Actions.php:372
+#: includes/Actions.php:309
 msgid "Booking Cancelled"
 msgstr ""
 
-#: includes/Actions.php:373
+#: includes/Actions.php:310
 msgid ""
 "Your booking has been cancelled. Please contact us to find a different "
 "arrangement."
 msgstr ""
 
-#: includes/Actions.php:379
+#: includes/Actions.php:316
 msgid "Booking Confirmed"
 msgstr ""
 
-#: includes/Actions.php:380
+#: includes/Actions.php:317
 msgid "Thank you for confirming your booking."
 msgstr ""
 
-#: includes/Actions.php:385
+#: includes/Actions.php:322
 msgid "Booking Check In"
 msgstr ""
 
-#: includes/Actions.php:386
+#: includes/Actions.php:323
 msgid "Check in is not possible at this time."
 msgstr ""
 
-#: includes/Actions.php:391
+#: includes/Actions.php:328
 msgid "Booking Checked In"
 msgstr ""
 
-#: includes/Actions.php:392
+#: includes/Actions.php:329
 msgid "Check in has been completed."
 msgstr ""
 
-#: includes/Actions.php:397
+#: includes/Actions.php:334
 msgid "Booking Check Out"
 msgstr ""
 
-#: includes/Actions.php:398
+#: includes/Actions.php:335
 msgid "Check-out is not possible at this time."
 msgstr ""
 
-#: includes/Actions.php:403
+#: includes/Actions.php:340
 msgid "Booking Checked Out"
 msgstr ""
 
-#: includes/Actions.php:404
+#: includes/Actions.php:341
 msgid "Check-out has been completed."
 msgstr ""
 
-#: includes/Actions.php:409
+#: includes/Actions.php:346
 msgid "Action not available"
 msgstr ""
 
-#: includes/Actions.php:410
+#: includes/Actions.php:347
 msgid "No action was taken."
 msgstr ""
 
