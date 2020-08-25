@@ -107,7 +107,7 @@ class IdM
         }
 
         add_filter('the_title', function ($title) {
-            return __('Require Authentication', 'rrze-rsvp');
+            return __('Authentication Required', 'rrze-rsvp');
         });
         add_filter('the_content', function ($content) use ($data) {
             return $this->template->getContent('auth/require-sso-auth', $data);
