@@ -90,7 +90,7 @@ class Schedule
     {
         $this->deleteOldBookings();
         $this->deleteCancelledBookings();
-        $this->deleteOldTrackingData();
+        // $this->deleteOldTrackingData();
     }
 
     /**
@@ -314,10 +314,10 @@ class Schedule
      * 
      * @return void
      */    
-    protected function deleteOldTrackingData()
-    {
-        global $wpdb;
-        $dbTable = Tracking::getDbTableName();
-        $wpdb->query("DELETE FROM $dbTable WHERE ts_end < DATE_SUB(CURDATE(), INTERVAL 4 WEEK)");
-    }
+    // protected function deleteOldTrackingData()
+    // {
+    //     global $wpdb;
+    //     $dbTable = Tracking::getDbTableName();
+    //     $wpdb->query("DELETE FROM $dbTable WHERE ts_end < DATE_SUB(CURDATE(), INTERVAL 4 WEEK)");
+    // }
 }
