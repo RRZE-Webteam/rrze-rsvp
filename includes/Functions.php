@@ -89,11 +89,12 @@ class Functions
      */
     public static function getOccupancyByRoomIdHTML(int $room_id, bool $from_now = NULL, int $timestamp = 0): string
     {
-        $output = '<table class="rsvp-room-occupancy"><tr>';
+       
 
         $seats_slots = self::getOccupancyByRoomId($room_id, $from_now, $timestamp);
 
         if ($seats_slots){
+	    $output = '<table class="rsvp-room-occupancy"><tr>';
             $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
             foreach($seats_slots['room_slots'] as $room_slot){
                 $output .= '<th scope="col"><span class="rrze-rsvp-timeslot">' . str_replace('-', ' - ', $room_slot) . '</span></th>';
@@ -111,10 +112,11 @@ class Functions
                 }
                 $output .= '</tr>';
             }
+	    $output .= '</table>';
         }else{
-            $output .= '<td>' . __('This room has no seats for today.', 'rrze-rsvp') . '</td>';
+            $output = '<div class="alert">' . __('This room has no seats for today.', 'rrze-rsvp') . '</div>';
         }
-        $output .= '</table>';
+       
 
         return $output;
     }
@@ -189,11 +191,12 @@ class Functions
      */
     public static function getOccupancyByRoomIdHTMLAdmin(int $room_id): string
     {
-        $output = '<table class="rsvp-room-occupancy"><tr>';
+        
 
         $seats_slots = self::getOccupancyByRoomIdAdmin($room_id);
 
         if ($seats_slots){
+	    $output = '<table class="rsvp-room-occupancy"><tr>';
             $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
             foreach($seats_slots['room_slots'] as $room_slot){
                 $output .= '<th scope="col"><span class="rrze-rsvp-timeslot">' . $room_slot . '</span></th>';
@@ -210,10 +213,11 @@ class Functions
                 }
                 $output .= '</tr>';
             }
+	    $output .= '</table>';
         }else{
-            $output .= '<td>' . __('This room has no seats for today.', 'rrze-rsvp') . '</td>';
+	    $output = '<div class="alert">' . __('This room has no seats for today.', 'rrze-rsvp') . '</div>';
         }
-        $output .= '</table>';
+        
 
         return $output;
     }

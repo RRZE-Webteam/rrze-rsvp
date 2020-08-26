@@ -11,12 +11,21 @@
     <p>{{=your_reservation_request}}</p>
 {{/autoconfirmation}}
 
-<ul>
-    <li>{{=date_label}}: <strong>{{=date}}</strong></li>
-    <li>{{=time_label}}: <strong>{{=time}}</strong></li>
-    <li>{{=room_label}}: <strong>{{=room_name}}</strong></li>
-    <li>{{=seat_label}}: <strong>{{=seat_name}}</strong></li>
-</ul>
+<table class="nobackground">
+    <tr>
+	<th>{{=date_label}}</th><td>{{=date}}</td>
+    </tr>
+    <tr>
+	<th>{{=time_label}}</th><td>{{=time}}</td>
+    </tr>
+    <tr>
+	<th>{{=room_label}}</th><td>{{=room_name}}</td>
+    </tr>
+    <tr>
+	<th>{{=seat_label}}</th><td>{{=seat_name}}</td>
+    </tr>
+</table>
+
 
 <p>{{=data_sent_to_customer_email}}</p>
 
