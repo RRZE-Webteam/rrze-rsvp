@@ -96,7 +96,7 @@ class Functions
         if ($seats_slots){
             $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
             foreach($seats_slots['room_slots'] as $room_slot){
-                $output .= '<th scope="col"><span class="rrze-rsvp-timespan">' . str_replace('-', ' - ', $room_slot) . '</span></th>';
+                $output .= '<th scope="col"><span class="rrze-rsvp-timeslot">' . str_replace('-', ' - ', $room_slot) . '</span></th>';
             }
             $output .= '</tr>';
             $aRoomSlots = $seats_slots['room_slots'];
@@ -196,7 +196,7 @@ class Functions
         if ($seats_slots){
             $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
             foreach($seats_slots['room_slots'] as $room_slot){
-                $output .= '<th scope="col"><span class="rrze-rsvp-timespan">' . $room_slot . '</span></th>';
+                $output .= '<th scope="col"><span class="rrze-rsvp-timeslot">' . $room_slot . '</span></th>';
             }
             $output .= '</tr>';
             $aRoomSlots = $seats_slots['room_slots'];
