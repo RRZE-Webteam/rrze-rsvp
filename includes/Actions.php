@@ -189,30 +189,37 @@ class Actions
 			$alreadyDone = true;
 		}
 
+		$data = [];
+
 		if (!$alreadyDone && $bookingConfirmed) {
+			$data['title'] = __('Booking Confirmed', 'rrze-rsvp');
+			$data['text'] = sprintf(__('The booking has been %s', 'rrze-rsvp'), _x('confirmed', 'Booking', 'rrze-rsvp'));
+			$data['customer_has_received_an_email'] = __('Your customer has received an email confirmation.', 'rrze-rsvp');
 			$response = 'confirmed';
 		} elseif (!$alreadyDone && $bookingCancelled) {
+			$data['title'] = __('Booking Cancelled', 'rrze-rsvp');
+			$data['text'] = sprintf(__('The booking has been %s', 'rrze-rsvp'), _x('cancelled', 'Booking', 'rrze-rsvp'));
+			$data['customer_has_received_an_email'] = __('Your customer has received an email cancellation.', 'rrze-rsvp');
 			$response = 'cancelled';
 		} elseif ($alreadyDone && $bookingConfirmed) {
-			$response = 'already-confirmed';
+			$data['title'] = __('Booking Confirmed', 'rrze-rsvp');
+			$data['text'] = sprintf(__('The booking has already been %s.', 'rrze-rsvp'), _x('confirmed', 'Booking', 'rrze-rsvp'));
+			$response = 'confirmed';
 		} elseif ($alreadyDone && $bookingCancelled) {
-			$response = 'already-cancelled';
+			$data['title'] = __('Booking Cancelled', 'rrze-rsvp');
+			$data['text'] = sprintf(__('The booking has already been %s.', 'rrze-rsvp'), _x('cancelled', 'Booking', 'rrze-rsvp'));
+			$response = 'cancelled';
 		} else {
+			$data['title'] = __('Action not available', 'rrze-rsvp');
+			$data['text'] = __('No action was taken.', 'rrze-rsvp');
 			$response = 'no-action';
 		}
 
 		$customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
 		$customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
-
-		$data = [];
-		$data['booking_title'] = __('Booking', 'rrze-rsvp');
-
+		
 		$data['already_done'] = $alreadyDone;
-		$responseText = in_array($response, ['confirmed', 'already-confirmed']) ? _x('confirmed', 'Booking', 'rrze-rsvp') : _x('cancelled', 'Booking', 'rrze-rsvp');
-		$data['booking_has_already_been'] = sprintf(__('The booking has already been %s', 'rrze-rsvp'), $responseText);
-		$data['booking_has_been'] = sprintf(__('The booking has been %s', 'rrze-rsvp'), $responseText);
-		$data['customer_has_received_an_email'] = __('Your customer has received an email confirmation.', 'rrze-rsvp');
-
+		$data['no-action'] = ($response == 'no-action');
 		$data['class_cancelled'] = in_array($response, ['cancelled', 'already-cancelled']) ? 'cancelled' : '';
 
 		$data['room_name'] = $booking['room_name'];

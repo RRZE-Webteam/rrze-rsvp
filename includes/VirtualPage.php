@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 use stdClass;
 
-class FormPage
+class VirtualPage
 {
     protected $options;
 
