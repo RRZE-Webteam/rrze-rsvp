@@ -573,7 +573,7 @@ class Bookings extends Shortcodes {
                     'nonce' => wp_create_nonce('transient-data'),
                     'transient-data' => $transientData->getTransient()
                 ],
-                $this->getRequestLink()
+                wp_get_referer()
             );
             wp_redirect($redirectUrl);
             exit;             
