@@ -29,11 +29,10 @@ class Functions
         return self::validateDate($date, $format);
     }
 
-    // phone must be at least 10 figures
+    // The phone number must be at least 3 digits long.
     public static function validatePhone(string $phone): bool
     {
-        $phone = preg_replace('/[^0-9]/', '', $phone);
-        return (strlen($phone) > 9);
+        return (preg_match_all('/\d/', $phone) >= 3);
     }
 
     public static function isLocaleEnglish()
