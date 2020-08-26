@@ -243,7 +243,7 @@ class Metaboxes
 
         $cmb_general->add_field(array(
             'name' => __('Automatic confirmation', 'rrze-rsvp'),
-            'desc' => __('Incoming bookings do not need to be confirmed by the administrator', 'rrze-rsvp'),
+            'desc' => __('Incoming bookings do not need to be confirmed by the booking managers', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-auto-confirmation',
             'type' => 'checkbox',
             'default' => '',
