@@ -15,8 +15,8 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"POT-Creation-Date: 2020-08-26 09:19+0000\n"
-"PO-Revision-Date: 2020-08-26 09:20+0000\n"
+"POT-Creation-Date: 2020-08-26 10:56+0000\n"
+"PO-Revision-Date: 2020-08-26 10:57+0000\n"
 "Last-Translator: RRZE Webteam <webmaster@fau.de>\n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -936,8 +936,10 @@ msgid "Automatic confirmation"
 msgstr "Automatische Bestätigung"
 
 #: includes/Metaboxes.php:246
-msgid "Incoming bookings do not need to be confirmed by the administrator"
-msgstr "Eingehende Buchungen müssen nicht vom Administrator bestätigt werden"
+msgid "Incoming bookings do not need to be confirmed by the booking managers"
+msgstr ""
+"Eingehende Buchungen müssen nicht von den Raumverantwortlichen bestätigt "
+"werden"
 
 #: includes/Metaboxes.php:253
 msgid "Allow Instant Check-In"

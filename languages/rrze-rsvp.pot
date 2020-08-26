@@ -16,7 +16,7 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"POT-Creation-Date: 2020-08-26 09:19+0000\n"
+"POT-Creation-Date: 2020-08-26 10:56+0000\n"
 "Language: \n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: Loco https://localise.biz/"
@@ -890,7 +890,7 @@ msgid "Automatic confirmation"
 msgstr ""
 
 #: includes/Metaboxes.php:246
-msgid "Incoming bookings do not need to be confirmed by the administrator"
+msgid "Incoming bookings do not need to be confirmed by the booking managers"
 msgstr ""
 
 #: includes/Metaboxes.php:253
