@@ -1,8 +1,11 @@
 /*
 RRZE RSVP Frontend CSS
 */
+#content .rrze-rsvp form,
 .rrze-rsvp form {
+  border: none;
   position: relative; }
+  #content .rrze-rsvp form legend,
   .rrze-rsvp form legend {
     padding-bottom: 5px;
     margin-bottom: 10px; }
