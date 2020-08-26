@@ -132,10 +132,9 @@ class Tracking
         echo '<input type="hidden" name="page" value="rrze-rsvp-tracking">';
         echo '<table class="form-table" role="presentation"><tbody>';
 
-        // searchdate fehlt
         echo '<tr>'
-            . '<th scope="row"><label for="searchdate">' . __('Search date [YYYY-MM-DD]', 'rrze-rsvp') . '</label></th>'
-            . '<td><input type="text" id="searchdate" name="searchdate" value="' . $searchdate . '">'
+            . '<th scope="row"><label for="searchdate">' . __('Search date', 'rrze-rsvp') . '</label></th>'
+            . '<td><input type="text" id="searchdate" name="searchdate" placeholder="YYYY-MM-DD" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" value="' . $searchdate . '">'
             . '</td>'
             . '</tr>';
 
