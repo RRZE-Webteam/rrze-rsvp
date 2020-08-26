@@ -55,6 +55,7 @@ function getConstants() {
         return [
             'booking_page_title' => __('RSVP Booking', 'rrze-rsvp'),
             'single_room_availability_table' => 'yes_link',
+            'contact_tracking_note' => 'Contact your SuperAdmin <a href="mailto:' . $sender_email . '>' . $sender_name . '</a> to receive contact tracking informations.',
             'notification_email' => $notification_email,
             'notification_if_new' => 'yes',
             'notification_if_cancel' => 'yes',
@@ -233,6 +234,14 @@ function getFields(){
                     'yes' => __('Yes (no link)', 'rrze-rsvp'),
                     'no'  => __('No', 'rrze-rsvp')
                 ]
+            ],
+            [
+                'name'    => 'contact_tracking_note',
+                'label'   => __('Note for admins', 'rrze-rsvp'),
+                'desc'    => __('Enter a note for administrators that are not superadministrators.', 'rrze-rsvp'),
+                'type'    => 'textarea',
+                'default' =>  $defaults['contact_tracking_note'],
+                'sanitize_callback' => 'sanitize_textarea_field'                
             ],
         ],
         'email' => [
