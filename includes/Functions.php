@@ -334,8 +334,8 @@ class Functions
         $data['room'] = get_post_meta($data['seat'], 'rrze-rsvp-seat-room', true);
         $data['room_name'] = get_the_title($data['room']);
         $data['room_street'] = get_post_meta($data['room'], 'rrze-rsvp-room-street', true);
-        $data['room_zip'] = get_post_meta($data['room'], 'rrze-rsvp-room-street', true);
-        $data['room_city'] = get_post_meta($data['room'], 'rrze-rsvp-room-scity', true);
+        $data['room_zip'] = get_post_meta($data['room'], 'rrze-rsvp-room-zip', true);
+        $data['room_city'] = get_post_meta($data['room'], 'rrze-rsvp-room-city', true);
 
         $data['notes'] = get_post_meta($post->ID, 'rrze-rsvp-booking-notes', true);
 

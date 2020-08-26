@@ -14,6 +14,7 @@ class Tools
     public function onLoaded() {
         add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
         add_action( 'admin_head', array( $this, 'create_seats_add_js' ) );
+        add_action( 'wp_ajax_csv_pull', array( $this, 'tracking_csv_pull' ) );
     }
 
     public function add_admin_menu() {
@@ -24,7 +25,136 @@ class Tools
             'rrze-rsvp-tools',
             array( $this, 'admin_page' )
         );
+        $menu_id = add_management_page(
+            _x( 'Contact tracking', 'admin page title', 'rrze-rsvp' ),
+            _x( 'RSVP Contact tracking', 'admin menu entry title', 'rrze-rsvp' ),
+            'manage_options',
+            'rrze-rsvp-tracking',
+            array( $this, 'admin_page_tracking' )
+        );
     }
+    
+    function tracking_csv_pull() {
+
+        $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
+        $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
+        $guest_firstname = filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING);
+        $guest_lastname = filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING);
+        $guest_email = filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL);
+        $guest_phone = filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING);
+
+        $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $guest_firstname, $guest_lastname, $guest_email, $guest_phone);
+
+        $file = 'rrze_tracking_csv';
+        $csv_output = '';
+
+        if ($aGuests){
+            foreach ($aGuests as $row){
+                $row = array_values($row);
+                $row = implode(", ", $row);
+                $csv_output .= $row."\n";
+             }
+        }
+ 
+        $filename = $file . "_" . date("Y-m-d_H-i", time());
+        header( "Content-type: application/vnd.ms-excel" );
+        header( "Content-disposition: csv" . date("Y-m-d") . ".csv" );
+        header( "Content-disposition: filename=" . $filename . ".csv" );
+        print $csv_output;
+        exit;
+    }
+
+
+    function admin_page_tracking() {
+        $searchdate = '';
+        $delta = 0;
+        $guest_firstname = '';
+        $guest_lastname = '';
+        $guest_email = '';
+        $guest_phone = '';
+
+        echo '<div class="wrap">';
+        echo '<h1>' . esc_html_x( 'Contact tracking', 'admin page title', 'rrze-rsvp' ) . '</h1>';
+
+        if ( isset( $_GET['submit'])) {
+            /*
+             * Submit Form, Search for users
+             */
+
+            $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
+            $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
+            $guest_firstname = filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING);
+            $guest_lastname = filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING);
+            $guest_email = filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL);
+            $guest_phone = filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING);
+
+            $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $guest_firstname, $guest_lastname, $guest_email, $guest_phone);
+
+            if ($aGuests){
+                // generate CSV
+                $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&guest_firstname=' . urlencode($guest_firstname) . '&guest_lastname=' . urlencode($guest_lastname) . '&guest_email=' . urlencode($guest_email) . '&guest_phone=' . urlencode($guest_phone);
+                echo '<div class="notice notice-success is-dismissible">';
+                echo '<h2>Guests found!</h2>';
+                echo "<a href='$ajax_url'>Download CSV</a>";
+                echo '</div>';
+            }else{
+                echo '<div class="notice notice-success is-dismissible">';
+                echo '<h2>No guests found</h2>';
+                echo '</div>';
+            }
+        }
+
+        /*
+         * Build Form
+         */
+
+        echo '<form id="rsvp-search-tracking" method="get">';
+        echo '<input type="hidden" name="page" value="rrze-rsvp-tracking">';
+        echo '<table class="form-table" role="presentation"><tbody>';
+
+        // searchdate fehlt
+        echo '<tr>'
+            . '<th scope="row"><label for="searchdate">' . __('Search date [YYYY-MM-DD]', 'rrze-rsvp') . '</label></th>'
+            . '<td><input type="text" id="searchdate" name="searchdate" value="' . $searchdate . '">'
+            . '</td>'
+            . '</tr>';
+
+        echo '<tr>'
+            . '<th scope="row"><label for="delta">' . '&#177; ' . __('days', 'rrze-rsvp') . '</label></th>'
+            . '<td><input type="number" id="delta" name="delta" min="0" required value="' . $delta . '"></td>'
+            . '</tr>'; // $value_delta
+        
+        echo '<tr>'
+            . '<th scope="row"><label for="guest_firstname">' . __('First name', 'rrze-rsvp') . '</label></th>'
+            . '<td><input type="text" id="guest_firstname" name="guest_firstname" value="' . $guest_firstname . '">'
+            . '</td>'
+            . '</tr>';
+
+        echo '<tr>'
+            . '<th scope="row"><label for="guest_lastname">' . __('Last name', 'rrze-rsvp') . '</label></th>'
+            . '<td><input type="text" id="guest_lastname" name="guest_lastname" value="' . $guest_lastname . '">'
+            . '</td>'
+            . '</tr>';
+
+        echo '<tr>'
+            . '<th scope="row"><label for="guest_email">' . __('Email', 'rrze-rsvp') . '</label></th>'
+            . '<td><input type="text" id="guest_email" name="guest_email" value="' . $guest_email . '">'
+            . '</td>'
+            . '</tr>';
+
+        echo '<tr>'
+            . '<th scope="row"><label for="guest_phone">' . __('Phone', 'rrze-rsvp') . '</label></th>'
+            . '<td><input type="text" id="guest_phone" name="guest_phone" value="' . $guest_phone . '">'
+            . '</td>'
+            . '</tr>';
+
+        echo '</tbody></table>';
+        echo '<p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="' . __('Search', 'rrze-rsvp') . '"></p>';
+
+        echo '</form>';
+        echo '</div>';
+    }
+
 
     function admin_page() {
         // Empty the form so it won't be submitted twice.
