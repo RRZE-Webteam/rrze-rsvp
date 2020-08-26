@@ -215,22 +215,32 @@ class Bookings extends Shortcodes {
                 . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
                 . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
                 . '</div>';
-
-
         } else {
-            $output .= '<div class="form-group"><label for="rsvp_lastname">'
+            $error = isset($fieldErrors['rsvp_lastname']) ? ' error' : '';
+            $value = isset($fieldErrors['rsvp_lastname']['value']) ? $fieldErrors['rsvp_lastname']['value'] : '';
+            $message = isset($fieldErrors['rsvp_lastname']['message']) ? $fieldErrors['rsvp_lastname']['message'] : '';    
+            $output .= '<div class="form-group' . $error . '"><label for="rsvp_lastname">'
                 . __('Last name', 'rrze-rsvp') . ' *</label>'
-                . "<input type=\"text\" name=\"rsvp_lastname\" id=\"rsvp_lastname\" required aria-required=\"true\">"
+                . '<input type="text" name="rsvp_lastname" value="' . $value . '" id="rsvp_lastname" required aria-required="true">'
+                . '<div class="error-message">' . $message . '</div>'
                 . '</div>';
 
-            $output .= '<div class="form-group"><label for="rsvp_firstname">'
+            $error = isset($fieldErrors['rsvp_firstname']) ? ' error' : '';
+            $value = isset($fieldErrors['rsvp_firstname']['value']) ? $fieldErrors['rsvp_firstname']['value'] : '';
+            $message = isset($fieldErrors['rsvp_firstname']['message']) ? $fieldErrors['rsvp_firstname']['message'] : '';    
+            $output .= '<div class="form-group' . $error . '"><label for="rsvp_firstname">'
                 . __('First name', 'rrze-rsvp') . ' *</label>'
-                . "<input type=\"text\" name=\"rsvp_firstname\" id=\"rsvp_firstname\" required aria-required=\"true\">"
+                . '<input type="text" name="rsvp_firstname" value="' . $value . '" id="rsvp_firstname" required aria-required="true">'
+                . '<div class="error-message">' . $message . '</div>'
                 . '</div>';
 
-            $output .= '<div class="form-group"><label for="rsvp_email">'
+            $error = isset($fieldErrors['rsvp_email']) ? ' error' : '';
+            $value = isset($fieldErrors['rsvp_email']['value']) ? $fieldErrors['rsvp_email']['value'] : '';
+            $message = isset($fieldErrors['rsvp_email']['message']) ? $fieldErrors['rsvp_email']['message'] : '';    
+            $output .= '<div class="form-group' . $error . '"><label for="rsvp_email">'
                 . __('Email', 'rrze-rsvp') . ' *</label>'
-                . "<input type=\"text\" name=\"rsvp_email\" id=\"rsvp_email\" required aria-required=\"true\">"
+                . '<input type="text" name="rsvp_email" value="' . $value . '" id="rsvp_email" required aria-required="true">'
+                . '<div class="error-message">' . $message . '</div>'
                 . '</div>';
         }
         $error = isset($fieldErrors['rsvp_phone']) ? ' error' : '';
@@ -238,7 +248,7 @@ class Bookings extends Shortcodes {
         $message = isset($fieldErrors['rsvp_phone']['message']) ? $fieldErrors['rsvp_phone']['message'] : '';
         $output .= '<div class="form-group' . $error . '"><label for="rsvp_phone">'
             . __('Phone Number', 'rrze-rsvp') . ' *</label>'
-            . '<input type="tel" name="rsvp_phone" value="' . $value . '" pattern="^[0-9-+\s()]*$" id="rsvp_phone" required aria-required="true">'
+            . '<input type="text" name="rsvp_phone" value="' . $value . '" pattern="^([+])?(\d{1,3})?\s?(\(\d{3,5}\)|\d{3,5})?\s?(\d{1,3}\s?|\d{1,3}[-])?(\d{3,8})$" id="rsvp_phone" required aria-required="true">'
             . '<div class="error-message">' . $message . '</div>'
             . '<p class="description">'
             . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
