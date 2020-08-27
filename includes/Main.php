@@ -27,7 +27,7 @@ class Main
 	}
 
 	public function onLoaded()
-	{	
+	{
 		// Settings
 		$settings = new Settings($this->pluginFile);
 		$settings->onLoaded();
@@ -44,7 +44,7 @@ class Main
 		$tracking = new Tracking;
 		$tracking->onLoaded();
 
-        $actions = new Actions;
+		$actions = new Actions;
 		$actions->onLoaded();
 
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
@@ -61,9 +61,6 @@ class Main
 
 		$tools = new Tools;
 		$tools->onLoaded();
-
-		$formPage = new VirtualPage('rsvp-booking', '[rsvp-booking]');
-		$formPage->onLoaded();
 
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
 		add_action('wp_enqueue_scripts', [$this, 'wpEnqueueScripts']);
@@ -113,17 +110,17 @@ class Main
 			'alert_no_seat_date' => __('Please select a seat and a date first.', 'rrze-rsvp')
 		));
 
-        if ($post_type == 'seat'){
-            wp_enqueue_script(
-                'rrze-rsvp-seat',
-                plugins_url('assets/js/rrze-rsvp-seat.js', plugin()->getBasename()),
-                ['jquery'],
-                plugin()->getVersion()
-            );
+		if ($post_type == 'seat') {
+			wp_enqueue_script(
+				'rrze-rsvp-seat',
+				plugins_url('assets/js/rrze-rsvp-seat.js', plugin()->getBasename()),
+				['jquery'],
+				plugin()->getVersion()
+			);
 
-            wp_localize_script( 'rrze-rsvp-seat', 'button_label', __('Create Seats', 'rrze-rsvp'));
-        }
-    }
+			wp_localize_script('rrze-rsvp-seat', 'button_label', __('Create Seats', 'rrze-rsvp'));
+		}
+	}
 
 	public function wpEnqueueScripts()
 	{

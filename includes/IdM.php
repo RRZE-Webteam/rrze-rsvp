@@ -41,11 +41,9 @@ class IdM
         }
 
         if (!$this->simplesamlAuth->isAuthenticated()) {
-            global $wp;
-            $redirectTo = site_url($wp->request);
             $nonce = wp_create_nonce('require-sso-auth');
             $room = isset($_GET['room_id']) ? '&room_id=' . absint($_GET['room_id']) : '';
-            $redirectUrl = sprintf('%s/rsvp-booking/?require-sso-auth=%s&redirect-to=%s%s', get_site_url(), $nonce, $redirectTo, $room);
+            $redirectUrl = sprintf('%s/?require-sso-auth=%s%s', get_permalink(), $nonce, $room);
             header('HTTP/1.0 403 Forbidden');
             wp_redirect($redirectUrl);
             exit;
@@ -65,17 +63,16 @@ class IdM
     public function requireAuth()
     {
         global $post;
-        if (!is_a($post, '\WP_Post') || !is_page() || $post->post_name != "rsvp-booking") {
+        if (!is_a($post, '\WP_Post') || !is_page()) {
             return;
         }
 
         $nonce = isset($_GET['require-sso-auth']) ? sanitize_text_field($_GET['require-sso-auth']) : false;
-        $redirectTo = isset($_GET['redirect-to']) ? sanitize_text_field($_GET['redirect-to']) : false;
 
         if (!$nonce) {
             return;
         }
-        if (!$redirectTo || !wp_verify_nonce($nonce, 'require-sso-auth')) {
+        if (!wp_verify_nonce($nonce, 'require-sso-auth')) {
             header('HTTP/1.0 403 Forbidden');
             wp_redirect(get_site_url());
             exit;            
@@ -83,7 +80,7 @@ class IdM
 
         if ($this->simplesamlAuth() && $this->simplesamlAuth->isAuthenticated()) {
             $room = isset($_GET['room_id']) ? '?room_id=' . absint($_GET['room_id']) : '';
-            $redirectUrl = sprintf('%s%s', $redirectTo, $room);
+            $redirectUrl = sprintf('%s/%s', get_permalink(), $room);
             wp_redirect($redirectUrl);
             exit;
         }
@@ -98,6 +95,7 @@ class IdM
         $data = [];
         if ($this->simplesamlAuth()) {
             $loginUrl = $this->simplesamlAuth->getLoginURL();
+            $data['title'] = __('Authentication Required', 'rrze-rsvp');
             $data['access_denied'] = __('Access to the requested page is denied', 'rrze-rsvp');
             $data['please_login'] = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
         } else {
@@ -106,9 +104,6 @@ class IdM
             exit;
         }
 
-        add_filter('the_title', function ($title) {
-            return __('Authentication Required', 'rrze-rsvp');
-        });
         add_filter('the_content', function ($content) use ($data) {
             return $this->template->getContent('auth/require-sso-auth', $data);
         });

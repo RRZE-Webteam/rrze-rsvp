@@ -697,4 +697,10 @@ class Functions
         }
         return $aResults;
     }
+
+    public static function getBoolValueFromAtt($att)
+    {
+        $filter = (string) preg_replace('/[^a-z0-9]/', '', strtolower($att));
+        return (in_array($filter, ['on', 'true', '1', 'wahr', 'aktiv', 'show']));
+    }    
 }
