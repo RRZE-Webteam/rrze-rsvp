@@ -6,6 +6,7 @@ use RRZE\RSVP\Email;
 use RRZE\RSVP\IdM;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Template;
+use RRZE\RSVP\TransientData;
 
 use function RRZE\RSVP\Config\defaultOptions;
 use function RRZE\RSVP\Config\getShortcodeSettings;
@@ -74,6 +75,15 @@ class Bookings extends Shortcodes {
     public function shortcodeBooking($atts, $content = '', $tag) { 
         global $post;
         $isFormPage = ($post->ID < 0);
+
+        if (isset($_GET['transient-data']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'transient-data')) {
+            $transient = $_GET['transient-data'];
+            $transientData = new TransientData($transient);
+            if (empty($fieldErrors = $transientData->getData())) {
+                wp_redirect($this->getRequestLink());
+                exit;
+            }           
+        }
 
         wp_enqueue_style('rrze-rsvp-shortcode');
 
@@ -205,28 +215,41 @@ class Bookings extends Shortcodes {
                 . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
                 . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
                 . '</div>';
-
-
         } else {
-            $output .= '<div class="form-group"><label for="rsvp_lastname">'
+            $error = isset($fieldErrors['rsvp_lastname']) ? ' error' : '';
+            $value = isset($fieldErrors['rsvp_lastname']['value']) ? $fieldErrors['rsvp_lastname']['value'] : '';
+            $message = isset($fieldErrors['rsvp_lastname']['message']) ? $fieldErrors['rsvp_lastname']['message'] : '';    
+            $output .= '<div class="form-group' . $error . '"><label for="rsvp_lastname">'
                 . __('Last name', 'rrze-rsvp') . ' *</label>'
-                . "<input type=\"text\" name=\"rsvp_lastname\" id=\"rsvp_lastname\" required aria-required=\"true\">"
+                . '<input type="text" name="rsvp_lastname" value="' . $value . '" id="rsvp_lastname" required aria-required="true">'
+                . '<div class="error-message">' . $message . '</div>'
                 . '</div>';
 
-            $output .= '<div class="form-group"><label for="rsvp_firstname">'
+            $error = isset($fieldErrors['rsvp_firstname']) ? ' error' : '';
+            $value = isset($fieldErrors['rsvp_firstname']['value']) ? $fieldErrors['rsvp_firstname']['value'] : '';
+            $message = isset($fieldErrors['rsvp_firstname']['message']) ? $fieldErrors['rsvp_firstname']['message'] : '';    
+            $output .= '<div class="form-group' . $error . '"><label for="rsvp_firstname">'
                 . __('First name', 'rrze-rsvp') . ' *</label>'
-                . "<input type=\"text\" name=\"rsvp_firstname\" id=\"rsvp_firstname\" required aria-required=\"true\">"
+                . '<input type="text" name="rsvp_firstname" value="' . $value . '" id="rsvp_firstname" required aria-required="true">'
+                . '<div class="error-message">' . $message . '</div>'
                 . '</div>';
 
-            $output .= '<div class="form-group"><label for="rsvp_email">'
+            $error = isset($fieldErrors['rsvp_email']) ? ' error' : '';
+            $value = isset($fieldErrors['rsvp_email']['value']) ? $fieldErrors['rsvp_email']['value'] : '';
+            $message = isset($fieldErrors['rsvp_email']['message']) ? $fieldErrors['rsvp_email']['message'] : '';    
+            $output .= '<div class="form-group' . $error . '"><label for="rsvp_email">'
                 . __('Email', 'rrze-rsvp') . ' *</label>'
-                . "<input type=\"text\" name=\"rsvp_email\" id=\"rsvp_email\" required aria-required=\"true\">"
+                . '<input type="text" name="rsvp_email" value="' . $value . '" id="rsvp_email" required aria-required="true">'
+                . '<div class="error-message">' . $message . '</div>'
                 . '</div>';
         }
-
-        $output .= '<div class="form-group"><label for="rsvp_phone">'
+        $error = isset($fieldErrors['rsvp_phone']) ? ' error' : '';
+        $value = isset($fieldErrors['rsvp_phone']['value']) ? $fieldErrors['rsvp_phone']['value'] : '';
+        $message = isset($fieldErrors['rsvp_phone']['message']) ? $fieldErrors['rsvp_phone']['message'] : '';
+        $output .= '<div class="form-group' . $error . '"><label for="rsvp_phone">'
             . __('Phone Number', 'rrze-rsvp') . ' *</label>'
-            . '<input type="tel" name="rsvp_phone" pattern="^[0-9-+\s()]*$" id="rsvp_phone" required aria-required="true">'
+            . '<input type="text" name="rsvp_phone" value="' . $value . '" pattern="^([+])?(\d{1,3})?\s?(\(\d{3,5}\)|\d{3,5})?\s?(\d{1,3}\s?|\d{1,3}[-])?(\d{3,8})$" id="rsvp_phone" required aria-required="true">'
+            . '<div class="error-message">' . $message . '</div>'
             . '<p class="description">'
             . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
             . '</div>';
@@ -488,23 +511,82 @@ class Bookings extends Shortcodes {
 
 
         // Postdaten überprüfen
-        if (!$booking_dsgvo
-            || !Functions::validateDate($booking_date)
-            || !Functions::validateTime($booking_start, 'H:i')
-            || !get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true)
-            || empty($booking_lastname)
-            || empty($booking_firstname)
-            || !filter_var($booking_email, FILTER_VALIDATE_EMAIL)
-            || !Functions::validatePhone($booking_phone))
-        {
+        $transientData = new TransientData(bin2hex(random_bytes(8)));
+
+        if (!$booking_dsgvo) {
+            $transientData->addData(
+                'rsvp_dsgvo', 
+                [
+                    'value' => $booking_dsgvo,
+                    'message' => __('DSGVO field is required.', 'rrze-rsvp')
+                ]
+            );
+        }
+        if (!Functions::validateDate($booking_date) || !Functions::validateTime($booking_start, 'H:i')) {
+            $transientData->addData(
+                'rsvp_date', 
+                [
+                    'value' => $booking_date,
+                    'message' => __('The date or time of the booking is not valid.', 'rrze-rsvp')
+                ]
+            );
+        }
+        if (!get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true)) {
+            $transientData->addData(
+                'rsvp_seat', 
+                [
+                    'value' => $booking_seat,
+                    'message' => __('The room does not exist.', 'rrze-rsvp')
+                ]
+            );
+        }
+        if (empty($booking_lastname)) {
+            $transientData->addData(
+                'customer_lastname', 
+                [
+                    'value' => $booking_lastname,
+                    'message' => __('Your last name is required.', 'rrze-rsvp')
+                ]
+            );
+        }
+        if (empty($booking_firstname)) {
+            $transientData->addData(
+                'customer_firstname', 
+                [
+                    'value' => $booking_firstname,
+                    'message' => __('Your name is required.', 'rrze-rsvp')
+                ]
+            );
+        }        
+        if (!filter_var($booking_email, FILTER_VALIDATE_EMAIL)) {
+            $transientData->addData('
+            rsvp_date', 
+            [
+                'value' => $booking_email,
+                'message' => __('The email address is not valid.', 'rrze-rsvp')
+            ]
+        );
+        }
+        if (!Functions::validatePhone($booking_phone)) {
+            $transientData->addData(
+                'rsvp_phone', 
+                [
+                    'value' => $booking_phone,
+                    'message' => __('Your phone number is not valid.', 'rrze-rsvp')
+                ]
+            );
+        }
+
+        if (!empty($transientData->getData(false))) {           
             $redirectUrl = add_query_arg(
                 [
-                    'booking' => wp_create_nonce('post_data')
+                    'nonce' => wp_create_nonce('transient-data'),
+                    'transient-data' => $transientData->getTransient()
                 ],
-                $this->getRequestLink()
+                wp_get_referer()
             );
             wp_redirect($redirectUrl);
-            exit;  
+            exit;             
         }
 
         // Überprüfen ob bereits eine Buchung mit gleicher E-Mail-Adresse zur gleichen Zeit vorliegt

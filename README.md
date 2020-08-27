@@ -27,7 +27,6 @@ In Bezug auf die notwendigen Maßnahmen zur Eindämmung der Corona-Pandemie eign
 
 Das System eignet sich auch für die Verwaltung von Sprechstundenterminen.
 
-
 ## Dokumentation
 
 Eine vollständige Dokumentation mit vielen Anwendungsbeispielen findet sich auf der Seite: 

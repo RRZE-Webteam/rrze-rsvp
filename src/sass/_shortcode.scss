@@ -1,5 +1,9 @@
 .rrze-rsvp {
+    
+    #content & form,
     form {
+	border: none;
+	
         position: relative;
         legend {
             padding-bottom: 5px;
@@ -26,6 +30,27 @@
     .form-group {
         .description {
             font-style: italic;
+        }
+        .error-message {
+            display: none;
+        }
+    }
+    .error-message {
+        font-style: italic;
+        color: #cc0033;
+        display: inline-block;
+    }
+    .error {
+        label, p {
+            color: #cc0033;
+        }
+        input[type] {
+            background-color: #fce4e4;
+            border: 1px solid #cc0033;
+            outline: none;
+        }
+        .error-message {
+            display: inline-block;
         }
     }
     .rsvp-datetime-container {

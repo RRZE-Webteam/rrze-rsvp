@@ -29,11 +29,10 @@ class Functions
         return self::validateDate($date, $format);
     }
 
-    // phone must be at least 10 figures
+    // The phone number must be at least 3 digits long.
     public static function validatePhone(string $phone): bool
     {
-        $phone = preg_replace('/[^0-9]/', '', $phone);
-        return (strlen($phone) > 9);
+        return (preg_match_all('/\d/', $phone) >= 3);
     }
 
     public static function isLocaleEnglish()
@@ -89,14 +88,15 @@ class Functions
      */
     public static function getOccupancyByRoomIdHTML(int $room_id, bool $from_now = NULL, int $timestamp = 0): string
     {
-        $output = '<table class="rsvp-room-occupancy"><tr>';
+       
 
         $seats_slots = self::getOccupancyByRoomId($room_id, $from_now, $timestamp);
 
         if ($seats_slots){
+	    $output = '<table class="rsvp-room-occupancy"><tr>';
             $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
             foreach($seats_slots['room_slots'] as $room_slot){
-                $output .= '<th scope="col"><span class="rrze-rsvp-timespan">' . str_replace('-', ' - ', $room_slot) . '</span></th>';
+                $output .= '<th scope="col"><span class="rrze-rsvp-timeslot">' . str_replace('-', ' - ', $room_slot) . '</span></th>';
             }
             $output .= '</tr>';
             $aRoomSlots = $seats_slots['room_slots'];
@@ -111,10 +111,11 @@ class Functions
                 }
                 $output .= '</tr>';
             }
+	    $output .= '</table>';
         }else{
-            $output .= '<td>' . __('This room has no seats for today.', 'rrze-rsvp') . '</td>';
+            $output = '<div class="alert">' . __('This room has no seats for today.', 'rrze-rsvp') . '</div>';
         }
-        $output .= '</table>';
+       
 
         return $output;
     }
@@ -189,14 +190,15 @@ class Functions
      */
     public static function getOccupancyByRoomIdHTMLAdmin(int $room_id): string
     {
-        $output = '<table class="rsvp-room-occupancy"><tr>';
+        
 
         $seats_slots = self::getOccupancyByRoomIdAdmin($room_id);
 
         if ($seats_slots){
+	    $output = '<table class="rsvp-room-occupancy"><tr>';
             $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
             foreach($seats_slots['room_slots'] as $room_slot){
-                $output .= '<th scope="col"><span class="rrze-rsvp-timespan">' . $room_slot . '</span></th>';
+                $output .= '<th scope="col"><span class="rrze-rsvp-timeslot">' . $room_slot . '</span></th>';
             }
             $output .= '</tr>';
             $aRoomSlots = $seats_slots['room_slots'];
@@ -210,10 +212,11 @@ class Functions
                 }
                 $output .= '</tr>';
             }
+	    $output .= '</table>';
         }else{
-            $output .= '<td>' . __('This room has no seats for today.', 'rrze-rsvp') . '</td>';
+	    $output = '<div class="alert">' . __('This room has no seats for today.', 'rrze-rsvp') . '</div>';
         }
-        $output .= '</table>';
+        
 
         return $output;
     }
@@ -334,8 +337,8 @@ class Functions
         $data['room'] = get_post_meta($data['seat'], 'rrze-rsvp-seat-room', true);
         $data['room_name'] = get_the_title($data['room']);
         $data['room_street'] = get_post_meta($data['room'], 'rrze-rsvp-room-street', true);
-        $data['room_zip'] = get_post_meta($data['room'], 'rrze-rsvp-room-street', true);
-        $data['room_city'] = get_post_meta($data['room'], 'rrze-rsvp-room-scity', true);
+        $data['room_zip'] = get_post_meta($data['room'], 'rrze-rsvp-room-zip', true);
+        $data['room_city'] = get_post_meta($data['room'], 'rrze-rsvp-room-city', true);
 
         $data['notes'] = get_post_meta($post->ID, 'rrze-rsvp-booking-notes', true);
 
