@@ -168,10 +168,14 @@ while ( have_posts() ) : the_post();
                 . '[collapse title="'.__('Current Room Occupancy', 'rrze-rsvp').'" name="occupancy"]'
                 . Functions::getOccupancyByRoomIdNextHTML($postID)
                 . '[/collapse]';
-            if ($options->general_single_room_availability_table != 'no') {
-                $shortcode .= '[collapse title="' . __('Availability', 'rrze-rsvp') . '" name="availability"]'
+            if ($options->general_single_room_availability_table != 'no') {		
+		$bookingmode = get_post_meta($postID, 'rrze-rsvp-room-bookingmode', true);
+		if (!empty($bookingmode)) {
+		    
+		    $shortcode .= '[collapse title="' . __('Availability', 'rrze-rsvp') . '" name="availability"]'
                     . do_shortcode('[rsvp-availability room=' . $postID . ' days=10 '.$booking_link.']')
                     . '[/collapse]';
+		}
             }
             $shortcode .= '[/collapsibles]';
             $timetables = do_shortcode($shortcode);
