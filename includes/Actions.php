@@ -14,10 +14,6 @@ class Actions
 	{
 		$this->email = new Email;
 		$this->template = new Template;
-
-		// Endpoint
-		$this->endpoint = new Endpoint('rsvp-booking');
-		$this->endpoint->onLoaded();		
 	}
 
 	public function onLoaded()
@@ -126,10 +122,11 @@ class Actions
 
 	public function bookingReply()
 	{
-        if (!is_a($post, '\WP_Post') || !is_page() || $this->endpoint->getEndpointName() != "rsvp-booking") {
+        global $post;
+        if (!is_a($post, '\WP_Post') || !is_page() || $post->post_name != "rsvp-booking") {
             return;
 		}
-		\RRZE\Dev\dLog('passed 1');
+
 		$bookingId = isset($_GET['id']) ? absint($_GET['id']) : false;
 		$action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : false;
 		$hash = isset($_GET['booking-reply']) ? sanitize_text_field($_GET['booking-reply']) : false;
