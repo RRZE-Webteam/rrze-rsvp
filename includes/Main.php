@@ -62,7 +62,7 @@ class Main
 		$tools = new Tools;
 		$tools->onLoaded();
 
-		$formPage = new VirtualPage('rsvp-booking', '[rsvp-booking]');
+		$formPage = new VirtualPage(__('Booking', 'rrze-rsvp'), 'rsvp-booking', '[rsvp-booking]');
 		$formPage->onLoaded();
 
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);

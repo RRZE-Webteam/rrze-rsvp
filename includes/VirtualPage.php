@@ -16,13 +16,13 @@ class VirtualPage
 
     protected $shortcode;
 
-    public function __construct(string $pageSlug, string $shortcode)
+    public function __construct(string $title, string $pageSlug, string $shortcode)
     {
         $settings = new Settings(plugin()->getFile());
         $this->options = (object) $settings->getOptions();
 
         $this->pageSlug = sanitize_title($pageSlug);
-        $this->pageTitle = sanitize_text_field($this->options->general_booking_page_title);
+        $this->pageTitle = sanitize_text_field($title);
         $this->shortcode = $shortcode;
     }
 
