@@ -1024,8 +1024,9 @@ class Bookings extends Shortcodes {
                 }
             }
             foreach ($result as $key => $value) {
-                if (isset($value[$shortcode]['sso']) && $value[$shortcode]['sso'] == 'true') {
-                    return true;
+                if (isset($value[$shortcode]['sso'])) {
+                    $filter = (string) preg_replace('/[^a-z0-9]/', '', strtolower($value[$shortcode]['sso']));
+                    return (in_array($filter, ['on', 'true', '1', 'wahr', 'aktiv', 'show']));
                 }
             }
         }
