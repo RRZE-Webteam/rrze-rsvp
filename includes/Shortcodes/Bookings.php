@@ -142,7 +142,11 @@ class Bookings extends Shortcodes {
         }
 
         if ($ssoRequired && !$this->sso) {
-            return '<div class="alert alert-warning" role="alert">' . sprintf('%sSSO not available.%s Please activate SSO authentication or remove the SSO attribute from your shortcode.', '<strong>', '</strong><br />') . '</div>';
+	    $alert = '<div class="alert alert-warning" role="alert">';
+	    $alert .= '<p><strong>'.__('SSO not available.','rrze-rsvp').'</strong><br>';
+	    $alert .= __('Please activate SSO authentication or remove the SSO attribute from your shortcode.','rrze-rsvp').'</p>';
+	    $alert .= '</div>';
+            return $alert;
         }
 
         $get_date = isset($_GET[ 'bookingdate' ]) ? sanitize_text_field($_GET[ 'bookingdate' ]) : date('Y-m-d', current_time('timestamp'));
