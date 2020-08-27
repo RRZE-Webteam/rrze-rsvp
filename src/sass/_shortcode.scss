@@ -3,11 +3,13 @@
     #content & form,
     form {
 	border: none;
+	padding: 0;
 	
         position: relative;
         legend {
             padding-bottom: 5px;
             margin-bottom: 10px;
+	    border-bottom: none;
         }
     }
     #loading {

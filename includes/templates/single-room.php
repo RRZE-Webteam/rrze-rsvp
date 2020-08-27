@@ -185,8 +185,13 @@ while ( have_posts() ) : the_post();
                 //. '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
                 . Functions::getOccupancyByRoomIdNextHTML($postID);
             if ($options->general_single_room_availability_table != 'no') {
-                $timetables .= '<h3>' . __('Availability', 'rrze-rsvp') . '</h3>'
+		
+		$bookingmode = get_post_meta($postID, 'rrze-rsvp-room-bookingmode', true);
+		if (!empty($bookingmode)) {
+		
+		    $timetables .= '<h3>' . __('Availability', 'rrze-rsvp') . '</h3>'
                     . do_shortcode('[rsvp-availability room=' . $postID . ' days=10 '.$booking_link.']');
+		}
             }
         }
 

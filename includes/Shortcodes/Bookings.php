@@ -148,7 +148,80 @@ class Bookings extends Shortcodes {
 	    $alert .= '</div>';
             return $alert;
         }
-
+	$bookingmode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
+	if (empty($bookingmode)) {
+	    
+	    $alert = '<div class="alert alert-info" role="alert">';
+	    $alert .= '<p><strong>'.__('Checkin in room','rrze-rsvp').'</strong><br>';
+	    $alert .= __('Reservations disabled. Please checkin at the seats in the room.','rrze-rsvp').'</p>';
+	    $alert .= '</div>';
+	    
+	    
+	    if (shortcode_exists('collapsibles')) {
+		$scheduleinfo = '';
+		// Schedule
+		$scheduleData = Functions::getRoomSchedule($roomID);
+		$schedule = '';
+		$weekdays = [
+		    1 => __('Monday', 'rrze-rsvp'),
+		    2 => __('Tuesday', 'rrze-rsvp'),
+		    3 => __('Wednesday', 'rrze-rsvp'),
+		    4 => __('Thursday', 'rrze-rsvp'),
+		    5 => __('Friday', 'rrze-rsvp'),
+		    6 => __('Saturday', 'rrze-rsvp'),
+		    7 => __('Sunday', 'rrze-rsvp')
+		];
+		if (!empty($scheduleData)) {
+		    $schedule .= '<table class="rsvp-schedule">';
+		    $schedule .= '<tr>'
+			. '<th>'. __('Weekday', 'rrze-rsvp') . '</th>'
+			. '<th>'. __('Time slots', 'rrze-rsvp') . '</th>';
+		    $schedule .= '</tr>';
+		    foreach ($scheduleData as $weekday => $dailySlots) {
+			$schedule .= '<tr>'
+			    .'<td>' . $weekdays[$weekday] . '</td>'
+			    . '<td>';
+			$ts = [];
+			foreach ($dailySlots as $start => $end) {
+			    $ts[] = $start . ' - ' . $end;
+			}
+			$schedule .= implode('<br />', $ts);
+			$schedule .= '</td>'
+			    . '</tr>';
+		    }
+		    $schedule .= "</table>";
+		}
+		if (!empty($schedule)) {
+		    $scheduleinfo .= '[collapsibles expand-all-link="true"]'
+		    . '[collapse title="'.__('Schedule','rrze-rsvp').'" name="schedule" load="open"]'
+		    . $schedule
+		    . '[/collapse]';
+		
+		
+		}
+		
+		$scheduleinfo .= '[collapse title="'.__('Current Room Occupancy', 'rrze-rsvp').'" name="occupancy"]'
+		    . Functions::getOccupancyByRoomIdNextHTML($roomID)
+		    . '[/collapse]';
+		
+		$scheduleinfo .= '[/collapsibles]';
+		$schedulehtml = do_shortcode($scheduleinfo);
+		$alert  .= $schedulehtml;
+	    } else {
+		
+		$scheduleinfo = '<h2>' . __('Schedule', 'rrze-rsvp') . '</h2>'
+                . $schedule
+                //. '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
+                . Functions::getOccupancyByRoomIdNextHTML($postID);
+		$alert  .= $scheduleinfo;
+        
+	    }
+	    return $alert;
+	}
+	
+	
+	
+	
         $get_date = isset($_GET[ 'bookingdate' ]) ? sanitize_text_field($_GET[ 'bookingdate' ]) : date('Y-m-d', current_time('timestamp'));
         $get_time = isset($_GET[ 'timeslot' ]) ? sanitize_text_field($_GET[ 'timeslot' ]) : false;
         $get_seat = isset($_GET[ 'seat_id' ]) ? absint($_GET[ 'seat_id' ]) : false;
