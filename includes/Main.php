@@ -62,6 +62,9 @@ class Main
 		$tools = new Tools;
 		$tools->onLoaded();
 
+		$formPage = new VirtualPage('rsvp-booking', '[rsvp-booking]');
+		$formPage->onLoaded();
+
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
 		add_action('wp_enqueue_scripts', [$this, 'wpEnqueueScripts']);
 
