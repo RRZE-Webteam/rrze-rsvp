@@ -210,17 +210,6 @@ class Metaboxes
             'after_row' => '<div id="rrze-rsvp-additionals">'
         ));
 
-
-        $cmb_general->add_field(array(
-            'name'             => __('Booking Form Page', 'rrze-rsvp'),
-            'desc'             => __('The shortcode for the booking form must be inserted on this page.', 'rrze-rsvp'),
-            'id'               => 'rrze-rsvp-room-form-page',
-            'type'             => 'select',
-            'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
-            'default'          => '-1',
-            'options'          => $this->getPosts('page')
-        ));
-
         $cmb_general->add_field(array(
             'name' => __('SSO is required', 'rrze-rsvp'),
             'desc' => __('If SSO is enabled then the customer must log in through SSO in order to use the booking form.', 'rrze-rsvp'),

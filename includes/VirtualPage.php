@@ -14,16 +14,16 @@ class VirtualPage
 
     protected $pageTitle;
 
-    protected $shortcode;
+    protected $content;
 
-    public function __construct(string $pageSlug, string $shortcode)
+    public function __construct(string $title, string $pageSlug, string $content = '')
     {
         $settings = new Settings(plugin()->getFile());
         $this->options = (object) $settings->getOptions();
 
         $this->pageSlug = sanitize_title($pageSlug);
-        $this->pageTitle = sanitize_text_field($this->options->general_booking_page_title);
-        $this->shortcode = $shortcode;
+        $this->pageTitle = sanitize_text_field($title);
+        $this->content = $content;
     }
 
     public function onLoaded()
@@ -44,18 +44,6 @@ class VirtualPage
         }
 
         if ($param == $this->pageSlug) {
-            wp_register_style(
-                'rrze-rsvp-shortcode',
-                plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename()),
-                [],
-                plugin()->getVersion()
-            );
-            wp_register_script(
-                'rrze-rsvp-shortcode',
-                plugins_url('assets/js/shortcode.js', plugin()->getBasename()),
-                ['jquery'],
-                plugin()->getVersion()
-            );
             add_filter('the_posts', [$this, 'generatePage']);
         }
     }
@@ -91,7 +79,7 @@ class VirtualPage
         $post->post_author           = 1;
         $post->post_date             = current_time('mysql');
         $post->post_date_gmt         = current_time('mysql', true);
-        $post->post_content          = do_shortcode($this->shortcode);
+        $post->post_content          = $this->content;
         $post->post_title            = $this->pageTitle;
         $post->post_excerpt          = '';
         $post->post_status           = 'publish';
@@ -107,7 +95,7 @@ class VirtualPage
         $post->post_parent           = 0;
         $post->guid                  = get_home_url(1, '/' . $this->pageSlug);
         $post->menu_order            = 0;
-        $post->post_tyle             = 'page';
+        $post->post_type             = 'page';
         $post->post_mime_type        = '';
         $post->comment_count         = 0;
 

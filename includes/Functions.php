@@ -450,7 +450,7 @@ class Functions
             if (isset($slots[$weekday])) {
                 foreach ($slots[$weekday] as $time => $endtime) {
                     $time_parts = explode(':', $time);
-                    $room_availability[strtotime('+' . $time_parts[0] . ' hours, + ' . $time_parts[1] . ' minutes', $loopstart)] = $seat_ids;
+                    $room_availability[strtotime('+' . intval($time_parts[0]) . ' hours, + ' . $time_parts[1] . ' minutes', $loopstart)] = $seat_ids;
                 }
             }
             $loopstart = strtotime("+1 day", $loopstart);
@@ -663,31 +663,7 @@ class Functions
         });
 
     }
-
-    public static function isFormPage(int $postId): bool
-    {
-        return !is_null(self::getRoomIdByFormPageId($postId)) ? true : false;
-    }
-
-    public static function getRoomIdByFormPageId(int $postId)
-    {
-        $args = [
-            'numberposts' => -1,
-            'post_type' => 'room'
-        ];
-        $posts = get_posts($args);
-        if (empty($posts)) {
-            return null;
-        }
-        foreach ($posts as $post) {
-            if (get_post_meta($post->ID, 'rrze-rsvp-room-form-page', true) == $postId) {
-                return $post->ID;
-            }
-        }
-        return null;
-    }  
-    
-
+ 
     public static function searchArrayByKey(array $aInput, string $key, string $value): array
     {
         $aResults = [];
@@ -698,4 +674,10 @@ class Functions
         }
         return $aResults;
     }
+
+    public static function getBoolValueFromAtt($att)
+    {
+        $filter = (string) preg_replace('/[^a-z0-9]/', '', strtolower($att));
+        return (in_array($filter, ['on', 'true', '1', 'wahr', 'aktiv', 'show']));
+    }    
 }

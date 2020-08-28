@@ -53,7 +53,6 @@ function getConstants() {
     }
 
         return [
-            'booking_page_title' => __('RSVP Booking', 'rrze-rsvp'),
             'single_room_availability_table' => 'yes_link',
             'contact_tracking_note' => 'Contact your SuperAdmin <a href="mailto:' . $sender_email . '>' . $sender_name . '</a> to receive contact tracking informations.',
             'notification_email' => $notification_email,
@@ -216,14 +215,6 @@ function getFields(){
         ],
  */
         'general' => [
-            [
-                'name'    => 'booking_page_title',
-                'label'   => __('Booking Page Title', 'rrze-rsvp'),
-                'desc'    => __('Enter the title of the default booking form page.', 'rrze-rsvp'),
-                'type'    => 'text',
-                'default' =>  $defaults['booking_page_title'],
-                'sanitize_callback' => 'sanitize_text_field'                
-            ],
             [
                 'name'    => 'single_room_availability_table',
                 'label'   => __('Show Availability table on Room page.', 'rrze-rsvp'),
