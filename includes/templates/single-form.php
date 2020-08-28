@@ -6,9 +6,6 @@ defined('ABSPATH') || exit;
 
 $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
 $room = $roomId ? sprintf(' room=%d', $roomId) : '';
-$seat = isset($_GET['seat_id']) ? sprintf(' seat=%d', absint($_GET['room_id'])) : '';
-$bookingDate = isset($_GET['bookingdate']) ? sprintf(' bookingdate=%s', sanitize_text_field($_GET['bookingdate'])) : '';
-$timeslot = isset($_GET['timeslot']) ? sprintf(' timeslot=%s', sanitize_text_field($_GET['timeslot'])) : '';
 $sso = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true)) ? ' sso=true' : '';
 $daysInAdvance = absint(get_post_meta($roomId, 'rrze-rsvp-room-days-in-advance', true));
 $days =  $daysInAdvance ? sprintf(' days=%d', $daysInAdvance) : sprintf(' days=%d', 7);
