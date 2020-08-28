@@ -254,7 +254,7 @@ class Bookings extends Shortcodes {
                 'rrze-rsvp'
             ) . '</legend>'
                             . '<div class="rsvp-date-container">';
-        $dateComponents = getdate(strtotime($get_date . ' +1 days'));
+        $dateComponents = getdate(strtotime($get_date));
         $month          = $dateComponents[ 'mon' ];
         $year           = $dateComponents[ 'year' ];
         $start          = date_create();
