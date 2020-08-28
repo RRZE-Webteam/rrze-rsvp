@@ -104,7 +104,7 @@ class Shortcodes
         global $post;
         if (isset($_GET['require-sso-auth']) && wp_verify_nonce($_GET['require-sso-auth'], 'require-sso-auth')) {
             return sprintf('%sincludes/templates/single-auth.php', plugin()->getDirectory());
-        } elseif (isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rsvp-availability')) {
+        } elseif (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) {
             return sprintf('%sincludes/templates/single-form.php', plugin()->getDirectory());
         } elseif ($post->post_type == 'room') {
             return dirname($this->pluginFile) . '/includes/templates/single-room.php';

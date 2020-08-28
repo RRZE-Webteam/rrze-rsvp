@@ -27,6 +27,8 @@ class Bookings extends Shortcodes {
     protected $idm;
     protected $sso = false;
 
+    protected $nonce;
+
     public function __construct($pluginFile, $settings)
     {
         parent::__construct($pluginFile, $settings);
@@ -58,9 +60,10 @@ class Bookings extends Shortcodes {
         if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
             return;
         }
+        $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         if ($this->hasShortcodeSSO($post->post_content, 'rsvp-booking')
-            || (isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rsvp-availability'))
+            || $this->nonce
         ) {
             $this->sso = $this->idm->tryLogIn();
         }     
@@ -70,11 +73,17 @@ class Bookings extends Shortcodes {
         global $post;
         $postID = $post->ID;
 
-        if (isset($_GET['transient-data']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'transient-data')) {
+        if (isset($_GET['transient-data']) && isset($_GET['transient-data-nonce']) && wp_verify_nonce($_GET['transient-data-nonce'], 'transient-data')) {
             $transient = $_GET['transient-data'];
             $transientData = new TransientData($transient);
             if (empty($fieldErrors = $transientData->getData())) {
-                wp_redirect(get_permalink());
+                $redirectUrl = add_query_arg(
+                    [
+                        'nonce' => $this->nonce
+                    ],
+                    get_permalink()
+                );
+                wp_redirect($redirectUrl);
                 exit;
             }           
         }
@@ -232,6 +241,9 @@ class Bookings extends Shortcodes {
             $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
         }
 
+        if (isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rsvp-availability')) {
+            $output .= '<div><input type="hidden" value="' . $_GET['nonce'] . '" id="rsvp_availability" name="nonce"></div>';
+        }
         $output .= '<p><input type="hidden" value="' . $roomID . '" id="rsvp_room">'
                     . wp_nonce_field('post_nonce', 'rrze_rsvp_post_nonce_field')
                     . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($roomID) . '</strong>'
@@ -563,7 +575,8 @@ class Bookings extends Shortcodes {
             } else {
                 $redirectUrl = add_query_arg(
                     [
-                        'booking' => wp_create_nonce('sso_authentication')
+                        'booking' => wp_create_nonce('sso_authentication'),
+                        'nonce' => $this->nonce
                     ],
                     get_permalink()
                 );
@@ -647,8 +660,9 @@ class Bookings extends Shortcodes {
         if (!empty($transientData->getData(false))) {           
             $redirectUrl = add_query_arg(
                 [
-                    'nonce' => wp_create_nonce('transient-data'),
-                    'transient-data' => $transientData->getTransient()
+                    'transient-data-nonce' => wp_create_nonce('transient-data'),
+                    'transient-data' => $transientData->getTransient(),
+                    'nonce' => $this->nonce
                 ],
                 wp_get_referer()
             );
@@ -681,7 +695,8 @@ class Bookings extends Shortcodes {
         if (!empty($check_bookings)) {
             $redirectUrl = add_query_arg(
                 [
-                    'booking' => wp_create_nonce('multiple_booking')
+                    'booking' => wp_create_nonce('multiple_booking'),
+                    'nonce' => $this->nonce
                 ],
                 get_permalink()
             );
@@ -707,7 +722,8 @@ class Bookings extends Shortcodes {
                 [
                     //'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', get_permalink(), $room_id, $booking_date, $booking_start),
                     'url' => wp_get_referer(),
-                    'booking' => wp_create_nonce('timeslot_unavailable')
+                    'booking' => wp_create_nonce('timeslot_unavailable'),
+                    'nonce' => $this->nonce
                 ],
                 get_permalink()
             );
@@ -729,7 +745,8 @@ class Bookings extends Shortcodes {
                 [
                     //'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', get_permalink(), $room_id, $booking_date, $booking_start),
                     'url' => wp_get_referer(),
-                    'booking' => wp_create_nonce('seat_unavailable')
+                    'booking' => wp_create_nonce('seat_unavailable'),
+                    'nonce' => $this->nonce
                 ],
                 get_permalink()
             );
@@ -752,7 +769,8 @@ class Bookings extends Shortcodes {
         if (!$booking_id || is_wp_error($booking_id)) {
             $redirectUrl = add_query_arg(
                 [
-                    'booking' => wp_create_nonce('save_error')
+                    'booking' => wp_create_nonce('save_error'),
+                    'nonce' => $this->nonce
                 ],
                 get_permalink()
             );
@@ -809,7 +827,8 @@ class Bookings extends Shortcodes {
         $redirectUrl = add_query_arg(
             [
                 'id' => $booking_id,
-                'booking' => wp_create_nonce('booked')
+                'booking' => wp_create_nonce('booked'),
+                'nonce' => $this->nonce
             ],
             get_permalink()
         );
