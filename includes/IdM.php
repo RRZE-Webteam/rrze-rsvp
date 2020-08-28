@@ -12,7 +12,7 @@ class IdM
 
     protected $webssoOptionName = '_fau_websso';
 
-    protected $simplesamlAuth = null;
+    public $simplesamlAuth = null;
 
     protected $personAttributes = null;
 
@@ -31,6 +31,9 @@ class IdM
     public function __construct()
     {
         $this->template = new Template;
+    }
+
+    public function onLoaded() {
         add_action('wp', [$this, 'requireAuth']);
     }
 
@@ -96,7 +99,6 @@ class IdM
         if ($this->simplesamlAuth()) {
             $loginUrl = $this->simplesamlAuth->getLoginURL();
             $data['title'] = __('Authentication Required', 'rrze-rsvp');
-            $data['access_denied'] = __('Access to the requested page is denied', 'rrze-rsvp');
             $data['please_login'] = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
         } else {
             header('HTTP/1.0 403 Forbidden');
@@ -137,7 +139,7 @@ class IdM
         ];
     }
 
-    protected function simplesamlAuth()
+    public function simplesamlAuth()
     {
         if (!$this->isPluginActive($this->webssoPlugin)) {
             return false;

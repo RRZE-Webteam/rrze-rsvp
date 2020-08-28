@@ -34,6 +34,7 @@ class Bookings extends Shortcodes {
         $this->options = (object) $settings->getOptions();
         $this->email = new Email;
         $this->idm = new IdM;
+        $this->idm->onLoaded();
         $this->template = new Template;
     }
 
