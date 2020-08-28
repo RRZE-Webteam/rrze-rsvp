@@ -23,7 +23,7 @@ class Actions
 		add_action('transition_post_status', [$this, 'transitionPostStatus'], 10, 3);
 		add_action('wp', [$this, 'bookingReply']);
 	}
-    
+
 	public function ajaxBookingAction()
 	{
 		$bookingId = absint($_POST['id']);
@@ -122,9 +122,9 @@ class Actions
 
 	public function bookingReply()
 	{
-        global $post;
-        if (!is_a($post, '\WP_Post') || !is_page() || $post->post_name != "rsvp-booking") {
-            return;
+		global $post;
+		if (!is_a($post, '\WP_Post') || !is_page() || $post->post_name != "rsvp-booking") {
+			return;
 		}
 
 		$bookingId = isset($_GET['id']) ? absint($_GET['id']) : false;
@@ -134,11 +134,11 @@ class Actions
 		if (!$hash || !$bookingId || !$action) {
 			return;
 		}
-		
+
 		wp_enqueue_style(
-			'rrze-rsvp-booking-reply', 
-			plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename()), 
-			[], 
+			'rrze-rsvp-booking-reply',
+			plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename()),
+			[],
 			plugin()->getVersion()
 		);
 
@@ -180,7 +180,7 @@ class Actions
 				$this->email->bookingRequestedCustomer($bookingId);
 			} else {
 				$this->email->bookingConfirmedCustomer($bookingId);
-			}			
+			}
 		} elseif ($bookingBooked && $action == 'cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 			$bookingCancelled = true;
@@ -217,7 +217,7 @@ class Actions
 
 		$customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
 		$customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
-		
+
 		$data['already_done'] = $alreadyDone;
 		$data['no-action'] = ($response == 'no-action');
 		$data['class_cancelled'] = in_array($response, ['cancelled', 'already-cancelled']) ? 'cancelled' : '';
@@ -230,10 +230,10 @@ class Actions
 		$data['customer']['name'] = $customerName;
 		$data['customer']['email'] = $customerEmail;
 
-		add_filter('the_title', function($title) {
+		add_filter('the_title', function ($title) {
 			return __('Booking', 'rrze-rsvp');
-		});		
-		add_filter('the_content', function($content) use ($data) {
+		});
+		add_filter('the_content', function ($content) use ($data) {
 			return $this->template->getContent('reply/booking-admin', $data);
 		});
 	}
@@ -290,9 +290,9 @@ class Actions
 		}
 
 		$data = [];
-        // Is locale not english?
+		// Is locale not english?
 		$data['is_locale_not_english'] = !Functions::isLocaleEnglish() ? true : false;
-		
+
 		$data['room_name'] = $booking['room_name'];
 
 		$data['date'] = $booking['date'];
@@ -354,12 +354,12 @@ class Actions
 				$data['no_action_was_taken'] = __('No action was taken.', 'rrze-rsvp');
 				$data['action_not_available_en'] = 'Action not available';
 				$data['no_action_was_taken_en'] = 'No action was taken.';
-		}		
+		}
 
-		add_filter('the_title', function($title) {
+		add_filter('the_title', function ($title) {
 			return __('Booking', 'rrze-rsvp');
 		});
-		add_filter('the_content', function($content) use ($data) {
+		add_filter('the_content', function ($content) use ($data) {
 			return $this->template->getContent('reply/booking-customer', $data);
 		});
 	}
@@ -369,5 +369,4 @@ class Actions
 		echo json_encode($returnAry);
 		exit;
 	}
-
 }
