@@ -241,7 +241,7 @@ class Bookings extends Shortcodes {
                 'rrze-rsvp'
             ) . '</legend>'
                             . '<div class="rsvp-date-container">';
-        $dateComponents = getdate();
+        $dateComponents = getdate(strtotime($get_date . ' +1 days'));
         $month          = $dateComponents[ 'mon' ];
         $year           = $dateComponents[ 'year' ];
         $start          = date_create();
@@ -853,7 +853,6 @@ class Bookings extends Shortcodes {
         $link_next = '<a href="#" class="cal-skip cal-next" data-direction="next">&gt;&gt;</a>';
         $link_prev = '<a href="#" class="cal-skip cal-prev" data-direction="prev">&lt;&lt;</a>';
         $availability = Functions::getRoomAvailability($roomID, $startDate, $endDate, false);
-
         // Create the table tag opener and day headers
         $calendar = '<table class="rsvp_calendar" data-period="'.date_i18n('Y-m', $firstDayOfMonth).'" data-end="'.$endDate.'">';
         $calendar .= "<caption>";
