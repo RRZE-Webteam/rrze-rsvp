@@ -8,24 +8,17 @@ $idm = new IdM;
 $template = new Template;
 
 $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
-$room = $roomId ? sprintf(' room=%d', $roomId) : '';
-$seat = isset($_GET['seat_id']) ? sprintf(' seat=%d', absint($_GET['room_id'])) : '';
-$bookingDate = isset($_GET['bookingdate']) ? sprintf(' bookingdate=%s', sanitize_text_field($_GET['bookingdate'])) : '';
-$timeslot = isset($_GET['timeslot']) ? sprintf(' timeslot=%s', sanitize_text_field($_GET['timeslot'])) : '';
+$room = $roomId ? sprintf('?room_id=%d', $roomId) : '';
+$seat = isset($_GET['seat_id']) ? sprintf('&seat_id=%d', absint($_GET['seat_id'])) : '';
+$bookingDate = isset($_GET['bookingdate']) ? sprintf('&bookingdate=%s', sanitize_text_field($_GET['bookingdate'])) : '';
+$timeslot = isset($_GET['timeslot']) ? sprintf('&timeslot=%s', sanitize_text_field($_GET['timeslot'])) : '';
+$nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET['nonce'])) : '';        
 
 if ($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated()) {
-    $room = isset($_GET['room_id']) ? '?room_id=' . absint($_GET['room_id']) : '';
-    $redirectUrl = sprintf('%s/%s', get_permalink(), $room);
+    $redirectUrl = sprintf('%s/%s%s%s%s%s', get_permalink(), $room, $seat, $bookingDate, $timeslot, $nonce);
     wp_redirect($redirectUrl);
     exit;
 }
-
-wp_enqueue_style(
-    'rrze-rsvp-require-auth',
-    plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename()),
-    [],
-    plugin()->getVersion()
-);
 
 $data = [];
 if ($idm->simplesamlAuth()) {
