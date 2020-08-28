@@ -114,8 +114,10 @@ while ( have_posts() ) : the_post();
             }
 
             if ($booking_start != '') {
+                $nonce = wp_create_nonce('rsvp-availability');
+                $permalink = get_permalink($room_id);
                 $timeslot = explode('-', $booking_start)[0];
-                $url = get_permalink() . "?room_id=$room_id&seat_id=$id&bookingdate=$day&timeslot=$timeslot&instant=1";
+                $url = get_permalink() . "?room_id=$room_id&seat_id=$id&bookingdate=$day&timeslot=$timeslot&instant=1&nonce=$nonce";
                 echo '<p>' . sprintf(__('This seat is %sfree for instant check-in%s (booking and check-in in one step) for the current timeslot.', 'rrze-rsvp'), '<strong>', '</strong>') . '</p>';
                 echo '<p><a class="btn btn-success btn-lg btn-block" href="' . $url . '">' . __('Instant check-in', 'rrze-rsvp') . '</a></p><hr />';
             }

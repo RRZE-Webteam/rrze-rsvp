@@ -139,7 +139,7 @@ class Bookings extends Shortcodes {
             return $alert;
         }
 	$bookingmode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
-	if (empty($bookingmode)) {
+	if (empty($bookingmode) && !(isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rsvp-availability'))) {
 	    
 	    $alert = '<div class="alert alert-info" role="alert">';
 	    $alert .= '<p><strong>'.__('Checkin in room','rrze-rsvp').'</strong><br>';
