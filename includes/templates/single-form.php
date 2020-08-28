@@ -53,7 +53,7 @@ if (Helper::isFauTheme()) {
  */
 echo $divOpen;
 
-echo do_shortcode(sprintf('[rsvp-booking%s%s%s%s%s%s]', $room, $days, $seat, $bookingDate, $timeslot, $sso));
+echo do_shortcode(sprintf('[rsvp-booking%s%s%s]', $room, $days, $sso));
 
 echo $divClose;
 
