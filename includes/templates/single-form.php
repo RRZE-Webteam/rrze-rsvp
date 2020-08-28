@@ -4,7 +4,7 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-$roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
+$roomId = isset($_REQUEST['room_id']) ? absint($_REQUEST['room_id']) : null;
 $room = $roomId ? sprintf(' room=%d', $roomId) : '';
 $sso = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true)) ? ' sso=true' : '';
 $daysInAdvance = absint(get_post_meta($roomId, 'rrze-rsvp-room-days-in-advance', true));

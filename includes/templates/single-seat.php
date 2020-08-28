@@ -122,12 +122,12 @@ while ( have_posts() ) : the_post();
                 echo '<p><a class="btn btn-success btn-lg btn-block" href="' . $url . '">' . __('Instant check-in', 'rrze-rsvp') . '</a></p><hr />';
             }
         }
-    }
-
-    echo '<h3>' . __('Book this seat', 'rrze-rsvp') . '</h3>';
+    } else {
+        echo '<h3>' . __('Book this seat', 'rrze-rsvp') . '</h3>';
     
-    echo do_shortcode('[rsvp-qr seat=' . $id . ']');
-    echo do_shortcode('[rsvp-availability seat=' . $id . ' days=14 booking_link=true]');
+        echo do_shortcode('[rsvp-qr seat=' . $id . ']');
+        echo do_shortcode('[rsvp-availability seat=' . $id . ' days=14 booking_link=true]');
+    }
 
 endwhile;
 
