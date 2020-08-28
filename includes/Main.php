@@ -44,9 +44,6 @@ class Main
 		$tracking = new Tracking;
 		$tracking->onLoaded();
 
-		$actions = new Actions;
-		$actions->onLoaded();
-
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();
 
@@ -64,6 +61,9 @@ class Main
 
 		$formPage = new VirtualPage(__('Booking', 'rrze-rsvp'), 'rsvp-booking');
 		$formPage->onLoaded();
+
+		$actions = new Actions;
+		$actions->onLoaded();
 
 		add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
 		add_action('wp_enqueue_scripts', [$this, 'wpEnqueueScripts']);
