@@ -95,7 +95,7 @@ class VirtualPage
         $post->post_parent           = 0;
         $post->guid                  = get_home_url(1, '/' . $this->pageSlug);
         $post->menu_order            = 0;
-        $post->post_tyle             = 'page';
+        $post->post_type             = 'page';
         $post->post_mime_type        = '';
         $post->comment_count         = 0;
 
