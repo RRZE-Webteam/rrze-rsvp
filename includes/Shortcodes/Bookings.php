@@ -54,11 +54,13 @@ class Bookings extends Shortcodes {
     public function maybeAuthenticate()
     {
         global $post;
-        if (!is_a($post, '\WP_Post') || !is_page() || isset($_GET['require-sso-auth'])) {
+        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
             return;
         }
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
-        if ($this->hasShortcodeSSO($post->post_content, 'rsvp-booking')) {
+        if ($this->hasShortcodeSSO($post->post_content, 'rsvp-booking')
+            || (isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rsvp-availability'))
+        ) {
             $this->sso = $this->idm->tryLogIn();
         }     
     }
