@@ -704,7 +704,8 @@ class Bookings extends Shortcodes {
         if ($booking_timestamp_end < current_time('timestamp')) {
             $redirectUrl = add_query_arg(
                 [
-                    'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', $permalink, $room_id, $booking_date, $booking_start),
+                    //'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', get_permalink(), $room_id, $booking_date, $booking_start),
+                    'url' => wp_get_referer(),
                     'booking' => wp_create_nonce('timeslot_unavailable')
                 ],
                 get_permalink()
@@ -725,7 +726,8 @@ class Bookings extends Shortcodes {
         if (!$seat_available) {
             $redirectUrl = add_query_arg(
                 [
-                    'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', $permalink, $room_id, $booking_date, $booking_start),
+                    //'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', get_permalink(), $room_id, $booking_date, $booking_start),
+                    'url' => wp_get_referer(),
                     'booking' => wp_create_nonce('seat_unavailable')
                 ],
                 get_permalink()
