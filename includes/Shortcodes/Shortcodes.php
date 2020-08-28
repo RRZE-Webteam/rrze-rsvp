@@ -9,6 +9,7 @@ use RRZE\RSVP\Shortcodes\Bookings;
 use RRZE\RSVP\Shortcodes\Availability;
 use RRZE\RSVP\Shortcodes\QR;
 use function RRZE\RSVP\Config\getShortcodeSettings;
+use function RRZE\RSVP\plugin;
 
 /**
  * Laden und definieren der Shortcodes
@@ -26,7 +27,9 @@ class Shortcodes {
 
     public function onLoaded() {
         //add_action('wp_enqueue_scripts', [$this, 'enqueueScripts']);
-        add_filter( 'single_template', [$this, 'includeSingleTemplate'] );
+        if (!isset($_GET['require-sso-auth']) || !wp_verify_nonce($_GET['require-sso-auth'], 'require-sso-auth')) {
+            add_filter( 'single_template', [$this, 'includeSingleTemplate'] );
+        }
 
         $bookings_shortcode = new Bookings($this->pluginFile,  $this->settings);
         $bookings_shortcode->onLoaded();
@@ -98,7 +101,9 @@ class Shortcodes {
 
     public function includeSingleTemplate() {
         global $post;
-        if ($post->post_type == 'room') {
+        if (isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rsvp-availability')) {
+			return sprintf('%sincludes/templates/single-form.php', plugin()->getDirectory());
+		} elseif ($post->post_type == 'room') {
             return dirname($this->pluginFile) . '/includes/templates/single-room.php';
         } elseif ($post->post_type == 'seat') {
             return dirname($this->pluginFile) . '/includes/templates/single-seat.php';
