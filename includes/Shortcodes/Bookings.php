@@ -702,7 +702,6 @@ class Bookings extends Shortcodes {
         $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
 
         if ($booking_timestamp_end < current_time('timestamp')) {
-            $permalink = get_permalink($this->options->general_booking_page);
             $redirectUrl = add_query_arg(
                 [
                     'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', $permalink, $room_id, $booking_date, $booking_start),
@@ -724,8 +723,6 @@ class Bookings extends Shortcodes {
             }
         }
         if (!$seat_available) {
-            $permalink = get_permalink($this->options->general_booking_page);
-
             $redirectUrl = add_query_arg(
                 [
                     'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', $permalink, $room_id, $booking_date, $booking_start),
