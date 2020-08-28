@@ -37,7 +37,9 @@ class Availability extends Shortcodes {
         $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
         $output = '';
         $today = date('Y-m-d');
-        //$booking_link = (isset($shortcode_atts['booking_link']) && $shortcode_atts['booking_link'] == 'true');
+        $permalink = get_permalink();
+        $nonce = wp_create_nonce('rsvp-availability');        
+        $booking_link = (isset($shortcode_atts['booking_link']) && Functions::getBoolValueFromAtt($shortcode_atts['booking_link']));
         $days = sanitize_text_field($shortcode_atts['days']); // kann today, tomorrow oder eine Zahl sein (kommende X Tage)
 
         if (isset($shortcode_atts['room']) && $shortcode_atts['room'] != '') {
@@ -67,18 +69,11 @@ class Availability extends Shortcodes {
 				$booking_link_open = '';
 				$booking_link_close = '';
                 $glue = ', ';
-                /**
 				if ($booking_link) {
-				    if ($roomBookingPage = get_post_meta($room, 'rrze-rsvp-room-form-page', true)) {
-					$permalink = get_permalink($roomBookingPage);
-				    } else {
-					$permalink = site_url('/rsvp-booking/');
-				    }
-				    $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$starttime\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "' class='seat-link'>";
+				    $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$starttime&nonce=$nonce\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "' class='seat-link'>";
 				    $booking_link_close = '</a>';
 				    $glue = '';
                 }
-                */
 				$seat_names[] = $booking_link_open . $seat_name . $booking_link_close;
 			    }
 
@@ -130,19 +125,11 @@ class Availability extends Shortcodes {
                         $booking_link_open = '';
                         $booking_link_close = '';
                         $glue = ', &nbsp; ';
-                        /**
                         if ($booking_link) {
-                            $roomBookingPage = get_post_meta($room_id, 'rrze-rsvp-room-form-page', true);
-                            if ($roomBookingPage == '')
-                                $roomBookingPage = $this->options->general_booking_page;
-                            if ($roomBookingPage != '') {
-                                $permalink = get_permalink($roomBookingPage);
-                                $booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$time\" title='" . __( 'Book this seat/timeslot now', 'rrze-rsvp' ) . "'>";
-                                $booking_link_close = '</a>';
-                                $glue = '';
-                            }
+                            $booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$time&nonce=$nonce\" title='" . __( 'Book this seat/timeslot now', 'rrze-rsvp' ) . "'>";
+                            $booking_link_close = '</a>';
+                            $glue = '';
                         }
-                        */
                         $time_output[] = $booking_link_open . $time . $booking_link_close;
                     }
                     $output .= '<tr>'
