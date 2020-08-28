@@ -57,7 +57,6 @@ class Availability extends Shortcodes {
 			. '<th scope="col">' . __('Seats available', 'rrze-rsvp') . '</th>';
 		    foreach ($availability as $date => $timeslot) {
 			foreach ($timeslot as $time => $seat_ids) {
-			    $starttime = explode('-', $time)[0];
 			    $seat_names = [];
 			    $date_formatted = date_i18n('d.m.Y', strtotime($date));
 			    $seat_names_raw = [];
@@ -70,7 +69,8 @@ class Availability extends Shortcodes {
 				$booking_link_close = '';
                 $glue = ', ';
 				if ($booking_link) {
-				    $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$starttime&nonce=$nonce\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "' class='seat-link'>";
+                    $timeslot = explode('-', $time)[0];
+				    $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$timeslot&nonce=$nonce\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "' class='seat-link'>";
 				    $booking_link_close = '</a>';
 				    $glue = '';
                 }
@@ -126,7 +126,8 @@ class Availability extends Shortcodes {
                         $booking_link_close = '';
                         $glue = ', &nbsp; ';
                         if ($booking_link) {
-                            $booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$time&nonce=$nonce\" title='" . __( 'Book this seat/timeslot now', 'rrze-rsvp' ) . "'>";
+                            $timeslot = explode('-', $time)[0];
+                            $booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$timeslot&nonce=$nonce\" title='" . __( 'Book this seat/timeslot now', 'rrze-rsvp' ) . "'>";
                             $booking_link_close = '</a>';
                             $glue = '';
                         }
