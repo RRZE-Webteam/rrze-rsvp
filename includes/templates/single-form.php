@@ -4,9 +4,11 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-$roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : false;
-$seatId = isset($_GET['seat_id']) ? absint($_GET['seat_id']) : false;
-$bookingDate = isset($_GET['bookingdate']) ? sanitize_text_field($_GET['bookingdate']) : false;
+$roomId = isset($_GET['room_id']) ? sprintf(' room=%d', absint($_GET['room_id'])) : '';
+$seatId = isset($_GET['seat_id']) ? sprintf(' seat=%d', absint($_GET['room_id'])) : '';
+$bookingDate = isset($_GET['bookingdate']) ? sprintf(' bookingdate=%s', sanitize_text_field($_GET['bookingdate'])) : '';
+$timeslot = isset($_GET['timeslot']) ? sprintf(' timeslot=%s', sanitize_text_field($_GET['timeslot'])) : '';
+$sso = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true)) ? ' sso=true' : '';
 
 get_header();
 
@@ -48,7 +50,7 @@ if (Helper::isFauTheme()) {
  */
 echo $divOpen;
 
-echo do_shortcode(sprintf('[rsvp-booking room=%s sso=true]', $roomId));
+echo do_shortcode(sprintf('[rsvp-booking%s%s%s%s%s]', $roomId, $seatId, $bookingDate, $timeslot, $sso));
 
 echo $divClose;
 
