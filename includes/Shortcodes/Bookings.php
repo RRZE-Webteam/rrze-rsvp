@@ -148,7 +148,7 @@ class Bookings extends Shortcodes {
             return $alert;
         }
 	$bookingmode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
-	if (empty($bookingmode) && !(isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rsvp-availability'))) {
+	if (empty($bookingmode) && !$this->nonce) {
 	    
 	    $alert = '<div class="alert alert-info" role="alert">';
 	    $alert .= '<p><strong>'.__('Checkin in room','rrze-rsvp').'</strong><br>';
@@ -254,7 +254,7 @@ class Bookings extends Shortcodes {
                 'rrze-rsvp'
             ) . '</legend>'
                             . '<div class="rsvp-date-container">';
-        $dateComponents = getdate(strtotime($get_date . ' +1 days'));
+        $dateComponents = getdate(strtotime($get_date));
         $month          = $dateComponents[ 'mon' ];
         $year           = $dateComponents[ 'year' ];
         $start          = date_create();
@@ -493,18 +493,10 @@ class Bookings extends Shortcodes {
         $data = [];
         $roomId = $booking['room'];
         $roomMeta = get_post_meta($roomId);
-        $autoconfirmation = (isset($roomMeta['rrze-rsvp-room-auto-confirmation']) && $roomMeta['rrze-rsvp-room-auto-confirmation'][0] == 'on') ? true : false;
-        $forceToConfirm = (isset($roomMeta['rrze-rsvp-room-force-to-confirm']) && $roomMeta['rrze-rsvp-room-force-to-confirm'][0] == 'on') ? true : false;
-        $forceToCheckin = (isset($roomMeta['rrze-rsvp-room-force-to-checkin']) && $roomMeta['rrze-rsvp-room-force-to-checkin'][0] == 'on') ? true : false;
-        if ($autoconfirmation) {
-            $data['autoconfirmation'] = true;
-        }
-        if ($forceToConfirm) {
-            $data['force_to_confirm'] = true;
-        }        
-        if ($forceToCheckin) {
-            $data['force_to_checkin'] = true;
-        }
+
+        $data['autoconfirmation'] = (isset($roomMeta['rrze-rsvp-room-auto-confirmation']) && $roomMeta['rrze-rsvp-room-auto-confirmation'][0] == 'on');
+        $data['force_to_confirm'] = (isset($roomMeta['rrze-rsvp-room-force-to-confirm']) && $roomMeta['rrze-rsvp-room-force-to-confirm'][0] == 'on');
+        $data['force_to_checkin'] = (isset($roomMeta['rrze-rsvp-room-force-to-checkin']) && $roomMeta['rrze-rsvp-room-force-to-checkin'][0] == 'on');
 
         $data['date'] = $booking['date'];
         $data['date_label'] = __('Date', 'rrze-rsvp');
@@ -754,9 +746,10 @@ class Bookings extends Shortcodes {
             exit;                
         }
 
-        $autoconfirmation = get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true) == 'on' ? true : false;
-        $forceToConfirm = get_post_meta($room_id, 'rrze-rsvp-room-force-to-confirm', true) == 'on' ? true : false;
-        $forceToCheckin = get_post_meta($room_id, 'rrze-rsvp-room-force-to-checkin', true) == 'on' ? true : false;
+        $autoconfirmation = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true));
+        $instantCheckIn = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-instant-check-in', true));
+        $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-force-to-confirm', true));
+        $forceToCheckin = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-force-to-checkin', true));
 
         //Buchung speichern
         $new_draft = [
@@ -787,29 +780,45 @@ class Bookings extends Shortcodes {
         update_post_meta($booking_id, 'rrze-rsvp-booking-guest-firstname', $booking_firstname);
         update_post_meta($booking_id, 'rrze-rsvp-booking-guest-email', $booking_email);
         update_post_meta($booking_id, 'rrze-rsvp-booking-guest-phone', $booking_phone);
-        if ($autoconfirmation) {
+
+        // Set booking status
+        $bookingmode = get_post_meta($room_id, 'rrze-rsvp-room-bookingmode', true);
+        if (empty($bookingmode)) {
             $status = 'confirmed';
             $timestamp = current_time('timestamp');
-            if ($booking_instant && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+            if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+                $status = 'checked-in';
+            }
+        } elseif ($autoconfirmation) {
+            $status = 'confirmed';
+            $timestamp = current_time('timestamp');
+            if (($booking_instant || $instantCheckIn) && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
                 $status = 'checked-in';
             }
         } else {
             $status = 'booked';
         }
+
         update_post_meta( $booking_id, 'rrze-rsvp-booking-status', $status );
         update_post_meta($booking_id, 'rrze-rsvp-booking-notes', $booking_comment);
         update_post_meta($booking_id, 'rrze-rsvp-booking-dsgvo', $booking_dsgvo);
+
+        // Set customer status
         if ($forceToConfirm) {
             update_post_meta($booking_id, 'rrze-rsvp-customer-status', 'booked');
         }
 
         // E-Mail senden
-        if ($autoconfirmation) {
-            if ($forceToConfirm) {
-                $this->email->bookingRequestedCustomer($booking_id);
+        if (empty($bookingmode)) {
+            $this->email->bookingConfirmedCustomer($booking_id, true);
+        } elseif ($autoconfirmation) {
+            if ($booking_instant || $instantCheckIn) {
+                $this->email->bookingConfirmedCustomer($booking_id, true);
             } else {
                 $this->email->bookingConfirmedCustomer($booking_id);
             }
+        } elseif ($forceToConfirm) {
+            $this->email->bookingRequestedCustomer($booking_id);
         } else {
             if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
                 $to = $this->options->email_notification_email;
@@ -824,6 +833,7 @@ class Bookings extends Shortcodes {
             exit;
         }
 
+        // Redirect to bookedNotice()
         $redirectUrl = add_query_arg(
             [
                 'id' => $booking_id,

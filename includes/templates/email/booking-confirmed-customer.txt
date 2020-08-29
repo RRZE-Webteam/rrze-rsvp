@@ -14,8 +14,10 @@
 {{=seat_name}}
 {{/seat_name}}
 
+{{!instant_checkin}}
 {{=alt_checkin_text}}
 {{=checkin_url}}
+{{/!instant_checkin}}
 
 {{=alt_checkout_text}}
 {{=checkout_url}}
@@ -40,8 +42,10 @@
 {{=seat_name}}
 {{/seat_name}}
 
+{{!instant_checkin}}
 {{=alt_checkin_text_en}}
 {{=checkin_url}}
+{{/!instant_checkin}}
 
 {{=alt_checkout_text_en}}
 {{=checkout_url}}

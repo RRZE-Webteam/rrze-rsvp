@@ -44,12 +44,14 @@
     <mj-section padding-bottom="5px" padding-top="5px">
       <mj-column>
         <mj-text align="center" font-size="14px" padding-top="10px">
+          {{!instant_checkin}}
           <p>{{=checkin_text}}</p>
+          {{/!instant_checkin}}
           <p>{{=checkout_text}}</p>
         </mj-text>
       </mj-column>
     </mj-section>
-
+    <mj-raw>{{!instant_checkin}}</mj-raw>
     <mj-section padding-bottom="20px" padding-top="10px">
       <mj-column width="20%">
       </mj-column>
@@ -61,11 +63,21 @@
       <mj-column width="30%">
         <mj-button background-color="#eeeeee" color="#444444" href="{{=checkout_url}}" padding="20px 0 0 0" font-family="Helvetica, Arial, sans-serif" font-weight="bold" font-size="16px" width="160px">
         {{=checkout_btn}}
-      </mj-button>
+        </mj-button>
       </mj-column>
       <mj-column width="20%">
       </mj-column>
     </mj-section>
+    <mj-raw>{{/!instant_checkin}}</mj-raw>
+    <mj-raw>{{instant_checkin}}</mj-raw>
+    <mj-section padding-bottom="20px" padding-top="10px">
+      <mj-column>
+        <mj-button background-color="#eeeeee" color="#444444" href="{{=checkout_url}}" padding="20px 0 0 0" font-family="Helvetica, Arial, sans-serif" font-weight="bold" font-size="16px" width="160px">
+        {{=checkout_btn}}
+        </mj-button>
+      </mj-column>
+    </mj-section>    
+    <mj-raw>{{/instant_checkin}}</mj-raw>
 
     <mj-section padding-bottom="5px" padding-top="5px">
       <mj-column>
@@ -125,12 +137,14 @@
     <mj-section padding-bottom="5px" padding-top="5px">
       <mj-column>
         <mj-text align="center" font-size="14px" padding-top="10px">
+          {{!instant_checkin}}
           <p>{{=checkin_text_en}}</p>
+          {{/!instant_checkin}}
           <p>{{=checkout_text_en}}</p>
         </mj-text>
       </mj-column>
     </mj-section>
-
+    <mj-raw>{{!instant_checkin}}</mj-raw>
     <mj-section padding-bottom="20px" padding-top="10px">
       <mj-column width="20%">
       </mj-column>
@@ -147,7 +161,16 @@
       <mj-column width="20%">
       </mj-column>
     </mj-section>
-
+    <mj-raw>{{/!instant_checkin}}</mj-raw>
+    <mj-raw>{{instant_checkin}}</mj-raw>
+    <mj-section padding-bottom="20px" padding-top="10px">
+      <mj-column>
+        <mj-button background-color="#eeeeee" color="#444444" href="{{=checkout_url}}" padding="20px 0 0 0" font-family="Helvetica, Arial, sans-serif" font-weight="bold" font-size="16px" width="160px">
+        {{=checkout_btn_en}}
+        </mj-button>
+      </mj-column>
+    </mj-section>    
+    <mj-raw>{{/instant_checkin}}</mj-raw>
     <mj-section padding-bottom="5px" padding-top="5px">
       <mj-column>
         <mj-text align="center" font-size="14px" color="#444444" padding-top="10px">
