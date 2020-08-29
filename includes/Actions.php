@@ -152,7 +152,7 @@ class Actions
 
 		if (($action == 'confirm' || $action == 'cancel') && $isAdmin) {
 			$this->bookingReplyAdmin($bookingId, $booking, $action);
-		} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel') && $isCustomer) {
+		} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel' || $action == 'maybe-cancel') && $isCustomer) {
 			if ($bookingCancelled) {
 				$action = 'cancel';
 			}
@@ -230,9 +230,6 @@ class Actions
 		$data['customer']['name'] = $customerName;
 		$data['customer']['email'] = $customerEmail;
 
-		add_filter('the_title', function ($title) {
-			return __('Booking', 'rrze-rsvp');
-		});
 		add_filter('the_content', function ($content) use ($data) {
 			return $this->template->getContent('reply/booking-admin', $data);
 		});
@@ -253,7 +250,7 @@ class Actions
 			update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'confirmed');
 			$this->email->bookingConfirmedCustomer($bookingId);
 			$userConfirmed = true;
-		} elseif (!$bookingCancelled && !$bookingCkeckedIn && $action == 'cancel') {
+		} elseif (!$bookingCancelled && !$bookingCkeckedOut && $action == 'maybe-cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 			$this->email->bookingCancelledAdmin($bookingId);
 			$bookingCancelled = true;
@@ -271,10 +268,12 @@ class Actions
 			}
 		}
 
-		if (!$bookingCancelled && !$bookingCkeckedIn && $action == 'cancel') {
-			$response = 'maybe-cancelled';
-		} elseif ($bookingCancelled && $action == 'cancel') {
+		if (!$bookingCancelled && !$bookingCkeckedOut && $action == 'cancel') {
+			$response = 'maybe-cancel';
+		} elseif ($bookingCancelled && $action == 'maybe-cancel') {
 			$response = 'cancelled';
+		} elseif ($bookingCancelled && $action == 'cancel') {
+			$response = 'already-cancelled';
 		} elseif ($userConfirmed && $action == 'confirm') {
 			$response = 'confirmed';
 		} elseif (!$bookingCkeckedIn && $action == 'checkin') {
@@ -300,12 +299,12 @@ class Actions
 		$data['date_en'] = $booking['date_en'];
 		$data['time_en'] = $booking['time_en'];
 
-		$cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
-		$data['cancel_btn'] = sprintf(__('<a href="%s" class="button button-cancel">Cancel Your Booking</a>', 'rrze-rsvp'), $cancelUrl);
-		$data['cancel_btn_en'] = sprintf('<a href="%s" class="button button-cancel">Cancel Your Booking</a>', $cancelUrl);
+		$cancelUrl = Functions::bookingReplyUrl('maybe-cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
+		$data['cancel_btn'] = sprintf(__('<a href="%s" class="button button-cancel">' . _x('Cancel', 'Booking', 'rrze-rsvp') . '</a>', 'rrze-rsvp'), $cancelUrl);
+		$data['cancel_btn_en'] = sprintf('<a href="%s" class="button button-cancel">Cancel</a>', $cancelUrl);
 
 		switch ($response) {
-			case 'maybe-cancelled':
+			case 'maybe-cancel':
 				$data['booking_cancel'] = __('Cancel Booking', 'rrze-rsvp');
 				$data['really_want_to_cancel_the_booking'] = __('Do you really want to cancel your booking?', 'rrze-rsvp');
 				$data['booking_cancel_en'] = 'Cancel Booking';
@@ -319,6 +318,13 @@ class Actions
 				$data['booking_has_been_cancelled_en'] = 'Your booking has been cancelled. Please contact us to find a different arrangement.';
 				$data['class_cancelled'] = ($action == 'cancel') ? 'cancelled' : '';
 				break;
+			case 'already-cancelled':
+				$data['booking_cancelled'] = __('Booking Cancelled', 'rrze-rsvp');
+				$data['booking_has_been_cancelled'] = __('The booking is already canceled.', 'rrze-rsvp');
+				$data['booking_cancelled_en'] = 'Booking Cancelled';
+				$data['booking_has_been_cancelled_en'] = 'The booking is already canceled.';
+				$data['class_cancelled'] = ($action == 'cancel') ? 'cancelled' : '';
+				break;				
 			case 'confirmed':
 				$data['booking_confirmed'] = __('Booking Confirmed', 'rrze-rsvp');
 				$data['thank_for_confirming'] = __('Thank you for confirming your booking.', 'rrze-rsvp');
@@ -356,9 +362,6 @@ class Actions
 				$data['no_action_was_taken_en'] = 'No action was taken.';
 		}
 
-		add_filter('the_title', function ($title) {
-			return __('Booking', 'rrze-rsvp');
-		});
 		add_filter('the_content', function ($content) use ($data) {
 			return $this->template->getContent('reply/booking-customer', $data);
 		});
