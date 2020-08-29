@@ -277,12 +277,14 @@ class Email
 
     /**
      * bookingConfirmedCustomer
-     * Send a booking confirmation email to the customer. Optionally, the
-     * customer can cancel the booking using the link included in the email message.
+     * Send a booking confirmation email to the customer. Optionally, 
+     * the customer can check in, check out or cancel the booking through 
+     * the respective links included in the email message.
      * @param integer $bookingId Booking Id
+     * @param boolean $instantCheckIn Instant Check In
      * @return void
      */
-    public function bookingConfirmedCustomer(int $bookingId)
+    public function bookingConfirmedCustomer(int $bookingId, $instantCheckIn = false)
     {
         $booking = Functions::getBooking($bookingId);
         if (empty($booking)) {
@@ -316,6 +318,8 @@ class Email
         $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
+        // Instant check in
+        $data['instant_checkin'] = $instantCheckIn;
         // Check in booking
         $data['checkin_url'] = $checkInUrl;
         $data['checkin_btn'] = __('Check In', 'rrze-rsvp');
@@ -347,9 +351,13 @@ class Email
         $message = $this->template->getContent('email/booking-confirmed-customer', $data);
         $altMessage = $this->template->getContent('email/booking-confirmed-customer.txt', $data);
 
-        $icsFilename = sanitize_title($booking['room_name']) . '-' . date('YmdHi', $booking['start']) . '.ics';
-        $icsContent = ICS::generate($bookingId, $icsFilename);
-        $attachment = $this->tempFile($icsFilename, $icsContent);
+        if ($instantCheckIn) {
+            $attachment = '';
+        } else {
+            $icsFilename = sanitize_title($booking['room_name']) . '-' . date('YmdHi', $booking['start']) . '.ics';
+            $icsContent = ICS::generate($bookingId, $icsFilename);
+            $attachment = $this->tempFile($icsFilename, $icsContent);
+        }
 
         $this->send($booking['guest_email'], $subject, $message, $altMessage, $attachment);
     }
