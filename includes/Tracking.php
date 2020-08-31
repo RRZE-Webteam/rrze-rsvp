@@ -38,12 +38,11 @@ class Tracking
         $this->updateDbVersion();
 
         if (is_multisite()) {
-            add_action( 'network_admin_menu', [$this, 'add_tracking_networkmenu']) ;
             add_action( 'admin_menu', [$this, 'add_tracking_menuinfo'] );
         }else{
             add_action( 'admin_menu', [$this, 'add_tracking_menu'] );
+            add_action( 'wp_ajax_csv_pull', [$this, 'tracking_csv_pull'] );
         }
-        add_action( 'wp_ajax_csv_pull', [$this, 'tracking_csv_pull'] );
     }
 
     protected function updateDbVersion()
@@ -59,16 +58,6 @@ class Tracking
             _x( 'Contact tracking', 'admin page title', 'rrze-rsvp' ),
             _x( 'RSVP Contact tracking', 'admin menu entry title', 'rrze-rsvp' ),
             'manage_options',
-            'rrze-rsvp-tracking',
-            [$this, 'admin_page_tracking']
-        );
-    }
-
-    public function add_tracking_networkmenu() {
-        $menu_id = add_menu_page(
-            _x( 'Contact tracking', 'admin page title', 'rrze-rsvp' ),
-            _x( 'RSVP Contact tracking', 'admin menu entry title', 'rrze-rsvp' ),
-            'manage_network_options',
             'rrze-rsvp-tracking',
             [$this, 'admin_page_tracking']
         );
