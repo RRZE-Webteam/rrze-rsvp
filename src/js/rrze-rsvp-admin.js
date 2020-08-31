@@ -110,54 +110,30 @@ jQuery(document).ready(function ($) {
         if ($('select#rrze-rsvp-room-bookingmode option:checked').val() == 'rrze-rsvp-additionals'){
             $('div#rrze-rsvp-additionals').slideDown(t);
         }else{
-			$('div#rrze-rsvp-additionals').slideUp(t);
+            $('div#rrze-rsvp-additionals').slideUp(t);
         }
     }
 
-    function triggerAutoConfirmation(t){
+    function triggerInstant(t){
         if ($('#rrze-rsvp-room-auto-confirmation').is(':checked')) {
             $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideDown(t);
         } else {
             $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideUp(t);
             if( $('#rrze-rsvp-room-instant-check-in').is(':checked')) {
                 $('#rrze-rsvp-room-instant-check-in').prop('checked', false)
-			}
-            $('div.cmb2-id-rrze-rsvp-room-force-to-confirm').slideDown(t);
-            $('div.cmb2-id-rrze-rsvp-room-force-to-checkin').slideDown(t);		
+            }
         }
     }
 
-    function triggerInstant(t){
-        if ($('#rrze-rsvp-room-instant-check-in').is(':checked')) {
-			$('div.cmb2-id-rrze-rsvp-room-force-to-confirm').slideUp(t);
-            if( $('#rrze-rsvp-room-force-to-confirm').is(':checked')) {
-                $('#rrze-rsvp-room-force-to-confirm').prop('checked', false)
-			}			
-			$('div.cmb2-id-rrze-rsvp-room-force-to-checkin').slideUp(t);
-            if( $('#rrze-rsvp-room-force-to-checkin').is(':checked')) {
-                $('#rrze-rsvp-room-force-to-checkin').prop('checked', false)
-            }			
-        } else {
-            $('div.cmb2-id-rrze-rsvp-room-force-to-confirm').slideDown(t);
-            $('div.cmb2-id-rrze-rsvp-room-force-to-checkin').slideDown(t);			
-        }
-	}
-		
-	triggerAdditionals(0);
-	triggerAutoConfirmation(0);
+    triggerAdditionals(0);
     triggerInstant(0);
 
     $('select#rrze-rsvp-room-bookingmode').on('change', function() {        
-        triggerAdditionals(200);
+        triggerAdditionals(400);
     });
 
     $('#rrze-rsvp-room-auto-confirmation').click(function() {
-        triggerAutoConfirmation(200);
-	});
-	
-    $('#rrze-rsvp-room-instant-check-in').click(function() {
-        triggerInstant(200);
-    });	
+        triggerInstant(400);
+    }); 
     
 });
-
