@@ -792,7 +792,7 @@ class Bookings extends Shortcodes {
         } elseif ($autoconfirmation) {
             $status = 'confirmed';
             $timestamp = current_time('timestamp');
-            if (($booking_instant || $instantCheckIn) && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+            if ($booking_instant && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
                 $status = 'checked-in';
             }
         } else {
@@ -812,13 +812,11 @@ class Bookings extends Shortcodes {
         if (empty($bookingmode)) {
             $this->email->bookingConfirmedCustomer($booking_id, true);
         } elseif ($autoconfirmation) {
-            if ($booking_instant || $instantCheckIn) {
+            if ($booking_instant) {
                 $this->email->bookingConfirmedCustomer($booking_id, true);
             } else {
                 $this->email->bookingConfirmedCustomer($booking_id);
             }
-        } elseif ($forceToConfirm) {
-            $this->email->bookingRequestedCustomer($booking_id);
         } else {
             if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
                 $to = $this->options->email_notification_email;
