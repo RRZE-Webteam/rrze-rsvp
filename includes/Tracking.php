@@ -181,12 +181,12 @@ class Tracking
         $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $guest_firstname, $guest_lastname, $guest_email, $guest_phone);
 
         $file = 'rrze_tracking_csv';
-        $csv_output = '';
+        $csv_output = 'START,END,ROOM,STREET,ZIP,CITY,EMAIL,PHONE,FIRSTNAME,LASTNAME'."\n";
 
         if ($aGuests){
             foreach ($aGuests as $row){
                 $row = array_values($row);
-                $row = implode(", ", $row);
+                $row = implode(",", $row);
                 $csv_output .= $row."\n";
              }
         }
@@ -343,7 +343,7 @@ class Tracking
             room_post_id bigint(20) NOT NULL,
             room_name text NOT NULL,
             room_street text NOT NULL, 
-            room_zip smallint(5) NOT NULL,
+            room_zip varchar(10) NOT NULL,
             room_city text NOT NULL, 
             seat_name text NOT NULL, 
             hash_seat_name char(64) NOT NULL,
