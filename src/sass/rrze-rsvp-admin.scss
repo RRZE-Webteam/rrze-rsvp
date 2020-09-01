@@ -23,25 +23,7 @@ table {
 			a, button {
 				margin: 2px 4px;
 				min-width: calc(50% - 10px);
-				text-align: center;
-
-				&.rrze-rsvp-confirmed[disabled] {
-					background: #009900 !important;
-					color: white !important;
-					border-color: #009900 !important;
-				}
-
-				&.rrze-rsvp-checkin[disabled] {
-					background: #802906 !important;
-					color: white !important;
-					border-color: #802906 !important;
-				}
-
-				&.rrze-rsvp-checkout[disabled] {
-					background: #807306 !important;
-					color: white !important;
-					border-color: #807306 !important;
-				}							
+				text-align: center;						
 			}
 
 			a.delete {
