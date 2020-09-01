@@ -1,5 +1,9 @@
 <?php
 
+namespace RRZE\RSVP;
+
+defined('ABSPATH') || exit;
+
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Helper;
 use RRZE\RSVP\Settings;
