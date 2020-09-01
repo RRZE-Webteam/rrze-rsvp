@@ -116,6 +116,7 @@ if ($checkInBooking) {
     switch ($action) {
         case 'checkin':
             update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
+            do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
             $link = sprintf(
                 '<a href="%1$s?id=%2$d&action=checkout&nonce=%3$s" class="button button-checkout" data-id="%2$d">%4$s</a>',
                 trailingslashit(get_permalink()),
