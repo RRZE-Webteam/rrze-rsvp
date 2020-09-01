@@ -51,7 +51,7 @@ class IdM
         $nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET['nonce'])) : '';
 
         $bookingId = isset($_GET['id']) && !$roomId ? sprintf('&id=%s', absint($_GET['id'])) : '';
-        $action = isset($_GET['action']) && !$bookingId ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
+        $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
 
         if (!$this->simplesamlAuth->isAuthenticated()) {
             $authNonce = sprintf('?require-sso-auth=%s', wp_create_nonce('require-sso-auth'));
@@ -61,13 +61,7 @@ class IdM
             exit;
         }
 
-        $this->personAttributes = $this->simplesamlAuth->getAttributes();
-
-        $this->uid = isset($this->personAttributes['urn:mace:dir:attribute-def:uid'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:uid'][0] : null;
-        $this->mail = isset($this->personAttributes['urn:mace:dir:attribute-def:mail'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:mail'][0] : null;
-        $this->displayName = isset($this->personAttributes['urn:mace:dir:attribute-def:displayName'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:displayName'][0] : null;
-        $this->eduPersonAffiliation = isset($this->personAttributes['urn:mace:dir:attribute-def:eduPersonAffiliation']) ? $this->personAttributes['urn:mace:dir:attribute-def:eduPersonAffiliation'] : null;
-        $this->eduPersonEntitlement = isset($this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement']) ? $this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement'] : null;
+        $this->setAttributes();
 
         return true;
     }
@@ -98,7 +92,7 @@ class IdM
         $nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET['nonce'])) : '';
         
         $bookingId = isset($_GET['id']) && !$roomId ? sprintf('?id=%s', absint($_GET['id'])) : '';
-        $action = isset($_GET['action']) && !$bookingId ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';        
+        $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';        
 
         if ($this->simplesamlAuth() && $this->simplesamlAuth->isAuthenticated()) {
             $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
@@ -132,6 +126,17 @@ class IdM
     public function isAuthenticated()
     {
         return $this->simplesamlAuth && $this->simplesamlAuth->isAuthenticated();
+    }
+
+    public function setAttributes()
+    {
+        $this->personAttributes = $this->simplesamlAuth->getAttributes();
+
+        $this->uid = isset($this->personAttributes['urn:mace:dir:attribute-def:uid'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:uid'][0] : null;
+        $this->mail = isset($this->personAttributes['urn:mace:dir:attribute-def:mail'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:mail'][0] : null;
+        $this->displayName = isset($this->personAttributes['urn:mace:dir:attribute-def:displayName'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:displayName'][0] : null;
+        $this->eduPersonAffiliation = isset($this->personAttributes['urn:mace:dir:attribute-def:eduPersonAffiliation']) ? $this->personAttributes['urn:mace:dir:attribute-def:eduPersonAffiliation'] : null;
+        $this->eduPersonEntitlement = isset($this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement']) ? $this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement'] : null;
     }
 
     public function getPersonAttributes()
