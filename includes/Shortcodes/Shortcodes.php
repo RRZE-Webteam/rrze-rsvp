@@ -117,7 +117,7 @@ class Shortcodes
             return;
         }
 
-        if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-single-seat')) {
+        if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
             $this->idm->tryLogIn();
         }     
     }
