@@ -190,7 +190,7 @@ class Bookings
             if ($archive) {
                 $start = new Carbon(date('Y-m-d H:i:s', $booking['start']), wp_timezone());
                 if ($booking['status'] == 'cancelled' && $start->endOfDay()->gt(new Carbon('now'))) {
-                    $cancelledButton = '<button class="button rrzs-rsvp-cancel" disabled>' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</button>';
+                    $cancelledButton = '<button class="button button-secondary" disabled>' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</button>';
                     $restoreButton = sprintf(
                         '<a href="edit.php?post_type=%1$s&action=restore&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>',
                         'booking',
@@ -232,21 +232,21 @@ class Bookings
                 echo $button . $bookingDate;
             } else {
                 $cancelButton = sprintf(
-                    '<a href="edit.php?post_type=%1$s&action=cancel&id=%2$d&_wpnonce=%3$s" class="button rrze-rsvp-cancel" data-id="%2$d">%4$s</a>',
+                    '<a href="edit.php?post_type=%1$s&action=cancel&id=%2$d&_wpnonce=%3$s" class="button button-secondary" data-id="%2$d">%4$s</a>',
                     'booking',
                     $booking['id'],
                     $_wpnonce,
                     _x('Cancel', 'Booking', 'rrze-rsvp')
                 );
                 if ($booking['status'] == 'confirmed') {
-                    $button = $cancelButton . "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
+                    $button = $cancelButton . "<button class='button button-primary' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
                 } elseif ($booking['status'] == 'checked-in') {
-                    $button = "<button class='button button-primary rrze-rsvp-checkin' disabled>" . __('Checked-In', 'rrze-rsvp') . "</button>";
+                    $button = "<button class='button button-secondary' disabled>" . __('Checked-In', 'rrze-rsvp') . "</button>";
                 } elseif ($booking['status'] == 'checked-out') {
-                    $button = "<button class='button button-primary rrze-rsvp-confirmed' disabled>" . __('Checked-Out', 'rrze-rsvp') . "</button>";
+                    $button = "<button class='button button-secondary' disabled>" . __('Checked-Out', 'rrze-rsvp') . "</button>";
                 } else {
                     $button = $cancelButton . sprintf(
-                        '<a href="edit.php?post_type=%1$s&action=confirm&id=%2$d&_wpnonce=%3$s" class="button button-primary rrze-rsvp-confirm" data-id="%2$d">%4$s</a>',
+                        '<a href="edit.php?post_type=%1$s&action=confirm&id=%2$d&_wpnonce=%3$s" class="button button-primary" data-id="%2$d">%4$s</a>',
                         'booking',
                         $booking['id'],
                         $_wpnonce,
