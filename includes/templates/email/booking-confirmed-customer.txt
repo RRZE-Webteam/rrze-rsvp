@@ -22,8 +22,10 @@
 {{=alt_checkout_text}}
 {{=checkout_url}}
 
+{{!instant_checkin}}
 {{=alt_cancel_text}}
 {{=cancel_url}}
+{{/!instant_checkin}}
 
 {{=site_name}}
 {{=site_url}}
@@ -50,8 +52,10 @@
 {{=alt_checkout_text_en}}
 {{=checkout_url}}
 
+{{!instant_checkin}}
 {{=alt_cancel_text_en}}
 {{=cancel_url}}
+{{/!instant_checkin}}
 
 {{=site_name}}
 {{=site_url}}

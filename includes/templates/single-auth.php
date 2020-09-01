@@ -14,8 +14,11 @@ $bookingDate = isset($_GET['bookingdate']) ? sprintf('&bookingdate=%s', sanitize
 $timeslot = isset($_GET['timeslot']) ? sprintf('&timeslot=%s', sanitize_text_field($_GET['timeslot'])) : '';
 $nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET['nonce'])) : '';        
 
+$bookingId = isset($_GET['id']) && !$roomId ? sprintf('?id=%s', absint($_GET['id'])) : '';
+$action = isset($_GET['action']) && !$roomId ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
+
 if ($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated()) {
-    $redirectUrl = sprintf('%s/%s%s%s%s%s', get_permalink(), $room, $seat, $bookingDate, $timeslot, $nonce);
+    $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
     wp_redirect($redirectUrl);
     exit;
 }
