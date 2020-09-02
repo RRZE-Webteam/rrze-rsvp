@@ -106,6 +106,7 @@ if ($checkInBooking) {
     echo '<p>' . $link . '</p>';    
     echo '</div> </div>';
 } elseif ($seatCheckInOut) {
+    $status = $seatCheckInOut['status'];
     $room = $seatCheckInOut['room'];
     $roomName = $seatCheckInOut['room_name'];
     $seatName = $seatCheckInOut['seat_name'];
@@ -115,8 +116,10 @@ if ($checkInBooking) {
     echo '<div class="rrze-rsvp-seat-check-inout"> <div class="container">';
     switch ($action) {
         case 'checkin':
-            update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
-            do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
+            if ($status == 'confirmed') {
+                update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
+                do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
+            }
             $link = sprintf(
                 '<a href="%1$s?id=%2$d&action=checkout&nonce=%3$s" class="button button-checkout" data-id="%2$d">%4$s</a>',
                 trailingslashit(get_permalink()),
@@ -136,7 +139,9 @@ if ($checkInBooking) {
             echo '<p>' . $link . '</p>';          
             break;
         case 'checkout':
-            update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-out');
+            if ($status == 'checked-in') {
+                update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-out');
+            }
             echo '<h2>' . __('Booking Checked Out', 'rrze-rsvp') . '</h2>';
             echo '<p>' . __('Check-out has been completed.', 'rrze-rsvp') . '</p>';
             echo '<p class="date checked-out">';
@@ -166,24 +171,28 @@ if ($checkInBooking) {
 
     echo '<p><strong>' . __('Room:', 'rrze-rsvp') . '</strong> <a href="' . get_permalink($roomId) . '">' . get_the_title($roomId) . '</a>';
 
-    // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
     $args = [
         'fields' => 'ids',
         'post_type' => 'booking',
         'post_status' => 'publish',
-        'nopaging' => true,
+        'nopaging' => true,         
         'meta_query' => [
-            [
+            'booking_status_clause' => [
+                'key'       => 'rrze-rsvp-booking-status',
+                'value'     => ['confirmed', 'checked-in'],
+                'compare'   => 'IN'
+            ],            
+            'seat_id_clause' =>[
                 'key' => 'rrze-rsvp-booking-seat',
                 'value'   => $postId,
             ],
-            [
+            'booking_start_clause' => [
                 'key'     => 'rrze-rsvp-booking-start',
                 'value' => $now,
                 'compare' => '<=',
                 'type' => 'numeric'
             ],
-            [
+            'booking_end_clause' => [
                 'key'     => 'rrze-rsvp-booking-end',
                 'value' => $now,
                 'compare' => '>=',
