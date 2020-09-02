@@ -228,13 +228,20 @@ class Schedule
      */
     protected function cancelNotCheckedInBookings()
     {
-        $timeStampAfter = current_time('timestamp') + (15 * MINUTE_IN_SECONDS);
+        $timeStampBefore = current_time('timestamp') - (15 * MINUTE_IN_SECONDS);
+        $timeStampAfter = current_time('timestamp') + (15 * MINUTE_IN_SECONDS);        
 
         $args = [
             'fields'            => 'ids',
             'post_type'         => ['booking'],
             'post_status'       => 'publish',
             'nopaging'          => true,
+            'date_query'        => [
+                [
+                    'before'    => date('Y-m-d H:i:s', $timeStampBefore),
+                    'inclusive' => false,
+                ],
+            ],            
             'meta_query'        => [
                 'relation'      => 'AND',
                 'booking_status_clause' => [
