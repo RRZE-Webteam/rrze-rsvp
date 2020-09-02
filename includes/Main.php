@@ -32,6 +32,10 @@ class Main
 		$settings = new Settings($this->pluginFile);
 		$settings->onLoaded();
 
+		// IdM
+        $idm = new IdM;
+        $idm->onLoaded();		
+
 		// Posttypes 
 		$cpt = new CPT($this->pluginFile, $settings);
 		$cpt->onLoaded();

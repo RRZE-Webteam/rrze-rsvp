@@ -4,6 +4,7 @@ namespace RRZE\RSVP\Shortcodes;
 
 defined('ABSPATH') || exit;
 
+use RRZE\RSVP\IdM;
 use RRZE\RSVP\Shortcodes\Bookings;
 use RRZE\RSVP\Shortcodes\Availability;
 use RRZE\RSVP\Shortcodes\QR;
@@ -16,19 +17,24 @@ use function RRZE\RSVP\plugin;
 class Shortcodes
 {
     protected $pluginFile;
+    
     private $settings = '';
+
     private $shortcodesettings = 'X';
+
+    protected $idm;
 
     public function __construct($pluginFile, $settings)
     {
         $this->pluginFile = $pluginFile;
         $this->settings = $settings;
         $this->shortcodesettings = getShortcodeSettings();
+        $this->idm = new IdM;
     }
 
     public function onLoaded()
     {
-        //add_action('wp_enqueue_scripts', [$this, 'enqueueScripts']);
+        add_action('template_redirect', [$this, 'maybeAuthenticate']);
         add_filter('single_template', [$this, 'includeSingleTemplate']);
 
         $bookings_shortcode = new Bookings($this->pluginFile,  $this->settings);
@@ -39,15 +45,6 @@ class Shortcodes
 
         $qr_shortcode = new QR($this->pluginFile,  $this->settings);
         $qr_shortcode->onLoaded();
-    }
-
-    /**
-     * Enqueue der Skripte.
-     */
-    public function enqueueScripts()
-    {
-        wp_register_style('rrze-rsvp-shortcode', plugins_url('assets/css/rrze-rsvp.css', plugin_basename($this->pluginFile)));
-        wp_register_script('rrze-rsvp-shortcode', plugins_url('assets/js/shortcode.js', plugin_basename($this->pluginFile)));
     }
 
     public function gutenberg_init()
@@ -111,5 +108,17 @@ class Shortcodes
         } elseif ($post->post_type == 'seat') {
             return dirname($this->pluginFile) . '/includes/templates/single-seat.php';
         }
+    }
+
+    public function maybeAuthenticate()
+    {
+        global $post;
+        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
+            return;
+        }
+
+        if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
+            $this->idm->tryLogIn();
+        }     
     }
 }

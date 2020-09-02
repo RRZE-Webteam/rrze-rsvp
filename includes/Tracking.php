@@ -6,8 +6,7 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Settings;
 
-class Tracking
-{
+class Tracking {
     const DB_TABLE = 'rrze_rsvp_tracking';
 
     const DB_VERSION = '1.0.0';
@@ -23,8 +22,7 @@ class Tracking
     protected $contact_tracking_note;
 
 
-    public function __construct()
-    {
+    public function __construct() {
         global $wpdb;
         $this->dbTable = $wpdb->base_prefix . static::DB_TABLE;
         $this->dbVersion = static::DB_VERSION;
@@ -33,22 +31,36 @@ class Tracking
         $this->contact_tracking_note = $settings->getOption('general', 'contact_tracking_note');
     }
 
-    public function onLoaded()
-    {
-        $this->updateDbVersion();
+    public function onLoaded() {
+        // check use cases here 
+        // https://github.com/RRZE-Webteam/rrze-rsvp/issues/110
 
-        if (is_multisite()) {
+        if (is_multisite()){
+            if (is_plugin_active_for_network( 'rrze-rsvp-network/rrze-rsvp-network.php' )){
+                // use case C, D
+            }else{
+                // use case A, B
+            }
             add_action( 'admin_menu', [$this, 'add_tracking_menuinfo'] );
         }else{
+            // use case E
+            $this->updateDbVersion(false);
             add_action( 'admin_menu', [$this, 'add_tracking_menu'] );
             add_action( 'wp_ajax_csv_pull', [$this, 'tracking_csv_pull'] );
         }
+
     }
 
-    protected function updateDbVersion()
-    {
+
+
+  
+    protected function updateDbVersion(bool $central = true) {
+
+        // BK 2DO: somehow store info to which tablename see use cases https://github.com/RRZE-Webteam/rrze-rsvp/issues/110 in site option ( == table wp_sitemeta )
+        // BK 2DO: get_site_option & set_site_option seems to be quite useless if there is no "create OR REPLACE table" (which is "DROP TABLE IF EXISTS `tablename`; CREATE TABLE..." in MySQL) ... combined with caching old data to insert into new table (CREATE TEMPORARY TABLE ... ) but it could be an overkill
+
         if (get_site_option($this->dbOptionName, NULL) != $this->dbVersion) {
-            $this->createTrackingTable();
+            $this->createTrackingTable($central);
             update_site_option($this->dbOptionName, $this->dbVersion);
         }
     }
@@ -164,10 +176,10 @@ class Tracking
     }
 
     public function admin_page_trackinginfo() {
-        echo '<div class="wrap">';
-        echo '<h1>' . esc_html_x( 'Contact tracking', 'admin page title', 'rrze-rsvp' ) . '</h1>';
-        echo '<span class="rrze-rsvp-tracking-info">' . $this->contact_tracking_note . '</span>';
-        echo '</div>';
+        echo '<div class="wrap">'
+            . '<h1>' . esc_html_x( 'Contact tracking', 'admin page title', 'rrze-rsvp' ) . '</h1>'
+            . '<span class="rrze-rsvp-tracking-info">' . $this->contact_tracking_note . '</span>'
+            . '</div>';
     }
 
     public function tracking_csv_pull() {
@@ -181,12 +193,12 @@ class Tracking
         $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $guest_firstname, $guest_lastname, $guest_email, $guest_phone);
 
         $file = 'rrze_tracking_csv';
-        $csv_output = '';
+        $csv_output = 'START,END,ROOM,STREET,ZIP,CITY,EMAIL,PHONE,FIRSTNAME,LASTNAME'."\n";
 
         if ($aGuests){
             foreach ($aGuests as $row){
                 $row = array_values($row);
-                $row = implode(", ", $row);
+                $row = implode(",", $row);
                 $csv_output .= $row."\n";
              }
         }
@@ -200,8 +212,7 @@ class Tracking
     }
 
 
-    public function insertTracking(int $blogId, int $bookingId)
-    {
+    public function insertTracking(int $blogId, int $bookingId) {
         global $wpdb;
 
         $booking = Functions::getBooking($bookingId);
@@ -263,8 +274,7 @@ class Tracking
         // exit(var_dump( $wpdb->last_query));
     }
 
-    public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $guest_firstname, string $guest_lastname, string $guest_email = '', string $guest_phone = ''): array
-    {
+    public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $guest_firstname, string $guest_lastname, string $guest_email = '', string $guest_phone = ''): array {
         global $wpdb;
 
         $dbTrackingTable = Tracking::getDbTableName();
@@ -328,8 +338,7 @@ class Tracking
 
 
 
-    protected function createTrackingTable()
-    {
+    protected function createTrackingTable( bool $central = true ) {
         global $wpdb;
 
         $charsetCollate = $wpdb->get_charset_collate();
@@ -343,7 +352,7 @@ class Tracking
             room_post_id bigint(20) NOT NULL,
             room_name text NOT NULL,
             room_street text NOT NULL, 
-            room_zip smallint(5) NOT NULL,
+            room_zip varchar(10) NOT NULL,
             room_city text NOT NULL, 
             seat_name text NOT NULL, 
             hash_seat_name char(64) NOT NULL,
@@ -369,8 +378,7 @@ class Tracking
     }
 
 
-    public static function getDbTableName()
-    {
+    public static function getDbTableName(): string {
         global $wpdb;
         return $wpdb->base_prefix . static::DB_TABLE;
     }

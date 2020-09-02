@@ -78,7 +78,7 @@
       </mj-column>
     </mj-section>    
     <mj-raw>{{/instant_checkin}}</mj-raw>
-
+    <mj-raw>{{!instant_checkin}}</mj-raw>
     <mj-section padding-bottom="5px" padding-top="5px">
       <mj-column>
         <mj-text align="center" font-size="14px" color="#444444" padding-top="10px">
@@ -94,7 +94,7 @@
         </mj-button>
       </mj-column>
     </mj-section>
-
+    <mj-raw>{{/!instant_checkin}}</mj-raw>
     <mj-section>
       <mj-column>
         <mj-text align="center"><a href="{{=site_url}}" style="color:inherit">{{=site_name}}</a></mj-text>
@@ -171,6 +171,7 @@
       </mj-column>
     </mj-section>    
     <mj-raw>{{/instant_checkin}}</mj-raw>
+    <mj-raw>{{!instant_checkin}}</mj-raw>
     <mj-section padding-bottom="5px" padding-top="5px">
       <mj-column>
         <mj-text align="center" font-size="14px" color="#444444" padding-top="10px">
@@ -186,7 +187,7 @@
         </mj-button>
       </mj-column>
     </mj-section>
-
+    <mj-raw>{{/!instant_checkin}}</mj-raw>
     <mj-section>
       <mj-column>
         <mj-text align="center"><a href="{{=site_url}}" style="color:inherit">{{=site_name}}</a></mj-text>

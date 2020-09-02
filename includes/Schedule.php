@@ -90,7 +90,7 @@ class Schedule
     {
         $this->deleteOldBookings();
         $this->deleteCancelledBookings();
-        // $this->deleteOldTrackingData();
+        $this->deleteOldTrackingData();
     }
 
     /**
@@ -308,16 +308,14 @@ class Schedule
 
     /**
      * deleteOldTrackingData
-     * Delete all tracking data whose datetime is older than 4 weeks.
-     * 
-     * because date of rrze-rsvp-booking-start does not need to be date of rrze-rsvp-booking-end we delete rows which rrze-rsvp-booking-end is older than 4 weeks
+     * Delete all tracking data older than 4 weeks.
      * 
      * @return void
      */    
-    // protected function deleteOldTrackingData()
-    // {
-    //     global $wpdb;
-    //     $dbTable = Tracking::getDbTableName();
-    //     $wpdb->query("DELETE FROM $dbTable WHERE ts_end < DATE_SUB(CURDATE(), INTERVAL 4 WEEK)");
-    // }
+    protected function deleteOldTrackingData()
+    {
+        global $wpdb;
+        $dbTable = Tracking::getDbTableName();
+        $wpdb->query("DELETE FROM $dbTable WHERE ts_inserted < (NOW() - INTERVAL 4 WEEK)");
+    }
 }

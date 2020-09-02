@@ -36,7 +36,6 @@ class Bookings extends Shortcodes {
         $this->options = (object) $settings->getOptions();
         $this->email = new Email;
         $this->idm = new IdM;
-        $this->idm->onLoaded();
         $this->template = new Template;
     }
 
@@ -792,7 +791,7 @@ class Bookings extends Shortcodes {
         } elseif ($autoconfirmation) {
             $status = 'confirmed';
             $timestamp = current_time('timestamp');
-            if ($booking_instant && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+            if (($booking_instant || $instantCheckIn) && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
                 $status = 'checked-in';
             }
         } else {
@@ -810,12 +809,16 @@ class Bookings extends Shortcodes {
 
         // E-Mail senden
         if (empty($bookingmode)) {
-            $this->email->bookingConfirmedCustomer($booking_id, true);
-        } elseif ($autoconfirmation) {
-            if ($booking_instant) {
-                $this->email->bookingConfirmedCustomer($booking_id, true);
-            } else {
+            if ($status == 'confirmed') {
                 $this->email->bookingConfirmedCustomer($booking_id);
+            } else {
+                $this->email->bookingConfirmedCustomer($booking_id, true);
+            }
+        } elseif ($autoconfirmation) {
+            if ($status == 'confirmed') {
+                $this->email->bookingConfirmedCustomer($booking_id);
+            } else {
+                $this->email->bookingConfirmedCustomer($booking_id, true);
             }
         } else {
             if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
@@ -827,7 +830,15 @@ class Bookings extends Shortcodes {
 
         // Redirect zur Seat-Seite, falls
         if ($status == 'checked-in') {
-            wp_redirect(get_permalink($booking_seat));
+            do_action('rrze-rsvp-checked-in', get_current_blog_id(), $booking_id);
+            $redirectUrl = add_query_arg(
+                [
+                    'id' => $booking_id,
+                    'nonce' => wp_create_nonce('rrze-rsvp-checkin-booked')
+                ],
+                get_permalink($booking_seat)
+            );
+            wp_redirect($redirectUrl);
             exit;
         }
 
