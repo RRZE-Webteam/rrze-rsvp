@@ -791,7 +791,7 @@ class Bookings extends Shortcodes {
         } elseif ($autoconfirmation) {
             $status = 'confirmed';
             $timestamp = current_time('timestamp');
-            if ($booking_instant && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+            if (($booking_instant || $instantCheckIn) && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
                 $status = 'checked-in';
             }
         } else {
@@ -830,6 +830,7 @@ class Bookings extends Shortcodes {
 
         // Redirect zur Seat-Seite, falls
         if ($status == 'checked-in') {
+            do_action('rrze-rsvp-checked-in', get_current_blog_id(), $booking_id);
             $redirectUrl = add_query_arg(
                 [
                     'id' => $booking_id,
