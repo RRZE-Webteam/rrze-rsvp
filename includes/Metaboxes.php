@@ -206,16 +206,16 @@ class Metaboxes
             'options' => array(
                 '0' => __('Check-in and check-out only on site', 'rrze-rsvp'), // Nur Ein- und Auschecken vor Ort
                 'rrze-rsvp-additionals' => __('Activate additional reservation functions', 'rrze-rsvp'), // Zusätzliche Reservierungsfunktionen aktivieren
-            ),
-            'after_row' => '<div id="rrze-rsvp-additionals">'
+            )
         ));
 
         $cmb_general->add_field(array(
             'name' => __('SSO is required', 'rrze-rsvp'),
-            'desc' => __('If SSO is enabled then the customer must log in through SSO in order to use the booking form.', 'rrze-rsvp'),
+            'desc' => __('If SSO is enabled, the customer must log in via SSO in order to use the booking system.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-sso-required',
             'type' => 'checkbox',
             'default' => '',
+            'after_row' => '<div id="rrze-rsvp-additionals">'            
         ));
 
         $cmb_general->add_field(array(
