@@ -96,7 +96,7 @@ class Shortcodes
         return shortcode_atts($atts_default[$tag], $atts);
     }
 
-    public function includeSingleTemplate()
+    public function includeSingleTemplate($singleTemplate)
     {
         global $post;
         if (isset($_GET['require-sso-auth']) && wp_verify_nonce($_GET['require-sso-auth'], 'require-sso-auth')) {
@@ -108,6 +108,7 @@ class Shortcodes
         } elseif ($post->post_type == 'seat') {
             return dirname($this->pluginFile) . '/includes/templates/single-seat.php';
         }
+        return $singleTemplate;
     }
 
     public function maybeAuthenticate()
