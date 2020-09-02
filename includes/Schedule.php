@@ -297,7 +297,8 @@ class Schedule
                 'booking_start_clause' => [
                     'key'       => 'rrze-rsvp-booking-end',
                     'value'     => $timeStamp,
-                    'compare'   => '>'
+                    'compare'   => '<',
+                    'type' => 'numeric'
                 ]
             ]
         ];
