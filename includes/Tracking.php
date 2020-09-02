@@ -10,60 +10,119 @@ class Tracking {
     const DB_TABLE = 'rrze_rsvp_tracking';
 
     const DB_VERSION = '1.0.0';
-
     const DB_VERSION_OPTION_NAME = 'rrze_rsvp_tracking_db_version';
 
-    protected $dbTable;
-
+    protected $settings;
+    protected $trackingTable;
     protected $dbVersion;
-
     protected $dbOptionName;
-
     protected $contact_tracking_note;
 
 
     public function __construct() {
-        global $wpdb;
-        $this->dbTable = $wpdb->base_prefix . static::DB_TABLE;
         $this->dbVersion = static::DB_VERSION;
         $this->dbOptionName = static::DB_VERSION_OPTION_NAME;
-        $settings = new Settings(plugin()->getFile());
-        $this->contact_tracking_note = $settings->getOption('general', 'contact_tracking_note');
+        $this->settings = new Settings(plugin()->getFile());
+        $this->contact_tracking_note = $this->settings->getOption('general', 'contact_tracking_note');
     }
 
+
     public function onLoaded() {
-        // check use cases here 
-        // https://github.com/RRZE-Webteam/rrze-rsvp/issues/110
+        // Klärungsbedarf: 
+        // WARNING AUSGEBEN wenn "einfach mal so" Plugin de- und aktiviert wird
+        // wird Plugin beim Autoupdate über die Netzwerkeinstellungen / Repo auch de- / aktiviert?  
+        // Ebenfalls warnen, wenn rrze-rsvp-network de- und aktiviert wird
+        // was soll beim De- und Aktivieren von rrze-rsvp passieren? Daten aus network-table löschen? nicht löschen? Tables droppen? nicht droppen? 
+        // VORSICHT wg Mischzustand / Datenkonsistenz!
+        // => BK 2DO: Konstellationen durchtesten
+
+        // use cases defined in https://github.com/RRZE-Webteam/rrze-rsvp/issues/110
 
         if (is_multisite()){
             if (is_plugin_active_for_network( 'rrze-rsvp-network/rrze-rsvp-network.php' )){
-                // use case C, D
+                // use case C "Multisite: mit rrze-rsvp-network":
+                // Admin darf CSV NICHT erstellen
+                // SuperAdmin erstellt CSV über Menüpunkt in Network-Dashboard
+                $this->createTrackingTable('network');
+
+                // check if local tracking table for this blog already exists (in this version: we do not drop tables on plugin deactivation + we ignore garbage collecting plugins which do drop those tables)
+                $blogID = get_current_blog_id();
+                $checkTable = Tracking::getTrackingTableName('local', $blogID);
+                if ($this->checkTableExists($checkTable)){
+                    // use case B "Multisite: rrze-rsvp-network wird NACH rrze-rsvp aktiviert":
+                    // Admins dürfen CSV NICHT MEHR erstellen
+                    // SuperAdmin erstellt CSV über Menüpunkt in Network-Dashboard
+                    // => Merge aller lokalen Tracking-Tabellen in zentrale Tracking-Tabelle
+                    // => lokale Tracking-Tabellen werden gelöscht
+                    // $this->createTrackingTable('network');
+
+                    $blogIDs = $this->getBlogIDs();
+
+                    foreach ($blogIDs as $blogID) {
+                        if (false !== $this->fillTrackingTable('network', $blogID)){
+                            $this->dropTrackingTable('local', $blogID);
+                        }else{
+                            // exception handling
+                        }
+                    }
+                }
             }else{
-                // use case A, B
+                // check if network tracking table already exists (in this version: we do not drop tables on plugin deactivation + we ignore garbage collecting plugins which do drop those tables)
+                $checkTable = Tracking::getTrackingTableName('network');
+                if ($this->checkTableExists($checkTable)){
+                    // use case D "Multisite: rrze-rsvp-network wird DEAKTIVIERT":
+                    // Admin darf CSV (wieder) erstellen
+                    // => Lokale Tracking-Tabelle wird erstellt und mit den Daten von zentraler Tracking-Tabelle gefüllt, die zu dieser Website gehören
+                    // => Zentrale Tracking-Tabelle wird gelöscht
+                    $this->createTrackingTable('local');
+                    if (false !== $this->fillTrackingTable('local')){
+                        $this->dropTrackingTable('network');
+                    }else{
+                        // exception handling
+                    }
+                }else{
+                    // use case A "Multisite: ohne rrze-rsvp-network":
+                    // Admin darf CSV erstellen
+                    // => Tracking-Tabelle PRO WEBSITE (nicht als zentrale Tracking-Tabelle wie in [1] umgesetzt)
+                    $this->createTrackingTable('local');
+                }
             }
             add_action( 'admin_menu', [$this, 'add_tracking_menuinfo'] );
         }else{
-            // use case E
-            $this->updateDbVersion(false);
+            // use cases E "Singlesite":
+            $this->createTrackingTable('local');
+
             add_action( 'admin_menu', [$this, 'add_tracking_menu'] );
             add_action( 'wp_ajax_csv_pull', [$this, 'tracking_csv_pull'] );
         }
-
+        add_action('rrze-rsvp-checked-in', [$this, 'insertTracking'], 10, 2);
     }
-
-
-
-  
-    protected function updateDbVersion(bool $central = true) {
-
-        // BK 2DO: somehow store info to which tablename see use cases https://github.com/RRZE-Webteam/rrze-rsvp/issues/110 in site option ( == table wp_sitemeta )
-        // BK 2DO: get_site_option & set_site_option seems to be quite useless if there is no "create OR REPLACE table" (which is "DROP TABLE IF EXISTS `tablename`; CREATE TABLE..." in MySQL) ... combined with caching old data to insert into new table (CREATE TEMPORARY TABLE ... ) but it could be an overkill
-
+    
+ 
+    protected function isUpdate() {
         if (get_site_option($this->dbOptionName, NULL) != $this->dbVersion) {
-            $this->createTrackingTable($central);
             update_site_option($this->dbOptionName, $this->dbVersion);
+            return true;
         }
+        return false;
     }
+
+
+    protected function getBlogIDs(){
+        // parameters copied from plugin rrze-netzwerk-audit (10000 blogs is the limit)
+        return get_sites(
+            [
+                'number' => 10000,
+                'network_id' => get_current_network_id(),
+                'archived' => 0,
+                'mature' => 0,
+                'spam' => 0,
+                'deleted' => 0,
+                'fields' => 'ids'
+            ]
+        );
+    }
+
 
     public function add_tracking_menu() {
         $menu_id = add_management_page(
@@ -74,6 +133,7 @@ class Tracking {
             [$this, 'admin_page_tracking']
         );
     }
+
 
     public function add_tracking_menuinfo() {
         $menu_id = add_management_page(
@@ -98,10 +158,6 @@ class Tracking {
         echo '<h1>' . esc_html_x( 'Contact tracking', 'admin page title', 'rrze-rsvp' ) . '</h1>';
 
         if ( isset( $_GET['submit'])) {
-            /*
-             * Submit Form, Search for users
-             */
-
             $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
             $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
             $guest_firstname = filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING);
@@ -112,62 +168,50 @@ class Tracking {
             $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $guest_firstname, $guest_lastname, $guest_email, $guest_phone);
 
             if ($aGuests){
-                // generate CSV
                 $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&guest_firstname=' . urlencode($guest_firstname) . '&guest_lastname=' . urlencode($guest_lastname) . '&guest_email=' . urlencode($guest_email) . '&guest_phone=' . urlencode($guest_phone);
-                echo '<div class="notice notice-success is-dismissible">';
-                echo '<h2>Guests found!</h2>';
-                echo "<a href='$ajax_url'>Download CSV</a>";
-                echo '</div>';
+                echo '<div class="notice notice-success is-dismissible">'
+                    . '<h2>Guests found!</h2>'
+                    . "<a href='$ajax_url'>Download CSV</a>"
+                    . '</div>';
             }else{
-                echo '<div class="notice notice-success is-dismissible">';
-                echo '<h2>No guests found</h2>';
-                echo '</div>';
+                echo '<div class="notice notice-success is-dismissible">'
+                    . '<h2>No guests found</h2>'
+                    . '</div>';
             }
         }
-
-        /*
-         * Build Form
-         */
 
         echo '<form id="rsvp-search-tracking" method="get">';
         echo '<input type="hidden" name="page" value="rrze-rsvp-tracking">';
         echo '<table class="form-table" role="presentation"><tbody>';
-
         echo '<tr>'
             . '<th scope="row"><label for="searchdate">' . __('Search date', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="text" id="searchdate" name="searchdate" placeholder="YYYY-MM-DD" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" value="' . $searchdate . '">'
             . '</td>'
             . '</tr>';
-
         echo '<tr>'
             . '<th scope="row"><label for="delta">' . '&#177; ' . __('days', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="number" id="delta" name="delta" min="0" required value="' . $delta . '"></td>'
-            . '</tr>'; // $value_delta
-        
+            . '</tr>';
         echo '<tr>'
             . '<th scope="row"><label for="guest_firstname">' . __('First name', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="text" id="guest_firstname" name="guest_firstname" value="' . $guest_firstname . '">'
             . '</td>'
             . '</tr>';
-
         echo '<tr>'
             . '<th scope="row"><label for="guest_lastname">' . __('Last name', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="text" id="guest_lastname" name="guest_lastname" value="' . $guest_lastname . '">'
             . '</td>'
             . '</tr>';
-
         echo '<tr>'
             . '<th scope="row"><label for="guest_email">' . __('Email', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="text" id="guest_email" name="guest_email" value="' . $guest_email . '">'
             . '</td>'
             . '</tr>';
-
         echo '<tr>'
             . '<th scope="row"><label for="guest_phone">' . __('Phone', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="text" id="guest_phone" name="guest_phone" value="' . $guest_phone . '">'
             . '</td>'
             . '</tr>';
-
         echo '</tbody></table>';
         echo '<p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="' . __('Search', 'rrze-rsvp') . '"></p>';
 
@@ -175,12 +219,14 @@ class Tracking {
         echo '</div>';
     }
 
+
     public function admin_page_trackinginfo() {
         echo '<div class="wrap">'
             . '<h1>' . esc_html_x( 'Contact tracking', 'admin page title', 'rrze-rsvp' ) . '</h1>'
             . '<span class="rrze-rsvp-tracking-info">' . $this->contact_tracking_note . '</span>'
             . '</div>';
     }
+
 
     public function tracking_csv_pull() {
         $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
@@ -212,7 +258,41 @@ class Tracking {
     }
 
 
-    public function insertTracking(int $blogId, int $bookingId) {
+    protected function fillTrackingTable(string $into, int $blogID = 0){
+        global $wpdb;
+        $blogID = $blogID ? $blogID : get_current_blog_id();
+
+        $from = ($into == 'network' ? 'local' : 'network'); 
+        $fromTable = Tracking::getTrackingTableName($from);
+        $intoTable = Tracking::getTrackingTableName($into);
+
+        $prepare_vals = [
+            $into,
+            $from,
+            $blogID
+        ];
+
+        return $wpdb->query( 
+               $wpdb->prepare("INSERT INTO {$intoTable} (blog_id, start, end, room_post_id, room_name, room_street, room_zip, room_city, seat_name, hash_seat_name, guest_firstname, guest_lastname, hash_guest_firstname, hash_guest_lastname, guest_email, hash_guest_email, guest_phone, hash_guest_phone) 
+                    SELECT blog_id, start, end, room_post_id, room_name, room_street, room_zip, room_city, seat_name, hash_seat_name, guest_firstname, guest_lastname, hash_guest_firstname, hash_guest_lastname, guest_email, hash_guest_email, guest_phone, hash_guest_phone
+                    FROM {$fromTable} WHERE  blog_id = {$blogID}", $prepare_vals)); // returns 1, 0 or false
+    }
+
+    protected function dropTrackingTable(string $tableType, int $blogID = 0): bool{
+        global $wpdb;
+        $blogID = $blogID ? $blogID : get_current_blog_id();
+        $dropTable = Tracking::getTrackingTableName($tableType, $blogID);
+
+        return $wpdb->query(
+               $wpdb->prepare("DROP TABLE IF EXISTS {$dropTable}", $dropTable)); // returns true/false
+    }
+
+
+    public function insertTracking(int $blogID, int $bookingId) {
+        // Note: insertTracking() is called via action hook 'rrze-rsvp-checked-in' 
+        //       see $this->onLoaded : add_action('rrze-rsvp-checked-in', [$this, 'insertTracking'], 10, 2);
+        //       see Actions.php : do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
+
         global $wpdb;
 
         $booking = Functions::getBooking($bookingId);
@@ -224,7 +304,7 @@ class Tracking {
         $end = date('Y-m-d H:i:s', get_post_meta($bookingId, 'rrze-rsvp-booking-end', true));
 
         $fields = [
-            'blog_id' => $blogId,
+            'blog_id' => $blogID,
             'start' => $start,
             'end' => $end,
             'room_post_id' => (int)$booking['room'],
@@ -244,8 +324,8 @@ class Tracking {
             'hash_guest_phone' => Functions::crypt($booking['guest_phone']),
         ];
 
-        $cnt = $wpdb->insert(
-            $this->dbTable,
+        $wpdb->insert(
+            $this->trackingTable,
             $fields,
             [
                 '%d',
@@ -269,15 +349,13 @@ class Tracking {
             ]
         );
 
-        // echo "<script>console.log('insertTracking fields= " . json_encode($fields) . "' );</script>";
-        // echo "<script>console.log('insertTracking cnt= " . ($cnt?$cnt:'FALSE') . "' );</script>";
-        // exit(var_dump( $wpdb->last_query));
+        return $wpdb->insert_id; // returns the id (AUTO_INCREMENT) or false
     }
+
+
 
     public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $guest_firstname, string $guest_lastname, string $guest_email = '', string $guest_phone = ''): array {
         global $wpdb;
-
-        $dbTrackingTable = Tracking::getDbTableName();
 
         if (!$guest_email && !$guest_firstname && !$guest_lastname){
             // we have nothing to search for
@@ -288,6 +366,9 @@ class Tracking {
             // is not 'YYYY-MM-DD'
             return [];
         }
+
+        $tableType = get_option('rsvp_tracking_tabletype');
+        $trackingTable = Tracking::getTrackingTableName($tableType);
 
         //  "Identifikationsmerkmalen für eine Person (Name, E-Mail und oder Telefon)" see https://github.com/RRZE-Webteam/rrze-rsvp/issues/89
         $hash_guest_firstname = Functions::crypt(strtolower($guest_firstname));
@@ -318,7 +399,10 @@ class Tracking {
             $hash_guest_phone
         ];
 
-        $rows = $wpdb->get_results( 
+        // simpelst solution would be: 
+        // select ... INTO OUTFILE '$path_to_file' FIELDS TERMINATED BY ',' LINES TERMINATED BY ';' from ...
+        // but this is a question of user's file writing rights
+        return $wpdb->get_results( 
             $wpdb->prepare("SELECT surrounds.start, surrounds.end, surrounds.room_name, surrounds.room_street, surrounds.room_zip, surrounds.room_city, surrounds.guest_email, surrounds.guest_phone, surrounds.guest_firstname, surrounds.guest_lastname 
             FROM {$dbTrackingTable} AS surrounds 
             WHERE (DATE(surrounds.start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND (DATE(surrounds.end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
@@ -328,21 +412,24 @@ class Tracking {
             (DATE(needle.end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
             needle.hash_guest_firstname = %s AND needle.hash_guest_lastname = %s AND
             ((needle.hash_guest_email = %s) OR (needle.hash_guest_phone = %s))) 
-            ORDER BY surrounds.start, surrounds.guest_lastname", $prepare_vals), ARRAY_A);
-
-        // simpelst solution but a question of user's file rights: 
-        // select ... INTO OUTFILE '$path_to_file' FIELDS TERMINATED BY ',' LINES TERMINATED BY ';' from ...
-
-        return $rows;
+            ORDER BY surrounds.start, surrounds.guest_lastname", $prepare_vals), ARRAY_A); // returns assoc array
     }
 
 
-
-    protected function createTrackingTable( bool $central = true ) {
+    protected function createTrackingTable( string $tableType = 'network' ) {
         global $wpdb;
 
+        // store $tableType we are using for this blog (because of the use cases defined in https://github.com/RRZE-Webteam/rrze-rsvp/issues/110)
+        update_option('rsvp_tracking_tabletype', $tableType, false);
+
+        if (!$this->isUpdate()){
+            return;
+        }
+
+        $trackingTable = Tracking::getTrackingTableName($tableType);
         $charsetCollate = $wpdb->get_charset_collate();
-        $sql = "CREATE TABLE IF NOT EXISTS " . $this->dbTable . " (
+
+        $sql = "CREATE TABLE IF NOT EXISTS " . $trackingTable . " (
             id bigint(20) UNSIGNED NOT NULL auto_increment,
             blog_id bigint(20) NOT NULL,
             ts_updated timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -367,19 +454,31 @@ class Tracking {
             PRIMARY KEY  (id),
             KEY k_blog_id (blog_id)
             ) $charsetCollate;";
-
             // reason for all those hashes is that you cannot use TEXT (but CHAR / VARCHAR) for any kind of index resp KEY which improves performance & data integrity big times :-D 
             // ,UNIQUE KEY uk_guest_room_time (start,end,room_post_id,hash_seat_name,hash_guest_firstname,hash_guest_lastname,hash_guest_email,hash_guest_phone)            
 
+        echo "<script>console.log('sql = " . $sql . "' );</script>";
+
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+        // echo '<pre>';
+        // var_dump($sql);
+        // exit;
 
         $aRet = dbDelta($sql);
         // echo "<script>console.log('dbDelta returns " . json_encode($aRet) . "' );</script>";
     }
 
-
-    public static function getDbTableName(): string {
+    public static function getTrackingTableName( string $tableType = 'network', int $blogID = 0 ): string {
         global $wpdb;
-        return $wpdb->base_prefix . static::DB_TABLE;
+        return ( $tableType == 'network' ? $wpdb->base_prefix : $wpdb->get_blog_prefix($blogID) ) . static::DB_TABLE;
     }
+
+
+    protected function checkTableExists($tableName){
+        global $wpdb;
+
+        return $wpdb->get_results("SELECT * FROM information_schema.tables WHERE table_schema = '{$wpdb->dbname}' AND table_name = '{$tableName}' LIMIT 1", ARRAY_A);
+    }
+
 }
