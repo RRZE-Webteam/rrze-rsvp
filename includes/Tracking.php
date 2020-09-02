@@ -100,6 +100,7 @@ class Tracking {
     
  
     protected function isUpdate() {
+        // BK 2DO: get_site_option & set_site_option seems to be quite useless if there is no "create OR REPLACE table" (which is "DROP TABLE IF EXISTS `tablename`; CREATE TABLE..." in MySQL) ... combined with caching old data to insert into new table (CREATE TEMPORARY TABLE ... ) but this could be an overkill
         if (get_site_option($this->dbOptionName, NULL) != $this->dbVersion) {
             update_site_option($this->dbOptionName, $this->dbVersion);
             return true;
@@ -477,7 +478,6 @@ class Tracking {
 
     protected function checkTableExists($tableName){
         global $wpdb;
-
         return $wpdb->get_results("SELECT * FROM information_schema.tables WHERE table_schema = '{$wpdb->dbname}' AND table_name = '{$tableName}' LIMIT 1", ARRAY_A);
     }
 
