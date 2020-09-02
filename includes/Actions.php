@@ -307,7 +307,7 @@ class Actions
 		$data['time_en'] = $booking['time_en'];
 
 		$cancelUrl = Functions::bookingReplyUrl('maybe-cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
-		$data['cancel_btn'] = sprintf(__('<a href="%s" class="button button-cancel">' . _x('Cancel', 'Booking', 'rrze-rsvp') . '</a>', 'rrze-rsvp'), $cancelUrl);
+		$data['cancel_btn'] = sprintf('<a href="%s" class="button button-cancel">%s</a>', $cancelUrl, _x('Cancel', 'Booking', 'rrze-rsvp'));
 		$data['cancel_btn_en'] = sprintf('<a href="%s" class="button button-cancel">Cancel</a>', $cancelUrl);
 
 		switch ($response) {
