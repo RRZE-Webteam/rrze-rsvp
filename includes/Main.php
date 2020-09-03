@@ -44,9 +44,9 @@ class Main
 		$metaboxes = new Metaboxes;
 		$metaboxes->onLoaded();
 
-		// Tracking (in development)
-		//$tracking = new Tracking;
-		//$tracking->onLoaded();
+		// Tracking
+		$tracking = new Tracking;
+		$tracking->onLoaded();
 
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();

@@ -28,100 +28,40 @@ class Tracking {
 
 
     public function onLoaded() {
-        // Klärungsbedarf: 
-        // WARNING AUSGEBEN wenn "einfach mal so" Plugin de- und aktiviert wird
-        // wird Plugin beim Autoupdate über die Netzwerkeinstellungen / Repo auch de- / aktiviert?  
-        // Ebenfalls warnen, wenn rrze-rsvp-network de- und aktiviert wird
-        // was soll beim De- und Aktivieren von rrze-rsvp passieren? Daten aus network-table löschen? nicht löschen? Tables droppen? nicht droppen? 
-        // VORSICHT wg Mischzustand / Datenkonsistenz!
-        // => BK 2DO: Konstellationen durchtesten
-
         // use cases defined in https://github.com/RRZE-Webteam/rrze-rsvp/issues/110
-
         if (is_multisite()){
             if (is_plugin_active_for_network( 'rrze-rsvp-network/rrze-rsvp-network.php' )){
                 // use case C "Multisite: mit rrze-rsvp-network":
                 // Admin darf CSV NICHT erstellen
                 // SuperAdmin erstellt CSV über Menüpunkt in Network-Dashboard
-                $this->createTrackingTable('network');
-
-                // check if local tracking table for this blog already exists (in this version: we do not drop tables on plugin deactivation + we ignore garbage collecting plugins which do drop those tables)
-                $blogID = get_current_blog_id();
-                $checkTable = Tracking::getTrackingTableName('local', $blogID);
-                if ($this->checkTableExists($checkTable)){
-                    // use case B "Multisite: rrze-rsvp-network wird NACH rrze-rsvp aktiviert":
-                    // Admins dürfen CSV NICHT MEHR erstellen
-                    // SuperAdmin erstellt CSV über Menüpunkt in Network-Dashboard
-                    // => Merge aller lokalen Tracking-Tabellen in zentrale Tracking-Tabelle
-                    // => lokale Tracking-Tabellen werden gelöscht
-                    // $this->createTrackingTable('network');
-
-                    $blogIDs = $this->getBlogIDs();
-
-                    foreach ($blogIDs as $blogID) {
-                        if (false !== $this->fillTrackingTable('network', $blogID)){
-                            $this->dropTrackingTable('local', $blogID);
-                        }else{
-                            // exception handling
-                        }
-                    }
-                }
+                add_action( 'admin_menu', [$this, 'add_tracking_menuinfo'] );
             }else{
-                // check if network tracking table already exists (in this version: we do not drop tables on plugin deactivation + we ignore garbage collecting plugins which do drop those tables)
-                $checkTable = Tracking::getTrackingTableName('network');
-                if ($this->checkTableExists($checkTable)){
-                    // use case D "Multisite: rrze-rsvp-network wird DEAKTIVIERT":
-                    // Admin darf CSV (wieder) erstellen
-                    // => Lokale Tracking-Tabelle wird erstellt und mit den Daten von zentraler Tracking-Tabelle gefüllt, die zu dieser Website gehören
-                    // => Zentrale Tracking-Tabelle wird gelöscht
-                    $this->createTrackingTable('local');
-                    if (false !== $this->fillTrackingTable('local')){
-                        $this->dropTrackingTable('network');
-                    }else{
-                        // exception handling
-                    }
-                }else{
-                    // use case A "Multisite: ohne rrze-rsvp-network":
-                    // Admin darf CSV erstellen
-                    // => Tracking-Tabelle PRO WEBSITE (nicht als zentrale Tracking-Tabelle wie in [1] umgesetzt)
-                    $this->createTrackingTable('local');
-                }
+                // use case A "Multisite: ohne rrze-rsvp-network":
+                // Admin darf CSV erstellen
+                // use case D "Multisite: rrze-rsvp-network wird DEAKTIVIERT":
+                // Admin darf CSV (wieder) erstellen
+                add_action( 'admin_menu', [$this, 'add_tracking_menu'] );
             }
-            add_action( 'admin_menu', [$this, 'add_tracking_menuinfo'] );
+            $this->createTrackingTable('network');
         }else{
             // use cases E "Singlesite":
-            $this->createTrackingTable('local');
-
+            // Admin darf CVS erstellen
             add_action( 'admin_menu', [$this, 'add_tracking_menu'] );
-            add_action( 'wp_ajax_csv_pull', [$this, 'tracking_csv_pull'] );
+            $this->createTrackingTable('local');
         }
         add_action('rrze-rsvp-checked-in', [$this, 'insertTracking'], 10, 2);
+        add_action( 'wp_ajax_csv_pull', [$this, 'tracking_csv_pull'] );
     }
     
  
     protected function isUpdate() {
+        // returns true if tracking table does not exist or DB_VERSION has changed 
         // BK 2DO: get_site_option & set_site_option seems to be quite useless if there is no "create OR REPLACE table" (which is "DROP TABLE IF EXISTS `tablename`; CREATE TABLE..." in MySQL) ... combined with caching old data to insert into new table (CREATE TEMPORARY TABLE ... ) but this could be an overkill
-        if (get_site_option($this->dbOptionName, NULL) != $this->dbVersion) {
+        if (get_site_option($this->dbOptionName, '') != $this->dbVersion) {
             update_site_option($this->dbOptionName, $this->dbVersion);
             return true;
         }
         return false;
-    }
-
-
-    protected function getBlogIDs(){
-        // parameters copied from plugin rrze-netzwerk-audit (10000 blogs is the limit)
-        return get_sites(
-            [
-                'number' => 10000,
-                'network_id' => get_current_network_id(),
-                'archived' => 0,
-                'mature' => 0,
-                'spam' => 0,
-                'deleted' => 0,
-                'fields' => 'ids'
-            ]
-        );
     }
 
 
@@ -259,35 +199,6 @@ class Tracking {
     }
 
 
-    protected function fillTrackingTable(string $into, int $blogID = 0){
-        global $wpdb;
-        $blogID = $blogID ? $blogID : get_current_blog_id();
-
-        $from = ($into == 'network' ? 'local' : 'network'); 
-        $fromTable = Tracking::getTrackingTableName($from);
-        $intoTable = Tracking::getTrackingTableName($into);
-
-        $prepare_vals = [
-            $into,
-            $from,
-            $blogID
-        ];
-
-        return $wpdb->query( 
-               $wpdb->prepare("INSERT INTO {$intoTable} (blog_id, start, end, room_post_id, room_name, room_street, room_zip, room_city, seat_name, hash_seat_name, guest_firstname, guest_lastname, hash_guest_firstname, hash_guest_lastname, guest_email, hash_guest_email, guest_phone, hash_guest_phone) 
-                    SELECT blog_id, start, end, room_post_id, room_name, room_street, room_zip, room_city, seat_name, hash_seat_name, guest_firstname, guest_lastname, hash_guest_firstname, hash_guest_lastname, guest_email, hash_guest_email, guest_phone, hash_guest_phone
-                    FROM {$fromTable} WHERE  blog_id = {$blogID}", $prepare_vals)); // returns 1, 0 or false
-    }
-
-    protected function dropTrackingTable(string $tableType, int $blogID = 0): bool{
-        global $wpdb;
-        $blogID = $blogID ? $blogID : get_current_blog_id();
-        $dropTable = Tracking::getTrackingTableName($tableType, $blogID);
-
-        return $wpdb->query(
-               $wpdb->prepare("DROP TABLE IF EXISTS {$dropTable}", $dropTable)); // returns true/false
-    }
-
 
     public function insertTracking(int $blogID, int $bookingId) {
         // Note: insertTracking() is called via action hook 'rrze-rsvp-checked-in' 
@@ -419,9 +330,6 @@ class Tracking {
 
     protected function createTrackingTable( string $tableType = 'network' ) {
         global $wpdb;
-
-        // store $tableType we are using for this blog (because of the use cases defined in https://github.com/RRZE-Webteam/rrze-rsvp/issues/110)
-        update_option('rsvp_tracking_tabletype', $tableType, false);
 
         if (!$this->isUpdate()){
             return;
