@@ -331,7 +331,7 @@ class Tracking {
     protected function createTrackingTable( string $tableType = 'network' ) {
         global $wpdb;
 
-        if (!$this->isUpdate()){
+        if (false == $this->isUpdate()){
             return;
         }
 
