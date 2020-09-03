@@ -160,15 +160,7 @@ class Bookings extends Shortcodes {
 		// Schedule
 		$scheduleData = Functions::getRoomSchedule($roomID);
 		$schedule = '';
-		$weekdays = [
-		    1 => __('Monday', 'rrze-rsvp'),
-		    2 => __('Tuesday', 'rrze-rsvp'),
-		    3 => __('Wednesday', 'rrze-rsvp'),
-		    4 => __('Thursday', 'rrze-rsvp'),
-		    5 => __('Friday', 'rrze-rsvp'),
-		    6 => __('Saturday', 'rrze-rsvp'),
-		    7 => __('Sunday', 'rrze-rsvp')
-		];
+		$weekdays = Functions::daysOfWeekAry(1);
 		if (!empty($scheduleData)) {
 		    $schedule .= '<table class="rsvp-schedule">';
 		    $schedule .= '<tr>'
