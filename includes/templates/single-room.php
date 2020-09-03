@@ -14,11 +14,7 @@ $meta = get_post_meta($postID);
 // Schedule
 $scheduleData = Functions::getRoomSchedule($postID);
 $schedule = '';
-global $wp_locale;
-$weekdays = [];
-for ($wdcount = 1; $wdcount <= 7; $wdcount++) {
-    $weekdays[$wdcount] = $wp_locale->get_weekday(($wdcount) % 7);
-}
+$weekdays = Functions::daysOfWeekAry(1);
 
 if (!empty($scheduleData)) {
     $schedule .= '<table class="rsvp-schedule">';
