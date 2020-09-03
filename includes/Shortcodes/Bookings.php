@@ -867,7 +867,13 @@ class Bookings extends Shortcodes {
         if ($roomID == 'select')
             $roomID = '';
         // Create array containing abbreviations of days of week.
-        $daysOfWeek = array('Mo','Di','Mi','Do','Fr','Sa','So');
+        //$daysOfWeek = array('Mo','Di','Mi','Do','Fr','Sa','So');
+        global $wp_locale;
+        $daysOfWeek = [];
+        for ($wdcount = 0; $wdcount <= 6; $wdcount++) {
+            $wd = $wp_locale->get_weekday(($wdcount + 1) % 7);
+            $daysOfWeek[] = $wp_locale->get_weekday_abbrev($wd);
+        }        
         // What is the first day of the month in question?
         $firstDayOfMonth = mktime(0,0,0,$month,1,$year);
         $firstDayOfMonthObject = date_create($firstDayOfMonth);

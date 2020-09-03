@@ -4,8 +4,6 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use function RRZE\RSVP\plugin;
-
 use WP_Query;
 
 $idm = new Idm;
@@ -14,7 +12,7 @@ $settings = new Settings(plugin()->getFile());
 $options = (object) $settings->getOptions();
 
 global $post;
-$postId = $post->ID;
+$seatId = $post->ID;
 
 $checkInBooking = null;
 $seatCheckInOut = null;
@@ -166,7 +164,7 @@ if ($checkInBooking) {
     $bookingId = null;
     $status = null;
     $ssoRequired = false;
-    $roomId = get_post_meta($postId, 'rrze-rsvp-seat-room', true);
+    $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
     $now = current_time('timestamp');
 
     echo '<p><strong>' . __('Room:', 'rrze-rsvp') . '</strong> <a href="' . get_permalink($roomId) . '">' . get_the_title($roomId) . '</a>';
@@ -184,7 +182,7 @@ if ($checkInBooking) {
             ],            
             'seat_id_clause' =>[
                 'key' => 'rrze-rsvp-booking-seat',
-                'value'   => $postId,
+                'value'   => $seatId,
             ],
             'booking_start_clause' => [
                 'key'     => 'rrze-rsvp-booking-start',
@@ -295,14 +293,14 @@ if ($checkInBooking) {
                 $date = Functions::dateFormat($start);
                 $time = Functions::timeFormat($start) . ' - ' . Functions::timeFormat($end);
                 $roomName = get_the_title($roomId);
-                $seatName = get_the_title($postId);
+                $seatName = get_the_title($seatId);
                 $timeslot = explode('-', $bookingStart)[0];
                 $nonce = wp_create_nonce('rsvp-availability');
                 $link = sprintf(
                     '<a href="%1$s?room_id=%2$d&seat_id=%3$d&bookingdate=%4$s&timeslot=%5$s&instant=1&nonce=%6$s" class="button button-checkin" data-id="%2$d">%7$s</a>',
                     trailingslashit(get_permalink($roomId)),
                     $roomId,
-                    $postId,
+                    $seatId,
                     $day,
                     $timeslot,
                     $nonce,
@@ -320,9 +318,9 @@ if ($checkInBooking) {
                 echo '<p>' . $link . '</p>';
                 echo '</div> </div>';
             } else {
-                echo '<h3>' . __('Book this seat', 'rrze-rsvp') . '</h3>';
-                echo do_shortcode('[rsvp-qr seat=' . $postId . ']');
-                echo do_shortcode('[rsvp-availability seat=' . $postId . ' days=14 booking_link=true]');
+                echo '<h2>' . __('Book this seat', 'rrze-rsvp') . '</h2>';
+                echo do_shortcode('[rsvp-qr seat=' . $seatId . ']');
+                echo do_shortcode('[rsvp-availability seat=' . $seatId . ' days=14 booking_link=true]');
             }                    
     }
 
