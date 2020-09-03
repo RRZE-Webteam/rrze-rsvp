@@ -41,6 +41,22 @@ class Functions
         return (strpos($locale, 'en_') === 0);
     }
 
+    public static function daysOfWeekAry(int $startKey = 0, int $startWd = 1, int $abbr = 0): array
+    {
+        global $wp_locale;
+        $weekDays = [];
+        for ($wdCount = 0; $wdCount <= 6; $wdCount++) {
+            $wd = $wp_locale->get_weekday(($wdCount + $startWd) % 7);
+            if ($abbr == 1) {
+                $wd = $wp_locale->get_weekday_initial($wd);
+            } elseif ($abbr == 2) {
+                $wd = $wp_locale->get_weekday_abbrev($wd);
+            }
+            $weekDays[$wdCount + $startKey] = $wd;
+        }
+        return $weekDays;
+    }
+
     /**
      * getOccupancyByRoomIdNextHTML
      * returns getOccupancyByRoomIdHTML() if there is an available seat for today; otherwise returns the next available timeslots 
