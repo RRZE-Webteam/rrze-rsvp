@@ -4,11 +4,6 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Functions;
-use RRZE\RSVP\Helper;
-use RRZE\RSVP\Settings;
-use function RRZE\RSVP\plugin;
-
 $settings = new Settings(plugin()->getFile());
 $options = (object) $settings->getOptions();
 global $post;
@@ -19,15 +14,12 @@ $meta = get_post_meta($postID);
 // Schedule
 $scheduleData = Functions::getRoomSchedule($postID);
 $schedule = '';
-$weekdays = [
-    1 => __('Monday', 'rrze-rsvp'),
-    2 => __('Tuesday', 'rrze-rsvp'),
-    3 => __('Wednesday', 'rrze-rsvp'),
-    4 => __('Thursday', 'rrze-rsvp'),
-    5 => __('Friday', 'rrze-rsvp'),
-    6 => __('Saturday', 'rrze-rsvp'),
-    7 => __('Sunday', 'rrze-rsvp')
-];
+global $wp_locale;
+$weekdays = [];
+for ($wdcount = 1; $wdcount <= 7; $wdcount++) {
+    $weekdays[$wdcount] = $wp_locale->get_weekday(($wdcount) % 7);
+}
+
 if (!empty($scheduleData)) {
     $schedule .= '<table class="rsvp-schedule">';
     $schedule .= '<tr>'
@@ -55,7 +47,6 @@ if (!empty($scheduleData)) {
 if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id'] != '') {
     $imgID = $meta['rrze-rsvp-room-floorplan_id'][0];
 }
-
 
 get_header();
 
