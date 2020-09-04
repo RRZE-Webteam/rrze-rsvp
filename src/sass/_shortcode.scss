@@ -95,6 +95,9 @@
 		text-align: center;
 	    }
         }
+	tr:nth-child(2n+1) td {
+	    background: inherit;
+	}
         td {
             padding: 0;
             text-align: center;
@@ -148,6 +151,7 @@
 	margin-top: 10px;
 	margin-bottom: 10px;
     }
+    
 }
 table.rsvp-room-availability,
 table.rsvp-seat-availability {

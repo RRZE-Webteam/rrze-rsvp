@@ -227,7 +227,7 @@ class Bookings extends Shortcodes {
         $output .= '<div class="rrze-rsvp">';
         $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room">'
                     . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
-
+	$output .= '<fieldset>';  
         if ($get_instant) {
             $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
         }
@@ -240,11 +240,9 @@ class Bookings extends Shortcodes {
                     . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($roomID) . '</strong>'
                     . '</p>';
 
-        $output .= '<div class="rsvp-datetime-container form-group clearfix"><legend>' . __(
-                'Select date and time',
-                'rrze-rsvp'
-            ) . '</legend>'
-                            . '<div class="rsvp-date-container">';
+        $output .= '<div class="rsvp-datetime-container form-group clearfix">'; 	
+	$output .= '<legend>' . __( 'Select date and time','rrze-rsvp') . '</legend>';
+        $output .=  '<div class="rsvp-date-container">';
         $dateComponents = getdate(strtotime($get_date));
         $month          = $dateComponents[ 'mon' ];
         $year           = $dateComponents[ 'year' ];
@@ -262,7 +260,7 @@ class Bookings extends Shortcodes {
             $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
         }
         $output .= '</div>'; //.rsvp-time-container
-
+	
         $output .= '</div>'; //.rsvp-datetime-container
 
         $output .= '<div class="rsvp-seat-container">';
@@ -272,8 +270,9 @@ class Bookings extends Shortcodes {
             $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
         }
         $output .= '</div>'; //.rsvp-seat-container
-
-        $output .= '<legend>' . __('Your data', 'rrze-rsvp') . '</legend>';
+	$output .= '</fieldset>';  
+	$output .= '<fieldset>';  
+        $output .= '<legend>' . __('Your data', 'rrze-rsvp') . ' <span class="notice-required">('. __('Required','rrze-rsvp'). ')</span></legend>';
         if ($ssoRequired) {
             $data = $this->idm->getCustomerData();
             $output .= '<input type="hidden" value="' . $data['customer_lastname'] . '" id="rsvp_lastname" name="rsvp_lastname">';
@@ -290,7 +289,7 @@ class Bookings extends Shortcodes {
             $value = isset($fieldErrors['rsvp_lastname']['value']) ? $fieldErrors['rsvp_lastname']['value'] : '';
             $message = isset($fieldErrors['rsvp_lastname']['message']) ? $fieldErrors['rsvp_lastname']['message'] : '';    
             $output .= '<div class="form-group' . $error . '"><label for="rsvp_lastname">'
-                . __('Last name', 'rrze-rsvp') . ' *</label>'
+                . __('Last name', 'rrze-rsvp') . '</label>'
                 . '<input type="text" name="rsvp_lastname" value="' . $value . '" id="rsvp_lastname" required aria-required="true">'
                 . '<div class="error-message">' . $message . '</div>'
                 . '</div>';
@@ -299,7 +298,7 @@ class Bookings extends Shortcodes {
             $value = isset($fieldErrors['rsvp_firstname']['value']) ? $fieldErrors['rsvp_firstname']['value'] : '';
             $message = isset($fieldErrors['rsvp_firstname']['message']) ? $fieldErrors['rsvp_firstname']['message'] : '';    
             $output .= '<div class="form-group' . $error . '"><label for="rsvp_firstname">'
-                . __('First name', 'rrze-rsvp') . ' *</label>'
+                . __('First name', 'rrze-rsvp') . '</label>'
                 . '<input type="text" name="rsvp_firstname" value="' . $value . '" id="rsvp_firstname" required aria-required="true">'
                 . '<div class="error-message">' . $message . '</div>'
                 . '</div>';
@@ -308,7 +307,7 @@ class Bookings extends Shortcodes {
             $value = isset($fieldErrors['rsvp_email']['value']) ? $fieldErrors['rsvp_email']['value'] : '';
             $message = isset($fieldErrors['rsvp_email']['message']) ? $fieldErrors['rsvp_email']['message'] : '';    
             $output .= '<div class="form-group' . $error . '"><label for="rsvp_email">'
-                . __('Email', 'rrze-rsvp') . ' *</label>'
+                . __('Email', 'rrze-rsvp') . '</label>'
                 . '<input type="email" name="rsvp_email" value="' . $value . '" '
 		. 'pattern="^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*(\.\w{2,})+$" '
 		. 'id="rsvp_email" required aria-required="true">'
@@ -319,7 +318,7 @@ class Bookings extends Shortcodes {
         $value = isset($fieldErrors['rsvp_phone']['value']) ? $fieldErrors['rsvp_phone']['value'] : '';
         $message = isset($fieldErrors['rsvp_phone']['message']) ? $fieldErrors['rsvp_phone']['message'] : '';
         $output .= '<div class="form-group' . $error . '"><label for="rsvp_phone">'
-            . __('Phone Number', 'rrze-rsvp') . ' *</label>'
+            . __('Phone Number', 'rrze-rsvp') . '</label>'
             . '<input type="text" name="rsvp_phone" value="' . $value . '" pattern="^([+])?(\d{1,3})?\s?(\(\d{3,5}\)|\d{3,5})?\s?(\d{1,3}\s?|\d{1,3}[-])?(\d{3,8})$" id="rsvp_phone" required aria-required="true">'
             . '<div class="error-message">' . $message . '</div>'
             . '<p class="description">'
@@ -340,7 +339,7 @@ class Bookings extends Shortcodes {
                     . '<input type="checkbox" value="1" id="rsvp_dsgvo" name="rsvp_dsgvo" required> '
                     . '<label for="rsvp_dsgvo">' . $defaults['dsgvo-declaration'] . '</label>'
                     . '</div>';
-
+	$output .= '</fieldset>';  
         $output .= '<button type="submit" class="btn btn-primary">' . __('Submit booking', 'rrze-rsvp') . '</button>
             </form>
         </div>';
@@ -1043,7 +1042,7 @@ class Bookings extends Shortcodes {
         $equipment = get_the_terms($id, 'rrze-rsvp-equipment');
         $output .= '<div class="rsvp-item-info">';
         if ($equipment !== false) {
-            $output .= '<div class="rsvp-item-equipment"><h5 class="small">' . sprintf( __( 'Seat %s', 'rrze-rsvp' ), $seat_name ) . '</h5>';
+            $output .= '<div class="rsvp-item-equipment"><h5>' . sprintf( __( 'Seat %s', 'rrze-rsvp' ), $seat_name ) . '</h5>';
             foreach  ($equipment as $e) {
                 $e_arr[] = $e->name;
             }
