@@ -8,7 +8,7 @@ use RRZE\RSVP\Settings;
 
 class Tracking {
     const DB_TABLE = 'rrze_rsvp_tracking';
-    const DB_VERSION = '1.1.0';
+    const DB_VERSION = '1.1.1';
     const DB_VERSION_OPTION_NAME = 'rrze_rsvp_tracking_db_version';
 
     protected $settings;
@@ -255,7 +255,7 @@ class Tracking {
 
 
 
-    private function deCryptField(&$item, string $key): string{
+    private static function deCryptField(&$item, string $key): string{
         // $item can be of different types (int, string, ...)
         $aFields = [
             'hash_guest_firstname',
@@ -316,16 +316,17 @@ class Tracking {
         // but this is a question of user's file writing rights
         $aRows = $wpdb->get_results( 
             $wpdb->prepare("SELECT surrounds.start, surrounds.end, surrounds.room_name, surrounds.room_street, surrounds.room_zip, surrounds.room_city, surrounds.hash_guest_email, surrounds.hash_guest_phone, surrounds.hash_guest_firstname, surrounds.hash_guest_lastname 
-            FROM {$dbTrackingTable} AS surrounds 
+            FROM {$trackingTable} AS surrounds 
             WHERE (DATE(surrounds.start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND (DATE(surrounds.end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
             surrounds.room_post_id IN 
-            (SELECT needle.room_post_id FROM {$dbTrackingTable} AS needle WHERE 
+            (SELECT needle.room_post_id FROM {$trackingTable} AS needle WHERE 
             (DATE(needle.start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
             (DATE(needle.end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
             needle.hash_guest_firstname = %s AND needle.hash_guest_lastname = %s AND
             ((needle.hash_guest_email = %s) OR (needle.hash_guest_phone = %s))) 
             ORDER BY surrounds.start", $prepare_vals), ARRAY_A); // returns assoc array
-        return array_walk($aRows, [$this, 'deCryptField']);
+        array_walk($aRows, 'self::deCryptField');
+        return $aRows;
     }
 
 
