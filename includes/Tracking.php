@@ -340,6 +340,9 @@ class Tracking {
             return;
         }
 
+        // store $tableType we are using for this blog (because of the use cases defined in https://github.com/RRZE-Webteam/rrze-rsvp/issues/110)
+        update_option('rsvp_tracking_tabletype', $tableType, false);
+
         $charsetCollate = $wpdb->get_charset_collate();
         $trackingTable = Tracking::getTableName($tableType);
 
