@@ -29,6 +29,7 @@ class Tracking {
     public function onLoaded() {
         // use cases defined in https://github.com/RRZE-Webteam/rrze-rsvp/issues/110
         if (is_multisite()){
+            include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
             if (is_plugin_active_for_network( 'rrze-rsvp-network/rrze-rsvp-network.php' )){
                 // use case C "Multisite: mit rrze-rsvp-network":
                 // Admin darf CSV NICHT erstellen
@@ -100,12 +101,12 @@ class Tracking {
         if ( isset( $_GET['submit'])) {
             $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
             $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
-            $guest_firstname = filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING);
-            $guest_lastname = filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING);
-            $guest_email = filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL);
-            $guest_phone = filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING);
+            $hash_guest_firstname = Functions::crypt(filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING), 'encrypt');
+            $hash_guest_lastname = Functions::crypt(filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING), 'encrypt');
+            $hash_guest_email = Functions::crypt(filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL), 'encrypt');
+            $hash_guest_phone = Functions::crypt(filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING), 'encrypt');
 
-            $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $guest_firstname, $guest_lastname, $guest_email, $guest_phone);
+            $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email, $hash_guest_phone);
 
             if ($aGuests){
                 $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&guest_firstname=' . urlencode($guest_firstname) . '&guest_lastname=' . urlencode($guest_lastname) . '&guest_email=' . urlencode($guest_email) . '&guest_phone=' . urlencode($guest_phone);
