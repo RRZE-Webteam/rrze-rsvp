@@ -323,7 +323,7 @@ class Schedule
     protected function deleteOldTrackingData()
     {
         global $wpdb;
-        $dbTable = Tracking::getDbTableName();
+        $dbTable = Tracking::getTableName();
         $wpdb->query("DELETE FROM $dbTable WHERE ts_inserted < (NOW() - INTERVAL 4 WEEK)");
     }
 }
