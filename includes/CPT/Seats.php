@@ -114,7 +114,7 @@ class Seats
 	{
 		$columns = array(
 			'cb' => $columns['cb'],
-			'seat' => __('Seat', 'rrze-rsvp'),
+			'title' => __('Seat', 'rrze-rsvp'),
 			'room' => __('Room', 'rrze-rsvp')
 		);
 		return $columns;
@@ -123,7 +123,7 @@ class Seats
 	public function customColumn($column, $post_id)
 	{
 		$roomId = get_post_meta($post_id, 'rrze-rsvp-seat-room', true);
-		if ('seat' === $column) {
+		if ('title' === $column) {
 			echo get_the_title($post_id);
 		}
 		if ('room' === $column) {
@@ -134,7 +134,7 @@ class Seats
 	public function sortableColumns($columns)
 	{
 		$columns = array(
-			'seat' => __('Seat', 'rrze-rsvp'),
+			'title' => __('Seat', 'rrze-rsvp'),
 			'room' => __('Room', 'rrze-rsvp')
 		);
 		return $columns;
