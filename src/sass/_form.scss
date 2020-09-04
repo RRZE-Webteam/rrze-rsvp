@@ -1,0 +1,90 @@
+/*
+RSVP Form Adjustments
+*/
+
+
+.rrze-rsvp {
+     #content & form,
+    form {
+	border: none;
+	padding: 0;
+	
+        position: relative;
+        legend {
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+	    border-bottom: none;
+        }
+	
+	
+	button[type="submit"] {
+	    width: 100%;
+	    
+	    @media (min-width: 480px) {
+		width: auto;
+	    }
+	}
+    }
+    .form-group {
+        .description {
+            font-style: italic;
+        }
+        .error-message {
+            display: none;
+        }
+    }
+    .error-message {
+        font-style: italic;
+        color: #cc0033;
+        display: inline-block;
+    }
+    .error {
+        label, p {
+            color: #cc0033;
+        }
+        input[type] {
+            background-color: #fce4e4;
+            border: 1px solid #cc0033;
+            outline: none;
+        }
+        .error-message {
+            display: inline-block;
+        }
+    }
+    .rsvp-time-select label {
+        min-width: 0;
+    }
+    .rsvp-seat-select {
+        margin-bottom: 1em;
+        @media (min-width: 480px) {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        label {
+            min-width: 0;
+        }
+    }
+    .rsvp-item-info {
+        border: 1px solid #dde5f0;
+        padding: 10px;
+        margin-bottom: 1em;
+    }
+    .rsvp-seat-container {
+        margin-bottom: 1em;
+    }
+    input#rsvp_dsgvo {
+        display: block;
+        float: left;
+        margin-right: 10px;
+    }
+    label[for="rsvp_dsgvo"] {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 20px;
+        padding-top: 2px;
+        line-height: 1.3;
+        hyphens: auto;
+	
+    }
+
+}
