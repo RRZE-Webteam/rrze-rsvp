@@ -9,7 +9,6 @@ namespace RRZE\RSVP\CPT;
 defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Capabilities;
-use RRZE\RSVP\Functions;
 
 class Rooms
 {
@@ -26,11 +25,11 @@ class Rooms
     {
         add_action('init', [$this, 'room_post_type'], 0);
 
-		add_filter('manage_room_posts_columns', [$this, 'columns']);
-		add_action('manage_room_posts_custom_column', [$this, 'customColumn'], 10, 2);
-		add_filter('manage_edit-room_sortable_columns', [$this, 'sortableColumns']);
+        add_filter('manage_room_posts_columns', [$this, 'columns']);
+        add_action('manage_room_posts_custom_column', [$this, 'customColumn'], 10, 2);
+        add_filter('manage_edit-room_sortable_columns', [$this, 'sortableColumns']);
 
-		add_filter('months_dropdown_results', [$this, 'removeMonthsDropdown'], 10, 2);        
+        add_filter('months_dropdown_results', [$this, 'removeMonthsDropdown'], 10, 2);
     }
 
     // Register Custom Post Type
@@ -91,35 +90,35 @@ class Rooms
         register_post_type('room', $args);
     }
 
-	public function columns($columns)
-	{
-		$columns = array(
-			'cb' => $columns['cb'],
-			'title' => __('Room', 'rrze-rsvp')
-		);
-		return $columns;
-	}
+    public function columns($columns)
+    {
+        $columns = array(
+            'cb' => $columns['cb'],
+            'title' => __('Room', 'rrze-rsvp')
+        );
+        return $columns;
+    }
 
-	public function customColumn($column, $postId)
-	{
-		if ('title' === $column) {
-			echo get_the_title($postId);
-		}
-	}
+    public function customColumn($column, $postId)
+    {
+        if ('title' === $column) {
+            echo get_the_title($postId);
+        }
+    }
 
-	public function sortableColumns($columns)
-	{
-		$columns = array(
-			'title' => __('Room', 'rrze-rsvp')
-		);
-		return $columns;
-	}
+    public function sortableColumns($columns)
+    {
+        $columns = array(
+            'title' => __('Room', 'rrze-rsvp')
+        );
+        return $columns;
+    }
 
-	public function removeMonthsDropdown($months, $postType)
-	{
-		if ($postType == 'room') {
-			$months = 0;
-		}
-		return $months;
-	}    
+    public function removeMonthsDropdown($months, $postType)
+    {
+        if ($postType == 'room') {
+            $months = 0;
+        }
+        return $months;
+    }
 }
