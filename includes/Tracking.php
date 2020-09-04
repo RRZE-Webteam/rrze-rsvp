@@ -8,7 +8,7 @@ use RRZE\RSVP\Settings;
 
 class Tracking {
     const DB_TABLE = 'rrze_rsvp_tracking';
-    const DB_VERSION = '1.1.1';
+    const DB_VERSION = '1.2.3';
     const DB_VERSION_OPTION_NAME = 'rrze_rsvp_tracking_db_version';
 
     protected $settings;
@@ -58,12 +58,12 @@ class Tracking {
  
     protected function isUpdate() {
         // returns true if tracking table does not exist or DB_VERSION has changed 
-        // BK 2DO: get_site_option & set_site_option seems to be quite useless if there is no "create OR REPLACE table" (which is "DROP TABLE IF EXISTS `tablename`; CREATE TABLE..." in MySQL) ... combined with caching old data to insert into new table (CREATE TEMPORARY TABLE ... ) but this could be an overkill
         if (get_site_option($this->dbOptionName, '') != $this->dbVersion) {
             update_site_option($this->dbOptionName, $this->dbVersion);
             return true;
         }
         return false;
+
     }
 
 
@@ -340,10 +340,39 @@ class Tracking {
             return;
         }
 
-        $trackingTable = Tracking::getTableName($tableType);
         $charsetCollate = $wpdb->get_charset_collate();
+        $trackingTable = Tracking::getTableName($tableType);
 
-        $sql = "CREATE TABLE IF NOT EXISTS " . $trackingTable . " (
+        // BK 2DO:
+        // this is not a good solution
+        // read https://wordpress.stackexchange.com/questions/78667/dbdelta-alter-table-syntax
+        // ==> better use dbDelta strickly 
+        // documented here: https://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
+
+        // backup and drop table if it exists
+        if ($this->checkTableExists($trackingTable)){
+            if ($this->backupTable($trackingTable)){
+                if ($this->dropTable($trackingTable)){
+                    $msg = __('Warning! Database version has changed: tracking table has been backuped. New tracking table is now empty. Contact your SuperAdmin to restore tracking data!', 'rrze-rsvp');
+                }else{
+                    $msg = __('Error! Database version has changed but could not drop tracking table. Contact your SuperAdmin!', 'rrze-rsvp');
+                }
+            }else{
+                $msg = __('Error! Database version has changed but could not backup tracking table. Contact your SuperAdmin!', 'rrze-rsvp');
+            }
+            $pluginData = get_plugin_data(plugin()->getFile());
+            $pluginName = $pluginData['Name'];
+            $tag = is_plugin_active_for_network(plugin()->getBaseName()) ? 'network_admin_notices' : 'admin_notices';
+            add_action($tag, function () use ($pluginName, $msg) {
+                printf(
+                    '<div class="notice notice-error"><p>' . __('Plugins: %1$s: %2$s', 'rrze-rsvp') . '</p></div>',
+                    esc_html($pluginName),
+                    esc_html($msg)
+                );
+            });
+        }
+
+        $sql = "CREATE TABLE " . $trackingTable . " (
             id bigint(20) UNSIGNED NOT NULL auto_increment,
             blog_id bigint(20) NOT NULL,
             ts_updated timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -371,15 +400,31 @@ class Tracking {
         // echo "<script>console.log('dbDelta returns " . json_encode($aRet) . "' );</script>";
     }
 
+
     public static function getTableName( string $tableType = 'network', int $blogID = 0 ): string {
         global $wpdb;
         return ( $tableType == 'network' ? $wpdb->base_prefix : $wpdb->get_blog_prefix($blogID) ) . static::DB_TABLE;
     }
 
 
-    protected function checkTableExists($tableName){
+    protected function checkTableExists(string $tableName): bool{
         global $wpdb;
-        return $wpdb->get_results("SELECT * FROM information_schema.tables WHERE table_schema = '{$wpdb->dbname}' AND table_name = '{$tableName}' LIMIT 1", ARRAY_A);
+        $ret = $wpdb->get_results("SELECT * FROM information_schema.tables WHERE table_schema = '{$wpdb->dbname}' AND table_name = '{$tableName}' LIMIT 1", ARRAY_A);
+        return ( $ret ? true : false ); // $ret can be false, 0 or any integer
     }
 
+
+    protected function dropTable(string $tableName): bool{
+        global $wpdb;
+        return $wpdb->query(
+               $wpdb->prepare("DROP TABLE IF EXISTS {$tableName}", array($tableName))); // returns true/false
+    }
+
+
+    protected function backupTable(string $tableName){
+        global $wpdb;
+        return $wpdb->query("RENAME TABLE '$tableName' TO '$tableName" . '_backup_' . date('Y_m_d_His') . "'"); // returns true/false
+
+        // $wpdb->last_result;
+    }
 }
