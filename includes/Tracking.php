@@ -171,10 +171,10 @@ class Tracking {
     public function tracking_csv_pull() {
         $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
         $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
-        $hash_guest_firstname = filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING);
-        $hash_guest_lastname = filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING);
-        $hash_guest_email = filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL);
-        $hash_guest_phone = filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING);
+        $hash_guest_firstname = Functions::crypt(filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING), 'encrypt');
+        $hash_guest_lastname = Functions::crypt(filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING), 'encrypt');
+        $hash_guest_email = Functions::crypt(filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL), 'encrypt');
+        $hash_guest_phone = Functions::crypt(filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING), 'encrypt');
 
         $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email, $hash_guest_phone);
 
