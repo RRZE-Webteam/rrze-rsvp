@@ -29,7 +29,9 @@ class Tracking {
     public function onLoaded() {
         // use cases defined in https://github.com/RRZE-Webteam/rrze-rsvp/issues/110
         if (is_multisite()){
-            include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+            if (! function_exists('is_plugin_active_for_network')) {
+                include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+            }
             if (is_plugin_active_for_network( 'rrze-rsvp-network/rrze-rsvp-network.php' )){
                 // use case C "Multisite: mit rrze-rsvp-network":
                 // Admin darf CSV NICHT erstellen
