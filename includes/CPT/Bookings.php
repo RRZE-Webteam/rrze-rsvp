@@ -14,31 +14,27 @@ use RRZE\RSVP\Carbon;
 
 class Bookings
 {
-
-    protected $options;
     protected $sDate;
     protected $sRoom;
 
 
-    public function __construct($pluginFile, $settings)
+    public function __construct()
     {
-        $this->pluginFile = $pluginFile;
-        $this->settings = $settings;
         $this->sDate = 'rsvp_booking_date';
         $this->sRoom = 'rsvp_booking_room';
     }
 
     public function onLoaded()
     {
-        add_action('init', [$this, 'booking_post_type'], 0);
-        add_action( 'add_meta_boxes', [$this, 'not_cmb_metabox'] );
+        add_action('init', [$this, 'booking_post_type']);
+        add_action('add_meta_boxes', [$this, 'not_cmb_metabox']);
         //add_filter( 'manage_edit-booking_columns', [$this, 'booking_filter_posts_columns'] );
         add_filter('manage_booking_posts_columns', [$this, 'booking_columns']);
         add_action('manage_booking_posts_custom_column', [$this, 'booking_column'], 10, 2);
         add_filter('manage_edit-booking_sortable_columns', [$this, 'booking_sortable_columns']);
-        add_action( 'wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots'] );
-        add_action( 'restrict_manage_posts', [$this, 'addFilters'], 10, 1 );
-        add_filter( 'parse_query', [$this, 'filterQuery'], 10);
+        add_action('wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots']);
+        add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
+        add_filter('parse_query', [$this, 'filterQuery'], 10);
     }
 
     // Register Custom Post Type
@@ -95,14 +91,16 @@ class Bookings
 
     public function not_cmb_metabox()
     {
-        add_meta_box( 'rrze-rsvp-room-shortcode-helper', esc_html__( 'Shortcode', 'rrze-rsvp' ), [$this, 'not_cmb_metabox_callback'], 'room', 'side', 'high' );
+        add_meta_box('rrze-rsvp-room-shortcode-helper', esc_html__('Shortcode', 'rrze-rsvp'), [$this, 'not_cmb_metabox_callback'], 'room', 'side', 'high');
     }
 
-    public function not_cmb_metabox_callback() {
-        printf(__('%sTo add a booking form for this room, add the following shortcode to a page:%s'
-         . '[rsvp-booking room="%s" sso="true"]%s'
-         . 'Skip %ssso="true"%s to deactivate SSO authentication.%s'
-         . 'Add %sdays="20"%s to overwrite the number of days you can book a seat in advance.%s', 'rrze-rsvp'),
+    public function not_cmb_metabox_callback()
+    {
+        printf(
+            __('%sTo add a booking form for this room, add the following shortcode to a page:%s'
+                . '[rsvp-booking room="%s" sso="true"]%s'
+                . 'Skip %ssso="true"%s to deactivate SSO authentication.%s'
+                . 'Add %sdays="20"%s to overwrite the number of days you can book a seat in advance.%s', 'rrze-rsvp'),
             '<p class="description">',
             '</p><p><code>',
             get_the_ID(),
@@ -112,7 +110,8 @@ class Bookings
             '</p><p>',
             '<code>',
             '</code>',
-            '</p>');
+            '</p>'
+        );
     }
 
     /*
@@ -215,9 +214,9 @@ class Bookings
                             break;
                         case 'checked-out':
                             $button = __('Checked-Out', 'rrze-rsvp');
-                            break;                                                         
+                            break;
                     }
-                    if (! in_array($booking['status'], ['checked-in', 'checked-out'])) {
+                    if (!in_array($booking['status'], ['checked-in', 'checked-out'])) {
                         $button = sprintf(
                             '<a href="edit.php?post_type=%1$s&action=delete&id=%2$d&_wpnonce=%3$s" class="delete">%4$s</a>',
                             'booking',
@@ -270,26 +269,27 @@ class Bookings
         return $columns;
     }
 
-    public function ajaxShowTimeslots() {
+    public function ajaxShowTimeslots()
+    {
         $output = '';
         $seat = ((isset($_POST['seat']) && $_POST['seat'] > 0) ? (int)$_POST['seat'] : '');
         $date_raw = (isset($_POST['date']) ? sanitize_text_field($_POST['date']) : false);
         if (strpos($date_raw, '.') !== false) {
             $date_parts = explode('.', $date_raw);
-            $date = $date_parts[2].'-'.$date_parts[1].'-'.$date_parts[0];
+            $date = $date_parts[2] . '-' . $date_parts[1] . '-' . $date_parts[0];
         }
         $availability = Functions::getSeatAvailability($seat, $date, $date);
         $output .= '<div class="select_timeslot_container" style="display:inline-block;padding-left: 10px;">';
         if (isset($availability[$date])) {
             $output .= '<select class="select_timeslot">'
-            . '<option value="">' . __('Select timeslot', 'rrze-rsvp') . '</option>';
+                . '<option value="">' . __('Select timeslot', 'rrze-rsvp') . '</option>';
 
-            foreach($availability[$date] as $timeslot) {
+            foreach ($availability[$date] as $timeslot) {
                 $time_parts = explode('-', $timeslot);
-                $output .= '<option value="'.$time_parts[0].'" data-end="'.$time_parts[1].'">' . $timeslot . '</option>';
+                $output .= '<option value="' . $time_parts[0] . '" data-end="' . $time_parts[1] . '">' . $timeslot . '</option>';
             }
             $output .= '</select>';
-//            wp_send_json($availability[$date]);
+            //            wp_send_json($availability[$date]);
         } else {
             $output .= __('No timeslots available for this seat/day.', 'rrze-rsvp');
         }
@@ -299,13 +299,14 @@ class Bookings
     }
 
 
-    public function addFilters($post_type){
-        if ($post_type != 'booking'){
-          return;
+    public function addFilters($post_type)
+    {
+        if ($post_type != 'booking') {
+            return;
         }
 
-        $sAllDates = __( 'Show all dates', 'rrze-rsvp' );
-        $sAllRoomes = __( 'Show all rooms', 'rrze-rsvp' );
+        $sAllDates = __('Show all dates', 'rrze-rsvp');
+        $sAllRoomes = __('Show all rooms', 'rrze-rsvp');
         $sSelectedDate = (string) filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
         $sSelectedRoom = (string) filter_input(INPUT_GET, $this->sRoom, FILTER_SANITIZE_STRING);
 
@@ -319,7 +320,7 @@ class Bookings
         $aBookingDates = [];
         $aBookingRooms = [];
 
-        foreach ($aBookingIds as $bookingId){
+        foreach ($aBookingIds as $bookingId) {
             // 2. get unique dates
             $bookingDate = get_post_meta($bookingId, 'rrze-rsvp-booking-start', true);
             $aBookingDates[$bookingDate] = Functions::dateFormat($bookingDate);
@@ -329,24 +330,25 @@ class Bookings
             $aBookingRooms[$roomId] = get_the_title($roomId);
         }
 
-        if ($aBookingDates){
+        if ($aBookingDates) {
             Functions::sortArrayKeepKeys($aBookingDates);
             echo Functions::getSelectHTML($this->sDate, $sAllDates, $aBookingDates, $sSelectedDate);
         }
-        
-        if ($aBookingRooms){
+
+        if ($aBookingRooms) {
             Functions::sortArrayKeepKeys($aBookingRooms);
             echo Functions::getSelectHTML($this->sRoom, $sAllRoomes, $aBookingRooms, $sSelectedRoom);
         }
     }
 
-    public function filterQuery($query){
-        if ( !(is_admin() AND $query->is_main_query()) ){ 
-          return $query;
+    public function filterQuery($query)
+    {
+        if (!(is_admin() and $query->is_main_query())) {
+            return $query;
         }
 
         // don't modify query_vars because it's not our post_type
-        if ( !( $query->query['post_type'] === 'booking' ) ){
+        if (!($query->query['post_type'] === 'booking')) {
             return $query;
         }
 
@@ -354,12 +356,12 @@ class Bookings
         $roomId = filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
 
         // don't modify query_vars because only default values are given (= "show all ...")
-        if ( !( $filterDate || $roomId ) ){
+        if (!($filterDate || $roomId)) {
             return $query;
         }
 
         $meta_query = [];
-        if ($roomId){
+        if ($roomId) {
             // get 1 seatId for given room
             $sSeatIds = get_posts([
                 'post_type' => 'seat',
@@ -368,8 +370,8 @@ class Bookings
                 'numberposts' => 1,
                 'fields' => 'ids'
             ]);
-        
-            if (isset($sSeatIds[0])){
+
+            if (isset($sSeatIds[0])) {
                 $meta_query[] = array(
                     'key' => 'rrze-rsvp-booking-seat',
                     'value' => $sSeatIds[0]
@@ -377,18 +379,18 @@ class Bookings
             }
         }
 
-        if ($filterDate){
+        if ($filterDate) {
             $meta_query[] = array(
                 'key' => 'rrze-rsvp-booking-start',
                 'value' => $filterDate
             );
         }
 
-        if ($meta_query){
+        if ($meta_query) {
             $meta_query['relation'] = 'AND';
             $query->query_vars['meta_query'] = $meta_query;
         }
 
         return $query;
-      }
+    }
 }

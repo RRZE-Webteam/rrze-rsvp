@@ -14,6 +14,7 @@ Text Domain:     rrze-rsvp
 */
 
 namespace RRZE\RSVP;
+use RRZE\RSVP\CPT\CPT;
 
 defined('ABSPATH') || exit;
 
@@ -82,6 +83,11 @@ function activation()
 
     Users::addRoleCaps();
     Users::createBookingRole();
+
+    $cpt = new CPT;
+    $cpt->activation();
+
+    flush_rewrite_rules();    
 }
 
 /**
@@ -91,6 +97,8 @@ function deactivation()
 {
     Users::removeRoleCaps();
     Users::removeBookingRole();
+
+    flush_rewrite_rules();
 }
 
 /**

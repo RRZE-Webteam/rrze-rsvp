@@ -12,18 +12,14 @@ use RRZE\RSVP\Capabilities;
 
 class Rooms
 {
-
-    protected $options;
-
-    public function __construct($pluginFile, $settings)
+    public function __construct()
     {
-        $this->pluginFile = $pluginFile;
-        $this->settings = $settings;
+        //
     }
 
     public function onLoaded()
     {
-        add_action('init', [$this, 'room_post_type'], 0);
+        add_action('init', [$this, 'room_post_type']);
 
         add_filter('manage_room_posts_columns', [$this, 'columns']);
         add_action('manage_room_posts_custom_column', [$this, 'customColumn'], 10, 2);

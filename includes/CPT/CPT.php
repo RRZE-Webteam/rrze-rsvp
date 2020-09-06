@@ -12,24 +12,20 @@ use RRZE\RSVP\Capabilities;
  */
 class CPT extends Main
 {
-    protected $pluginFile;
-    protected $settings;
-    public $occupancy;
-
-    public function __construct($pluginFile, $settings)
+    public function __construct()
     {
-        $this->pluginFile = $pluginFile;
-        $this->settings = $settings;
+        //
     }
 
-    public function onLoaded() {
-        $bookings = new Bookings($this->pluginFile, $this->settings);
+    public function onLoaded()
+    {
+        $bookings = new Bookings;
         $bookings->onLoaded();
 
-        $rooms = new Rooms($this->pluginFile, $this->settings);
+        $rooms = new Rooms;
         $rooms->onLoaded();
 
-        $seats = new Seats($this->pluginFile, $this->settings);
+        $seats = new Seats;
         $seats->onLoaded();
 
         add_action('admin_menu', [$this, 'bookingMenu']);
@@ -43,6 +39,19 @@ class CPT extends Main
                 }
             );
         }
+    }
+
+    public function activation()
+    {
+        $bookings = new Bookings;
+        $bookings->booking_post_type();
+
+        $rooms = new Rooms;
+        $rooms->room_post_type();
+
+        $seats = new Seats;
+        $seats->seats_post_type();
+        $seats->seats_taxonomies();
     }
 
     public function bookingMenu()
@@ -79,8 +88,8 @@ class CPT extends Main
 
         add_submenu_page(
             'edit.php?post_type=booking',
-            __( 'Room occupancy for today', 'rrze-rsvp' ),
-            __( 'Room occupancy', 'rrze-rsvp' ),
+            __('Room occupancy for today', 'rrze-rsvp'),
+            __('Room occupancy', 'rrze-rsvp'),
             'edit_seats',
             'occupancy',
             [$this, 'getOccupancyPage']
@@ -137,13 +146,14 @@ class CPT extends Main
         return $parent_file;
     }
 
-    public function getOccupancyPage(){
+    public function getOccupancyPage()
+    {
         echo '<div class="wrap">'
-            . '<h1>' . esc_html_x( 'Room occupancy for today', 'admin page title', 'rrze-rsvp' ) . '</h1>'
+            . '<h1>' . esc_html_x('Room occupancy for today', 'admin page title', 'rrze-rsvp') . '</h1>'
 
             . '<div class="tablenav top">'
             . '<div class="alignleft actions bulkactions">'
-            . '<label for="select_room" class="screen-reader-text">' . __('Room','rrze-rsvp') . '</label>'
+            . '<label for="select_room" class="screen-reader-text">' . __('Room', 'rrze-rsvp') . '</label>'
             . '<form action="" method="post" class="occupancy">'
             . '<select id="rsvp_room_id" name="rsvp_room_id">'
             . '<option>&mdash; ' . __('Please select room', 'rrze-rsvp') . ' &mdash;</option>';
@@ -159,12 +169,11 @@ class CPT extends Main
         foreach ($rooms as $room) {
             echo '<option value="' . $room->ID . '">' . $room->post_title . '</option>';
         }
-            echo '</select></form>'
+        echo '</select></form>'
             . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>'
             . '</div>'
-            . '<div class="rsvp-occupancy-links"></div>' 
-            . '<div class="rsvp-occupancy-container"></div>' 
-            . '</div>'; 
-     }
-
+            . '<div class="rsvp-occupancy-links"></div>'
+            . '<div class="rsvp-occupancy-container"></div>'
+            . '</div>';
+    }
 }

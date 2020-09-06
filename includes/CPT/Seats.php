@@ -16,15 +16,14 @@ class Seats
 
 	protected $options;
 
-	public function __construct($pluginFile, $settings)
+	public function __construct()
 	{
-		$this->pluginFile = $pluginFile;
-		$this->settings = $settings;
+		//
 	}
 
 	public function onLoaded()
 	{
-		add_action('init', [$this, 'seats_post_type'], 0);
+		add_action('init', [$this, 'seats_post_type']);
 		add_action('init', [$this, 'seats_taxonomies']);
 
 		add_filter('manage_seat_posts_columns', [$this, 'columns']);

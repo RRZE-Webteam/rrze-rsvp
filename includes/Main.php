@@ -37,7 +37,7 @@ class Main
         $idm->onLoaded();		
 
 		// Posttypes 
-		$cpt = new CPT($this->pluginFile, $settings);
+		$cpt = new CPT;
 		$cpt->onLoaded();
 
 		// CMB2
