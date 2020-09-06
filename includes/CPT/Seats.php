@@ -210,7 +210,7 @@ class Seats
 	public function removeMonthsDropdown($months, $postType)
 	{
 		if ($postType == 'seat') {
-			$months = 0;
+			$months = [];
 		}
 		return $months;
 	}

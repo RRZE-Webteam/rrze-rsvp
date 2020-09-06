@@ -113,7 +113,7 @@ class Rooms
     public function removeMonthsDropdown($months, $postType)
     {
         if ($postType == 'room') {
-            $months = 0;
+            $months = [];
         }
         return $months;
     }
