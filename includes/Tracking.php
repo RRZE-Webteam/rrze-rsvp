@@ -8,7 +8,7 @@ use RRZE\RSVP\Settings;
 
 class Tracking {
     const DB_TABLE = 'rrze_rsvp_tracking';
-    const DB_VERSION = '1.2.6';
+    const DB_VERSION = '1.3.0';
     const DB_VERSION_OPTION_NAME = 'rrze_rsvp_tracking_db_version';
 
     protected $settings;
@@ -51,18 +51,26 @@ class Tracking {
             add_action( 'admin_menu', [$this, 'add_tracking_menu'] );
             $this->createTable('local');
         }
-        add_action( 'rrze-rsvp-checked-in', [$this, 'insertTracking'], 10, 2 );
+        add_action( 'rrze-rsvp-checked-in', [$this, 'insertOrUpdateTracking'], 10, 2 );
         add_action( 'wp_ajax_csv_pull', [$this, 'tracking_csv_pull'] );
     }
     
+
+    private function logError(string $method){
+        // uses plugin rrze-log
+        do_action('rrze.log.error', 'rrze-rsvp ' . $method . '() returns false $wpdb->last_result= ' . json_encode($wpdb->last_result) . '| $wpdb->last_query= ' . json_encode($wpdb->last_query . '| $wpdb->last_error= ' . json_encode($wpdb->last_error)));
+    }
+
  
-    protected function isUpdate() {
+    private function isUpdate() {
         // returns true if tracking table does not exist or DB_VERSION has changed 
+        $ret = false;
         if (get_site_option($this->dbOptionName, '') != $this->dbVersion) {
             update_site_option($this->dbOptionName, $this->dbVersion);
-            return true;
+            do_action('rrze.log.info', 'rrze-rsvp: Tracking DB Update v' . $this->dbVersion);
+            $ret = true;
         }
-        return false;
+        return $ret;
 
     }
 
@@ -201,30 +209,51 @@ class Tracking {
     }
 
 
+    private function getTrackingID(int $blogID, int $bookingID): int {
+        global $wpdb;
 
-    public function insertTracking(int $blogID, int $bookingId) {
+        $prepare_vals = [
+            $blogID,
+            $bookingID
+        ];
+
+        return $wpdb->get_results( 
+            $wpdb->prepare("SELECT ID FROM {$trackingTable} WHERE blog_id = %d AND booking_id = %d", $prepare_vals), ARRAY_A); 
+    }
 
 
-
-        // BK 2DO: booking status checked-in überprüfen
-
-        // Info: insertTracking() is called via action hook 'rrze-rsvp-checked-in' 
-        //       see $this->onLoaded : add_action('rrze-rsvp-checked-in', [$this, 'insertTracking'], 10, 2);
+    public function insertOrUpdateTracking(int $blogID, int $bookingID) {
+        // Info: insertOrUpdateTracking() is called via action hook 'rrze-rsvp-checked-in' 
+        //       it must be called on every change of any booking-data 
+        //       see $this->onLoaded : add_action('rrze-rsvp-checked-in', [$this, 'insertOrUpdateTracking'], 10, 2);
         //       see Actions.php : do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
-
 
         global $wpdb;
 
-        $booking = Functions::getBooking($bookingId);
-        if (!$booking) {
+        $booking = Functions::getBooking($bookingID);
+        if (!$booking || ($booking['status'] != 'checked-in')) {
             return;
         }
 
-        $start = date('Y-m-d H:i:s', get_post_meta($bookingId, 'rrze-rsvp-booking-start', true));
-        $end = date('Y-m-d H:i:s', get_post_meta($bookingId, 'rrze-rsvp-booking-end', true));
+        if ($trackingID = $this->getTrackingID($blogID, $bookingID)){
+            $this->updateTracking($trackingID);
+        }else{
+            $this->insertTracking($blogID, $bookingID);
+        }
+
+    } 
+
+
+    private function insertTracking(int $blogID, int $bookingID) {
+        global $wpdb;
+        $ret = false;
+
+        $start = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-start', true));
+        $end = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-end', true));
 
         $fields = [
             'blog_id' => $blogID,
+            'booking_id' => $bookingID,
             'start' => $start,
             'end' => $end,
             'room_post_id' => (int)$booking['room'],
@@ -236,32 +265,100 @@ class Tracking {
             'hash_guest_firstname' => Functions::crypt($booking['guest_firstname'], 'encrypt'),
             'hash_guest_lastname' => Functions::crypt($booking['guest_lastname'], 'encrypt'),
             'hash_guest_email' => Functions::crypt($booking['guest_email'], 'encrypt'),
-            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt'),
+            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt')
         ];
 
-        $wpdb->insert(
+        $fields_format = [
+            '%d',
+            '%d',
+            '%s',
+            '%s',
+            '%d',
+            '%s',
+            '%s',
+            '%d',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s'
+        ];
+
+        $rowCnt = $wpdb->insert(
             $this->trackingTable,
             $fields,
-            [
-                '%d',
-                '%s',
-                '%s',
-                '%d',
-                '%s',
-                '%s',
-                '%d',
-                '%s',
-                '%s',
-                '%s',
-                '%s',
-                '%s',
-                '%s',
-            ]
+            $fields_format
         );
 
-        return $wpdb->insert_id; // returns the id (AUTO_INCREMENT) or false
+        if ($rowCnt){
+            $ret = $wpdb->insert_id;
+        }else{
+            $this->logError('insertTracking');
+        }
+
+        return $ret;  // returns the id (AUTO_INCREMENT) or false
     }
 
+
+    private function updateTracking(int $trackingID) {
+        global $wpdb;
+
+        $start = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-start', true));
+        $end = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-end', true));
+
+        $fields = [
+            'start' => $start,
+            'end' => $end,
+            'room_post_id' => (int)$booking['room'],
+            'room_name' => $booking['room_name'],
+            'room_street' => $booking['room_street'],
+            'room_zip' => (int)$booking['room_zip'],
+            'room_city' => $booking['room_city'],
+            'seat_name' => $booking['seat_name'],
+            'hash_guest_firstname' => Functions::crypt($booking['guest_firstname'], 'encrypt'),
+            'hash_guest_lastname' => Functions::crypt($booking['guest_lastname'], 'encrypt'),
+            'hash_guest_email' => Functions::crypt($booking['guest_email'], 'encrypt'),
+            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt')
+        ];
+
+        $fields_format = [
+            '%s',
+            '%s',
+            '%d',
+            '%s',
+            '%s',
+            '%d',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s'
+        ];
+
+        $where = [
+            'id' => $trackingID
+        ];
+
+        $where_format =[
+            '%d'
+        ];
+
+        $ret = $wpdb->update(
+            $this->trackingTable,
+            $fields,
+            $where,
+            $fields_format,
+            $where_format
+        ); // returns the number of rows updated, or false on error.
+
+        if (false === $ret){
+            $this->logError('updateTracking');
+        }
+
+        return $ret;
+    }
 
 
     private static function deCryptField(&$item, string $key): string{
@@ -276,7 +373,6 @@ class Tracking {
             $item = Functions::crypt($item, 'decrypt');
         }
     }
-
 
 
     public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_firstname, string $hash_guest_lastname, string $hash_guest_email = '', string $hash_guest_phone = ''): array {
@@ -296,7 +392,6 @@ class Tracking {
         $trackingTable = Tracking::getTableName($tableType);
 
         //  "Identifikationsmerkmalen für eine Person (Name, E-Mail und oder Telefon)" see https://github.com/RRZE-Webteam/rrze-rsvp/issues/89
-
         $prepare_vals = [
             $searchdate,
             $delta,
@@ -352,7 +447,7 @@ class Tracking {
         $charsetCollate = $wpdb->get_charset_collate();
         $trackingTable = Tracking::getTableName($tableType);
 
-        // BK 2DO:
+        // BK 2DO 2020-09-07:
         // this is not a good solution
         // read https://wordpress.stackexchange.com/questions/78667/dbdelta-alter-table-syntax
         // ==> better use dbDelta strickly 
@@ -384,6 +479,7 @@ class Tracking {
         $sql = "CREATE TABLE " . $trackingTable . " (
             id bigint(20) UNSIGNED NOT NULL auto_increment,
             blog_id bigint(20) NOT NULL,
+            booking_id bigint(20) NOT NULL,
             ts_updated timestamp DEFAULT CURRENT_TIMESTAMP,
             ts_inserted timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             start datetime NOT NULL,
@@ -399,9 +495,8 @@ class Tracking {
             hash_guest_email char(64) NOT NULL,
             hash_guest_phone char(64) NOT NULL,
             PRIMARY KEY  (id),
-            KEY k_blog_id (blog_id)
+            UNIQUE KEY uk_blog_booking (blog_id, booking_id)
             ) $charsetCollate;";
-            // ,UNIQUE KEY uk_guest_room_time (start,end,room_post_id,seat_name,hash_guest_firstname,hash_guest_lastname,hash_guest_email,hash_guest_phone)            
 
         // echo "<script>console.log('sql = " . $sql . "' );</script>";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -412,12 +507,14 @@ class Tracking {
 
     public static function getTableName( string $tableType = 'network', int $blogID = 0 ): string {
         global $wpdb;
+
         return ( $tableType == 'network' ? $wpdb->base_prefix : $wpdb->get_blog_prefix($blogID) ) . static::DB_TABLE;
     }
 
 
     protected function checkTableExists(string $tableName): bool{
         global $wpdb;
+
         $ret = $wpdb->get_results("SELECT * FROM information_schema.tables WHERE table_schema = '{$wpdb->dbname}' AND table_name = '{$tableName}' LIMIT 1", ARRAY_A);
         return ( $ret ? true : false ); // $ret can be false, 0 or any integer
     }
@@ -426,12 +523,11 @@ class Tracking {
     protected function dropTable(string $tableName): bool{
         global $wpdb;
 
-        $sql = "DROP TABLE IF EXISTS $tableName";
         $ret = $wpdb->query(
                $wpdb->prepare("DROP TABLE IF EXISTS {$tableName}", array($tableName))); // returns true/false
 
-        if (!$ret){
-            do_action('rrze.log.error', 'rrze-rsvp dropTable() returns false $sql= ' . $sql . '| $wpdb->last_result= ' . json_encode($wpdb->last_result) . '| $wpdb->last_query= ' . json_encode($wpdb->last_query));
+        if (false === $ret){
+            $this->logError('dropTable');
         }
         return $ret;
     }
@@ -440,10 +536,9 @@ class Tracking {
     protected function backupTable(string $tableName){
         global $wpdb;
 
-        $sql = "RENAME TABLE $tableName TO $tableName" . '_backup_' . date('Y_m_d_His');
-        $ret = $wpdb->query($sql); // returns true/false
-        if (!$ret){
-            do_action('rrze.log.error', 'rrze-rsvp backupTable() returns false $sql= ' . $sql . '| $wpdb->last_result= ' . json_encode($wpdb->last_result) . '| $wpdb->last_query= ' . json_encode($wpdb->last_query));
+        $ret = $wpdb->query("RENAME TABLE $tableName TO $tableName" . '_backup_' . date('Y_m_d_His')); // returns true/false
+        if (false === $ret){
+            $this->logError('backupTable');
         }
         return $ret;
     }
