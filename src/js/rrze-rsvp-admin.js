@@ -107,11 +107,18 @@ jQuery(document).ready(function ($) {
 
     /* trigger reservations' details - see https://github.com/RRZE-Webteam/rrze-rsvp/issues/92 */
     function triggerAdditionals(t){
-        if ($('select#rrze-rsvp-room-bookingmode option:checked').val() == 'rrze-rsvp-additionals'){
+		if (($('select#rrze-rsvp-room-bookingmode option:checked').val() == 'reservation') 
+		|| ($('select#rrze-rsvp-room-bookingmode option:checked').val() == 'consultation')) {
             $('div#rrze-rsvp-additionals').slideDown(t);
         }else{
             $('div#rrze-rsvp-additionals').slideUp(t);
-        }
+		}
+		if ($('select#rrze-rsvp-room-bookingmode option:checked').val() == 'reservation') {
+			$('div#rrze-rsvp-consultation').slideDown(t);
+		}
+		if ($('select#rrze-rsvp-room-bookingmode option:checked').val() == 'consultation') {
+			$('div#rrze-rsvp-consultation').slideUp(t);
+		}		
     }
 
     function triggerInstant(t){
@@ -129,11 +136,11 @@ jQuery(document).ready(function ($) {
     triggerInstant(0);
 
     $('select#rrze-rsvp-room-bookingmode').on('change', function() {        
-        triggerAdditionals(400);
+        triggerAdditionals(100);
     });
 
     $('#rrze-rsvp-room-auto-confirmation').click(function() {
-        triggerInstant(400);
+        triggerInstant(100);
     }); 
     
 });
