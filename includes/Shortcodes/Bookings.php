@@ -147,7 +147,7 @@ class Bookings extends Shortcodes {
             return $alert;
         }
 	$bookingmode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
-	if ($bookingmode == 0 && !$this->nonce) {
+	if ($bookingmode == 'check-only' && !$this->nonce) {
 	    
 	    $alert = '<div class="alert alert-info" role="alert">';
 	    $alert .= '<p><strong>'.__('Checkin in room','rrze-rsvp').'</strong><br>';
@@ -781,20 +781,20 @@ class Bookings extends Shortcodes {
         $bookingmode = get_post_meta($room_id, 'rrze-rsvp-room-bookingmode', true);
 
         switch($bookingmode) {
-            case 0:
+            case 'check-only':
                 $status = 'confirmed';
                 if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
                     $status = 'checked-in';
                 }
             break;
-            case 1:
+            case 'reservation':
                 $status = $autoconfirmation ? 'confirmed' : 'booked';
                 $timestamp = current_time('timestamp');
                 if (($booking_instant || $instantCheckIn) && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
                     $status = 'checked-in';
                 }
             break;
-            case 2:
+            case 'consultation':
                 $status = $autoconfirmation ? 'confirmed' : 'checked-in';
                 $timestamp = current_time('timestamp');
                 if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
@@ -816,14 +816,14 @@ class Bookings extends Shortcodes {
 
         // E-Mail senden
         switch($bookingmode) {
-            case 0:
+            case 'check-only':
                 if ($status == 'confirmed') {
                     $this->email->bookingConfirmedCustomer($booking_id);
                 } else {
                     $this->email->bookingConfirmedCustomer($booking_id, true);
                 }
             break;
-            case 1:
+            case 'reservation':
                 if ($status == 'confirmed') {
                     $this->email->bookingConfirmedCustomer($booking_id);
                 } elseif ($status == 'checked-in') {
@@ -836,7 +836,7 @@ class Bookings extends Shortcodes {
                     }
                 }
             break;
-            case 2:
+            case 'consultation':
                 if ($status == 'confirmed') {
                     $this->email->bookingConfirmedCustomer($booking_id);
                 } else {

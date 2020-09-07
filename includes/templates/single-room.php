@@ -8,11 +8,11 @@ $settings = new Settings(plugin()->getFile());
 $options = (object) $settings->getOptions();
 global $post;
 
-$postID = $post->ID;
-$meta = get_post_meta($postID);
+$roomId = $post->ID;
+$meta = get_post_meta($roomId);
 
 // Schedule
-$scheduleData = Functions::getRoomSchedule($postID);
+$scheduleData = Functions::getRoomSchedule($roomId);
 $schedule = '';
 $weekdays = Functions::daysOfWeekAry(1);
 
@@ -60,9 +60,9 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
         switch ($_GET['show']) {
             case 'info':
                 if (has_post_thumbnail()) {
-                    echo get_the_post_thumbnail($postID, 'medium', array("class" => "alignright"));
+                    echo get_the_post_thumbnail($roomId, 'medium', array("class" => "alignright"));
                 }
-                echo get_the_content(null, false, $postID);
+                echo get_the_content(null, false, $roomId);
                 break;
             case 'floorplan':
                 if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id'] != '') {
@@ -75,19 +75,19 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
                 echo $schedule;
                 break;
             case 'availability':
-                echo do_shortcode('[rsvp-availability room=' . $postID . ' days=10]');
+                echo do_shortcode('[rsvp-availability room=' . $roomId . ' days=10]');
                 break;
             case 'occupancy':
-                echo Functions::getOccupancyByRoomIdHTML($postID);
+                echo Functions::getOccupancyByRoomIdHTML($roomId);
                 break;
             case 'occupancy_now':
-                echo Functions::getOccupancyByRoomIdHTML($postID, true);
+                echo Functions::getOccupancyByRoomIdHTML($roomId, true);
                 break;
             case 'occupancy_nextavailable':
-                echo Functions::getOccupancyByRoomIdNextHTML($postID);
+                echo Functions::getOccupancyByRoomIdNextHTML($roomId);
                 break;
             default:
-                echo Functions::getOccupancyByRoomIdHTML($postID, true);
+                echo Functions::getOccupancyByRoomIdHTML($roomId, true);
                 break;
         }
     }
@@ -157,14 +157,14 @@ while (have_posts()) : the_post();
                 . $schedule
                 . '[/collapse]'
                 . '[collapse title="' . __('Current Room Occupancy', 'rrze-rsvp') . '" name="occupancy"]'
-                . Functions::getOccupancyByRoomIdNextHTML($postID)
+                . Functions::getOccupancyByRoomIdNextHTML($roomId)
                 . '[/collapse]';
             if ($options->general_single_room_availability_table != 'no') {
-                $bookingmode = get_post_meta($postID, 'rrze-rsvp-room-bookingmode', true);
-                if (!empty($bookingmode)) {
+                $bookingmode = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true);
+                if ($bookingmode != 'check-only') {
 
                     $shortcode .= '[collapse title="' . __('Availability', 'rrze-rsvp') . '" name="availability"]'
-                        . do_shortcode('[rsvp-availability room=' . $postID . ' days=10 ' . $booking_link . ']')
+                        . do_shortcode('[rsvp-availability room=' . $roomId . ' days=10 ' . $booking_link . ']')
                         . '[/collapse]';
                 }
             }
@@ -174,14 +174,14 @@ while (have_posts()) : the_post();
             $timetables = '<h2>' . __('Schedule', 'rrze-rsvp') . '</h2>'
                 . $schedule
                 //. '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
-                . Functions::getOccupancyByRoomIdNextHTML($postID);
+                . Functions::getOccupancyByRoomIdNextHTML($roomId);
             if ($options->general_single_room_availability_table != 'no') {
 
-                $bookingmode = get_post_meta($postID, 'rrze-rsvp-room-bookingmode', true);
-                if (!empty($bookingmode)) {
+                $bookingmode = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true);
+                if ($bookingmode != 'check-only') {
 
                     $timetables .= '<h3>' . __('Availability', 'rrze-rsvp') . '</h3>'
-                        . do_shortcode('[rsvp-availability room=' . $postID . ' days=10 ' . $booking_link . ']');
+                        . do_shortcode('[rsvp-availability room=' . $roomId . ' days=10 ' . $booking_link . ']');
                 }
             }
         }

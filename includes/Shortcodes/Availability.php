@@ -47,7 +47,7 @@ class Availability extends Shortcodes
         if (isset($shortcode_atts['room']) && $shortcode_atts['room'] != '') {
             $room = (int)$shortcode_atts['room'];
             $bookingmode = get_post_meta($room, 'rrze-rsvp-room-bookingmode', true);
-            if (empty($bookingmode)) {
+            if ($bookingmode = 'check-only') {
                 $output .= '<p>' . __('Reservations disabled. Please checkin at the seats in the room.', 'rrze-rsvp') . '</p>';
             } else {
                 $availability = Functions::getRoomAvailability($room, $today, date('Y-m-d', strtotime($today . ' +' . $days . ' days')), false);
