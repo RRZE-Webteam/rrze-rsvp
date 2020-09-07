@@ -58,6 +58,8 @@ class Tracking {
 
     private function logError(string $method){
         // uses plugin rrze-log
+        global $wpdb;
+
         do_action('rrze.log.error', 'rrze-rsvp ' . $method . '() returns false $wpdb->last_result= ' . json_encode($wpdb->last_result) . '| $wpdb->last_query= ' . json_encode($wpdb->last_query . '| $wpdb->last_error= ' . json_encode($wpdb->last_error)));
     }
 
