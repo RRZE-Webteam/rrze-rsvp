@@ -264,6 +264,8 @@ class Tracking {
         $start = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-start', true));
         $end = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-end', true));
 
+        $booking = Functions::getBooking($bookingID);
+
         $fields = [
             'blog_id' => $blogID,
             'booking_id' => $bookingID,
@@ -319,6 +321,8 @@ class Tracking {
 
         $start = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-start', true));
         $end = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-end', true));
+
+        $booking = Functions::getBooking($bookingID);
 
         $fields = [
             'start' => $start,
