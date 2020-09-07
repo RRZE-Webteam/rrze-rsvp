@@ -227,7 +227,11 @@ class Bookings extends Shortcodes {
         $output .= '<div class="rrze-rsvp">';
         $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room">'
                     . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
-	$output .= '<fieldset>';  
+// TODO:	
+//	$output .= '<fieldset>';  
+	// FIELDSET muss noch rein oder unten <legend> raus. Wenn fieldset drin ist, ist die Ausstattungsanzeige des Sitzplatzes allerdings broken.
+	// Wahrscheinlich Problem mit dem JS?
+	
         if ($get_instant) {
             $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
         }
@@ -270,7 +274,7 @@ class Bookings extends Shortcodes {
             $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
         }
         $output .= '</div>'; //.rsvp-seat-container
-	$output .= '</fieldset>';  
+//	$output .= '</fieldset>';  
 	$output .= '<fieldset>';  
         $output .= '<legend>' . __('Your data', 'rrze-rsvp') . ' <span class="notice-required">('. __('Required','rrze-rsvp'). ')</span></legend>';
         if ($ssoRequired) {
