@@ -12,7 +12,6 @@ class Tracking {
     const DB_VERSION_OPTION_NAME = 'rrze_rsvp_tracking_db_version';
 
     protected $settings;
-    protected $trackingTable;
     protected $dbVersion;
     protected $dbOptionName;
     protected $contact_tracking_note;
@@ -211,16 +210,24 @@ class Tracking {
     }
 
 
-    private function getTrackingID(int $blogID, int $bookingID): int {
+    private function getTrackingID(int $blogID, int $bookingID, $trackingTable): int {
         global $wpdb;
+        
+        $ret = false;
 
         $prepare_vals = [
             $blogID,
             $bookingID
         ];
 
-        return $wpdb->get_results( 
-            $wpdb->prepare("SELECT ID FROM {$trackingTable} WHERE blog_id = %d AND booking_id = %d", $prepare_vals), ARRAY_A); 
+        $row = $wpdb->get_results( 
+            $wpdb->prepare("SELECT ID FROM {$trackingTable} WHERE blog_id = %d AND booking_id = %d", $prepare_vals), ARRAY_A);
+
+        if (isset($row["ID"])){
+            $ret = $row["ID"];
+        } 
+
+        return $ret;
     }
 
 
@@ -233,25 +240,31 @@ class Tracking {
         global $wpdb;
 
         $booking = Functions::getBooking($bookingID);
-        if (!$booking || ($booking['status'] != 'checked-in')) {
+        if (!$booking || ($booking['status'] != 'checked-in')) {
             return;
         }
 
-        if ($trackingID = $this->getTrackingID($blogID, $bookingID)){
-            $this->updateTracking($trackingID);
+        $tableType = get_option('rsvp_tracking_tabletype');
+        $trackingTable = Tracking::getTableName($tableType);
+        $trackingID = $this->getTrackingID($blogID, $bookingID, $trackingTable);
+
+        if ($trackingID){
+            $this->updateTracking($trackingID, $trackingTable);
         }else{
-            $this->insertTracking($blogID, $bookingID);
+            $this->insertTracking($blogID, $bookingID, $trackingTable);
         }
 
     } 
 
 
-    private function insertTracking(int $blogID, int $bookingID) {
+    private function insertTracking(int $blogID, int $bookingID, string $trackingTable) {
         global $wpdb;
         $ret = false;
 
         $start = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-start', true));
         $end = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-end', true));
+
+        $booking = Functions::getBooking($bookingID);
 
         $fields = [
             'blog_id' => $blogID,
@@ -288,7 +301,7 @@ class Tracking {
         ];
 
         $rowCnt = $wpdb->insert(
-            $this->trackingTable,
+            $trackingTable,
             $fields,
             $fields_format
         );
@@ -303,11 +316,13 @@ class Tracking {
     }
 
 
-    private function updateTracking(int $trackingID) {
+    private function updateTracking(int $trackingID, string $trackingTable) {
         global $wpdb;
 
         $start = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-start', true));
         $end = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-end', true));
+
+        $booking = Functions::getBooking($bookingID);
 
         $fields = [
             'start' => $start,
@@ -348,7 +363,7 @@ class Tracking {
         ];
 
         $ret = $wpdb->update(
-            $this->trackingTable,
+            $trackingTable,
             $fields,
             $where,
             $fields_format,

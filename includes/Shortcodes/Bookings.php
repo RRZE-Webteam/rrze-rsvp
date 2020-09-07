@@ -795,14 +795,14 @@ class Bookings extends Shortcodes {
                 }
             break;
             case 'consultation':
-                $status = $autoconfirmation ? 'confirmed' : 'checked-in';
+                $status = $autoconfirmation ? 'checked-in' : 'booked';
                 $timestamp = current_time('timestamp');
                 if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
                     $status = 'checked-in';
                 }
             break;
             default:
-                $status = 'booked';
+                //
         }
 
         update_post_meta( $booking_id, 'rrze-rsvp-booking-status', $status );
@@ -820,14 +820,14 @@ class Bookings extends Shortcodes {
                 if ($status == 'confirmed') {
                     $this->email->bookingConfirmedCustomer($booking_id);
                 } else {
-                    $this->email->bookingConfirmedCustomer($booking_id, true);
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingmode, true);
                 }
             break;
             case 'reservation':
                 if ($status == 'confirmed') {
                     $this->email->bookingConfirmedCustomer($booking_id);
                 } elseif ($status == 'checked-in') {
-                    $this->email->bookingConfirmedCustomer($booking_id, true);
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingmode, true);
                 } else {
                     if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
                         $to = $this->options->email_notification_email;
@@ -837,10 +837,14 @@ class Bookings extends Shortcodes {
                 }
             break;
             case 'consultation':
-                if ($status == 'confirmed') {
-                    $this->email->bookingConfirmedCustomer($booking_id);
+                if ($status == 'checked-in') {
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingmode, true);
                 } else {
-                    $this->email->bookingConfirmedCustomer($booking_id, true);
+                    if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
+                        $to = $this->options->email_notification_email;
+                        $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
+                        $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
+                    }
                 }
             break;
             default:
