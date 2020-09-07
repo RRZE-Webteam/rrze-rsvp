@@ -203,9 +203,15 @@ class Tracking {
 
 
     public function insertTracking(int $blogID, int $bookingId) {
+
+
+
+        // BK 2DO: booking status checked-in überprüfen
+
         // Info: insertTracking() is called via action hook 'rrze-rsvp-checked-in' 
         //       see $this->onLoaded : add_action('rrze-rsvp-checked-in', [$this, 'insertTracking'], 10, 2);
         //       see Actions.php : do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
+
 
         global $wpdb;
 

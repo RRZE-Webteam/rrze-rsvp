@@ -121,10 +121,12 @@ class Actions
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', $bookingStatus);
 			$this->email->bookingCancelledCustomer($bookingId);
 		} elseif ($bookingCkeckedIn) {
-			do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
 		} elseif ($bookingCkeckedOut) {
 			//
-		}
+        }
+        
+        // 2020-09-07 every time booking is saved:
+        do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
 	}
 
 	public function bookingReply()
