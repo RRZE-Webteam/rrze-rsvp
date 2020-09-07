@@ -8,7 +8,7 @@ use RRZE\RSVP\Settings;
 
 class Tracking {
     const DB_TABLE = 'rrze_rsvp_tracking';
-    const DB_VERSION = '1.2.5';
+    const DB_VERSION = '1.2.6';
     const DB_VERSION_OPTION_NAME = 'rrze_rsvp_tracking_db_version';
 
     protected $settings;
@@ -420,13 +420,12 @@ class Tracking {
     protected function dropTable(string $tableName): bool{
         global $wpdb;
 
-        // BK : vorerst für mich zum Debuggen aufgedröselt:
         $sql = "DROP TABLE IF EXISTS $tableName";
         $ret = $wpdb->query(
                $wpdb->prepare("DROP TABLE IF EXISTS {$tableName}", array($tableName))); // returns true/false
 
         if (!$ret){
-            do_action('rrze.log.error', 'BK DEBUG rrze-rsvp dropTable() returns false $sql= ' . $sql . '| $wpdb->last_result= ' . json_encode($wpdb->last_result) . '| $wpdb->last_query= ' . json_encode($wpdb->last_query));
+            do_action('rrze.log.error', 'rrze-rsvp dropTable() returns false $sql= ' . $sql . '| $wpdb->last_result= ' . json_encode($wpdb->last_result) . '| $wpdb->last_query= ' . json_encode($wpdb->last_query));
         }
         return $ret;
     }
@@ -435,11 +434,10 @@ class Tracking {
     protected function backupTable(string $tableName){
         global $wpdb;
 
-        // BK : vorerst für mich zum Debuggen aufgedröselt:
-        $sql = "RENAME TABLE '$tableName' TO '$tableName" . '_backup_' . date('Y_m_d_His') . "'";
+        $sql = "RENAME TABLE $tableName TO $tableName" . '_backup_' . date('Y_m_d_His');
         $ret = $wpdb->query($sql); // returns true/false
         if (!$ret){
-            do_action('rrze.log.error', 'BK DEBUG rrze-rsvp backupTable() returns false $sql= ' . $sql . '| $wpdb->last_result= ' . json_encode($wpdb->last_result) . '| $wpdb->last_query= ' . json_encode($wpdb->last_query));
+            do_action('rrze.log.error', 'rrze-rsvp backupTable() returns false $sql= ' . $sql . '| $wpdb->last_result= ' . json_encode($wpdb->last_result) . '| $wpdb->last_query= ' . json_encode($wpdb->last_query));
         }
         return $ret;
     }
