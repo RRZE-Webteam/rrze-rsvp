@@ -233,7 +233,7 @@ class Tracking {
         global $wpdb;
 
         $booking = Functions::getBooking($bookingID);
-        if (!$booking || ($booking['status'] != 'checked-in')) {
+        if (!$booking || ($booking['status'] != 'checked-in')) {
             return;
         }
 
