@@ -54,7 +54,7 @@ function getConstants() {
 
         return [
             'single_room_availability_table' => 'yes_link',
-            'contact_tracking_note' => "Contact your SuperAdmin $sender_name ($sender_email) to receive contact tracking informations.", // <a href="mailto:' . $sender_email . '>' . $sender_name . '</a> (see: https://github.com/RRZE-Webteam/rrze-rsvp/issues/111 )
+            'contact_tracking_note' => "Hinweis: Bei Anfragen der Gesundheitsamtes oder anderer Behörden ist auf die Adresse kanzler@fau.de zu verweisen. Eine Abfrage der Daten zur Kontaktverfolgung wird auf Anforderung und Freigabe des Kanzlerbüros zentral durch das RRZE vorgenommen. Bei technischen Fragen hierzu wenden Sie sich an webmaster@fau.de . Weitergehende Informationen finden sie hier: Empfehlungen zu Hygienemaßnahmen des Referats Arbeitssicherheit: https://www.verwaltung.zuv.fau.de/arbeitssicherheit/gefaehrungen-am-arbeitsplatz/biologische-arbeitsstoffe/#sprungmarke2 Handlungshilfen des Referats Arbeitssicherheit: https://www.verwaltung.zuv.fau.de/arbeitssicherheit/dokumentation-im-arbeitsschutz/gefaehrdungsbeurteilung/#sprungmarke7 Hilfsmittel und Hinweise zur Nutzung der Platzbuchungssystems: https://www.wordpress.rrze.fau.de/plugins/fau-und-rrze-plugins/rsvp/hilfsmittel-und-hinweise-zur-nutzung/", // 2DO: Formatierung / HTML-Tags / <a href="mailto:' . $sender_email . '>' . $sender_name . '</a> see: https://github.com/RRZE-Webteam/rrze-rsvp/issues/111 )
             'notification_email' => $notification_email,
             'notification_if_new' => 'yes',
             'notification_if_cancel' => 'yes',
