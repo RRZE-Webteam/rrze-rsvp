@@ -147,7 +147,7 @@ class Bookings extends Shortcodes {
             return $alert;
         }
 	$bookingmode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
-	if (empty($bookingmode) && !$this->nonce) {
+	if ($bookingmode == 0 && !$this->nonce) {
 	    
 	    $alert = '<div class="alert alert-info" role="alert">';
 	    $alert .= '<p><strong>'.__('Checkin in room','rrze-rsvp').'</strong><br>';
@@ -231,7 +231,6 @@ class Bookings extends Shortcodes {
 //	$output .= '<fieldset>';  
 	// FIELDSET muss noch rein oder unten <legend> raus. Wenn fieldset drin ist, ist die Ausstattungsanzeige des Sitzplatzes allerdings broken.
 	// Wahrscheinlich Problem mit dem JS?
-	
         if ($get_instant) {
             $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
         }
@@ -274,7 +273,7 @@ class Bookings extends Shortcodes {
             $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
         }
         $output .= '</div>'; //.rsvp-seat-container
-//	$output .= '</fieldset>';  
+//	$output .= '</fieldset>';
 	$output .= '<fieldset>';  
         $output .= '<legend>' . __('Your data', 'rrze-rsvp') . ' <span class="notice-required">('. __('Required','rrze-rsvp'). ')</span></legend>';
         if ($ssoRequired) {
@@ -778,21 +777,32 @@ class Bookings extends Shortcodes {
         update_post_meta($booking_id, 'rrze-rsvp-booking-guest-phone', $booking_phone);
 
         // Set booking status
+        $timestamp = current_time('timestamp');
         $bookingmode = get_post_meta($room_id, 'rrze-rsvp-room-bookingmode', true);
-        if (empty($bookingmode)) {
-            $status = 'confirmed';
-            $timestamp = current_time('timestamp');
-            if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
-                $status = 'checked-in';
-            }
-        } elseif ($autoconfirmation) {
-            $status = 'confirmed';
-            $timestamp = current_time('timestamp');
-            if (($booking_instant || $instantCheckIn) && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
-                $status = 'checked-in';
-            }
-        } else {
-            $status = 'booked';
+
+        switch($bookingmode) {
+            case 0:
+                $status = 'confirmed';
+                if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+                    $status = 'checked-in';
+                }
+            break;
+            case 1:
+                $status = $autoconfirmation ? 'confirmed' : 'booked';
+                $timestamp = current_time('timestamp');
+                if (($booking_instant || $instantCheckIn) && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+                    $status = 'checked-in';
+                }
+            break;
+            case 2:
+                $status = $autoconfirmation ? 'confirmed' : 'checked-in';
+                $timestamp = current_time('timestamp');
+                if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+                    $status = 'checked-in';
+                }
+            break;
+            default:
+                $status = 'booked';
         }
 
         update_post_meta( $booking_id, 'rrze-rsvp-booking-status', $status );
@@ -805,24 +815,36 @@ class Bookings extends Shortcodes {
         }
 
         // E-Mail senden
-        if (empty($bookingmode)) {
-            if ($status == 'confirmed') {
-                $this->email->bookingConfirmedCustomer($booking_id);
-            } else {
-                $this->email->bookingConfirmedCustomer($booking_id, true);
-            }
-        } elseif ($autoconfirmation) {
-            if ($status == 'confirmed') {
-                $this->email->bookingConfirmedCustomer($booking_id);
-            } else {
-                $this->email->bookingConfirmedCustomer($booking_id, true);
-            }
-        } else {
-            if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
-                $to = $this->options->email_notification_email;
-                $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
-                $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
-            }
+        switch($bookingmode) {
+            case 0:
+                if ($status == 'confirmed') {
+                    $this->email->bookingConfirmedCustomer($booking_id);
+                } else {
+                    $this->email->bookingConfirmedCustomer($booking_id, true);
+                }
+            break;
+            case 1:
+                if ($status == 'confirmed') {
+                    $this->email->bookingConfirmedCustomer($booking_id);
+                } elseif ($status == 'checked-in') {
+                    $this->email->bookingConfirmedCustomer($booking_id, true);
+                } else {
+                    if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
+                        $to = $this->options->email_notification_email;
+                        $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
+                        $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
+                    }
+                }
+            break;
+            case 2:
+                if ($status == 'confirmed') {
+                    $this->email->bookingConfirmedCustomer($booking_id);
+                } else {
+                    $this->email->bookingConfirmedCustomer($booking_id, true);
+                }
+            break;
+            default:
+                //
         }
 
         // Redirect zur Seat-Seite, falls
