@@ -159,15 +159,7 @@ class Metaboxes
             //'desc'    => 'field description (optional)',
             'id'      => 'rrze-rsvp-room-weekday',
             'type'    => 'multicheck',
-            'options' => array(
-                1 => __('Monday', 'rrze-rsvp'),
-                2 => __('Tuesday', 'rrze-rsvp'),
-                3 => __('Wednesday', 'rrze-rsvp'),
-                4 => __('Thursday', 'rrze-rsvp'),
-                5 => __('Friday', 'rrze-rsvp'),
-                6 => __('Saturday', 'rrze-rsvp'),
-                7 => __('Sunday', 'rrze-rsvp')
-            ),
+            'options' => Functions::daysOfWeekAry(1),
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(

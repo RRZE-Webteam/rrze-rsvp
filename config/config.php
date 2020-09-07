@@ -54,7 +54,7 @@ function getConstants() {
 
         return [
             'single_room_availability_table' => 'yes_link',
-            'contact_tracking_note' => 'Contact your SuperAdmin <a href="mailto:' . $sender_email . '>' . $sender_name . '</a> to receive contact tracking informations.',
+            'contact_tracking_note' => "Contact your SuperAdmin $sender_name ($sender_email) to receive contact tracking informations.", // <a href="mailto:' . $sender_email . '>' . $sender_name . '</a> (see: https://github.com/RRZE-Webteam/rrze-rsvp/issues/111 )
             'notification_email' => $notification_email,
             'notification_if_new' => 'yes',
             'notification_if_cancel' => 'yes',

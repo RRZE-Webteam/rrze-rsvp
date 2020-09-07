@@ -4,11 +4,6 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Functions;
-use RRZE\RSVP\Helper;
-use RRZE\RSVP\Settings;
-use function RRZE\RSVP\plugin;
-
 $settings = new Settings(plugin()->getFile());
 $options = (object) $settings->getOptions();
 global $post;
@@ -19,24 +14,17 @@ $meta = get_post_meta($postID);
 // Schedule
 $scheduleData = Functions::getRoomSchedule($postID);
 $schedule = '';
-$weekdays = [
-    1 => __('Monday', 'rrze-rsvp'),
-    2 => __('Tuesday', 'rrze-rsvp'),
-    3 => __('Wednesday', 'rrze-rsvp'),
-    4 => __('Thursday', 'rrze-rsvp'),
-    5 => __('Friday', 'rrze-rsvp'),
-    6 => __('Saturday', 'rrze-rsvp'),
-    7 => __('Sunday', 'rrze-rsvp')
-];
+$weekdays = Functions::daysOfWeekAry(1);
+
 if (!empty($scheduleData)) {
     $schedule .= '<table class="rsvp-schedule">';
     $schedule .= '<tr>'
-        . '<th>'. __('Weekday', 'rrze-rsvp') . '</th>'
-        . '<th>'. __('Time slots', 'rrze-rsvp') . '</th>';
+        . '<th>' . __('Weekday', 'rrze-rsvp') . '</th>'
+        . '<th>' . __('Time slots', 'rrze-rsvp') . '</th>';
     $schedule .= '</tr>';
     foreach ($scheduleData as $weekday => $dailySlots) {
         $schedule .= '<tr>'
-            .'<td>' . $weekdays[$weekday] . '</td>'
+            . '<td>' . $weekdays[$weekday] . '</td>'
             . '<td>';
         $ts = [];
         foreach ($dailySlots as $start => $end) {
@@ -56,7 +44,6 @@ if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorpl
     $imgID = $meta['rrze-rsvp-room-floorplan_id'][0];
 }
 
-
 get_header();
 
 /*
@@ -73,7 +60,7 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
         switch ($_GET['show']) {
             case 'info':
                 if (has_post_thumbnail()) {
-                    echo get_the_post_thumbnail($postID, 'medium', array( "class" => "alignright" ));
+                    echo get_the_post_thumbnail($postID, 'medium', array("class" => "alignright"));
                 }
                 echo get_the_content(null, false, $postID);
                 break;
@@ -149,10 +136,10 @@ if (Helper::isFauTheme()) {
  */
 echo $divOpen;
 
-while ( have_posts() ) : the_post();
+while (have_posts()) : the_post();
 
     if (has_post_thumbnail()) {
-        the_post_thumbnail('medium', array( "class" => "alignright" ));
+        the_post_thumbnail('medium', array("class" => "alignright"));
     }
     the_content();
 
@@ -166,20 +153,20 @@ while ( have_posts() ) : the_post();
         }
         if (shortcode_exists('collapsibles')) {
             $shortcode = '[collapsibles expand-all-link="true"]'
-                . '[collapse title="'.__('Schedule','rrze-rsvp').'" name="schedule" load="open"]'
+                . '[collapse title="' . __('Schedule', 'rrze-rsvp') . '" name="schedule" load="open"]'
                 . $schedule
                 . '[/collapse]'
-                . '[collapse title="'.__('Current Room Occupancy', 'rrze-rsvp').'" name="occupancy"]'
+                . '[collapse title="' . __('Current Room Occupancy', 'rrze-rsvp') . '" name="occupancy"]'
                 . Functions::getOccupancyByRoomIdNextHTML($postID)
                 . '[/collapse]';
-            if ($options->general_single_room_availability_table != 'no') {		
-		$bookingmode = get_post_meta($postID, 'rrze-rsvp-room-bookingmode', true);
-		if (!empty($bookingmode)) {
-		    
-		    $shortcode .= '[collapse title="' . __('Availability', 'rrze-rsvp') . '" name="availability"]'
-                    . do_shortcode('[rsvp-availability room=' . $postID . ' days=10 '.$booking_link.']')
-                    . '[/collapse]';
-		}
+            if ($options->general_single_room_availability_table != 'no') {
+                $bookingmode = get_post_meta($postID, 'rrze-rsvp-room-bookingmode', true);
+                if (!empty($bookingmode)) {
+
+                    $shortcode .= '[collapse title="' . __('Availability', 'rrze-rsvp') . '" name="availability"]'
+                        . do_shortcode('[rsvp-availability room=' . $postID . ' days=10 ' . $booking_link . ']')
+                        . '[/collapse]';
+                }
             }
             $shortcode .= '[/collapsibles]';
             $timetables = do_shortcode($shortcode);
@@ -189,24 +176,24 @@ while ( have_posts() ) : the_post();
                 //. '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
                 . Functions::getOccupancyByRoomIdNextHTML($postID);
             if ($options->general_single_room_availability_table != 'no') {
-		
-		$bookingmode = get_post_meta($postID, 'rrze-rsvp-room-bookingmode', true);
-		if (!empty($bookingmode)) {
-		
-		    $timetables .= '<h3>' . __('Availability', 'rrze-rsvp') . '</h3>'
-                    . do_shortcode('[rsvp-availability room=' . $postID . ' days=10 '.$booking_link.']');
-		}
+
+                $bookingmode = get_post_meta($postID, 'rrze-rsvp-room-bookingmode', true);
+                if (!empty($bookingmode)) {
+
+                    $timetables .= '<h3>' . __('Availability', 'rrze-rsvp') . '</h3>'
+                        . do_shortcode('[rsvp-availability room=' . $postID . ' days=10 ' . $booking_link . ']');
+                }
             }
         }
 
         echo $timetables;
-        }
+    }
 
     if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id']  != '') {
-        echo '<h2>'. __('Floor Plan','rrze-rsvp') . '</h2>';
-        $imgSrc = wp_get_attachment_image_src( $imgID, 'full');
-        $floorplan = wp_get_attachment_image( $imgID, 'large');
-        echo '<a href="' . $imgSrc[0] .'" class="lightbox">' . $floorplan . '</a>';
+        echo '<h2>' . __('Floor Plan', 'rrze-rsvp') . '</h2>';
+        $imgSrc = wp_get_attachment_image_src($imgID, 'full');
+        $floorplan = wp_get_attachment_image($imgID, 'large');
+        echo '<a href="' . $imgSrc[0] . '" class="lightbox">' . $floorplan . '</a>';
     }
 
 

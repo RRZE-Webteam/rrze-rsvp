@@ -9,22 +9,30 @@ namespace RRZE\RSVP\CPT;
 defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Capabilities;
+use RRZE\RSVP\Functions;
 
 class Seats
 {
 
 	protected $options;
 
-	public function __construct($pluginFile, $settings)
+	public function __construct()
 	{
-		$this->pluginFile = $pluginFile;
-		$this->settings = $settings;
+		//
 	}
 
 	public function onLoaded()
 	{
-		add_action('init', [$this, 'seats_post_type'], 0);
+		add_action('init', [$this, 'seats_post_type']);
 		add_action('init', [$this, 'seats_taxonomies']);
+
+		add_filter('manage_seat_posts_columns', [$this, 'columns']);
+		add_action('manage_seat_posts_custom_column', [$this, 'customColumn'], 10, 2);
+		add_filter('manage_edit-seat_sortable_columns', [$this, 'sortableColumns']);
+
+		add_action('restrict_manage_posts', [$this, 'applyFilters']);
+		add_filter('parse_query', [$this, 'filterQuery']);
+		add_filter('months_dropdown_results', [$this, 'removeMonthsDropdown'], 10, 2);
 	}
 
 	// Register Custom Post Type
@@ -99,5 +107,111 @@ class Seats
 			]
 		);
 		register_taxonomy('rrze-rsvp-equipment', 'seat', $args_equipment);
+	}
+
+	public function columns($columns)
+	{
+		$columns = array(
+			'cb' => $columns['cb'],
+			'title' => __('Seat', 'rrze-rsvp'),
+			'room' => __('Room', 'rrze-rsvp')
+		);
+		return $columns;
+	}
+
+	public function customColumn($column, $post_id)
+	{
+		$roomId = get_post_meta($post_id, 'rrze-rsvp-seat-room', true);
+		if ('title' === $column) {
+			echo get_the_title($post_id);
+		}
+		if ('room' === $column) {
+			echo get_the_title($roomId);
+		}
+	}
+
+	public function sortableColumns($columns)
+	{
+		$columns = array(
+			'title' => __('Seat', 'rrze-rsvp'),
+			'room' => __('Room', 'rrze-rsvp')
+		);
+		return $columns;
+	}
+
+	public function applyFilters($postType)
+	{
+		if ($postType != 'seat') {
+			return;
+		}
+
+		$allRooms = __('Show all rooms', 'rrze-rsvp');
+		$selectedRoom = (string) filter_input(INPUT_GET, 'rrze-rsvp-seat-room', FILTER_SANITIZE_STRING);
+
+		$seatIds = get_posts([
+			'post_type' => 'seat',
+			'nopaging' => true,
+			'fields' => 'ids'
+		]);
+
+		$seatRooms = [];
+
+		foreach ($seatIds as $seatId) {
+			$roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
+			$seatRooms[$roomId] = get_the_title($roomId);
+		}
+
+		if ($seatRooms) {
+			Functions::sortArrayKeepKeys($seatRooms);
+			echo Functions::getSelectHTML('rrze-rsvp-seat-room', $allRooms, $seatRooms, $selectedRoom);
+		}
+	}
+
+	public function filterQuery($query)
+	{
+		if (!(is_admin() and $query->is_main_query())) {
+			return $query;
+		}
+
+		if (!($query->query['post_type'] == 'seat')) {
+			return $query;
+		}
+
+		$roomId = filter_input(INPUT_GET, 'rrze-rsvp-seat-room', FILTER_VALIDATE_INT);
+
+		if (!$roomId) {
+			return $query;
+		}
+
+		$meta_query = [];
+		$seatId = get_posts([
+			'post_type' => 'seat',
+			'meta_key' => 'rrze-rsvp-seat-room',
+			'meta_value' => $roomId,
+			'numberposts' => 1,
+			'fields' => 'ids'
+		]);
+
+		if (isset($seatId[0])) {
+			$meta_query[] = array(
+				'key' => 'rrze-rsvp-seat-room',
+				'value' => $roomId
+			);
+		}
+
+		if ($meta_query) {
+			$meta_query['relation'] = 'AND';
+			$query->query_vars['meta_query'] = $meta_query;
+		}
+
+		return $query;
+	}
+
+	public function removeMonthsDropdown($months, $postType)
+	{
+		if ($postType == 'seat') {
+			$months = [];
+		}
+		return $months;
 	}
 }
