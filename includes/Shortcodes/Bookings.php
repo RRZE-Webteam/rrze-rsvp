@@ -820,14 +820,14 @@ class Bookings extends Shortcodes {
                 if ($status == 'confirmed') {
                     $this->email->bookingConfirmedCustomer($booking_id);
                 } else {
-                    $this->email->bookingConfirmedCustomer($booking_id, true);
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingmode, true);
                 }
             break;
             case 'reservation':
                 if ($status == 'confirmed') {
                     $this->email->bookingConfirmedCustomer($booking_id);
                 } elseif ($status == 'checked-in') {
-                    $this->email->bookingConfirmedCustomer($booking_id, true);
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingmode, true);
                 } else {
                     if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
                         $to = $this->options->email_notification_email;
@@ -840,7 +840,7 @@ class Bookings extends Shortcodes {
                 if ($status == 'confirmed') {
                     $this->email->bookingConfirmedCustomer($booking_id);
                 } else {
-                    $this->email->bookingConfirmedCustomer($booking_id, true);
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingmode, true);
                 }
             break;
             default:

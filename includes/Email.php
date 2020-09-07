@@ -281,10 +281,11 @@ class Email
      * the customer can check in, check out or cancel the booking through 
      * the respective links included in the email message.
      * @param integer $bookingId Booking Id
-     * @param boolean $instantCheckIn Instant Check In
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
+     * @param boolean $checkedIn Is booking checked in?
      * @return void
      */
-    public function bookingConfirmedCustomer(int $bookingId, $instantCheckIn = false)
+    public function bookingConfirmedCustomer(int $bookingId, string $bookingMode = 'reservation', bool $checkedIn = false)
     {
         $booking = Functions::getBooking($bookingId);
         if (empty($booking)) {
@@ -318,8 +319,8 @@ class Email
         $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
         $data['seat_name'] = $booking['seat_name'];
-        // Instant check in
-        $data['instant_checkin'] = $instantCheckIn;
+        // Checked in
+        $data['checked_in'] = $checkedIn;
         // Check in booking
         $data['checkin_url'] = $checkInUrl;
         $data['checkin_btn'] = __('Check In', 'rrze-rsvp');
@@ -348,10 +349,15 @@ class Email
         $data['site_url'] = site_url();
         $data['site_name'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
 
-        $message = $this->template->getContent('email/booking-confirmed-customer', $data);
-        $altMessage = $this->template->getContent('email/booking-confirmed-customer.txt', $data);
+        if ($bookingMode == 'consultation') {
+            $message = $this->template->getContent('email/booking-consultation-confirmed-customer', $data);
+            $altMessage = $this->template->getContent('email/booking-consultation-confirmed-customer.txt', $data);
+        } else {
+            $message = $this->template->getContent('email/booking-confirmed-customer', $data);
+            $altMessage = $this->template->getContent('email/booking-confirmed-customer.txt', $data);
+        }
 
-        if ($instantCheckIn) {
+        if ($checkedIn) {
             $attachment = '';
         } else {
             $icsFilename = sanitize_title($booking['room_name']) . '-' . date('YmdHi', $booking['start']) . '.ics';
