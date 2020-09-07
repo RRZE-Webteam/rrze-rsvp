@@ -86,30 +86,35 @@ if ($checkInBooking) {
     echo '<p><strong>' . __('Room', 'rrze-rsvp') . ':</strong> <a href="' . get_permalink($roomId) . '">' . $roomName . '</a>';
     echo '<div class="rrze-rsvp-seat-check-inout"> <div class="container">';
     if ($bookingmode == 'consultation') {
-        echo '<h2>' . __('Consult Hour', 'rrze-rsvp') . '</h2>';
+        echo '<h2>' . __('Consult', 'rrze-rsvp') . '</h2>';
         echo '<p>', __('This time slot has been reserved for you.', 'rrze-rsvp') . '</p>';
         echo '<p>' . sprintf(__('Additional information has been sent to your email address <strong>%s</strong>.', 'rrze-rsvp'), $customEmail) . '</p>';
+        echo '<p class="date">';
+        echo $date . '<br>';
+        echo $time;
+        echo '</p>';
+        echo '<p>' . $roomName . '</p>';    
     } else {
         echo '<h2>' . __('Booking Checked In', 'rrze-rsvp') . '</h2>';
         echo '<p>', __('This seat has been reserved for you.', 'rrze-rsvp') . '</p>';
         echo '<p>' . sprintf(__('Additional information has been sent to your email address <strong>%s</strong>.', 'rrze-rsvp'), $customEmail) . '</p>';
         echo '<p>' . __('Please check out when you leave the site.', 'rrze-rsvp') . '</p>';
+        echo '<p class="date">';
+        echo $date . '<br>';
+        echo $time;
+        echo '</p>';
+        echo '<p>' . $roomName . '</p>';
+        echo '<p>' . $seatName . '</p>';
+        // check-out btn
+        $link = sprintf(
+            '<a href="%1$s?id=%2$d&action=checkout&nonce=%3$s" class="button button-checkout" data-id="%2$d">%4$s</a>',
+            trailingslashit(get_permalink()),
+            $bookingId,
+            $nonce,
+            __('Check out', 'rrze-rsvp')
+        );
+        echo '<p>' . $link . '</p>';        
     }
-    echo '<p class="date">';
-    echo $date . '<br>';
-    echo $time;
-    echo '</p>';
-    echo '<p>' . $roomName . '</p>';
-    echo '<p>' . $seatName . '</p>';
-    // check-out btn
-    $link = sprintf(
-        '<a href="%1$s?id=%2$d&action=checkout&nonce=%3$s" class="button button-checkout" data-id="%2$d">%4$s</a>',
-        trailingslashit(get_permalink()),
-        $bookingId,
-        $nonce,
-        __('Check out', 'rrze-rsvp')
-    );
-    echo '<p>' . $link . '</p>';
     echo '</div> </div>';
 } elseif ($seatCheckInOut) {
     $status = $seatCheckInOut['status'];
