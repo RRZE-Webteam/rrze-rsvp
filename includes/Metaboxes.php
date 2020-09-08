@@ -239,7 +239,7 @@ class Metaboxes
 
         $cmb_general->add_field(array(
             'name' => __('Send to an email address', 'rrze-rsvp'),
-            'desc' => __('A copy of the confirmed reservation will be sent to the specified email address with a calendar file (.ics) as an attachment.', 'rrze-rsvp'),
+            'desc' => __('A copy of the confirmed booking will be sent to the specified email address with a calendar file (.ics) as an attachment.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-send-to-email',
             'type' => 'text_email',
             'default' => '',
