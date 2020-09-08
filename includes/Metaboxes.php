@@ -195,7 +195,6 @@ class Metaboxes
             'default'          => 'reservation',
             'options' => array(
                 'check-only' => __('Check-in and check-out only on site', 'rrze-rsvp'), // Nur Ein- und Auschecken vor Ort
-                //'rrze-rsvp-additionals' => __('Activate additional reservation functions', 'rrze-rsvp'), // Zusätzliche Reservierungsfunktionen aktivieren
                 'reservation' => __('Reservation', 'rrze-rsvp'),
                 'consultation' => __('Consultation', 'rrze-rsvp')
             )
@@ -235,9 +234,17 @@ class Metaboxes
             'desc' => __('The customer is forced to confirm his booking within a period of one hour. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-force-to-confirm',
             'type' => 'checkbox',
+            'default' => ''
+        ));
+
+        $cmb_general->add_field(array(
+            'name' => __('Send to an email address', 'rrze-rsvp'),
+            'desc' => __('A copy of the confirmed booking will be sent to the specified email address with a calendar file (.ics) as an attachment.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-send-to-email',
+            'type' => 'text_email',
             'default' => '',
             'after_row' => '<div id="rrze-rsvp-consultation">'
-        ));
+        ));        
 
         $cmb_general->add_field(array(
             'name' => __('Allow Instant Check-In', 'rrze-rsvp'),
