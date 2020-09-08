@@ -104,7 +104,6 @@ class Tracking {
         $guest_firstname = '';
         $guest_lastname = '';
         $guest_email = '';
-        // $guest_phone = '';
 
         echo '<div class="wrap">';
         echo '<h1>' . esc_html_x( 'Contact tracking', 'admin page title', 'rrze-rsvp' ) . '</h1>';
@@ -112,23 +111,23 @@ class Tracking {
         if ( isset( $_GET['submit'])) {
             $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
             $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
-            $hash_guest_firstname = Functions::crypt(filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING), 'encrypt');
-            $hash_guest_lastname = Functions::crypt(filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING), 'encrypt');
-            $hash_guest_email = Functions::crypt(filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL), 'encrypt');
-            // $hash_guest_phone = Functions::crypt(filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING), 'encrypt');
-
-            // $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email, $hash_guest_phone);
+            $guest_firstname = filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING);
+            $guest_lastname = filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING);
+            $guest_email = filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL);
+            $hash_guest_firstname = Functions::crypt($guest_firstname, 'encrypt');
+            $hash_guest_lastname = Functions::crypt($guest_lastname, 'encrypt');
+            $hash_guest_email = Functions::crypt($guest_email, 'encrypt');
             $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
 
             if ($aGuests){
-                $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&guest_firstname=' . urlencode($guest_firstname) . '&guest_lastname=' . urlencode($guest_lastname) . '&guest_email=' . urlencode($guest_email) . '&guest_phone=' . urlencode($guest_phone);
+                $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&hash_guest_firstname=' . urlencode($hash_guest_firstname) . '&hash_guest_lastname=' . urlencode($hash_guest_lastname) . '&hash_guest_email=' . urlencode($hash_guest_email);
                 echo '<div class="notice notice-success is-dismissible">'
-                    . '<h2>Guests found!</h2>'
-                    . "<a href='$ajax_url'>Download CSV</a>"
+                    . '<h2>' . __('Guests found!', 'rrze-rsvp') . '</h2>'
+                    . "<a href='$ajax_url'>" . __('Download CSV', 'rrze-rsvp') . '</a>'
                     . '</div>';
             }else{
                 echo '<div class="notice notice-success is-dismissible">'
-                    . '<h2>No guests found</h2>'
+                    . '<h2>' . __('No guest found.', 'rrze-rsvp') . '</h2>'
                     . '</div>';
             }
         }
@@ -160,14 +159,8 @@ class Tracking {
             . '<td><input type="text" id="guest_email" name="guest_email" value="' . $guest_email . '">'
             . '</td>'
             . '</tr>';
-        // echo '<tr>'
-        //     . '<th scope="row"><label for="guest_phone">' . __('Phone', 'rrze-rsvp') . '</label></th>'
-        //     . '<td><input type="text" id="guest_phone" name="guest_phone" value="' . $guest_phone . '">'
-        //     . '</td>'
-        //     . '</tr>';
         echo '</tbody></table>';
         echo '<p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="' . __('Search', 'rrze-rsvp') . '"></p>';
-
         echo '</form>';
         echo '</div>';
     }
@@ -184,12 +177,10 @@ class Tracking {
     public function tracking_csv_pull() {
         $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
         $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
-        $hash_guest_firstname = Functions::crypt(filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING), 'encrypt');
-        $hash_guest_lastname = Functions::crypt(filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING), 'encrypt');
-        $hash_guest_email = Functions::crypt(filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL), 'encrypt');
-        // $hash_guest_phone = Functions::crypt(filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING), 'encrypt');
+        $hash_guest_firstname = filter_input(INPUT_GET, 'hash_guest_firstname', FILTER_SANITIZE_STRING);
+        $hash_guest_lastname = filter_input(INPUT_GET, 'hash_guest_lastname', FILTER_SANITIZE_STRING);
+        $hash_guest_email = filter_input(INPUT_GET, 'hash_guest_email', FILTER_VALIDATE_EMAIL);
 
-        // $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email, $hash_guest_phone);
         $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
 
         $file = 'rrze_tracking_csv';
@@ -394,8 +385,7 @@ class Tracking {
     }
 
 
-    // public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_firstname, string $hash_guest_lastname, string $hash_guest_email = '', string $hash_guest_phone = ''): array {
-    public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_firstname, string $hash_guest_lastname, string $hash_guest_email = ''): array {
+    public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_firstname, string $hash_guest_lastname, string $hash_guest_email): array {
         global $wpdb;
 
         if (!$hash_guest_email && !$hash_guest_firstname && !$hash_guest_lastname){
@@ -410,47 +400,6 @@ class Tracking {
 
         $tableType = get_option('rsvp_tracking_tabletype');
         $trackingTable = Tracking::getTableName($tableType);
-
-        //  "Identifikationsmerkmalen für eine Person (Name, E-Mail und oder Telefon)" see https://github.com/RRZE-Webteam/rrze-rsvp/issues/89
-        // $prepare_vals = [
-        //     $searchdate,
-        //     $delta,
-        //     $searchdate,
-        //     $delta,
-        //     $searchdate,
-        //     $delta,
-        //     $searchdate,
-        //     $delta,
-        //     $searchdate,
-        //     $delta,
-        //     $searchdate,
-        //     $delta,
-        //     $searchdate,
-        //     $delta,
-        //     $searchdate,
-        //     $delta,
-        //     $hash_guest_firstname,
-        //     $hash_guest_lastname,
-        //     $hash_guest_email,
-        //     // $hash_guest_phone
-        // ];
-
-        // simpelst solution would be: 
-        // select ... INTO OUTFILE '$path_to_file' FIELDS TERMINATED BY ',' LINES TERMINATED BY ';' from ...
-        // but this is a question of user's file writing rights
-
-        // $aRows = $wpdb->get_results( 
-        //     $wpdb->prepare("SELECT surrounds.start, surrounds.end, surrounds.room_name, surrounds.room_street, surrounds.room_zip, surrounds.room_city, surrounds.hash_guest_email, surrounds.hash_guest_phone, surrounds.hash_guest_firstname, surrounds.hash_guest_lastname 
-        //     FROM {$trackingTable} AS surrounds 
-        //     WHERE (DATE(surrounds.start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND (DATE(surrounds.end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
-        //     surrounds.room_post_id IN 
-        //     (SELECT needle.room_post_id FROM {$trackingTable} AS needle WHERE 
-        //     (DATE(needle.start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
-        //     (DATE(needle.end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
-        //     needle.hash_guest_firstname = %s AND needle.hash_guest_lastname = %s AND needle.hash_guest_email = %s) 
-        //     ORDER BY surrounds.start", $prepare_vals), ARRAY_A); // returns assoc array
-
-
 
         $prepare_vals = [
             $hash_guest_firstname,
