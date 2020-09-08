@@ -9,9 +9,12 @@
 		{{/customer_has_received_an_email}}
 		{{/!already_done}}
 		<p class="date {{=class_cancelled}}">
+			{{=date}}<br>
+			{{=time}}<br>
 			{{=room_name}}<br>
-			{{=date}}<br />
-			{{=time}}
+			{{seat_name}}
+			{{=seat_name}}
+			{{/seat_name}}			
 		</p>
 		<p class="customer">
 			{{=customer.name}}<br>

@@ -108,9 +108,10 @@ class Email
      * @param string $to Customer email address
      * @param string $subject Email subject
      * @param integer $bookingId Booking Id
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
      * @return void
      */
-    public function bookingRequestedAdmin(string $to, string $subject, int $bookingId)
+    public function bookingRequestedAdmin(string $to, string $subject, int $bookingId, string $bookingMode = 'reservation')
     {
         $booking = Functions::getBooking($bookingId);
         if (empty($booking)) {
@@ -130,7 +131,7 @@ class Email
         $data['date'] = $booking['date'];
         $data['time'] = $booking['time'];
         $data['room_name'] = $booking['room_name'];
-        $data['seat_name'] = $booking['seat_name'];
+        $data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
         $data['customer']['name'] = $customerName;
         $data['customer']['email'] = $customerEmail;
         // Confirm booking
@@ -155,9 +156,10 @@ class Email
      * bookingCancelledAdmin
      * Send an email to the admin when the customer cancels the booking.
      * @param integer $bookingId Booking Id
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
      * @return void
      */
-    public function bookingCancelledAdmin(int $bookingId)
+    public function bookingCancelledAdmin(int $bookingId, string $bookingMode = 'reservation')
     {
         $booking = Functions::getBooking($bookingId);
         if (empty($booking)) {
@@ -180,7 +182,7 @@ class Email
         $data['date'] = $booking['date'];
         $data['time'] = $booking['time'];
         $data['room_name'] = $booking['room_name'];
-        $data['seat_name'] = $booking['seat_name'];
+        $data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
         $data['customer']['name'] = $customerName;
         $data['customer']['email'] = $customerEmail;
         // Site URL
@@ -200,9 +202,10 @@ class Email
      * cancellation of the booking. Optionally, the customer can cancel the 
      * reservation using the link included in the email message.
      * @param integer $bookingId
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
      * @return void
      */
-    public function bookingRequestedCustomer(int $bookingId)
+    public function bookingRequestedCustomer(int $bookingId, string $bookingMode = 'reservation')
     {
         $booking = Functions::getBooking($bookingId);
         if (empty($booking)) {
@@ -247,7 +250,7 @@ class Email
         $data['time'] = $booking['time'];
         $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
-        $data['seat_name'] = $booking['seat_name'];
+        $data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
 
         // Confirm booking
         $data['confirm_url'] = $confirmUrl;
@@ -373,9 +376,10 @@ class Email
      * Send a booking cancellation email to the customer. No further action 
      * is necessary.
      * @param integer $bookingId Booking Id
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
      * @return void
      */
-    public function bookingCancelledCustomer(int $bookingId)
+    public function bookingCancelledCustomer(int $bookingId, string $bookingMode = 'reservation')
     {
         $booking = Functions::getBooking($bookingId);
         if (empty($booking)) {
@@ -405,7 +409,7 @@ class Email
         $data['time'] = $booking['time'];
         $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
-        $data['seat_name'] = $booking['seat_name'];
+        $data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
         // Site URL
         $data['site_url'] = site_url();
         $data['site_name'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);

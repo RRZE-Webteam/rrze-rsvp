@@ -209,7 +209,8 @@ class Schedule
         if ($query->have_posts()) {
             while ($query->have_posts()) {
                 $query->the_post();
-                $roomId = get_post_meta(get_the_ID(), 'rrze-rsvp-seat-room', true);
+                $seatId = get_post_meta(get_the_ID(), 'rrze-rsvp-booking-seat', true);
+                $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
                 if (get_post_meta($roomId, 'rrze-rsvp-room-force-to-confirm', true)) {
                     update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'cancelled');
                     $this->email->bookingCancelledCustomer(get_the_ID());
@@ -262,8 +263,12 @@ class Schedule
         if ($query->have_posts()) {
             while ($query->have_posts()) {
                 $query->the_post();
-                $roomId = get_post_meta(get_the_ID(), 'rrze-rsvp-seat-room', true);
-                if (get_post_meta($roomId, 'rrze-rsvp-room-force-to-checkin', true)) {
+                $seatId = get_post_meta(get_the_ID(), 'rrze-rsvp-booking-seat', true);
+                $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
+                if (get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true) == 'consultation') {
+                    update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'checked-in');
+                    do_action('rrze-rsvp-checked-in', get_current_blog_id(), get_the_ID());
+                } elseif (get_post_meta($roomId, 'rrze-rsvp-room-force-to-checkin', true)) {
                     update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'cancelled');
                     $this->email->bookingCancelledCustomer(get_the_ID());
                 }

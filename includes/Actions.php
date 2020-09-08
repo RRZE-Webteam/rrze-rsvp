@@ -33,6 +33,8 @@ class Actions
 		if (!$booking) {
 			$this->ajaxResult(['result' => false]);
 		}
+
+		$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 		$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
 		if ($action == 'confirm') {
@@ -40,13 +42,13 @@ class Actions
 			update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
 			if ($forceToConfirm) {
 				update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'booked');
-				$this->email->bookingRequestedCustomer($bookingId);
+				$this->email->bookingRequestedCustomer($bookingId, $bookingMode);
 			} else {
-				$this->email->bookingConfirmedCustomer($bookingId);
+				$this->email->bookingConfirmedCustomer($bookingId, $bookingMode);
 			}
 		} else if ($action == 'cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
-			$this->email->bookingCancelledCustomer($bookingId);
+			$this->email->bookingCancelledCustomer($bookingId, $bookingMode);
 		} else {
 			$this->ajaxResult(['result' => false]);
 		}
@@ -106,6 +108,7 @@ class Actions
 		$bookingCkeckedIn = ($booking['status'] == 'checked-in');
 		$bookingCkeckedOut = ($booking['status'] == 'checked-out');
 
+		$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 		$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
 		if (($bookingBooked || $bookingCancelled) && $bookingStatus == 'confirmed') {
@@ -113,13 +116,13 @@ class Actions
 			update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
 			if ($forceToConfirm) {
 				update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'booked');
-				$this->email->bookingRequestedCustomer($bookingId);
+				$this->email->bookingRequestedCustomer($bookingId, $bookingMode);
 			} else {
-				$this->email->bookingConfirmedCustomer($bookingId);
+				$this->email->bookingConfirmedCustomer($bookingId, $bookingMode);
 			}
 		} elseif (($bookingBooked || $bookingConfirmed) && $bookingStatus == 'cancelled') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', $bookingStatus);
-			$this->email->bookingCancelledCustomer($bookingId);
+			$this->email->bookingCancelledCustomer($bookingId, $bookingMode);
 		} elseif ($bookingCkeckedIn) {
 		} elseif ($bookingCkeckedOut) {
 			//
@@ -180,20 +183,21 @@ class Actions
 		$bookingCancelled = ($booking['status'] == 'cancelled');
 		$alreadyDone = false;
 
+		$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 		$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
 		if ($bookingBooked && $action == 'confirm') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 			$bookingConfirmed = true;
 			if ($forceToConfirm) {
-				$this->email->bookingRequestedCustomer($bookingId);
+				$this->email->bookingRequestedCustomer($bookingId, $bookingMode);
 			} else {
-				$this->email->bookingConfirmedCustomer($bookingId);
+				$this->email->bookingConfirmedCustomer($bookingId, $bookingMode);
 			}
 		} elseif ($bookingBooked && $action == 'cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 			$bookingCancelled = true;
-			$this->email->bookingCancelledCustomer($bookingId);
+			$this->email->bookingCancelledCustomer($bookingId, $bookingMode);
 		} else {
 			$alreadyDone = true;
 		}
@@ -249,6 +253,9 @@ class Actions
 		$start = $booking['start'];
 		$end = $booking['end'];
 		$now = current_time('timestamp');
+		
+		$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
+
 		$userConfirmed = (get_post_meta($bookingId, 'rrze-rsvp-customer-status', true) == 'confirmed');
 		$bookingConfirmed = ($booking['status'] == 'confirmed');
 		$bookingCkeckedIn = ($booking['status'] == 'checked-in');
@@ -257,11 +264,11 @@ class Actions
 
 		if (!$bookingCancelled && !$userConfirmed && $action == 'confirm') {
 			update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'confirmed');
-			$this->email->bookingConfirmedCustomer($bookingId);
+			$this->email->bookingConfirmedCustomer($bookingId, $bookingMode);
 			$userConfirmed = true;
 		} elseif (!$bookingCancelled && !$bookingCkeckedOut && $action == 'maybe-cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
-			$this->email->bookingCancelledAdmin($bookingId);
+			$this->email->bookingCancelledAdmin($bookingId, $bookingMode);
 			$bookingCancelled = true;
 		} elseif (!$bookingCancelled && !$bookingCkeckedIn && $bookingConfirmed && $action == 'checkin') {
 			$offset = 15 * MINUTE_IN_SECONDS;
@@ -302,6 +309,7 @@ class Actions
 		$data['is_locale_not_english'] = !Functions::isLocaleEnglish() ? true : false;
 
 		$data['room_name'] = $booking['room_name'];
+		$data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
 
 		$data['date'] = $booking['date'];
 		$data['time'] = $booking['time'];

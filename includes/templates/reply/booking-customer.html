@@ -46,9 +46,12 @@
 		{{/action_not_available}}
 
 		<p class="date {{=class_cancelled}}">
-			{{=room_name}}<br>
 			{{=date}}<br>
-			{{=time}}
+			{{=time}}<br>
+			{{=room_name}}<br>
+			{{seat_name}}
+			{{=seat_name}}
+			{{/seat_name}}		
 		</p>		
 
 		{{booking_cancel}}
@@ -99,9 +102,12 @@
 		{{/action_not_available}}
 
 		<p class="date {{=class_cancelled}}">
-			{{=room_name}}<br>
 			{{=date_en}}<br>
-			{{=time_en}}
+			{{=time_en}}<br>
+			{{=room_name}}<br>
+			{{seat_name}}
+			{{=seat_name}}
+			{{/seat_name}}			
 		</p>
 	
 		{{booking_cancel}}
