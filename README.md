@@ -31,3 +31,16 @@ Das System eignet sich auch für die Verwaltung von Sprechstundenterminen.
 
 Eine vollständige Dokumentation mit vielen Anwendungsbeispielen findet sich auf der Seite: 
 https://www.wordpress.rrze.fau.de/plugins/fau-und-rrze-plugins/rsvp/
+
+
+## Verwendung der SSO-Option (Raum Einstellungen)
+
+Das Plugin unterstützt die Anmeldung für zentral-vergebene Kennungen von Studierenden und Beschäftigten der Universität Erlangen-Nürnberg. Mit dieser Option ist es möglich, den Zugriff auf die Reservierungsseite nur für Personen zu autorisieren, die eine IdM-Kennung haben.
+
+Damit die SSO-Option funktioniert, muss zuerst das FAU-WebSSO-Plugin installiert und aktiviert werden.
+Vgl. https://github.com/RRZE-Webteam/fau-websso
+
+Folgen Sie dann den Anweisungen unter folgendem Link:
+https://github.com/RRZE-Webteam/fau-websso/blob/master/README.md
+
+Nachdem Sie den korrekten Betrieb des FAU-WebSSO-Plugins überprüft haben, können Sie die SSO-Option des RSVP-Plugins verwenden.
