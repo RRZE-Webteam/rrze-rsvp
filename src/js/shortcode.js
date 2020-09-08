@@ -12,19 +12,6 @@ jQuery(document).ready(function($){
 
     $('div.rsvp-datetime-container, div.rsvp-seat-container').on('click', 'input', updateForm);
 
-    $('div.rsvp-seat-container').on('click', 'input', function(){
-        var id = $(this).val();
-        $('div.rsvp-item-info').remove();
-        $.post(rsvp_ajax.ajax_url, {         //POST request
-            _ajax_nonce: rsvp_ajax.nonce,     //nonce
-            action: "ShowItemInfo",            //action
-            id: id,
-        }, function(result) {                 //callback
-            //console.log(result);
-            $('div.rsvp-seat-select').after(result);
-        });
-    });
-
     $('div.rsvp-date-container').on('click', 'a.cal-skip', function(e) {
         e.preventDefault();
         var monthCurrent = $('table.rsvp_calendar').data('period');

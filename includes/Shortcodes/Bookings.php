@@ -795,14 +795,14 @@ class Bookings extends Shortcodes {
                 }
             break;
             case 'consultation':
-                $status = $autoconfirmation ? 'confirmed' : 'checked-in';
+                $status = $autoconfirmation ? 'checked-in' : 'booked';
                 $timestamp = current_time('timestamp');
                 if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
                     $status = 'checked-in';
                 }
             break;
             default:
-                $status = 'booked';
+                //
         }
 
         update_post_meta( $booking_id, 'rrze-rsvp-booking-status', $status );
@@ -837,10 +837,14 @@ class Bookings extends Shortcodes {
                 }
             break;
             case 'consultation':
-                if ($status == 'confirmed') {
-                    $this->email->bookingConfirmedCustomer($booking_id);
-                } else {
+                if ($status == 'checked-in') {
                     $this->email->bookingConfirmedCustomer($booking_id, $bookingmode, true);
+                } else {
+                    if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
+                        $to = $this->options->email_notification_email;
+                        $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
+                        $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
+                    }
                 }
             break;
             default:
@@ -1051,33 +1055,32 @@ class Bookings extends Shortcodes {
         if ($date) {
             $response['time'] = $this->buildTimeslotSelect($roomID, $date, $time, $availability);
             if ($time) {
-                $response['seat'] = $this->buildSeatSelect($roomID, $date, $time, $seat, $availability);
+                $seatSelect = $this->buildSeatSelect($roomID, $date, $time, $seat, $availability);
+                $seatInfo = ($seat) ? $this->buildSeatInfo($seat) : '';
+                $response['seat'] = $seatSelect . $seatInfo;
             }
         }
         wp_send_json($response);
     }
 
-    public function ajaxShowItemInfo() {
-        if (!isset($_POST['id'])) {
-            echo '';
-            wp_die();
+    public function buildSeatInfo($seatID = '') {
+        if ($seatID == '') {
+            return '';
         }
-        $id = (int)$_POST['id'];
         $output = '';
-        $seat_name = get_the_title($id);
-        $equipment = get_the_terms($id, 'rrze-rsvp-equipment');
-        $output .= '<div class="rsvp-item-info">';
+        $seat_name = get_the_title($seatID);
+        $equipment = get_the_terms($seatID, 'rrze-rsvp-equipment');
         if ($equipment !== false) {
+            $output .= '<div class="rsvp-item-info">';
             $output .= '<div class="rsvp-item-equipment"><h5>' . sprintf( __( 'Seat %s', 'rrze-rsvp' ), $seat_name ) . '</h5>';
             foreach  ($equipment as $e) {
                 $e_arr[] = $e->name;
             }
             $output .= '<p><strong>' . __('Equipment','rrze-rsvp') . '</strong>: ' . implode(', ', $e_arr) . '</p>';
             $output .= '</div>';
+            $output .= '</div>';
         }
-        $output .= '</div>';
-        echo $output;
-        wp_die();
+        return $output;
     }
 
     private function buildTimeslotSelect($roomID, $date, $time = false, $availability) {
