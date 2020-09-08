@@ -146,8 +146,8 @@ class Bookings extends Shortcodes {
 	    $alert .= '</div>';
             return $alert;
         }
-	$bookingmode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
-	if ($bookingmode == 'check-only' && !$this->nonce) {
+	$bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
+	if ($bookingMode == 'check-only' && !$this->nonce) {
 	    
 	    $alert = '<div class="alert alert-info" role="alert">';
 	    $alert .= '<p><strong>'.__('Checkin in room','rrze-rsvp').'</strong><br>';
@@ -484,9 +484,10 @@ class Bookings extends Shortcodes {
         if (!$booking) {
             return '';
         }
-
+        
         $data = [];
         $roomId = $booking['room'];
+        $bookingMode = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true);
         $roomMeta = get_post_meta($roomId);
 
         $data['autoconfirmation'] = (isset($roomMeta['rrze-rsvp-room-auto-confirmation']) && $roomMeta['rrze-rsvp-room-auto-confirmation'][0] == 'on');
@@ -499,7 +500,7 @@ class Bookings extends Shortcodes {
         $data['time_label'] = __('Time', 'rrze-rsvp');
         $data['room_name'] = $booking['room_name'];
         $data['room_label'] = __('Room', 'rrze-rsvp');
-        $data['seat_name'] = $booking['seat_name'];
+        $data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
         $data['seat_label'] = __('Seat', 'rrze-rsvp');        
         $data['customer']['name'] = sprintf('%s %s', $booking['guest_firstname'], $booking['guest_lastname']);
         $data['customer']['email'] = $booking['guest_email'];
@@ -778,9 +779,9 @@ class Bookings extends Shortcodes {
 
         // Set booking status
         $timestamp = current_time('timestamp');
-        $bookingmode = get_post_meta($room_id, 'rrze-rsvp-room-bookingmode', true);
+        $bookingMode = get_post_meta($room_id, 'rrze-rsvp-room-bookingmode', true);
 
-        switch($bookingmode) {
+        switch($bookingMode) {
             case 'check-only':
                 $status = 'confirmed';
                 if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
@@ -809,25 +810,25 @@ class Bookings extends Shortcodes {
         }
 
         // E-Mail senden
-        switch($bookingmode) {
+        switch($bookingMode) {
             case 'check-only':
                 if ($status == 'confirmed') {
-                    $this->email->bookingConfirmedCustomer($booking_id, $bookingmode);
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingMode);
                 } else {
-                    $this->email->bookingConfirmedCustomer($booking_id, $bookingmode, true);
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingMode, true);
                 }
             break;
             case 'reservation':
             case 'consultation':
                 if ($status == 'confirmed') {
-                    $this->email->bookingConfirmedCustomer($booking_id, $bookingmode);
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingMode);
                 } elseif ($status == 'checked-in') {
-                    $this->email->bookingConfirmedCustomer($booking_id, $bookingmode, true);
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingMode, true);
                 } else {
                     if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
                         $to = $this->options->email_notification_email;
                         $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
-                        $this->email->bookingRequestedAdmin($to, $subject, $booking_id, $bookingmode);
+                        $this->email->bookingRequestedAdmin($to, $subject, $booking_id, $bookingMode);
                     }
                 }
             break;
