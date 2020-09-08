@@ -126,7 +126,7 @@ class Actions
         }
         
         // 2020-09-07 every time booking is saved:
-        do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
+        do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
 	public function bookingReply()
@@ -268,7 +268,7 @@ class Actions
 			if (($start - $offset) <= $now && ($end - $offset) >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
 				$bookingCkeckedIn = true;
-				do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
+				do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 			}
 		} elseif (!$bookingCancelled && !$bookingCkeckedOut && $bookingCkeckedIn && $action == 'checkout') {
 			if ($start <= $now && $end >= $now) {

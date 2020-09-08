@@ -853,7 +853,7 @@ class Bookings extends Shortcodes {
 
         // Redirect zur Seat-Seite, falls
         if ($status == 'checked-in') {
-            do_action('rrze-rsvp-checked-in', get_current_blog_id(), $booking_id);
+            do_action('rrze-rsvp-tracking', get_current_blog_id(), $booking_id);
             $redirectUrl = add_query_arg(
                 [
                     'id' => $booking_id,
