@@ -20,7 +20,8 @@ class Actions
 	{
 		add_action('admin_init', [$this, 'handleActions']);
 		add_action('wp_ajax_booking_action', [$this, 'ajaxBookingAction']);
-		add_action('transition_post_status', [$this, 'transitionPostStatus'], 10, 3);
+		add_action('pre_post_update', [$this, 'preBookingUpdate'], 10, 2);
+		add_action('transition_post_status', [$this, 'transitionBookingStatus'], 10, 3);
 		add_action('wp', [$this, 'bookingReply']);
 	}
 
@@ -87,7 +88,25 @@ class Actions
 		}
 	}
 
-	public function transitionPostStatus($newStatus, $oldStatus, $post)
+	public function preBookingUpdate($postId, $data)
+	{
+		$postType = get_post_type($postId);
+		if ($postType != 'booking') {
+			return;
+		}
+		// ...
+		$errorMessage = '';
+		if (!$errorMessage) {
+			return;
+		}
+		wp_die(
+			$errorMessage,
+			__('Update Error', 'rrze-rsvp'),
+			['back_link' => true]
+		);
+	}
+
+	public function transitionBookingStatus($newStatus, $oldStatus, $post)
 	{
 		if (get_post_type($post) != 'booking') {
 			return;
@@ -126,10 +145,10 @@ class Actions
 		} elseif ($bookingCkeckedIn) {
 		} elseif ($bookingCkeckedOut) {
 			//
-        }
-        
-        // 2020-09-07 every time booking is saved:
-        do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
+		}
+
+		// 2020-09-07 every time booking is saved:
+		do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
 	}
 
 	public function bookingReply()
@@ -253,7 +272,7 @@ class Actions
 		$start = $booking['start'];
 		$end = $booking['end'];
 		$now = current_time('timestamp');
-		
+
 		$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 
 		$userConfirmed = (get_post_meta($bookingId, 'rrze-rsvp-customer-status', true) == 'confirmed');
@@ -341,7 +360,7 @@ class Actions
 				$data['booking_cancelled_en'] = 'Booking Cancelled';
 				$data['booking_has_been_cancelled_en'] = 'The booking is already canceled.';
 				$data['class_cancelled'] = ($action == 'cancel') ? 'cancelled' : '';
-				break;				
+				break;
 			case 'confirmed':
 				$data['booking_confirmed'] = __('Booking Confirmed', 'rrze-rsvp');
 				$data['thank_for_confirming'] = __('Thank you for confirming your booking.', 'rrze-rsvp');
