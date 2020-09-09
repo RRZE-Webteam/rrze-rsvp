@@ -230,8 +230,8 @@ class Metaboxes
         ));
 
         $cmb_general->add_field(array(
-            'name' => __('Force to confirm', 'rrze-rsvp'),
-            'desc' => __('The customer is forced to confirm his booking within a period of one hour. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
+            'name' => __('Email confirmation is required', 'rrze-rsvp'),
+            'desc' => __('The customer must confirm his reservation within one hour. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-force-to-confirm',
             'type' => 'checkbox',
             'default' => ''
