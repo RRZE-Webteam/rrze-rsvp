@@ -2,7 +2,7 @@
 
 	<div class="container">
 		{{is_locale_not_english}}
-		<p class="english-version">(English version below)</p>
+		<p class="english-version">(<a href="#english">English version below</a>)</p>
 		{{/is_locale_not_english}}
 
 		{{booking_cancel}}
@@ -59,8 +59,9 @@
 		{{/booking_cancel}}
 
 		{{is_locale_not_english}}
-		<p class='lang-hr'>&nbsp;</p>		
-
+		<div lang="en">
+		<p class='lang-hr'><a name="english">&nbsp;</a></p>		
+		
 		{{booking_cancel}}
 		<h2>{{=booking_cancel_en}}</h2>
 		<p>{{=really_want_to_cancel_the_booking_en}}</p>
@@ -113,7 +114,7 @@
 		{{booking_cancel}}
 			{{=cancel_btn_en}}
 		{{/booking_cancel}}
-
+		</div>
 		{{/is_locale_not_english}}		
 	</div>
 
