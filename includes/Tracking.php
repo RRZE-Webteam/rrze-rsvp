@@ -8,11 +8,10 @@ use RRZE\RSVP\Settings;
 
 class Tracking {
     const DB_TABLE = 'rrze_rsvp_tracking';
-    const DB_VERSION = '1.2.3';
+    const DB_VERSION = '1.3.2';
     const DB_VERSION_OPTION_NAME = 'rrze_rsvp_tracking_db_version';
 
     protected $settings;
-    protected $trackingTable;
     protected $dbVersion;
     protected $dbOptionName;
     protected $contact_tracking_note;
@@ -51,18 +50,28 @@ class Tracking {
             add_action( 'admin_menu', [$this, 'add_tracking_menu'] );
             $this->createTable('local');
         }
-        add_action( 'rrze-rsvp-checked-in', [$this, 'insertTracking'], 10, 2 );
+        add_action( 'rrze-rsvp-tracking', [$this, 'insertOrUpdateTracking'], 10, 2 );
         add_action( 'wp_ajax_csv_pull', [$this, 'tracking_csv_pull'] );
     }
     
+
+    private static function logError(string $method){
+        // uses plugin rrze-log
+        global $wpdb;
+
+        do_action('rrze.log.error', 'rrze-rsvp ' . $method . '() returns false $wpdb->last_result= ' . json_encode($wpdb->last_result) . '| $wpdb->last_query= ' . json_encode($wpdb->last_query . '| $wpdb->last_error= ' . json_encode($wpdb->last_error)));
+    }
+
  
-    protected function isUpdate() {
+    private function isUpdate() {
         // returns true if tracking table does not exist or DB_VERSION has changed 
+        $ret = false;
         if (get_site_option($this->dbOptionName, '') != $this->dbVersion) {
             update_site_option($this->dbOptionName, $this->dbVersion);
-            return true;
+            do_action('rrze.log.info', 'rrze-rsvp: Tracking DB Update v' . $this->dbVersion);
+            $ret = true;
         }
-        return false;
+        return $ret;
 
     }
 
@@ -92,10 +101,9 @@ class Tracking {
     public function admin_page_tracking_form() {
         $searchdate = '';
         $delta = 0;
-        $guest_firstname = '';
-        $guest_lastname = '';
+        // $guest_firstname = '';
+        // $guest_lastname = '';
         $guest_email = '';
-        $guest_phone = '';
 
         echo '<div class="wrap">';
         echo '<h1>' . esc_html_x( 'Contact tracking', 'admin page title', 'rrze-rsvp' ) . '</h1>';
@@ -103,22 +111,25 @@ class Tracking {
         if ( isset( $_GET['submit'])) {
             $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
             $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
-            $hash_guest_firstname = Functions::crypt(filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING), 'encrypt');
-            $hash_guest_lastname = Functions::crypt(filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING), 'encrypt');
-            $hash_guest_email = Functions::crypt(filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL), 'encrypt');
-            $hash_guest_phone = Functions::crypt(filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING), 'encrypt');
-
-            $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email, $hash_guest_phone);
+            // $guest_firstname = filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING);
+            // $guest_lastname = filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING);
+            $guest_email = filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL);
+            // $hash_guest_firstname = Functions::crypt($guest_firstname, 'encrypt');
+            // $hash_guest_lastname = Functions::crypt($guest_lastname, 'encrypt');
+            $hash_guest_email = Functions::crypt($guest_email, 'encrypt');
+            // $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
+            $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email);
 
             if ($aGuests){
-                $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&guest_firstname=' . urlencode($guest_firstname) . '&guest_lastname=' . urlencode($guest_lastname) . '&guest_email=' . urlencode($guest_email) . '&guest_phone=' . urlencode($guest_phone);
+                // $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&hash_guest_firstname=' . urlencode($hash_guest_firstname) . '&hash_guest_lastname=' . urlencode($hash_guest_lastname) . '&hash_guest_email=' . urlencode($hash_guest_email);
+                $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&hash_guest_email=' . urlencode($hash_guest_email);
                 echo '<div class="notice notice-success is-dismissible">'
-                    . '<h2>Guests found!</h2>'
-                    . "<a href='$ajax_url'>Download CSV</a>"
+                    . '<h2>' . __('Guests found!', 'rrze-rsvp') . '</h2>'
+                    . "<a href='$ajax_url'>" . __('Download CSV', 'rrze-rsvp') . '</a>'
                     . '</div>';
             }else{
                 echo '<div class="notice notice-success is-dismissible">'
-                    . '<h2>No guests found</h2>'
+                    . '<h2>' . __('No guest found.', 'rrze-rsvp') . '</h2>'
                     . '</div>';
             }
         }
@@ -135,29 +146,23 @@ class Tracking {
             . '<th scope="row"><label for="delta">' . '&#177; ' . __('days', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="number" id="delta" name="delta" min="0" required value="' . $delta . '"></td>'
             . '</tr>';
-        echo '<tr>'
-            . '<th scope="row"><label for="guest_firstname">' . __('First name', 'rrze-rsvp') . '</label></th>'
-            . '<td><input type="text" id="guest_firstname" name="guest_firstname" value="' . $guest_firstname . '">'
-            . '</td>'
-            . '</tr>';
-        echo '<tr>'
-            . '<th scope="row"><label for="guest_lastname">' . __('Last name', 'rrze-rsvp') . '</label></th>'
-            . '<td><input type="text" id="guest_lastname" name="guest_lastname" value="' . $guest_lastname . '">'
-            . '</td>'
-            . '</tr>';
+        // echo '<tr>'
+        //     . '<th scope="row"><label for="guest_firstname">' . __('First name', 'rrze-rsvp') . '</label></th>'
+        //     . '<td><input type="text" id="guest_firstname" name="guest_firstname" value="' . $guest_firstname . '">'
+        //     . '</td>'
+        //     . '</tr>';
+        // echo '<tr>'
+        //     . '<th scope="row"><label for="guest_lastname">' . __('Last name', 'rrze-rsvp') . '</label></th>'
+        //     . '<td><input type="text" id="guest_lastname" name="guest_lastname" value="' . $guest_lastname . '">'
+        //     . '</td>'
+        //     . '</tr>';
         echo '<tr>'
             . '<th scope="row"><label for="guest_email">' . __('Email', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="text" id="guest_email" name="guest_email" value="' . $guest_email . '">'
             . '</td>'
             . '</tr>';
-        echo '<tr>'
-            . '<th scope="row"><label for="guest_phone">' . __('Phone', 'rrze-rsvp') . '</label></th>'
-            . '<td><input type="text" id="guest_phone" name="guest_phone" value="' . $guest_phone . '">'
-            . '</td>'
-            . '</tr>';
         echo '</tbody></table>';
         echo '<p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="' . __('Search', 'rrze-rsvp') . '"></p>';
-
         echo '</form>';
         echo '</div>';
     }
@@ -174,12 +179,12 @@ class Tracking {
     public function tracking_csv_pull() {
         $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
         $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
-        $hash_guest_firstname = Functions::crypt(filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING), 'encrypt');
-        $hash_guest_lastname = Functions::crypt(filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING), 'encrypt');
-        $hash_guest_email = Functions::crypt(filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL), 'encrypt');
-        $hash_guest_phone = Functions::crypt(filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING), 'encrypt');
+        $hash_guest_firstname = filter_input(INPUT_GET, 'hash_guest_firstname', FILTER_SANITIZE_STRING);
+        $hash_guest_lastname = filter_input(INPUT_GET, 'hash_guest_lastname', FILTER_SANITIZE_STRING);
+        $hash_guest_email = filter_input(INPUT_GET, 'hash_guest_email', FILTER_VALIDATE_EMAIL);
 
-        $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email, $hash_guest_phone);
+        // $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
+        $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email);
 
         $file = 'rrze_tracking_csv';
         $csv_output = 'START,END,ROOM,STREET,ZIP,CITY,EMAIL,PHONE,FIRSTNAME,LASTNAME'."\n";
@@ -201,24 +206,59 @@ class Tracking {
     }
 
 
+    private function getTrackingID(int $blogID, int $bookingID, $trackingTable): int {
+        global $wpdb;
+        
+        $prepare_vals = [
+            $blogID,
+            $bookingID
+        ];
 
-    public function insertTracking(int $blogID, int $bookingId) {
-        // Info: insertTracking() is called via action hook 'rrze-rsvp-checked-in' 
-        //       see $this->onLoaded : add_action('rrze-rsvp-checked-in', [$this, 'insertTracking'], 10, 2);
-        //       see Actions.php : do_action('rrze-rsvp-checked-in', get_current_blog_id(), $bookingId);
+        $row = $wpdb->get_results( 
+            $wpdb->prepare("SELECT ID FROM {$trackingTable} WHERE blog_id = %d AND booking_id = %d", $prepare_vals), ARRAY_A);
 
+        return ( isset($row[0]['ID']) ? $row[0]['ID'] : 0 );
+    }
+
+
+    public function insertOrUpdateTracking(int $blogID, int $bookingID) {
         global $wpdb;
 
-        $booking = Functions::getBooking($bookingId);
-        if (!$booking) {
+        $trackBookingStatus = [
+            'checked-in', // is in the room at the moment
+            'checked-out' // has been in the room
+        ];
+
+        $booking = Functions::getBooking($bookingID);
+        if (!$booking || !in_array($booking['status'], $trackBookingStatus)) {
             return;
         }
 
-        $start = date('Y-m-d H:i:s', get_post_meta($bookingId, 'rrze-rsvp-booking-start', true));
-        $end = date('Y-m-d H:i:s', get_post_meta($bookingId, 'rrze-rsvp-booking-end', true));
+        $tableType = get_option('rsvp_tracking_tabletype');
+        $trackingTable = Tracking::getTableName($tableType);
+        $trackingID = $this->getTrackingID($blogID, $bookingID, $trackingTable);
+
+        if ($trackingID){
+            $this->updateTracking($trackingID, $bookingID, $trackingTable);
+        }else{
+            $this->insertTracking($blogID, $bookingID, $trackingTable);
+        }
+
+    } 
+
+
+    private function insertTracking(int $blogID, int $bookingID, string $trackingTable) {
+        global $wpdb;
+        $ret = false;
+
+        $start = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-start', true));
+        $end = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-end', true));
+
+        $booking = Functions::getBooking($bookingID);
 
         $fields = [
             'blog_id' => $blogID,
+            'booking_id' => $bookingID,
             'start' => $start,
             'end' => $end,
             'room_post_id' => (int)$booking['room'],
@@ -230,32 +270,102 @@ class Tracking {
             'hash_guest_firstname' => Functions::crypt($booking['guest_firstname'], 'encrypt'),
             'hash_guest_lastname' => Functions::crypt($booking['guest_lastname'], 'encrypt'),
             'hash_guest_email' => Functions::crypt($booking['guest_email'], 'encrypt'),
-            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt'),
+            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt')
         ];
 
-        $wpdb->insert(
-            $this->trackingTable,
+        $fields_format = [
+            '%d',
+            '%d',
+            '%s',
+            '%s',
+            '%d',
+            '%s',
+            '%s',
+            '%d',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s'
+        ];
+
+        $rowCnt = $wpdb->insert(
+            $trackingTable,
             $fields,
-            [
-                '%d',
-                '%s',
-                '%s',
-                '%d',
-                '%s',
-                '%s',
-                '%d',
-                '%s',
-                '%s',
-                '%s',
-                '%s',
-                '%s',
-                '%s',
-            ]
+            $fields_format
         );
 
-        return $wpdb->insert_id; // returns the id (AUTO_INCREMENT) or false
+        if ($rowCnt){
+            $ret = $wpdb->insert_id;
+        }else{
+            Tracking::logError('insertTracking');
+        }
+
+        return $ret;  // returns the id (AUTO_INCREMENT) or false
     }
 
+
+    private function updateTracking(int $trackingID, int $bookingID, string $trackingTable) {
+        global $wpdb;
+
+        $start = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-start', true));
+        $end = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-end', true));
+
+        $booking = Functions::getBooking($bookingID);
+
+        $fields = [
+            'start' => $start,
+            'end' => $end,
+            'room_post_id' => (int)$booking['room'],
+            'room_name' => $booking['room_name'],
+            'room_street' => $booking['room_street'],
+            'room_zip' => (int)$booking['room_zip'],
+            'room_city' => $booking['room_city'],
+            'seat_name' => $booking['seat_name'],
+            'hash_guest_firstname' => Functions::crypt($booking['guest_firstname'], 'encrypt'),
+            'hash_guest_lastname' => Functions::crypt($booking['guest_lastname'], 'encrypt'),
+            'hash_guest_email' => Functions::crypt($booking['guest_email'], 'encrypt'),
+            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt')
+        ];
+
+        $fields_format = [
+            '%s',
+            '%s',
+            '%d',
+            '%s',
+            '%s',
+            '%d',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s'
+        ];
+
+        $where = [
+            'id' => $trackingID
+        ];
+
+        $where_format =[
+            '%d'
+        ];
+
+        $ret = $wpdb->update(
+            $trackingTable,
+            $fields,
+            $where,
+            $fields_format,
+            $where_format
+        ); // returns the number of rows updated, or false on error.
+
+        if (false === $ret){
+            Tracking::logError('updateTracking');
+        }
+
+        return $ret;
+    }
 
 
     private static function deCryptField(&$item, string $key): string{
@@ -272,8 +382,8 @@ class Tracking {
     }
 
 
-
-    public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_firstname, string $hash_guest_lastname, string $hash_guest_email = '', string $hash_guest_phone = ''): array {
+    // public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_firstname, string $hash_guest_lastname, string $hash_guest_email): array {
+    public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_email): array {
         global $wpdb;
 
         if (!$hash_guest_email && !$hash_guest_firstname && !$hash_guest_lastname){
@@ -289,45 +399,39 @@ class Tracking {
         $tableType = get_option('rsvp_tracking_tabletype');
         $trackingTable = Tracking::getTableName($tableType);
 
-        //  "Identifikationsmerkmalen für eine Person (Name, E-Mail und oder Telefon)" see https://github.com/RRZE-Webteam/rrze-rsvp/issues/89
-
         $prepare_vals = [
-            $searchdate,
-            $delta,
-            $searchdate,
-            $delta,
-            $searchdate,
-            $delta,
-            $searchdate,
-            $delta,
-            $searchdate,
-            $delta,
-            $searchdate,
-            $delta,
-            $searchdate,
-            $delta,
-            $searchdate,
-            $delta,
-            $hash_guest_firstname,
-            $hash_guest_lastname,
             $hash_guest_email,
-            $hash_guest_phone
+            $searchdate,
+            $delta,
+            $searchdate,
+            $delta,
+            $searchdate,
+            $delta,
+            $searchdate,
+            $delta,
         ];
 
-        // simpelst solution would be: 
-        // select ... INTO OUTFILE '$path_to_file' FIELDS TERMINATED BY ',' LINES TERMINATED BY ';' from ...
-        // but this is a question of user's file writing rights
         $aRows = $wpdb->get_results( 
-            $wpdb->prepare("SELECT surrounds.start, surrounds.end, surrounds.room_name, surrounds.room_street, surrounds.room_zip, surrounds.room_city, surrounds.hash_guest_email, surrounds.hash_guest_phone, surrounds.hash_guest_firstname, surrounds.hash_guest_lastname 
-            FROM {$trackingTable} AS surrounds 
-            WHERE (DATE(surrounds.start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND (DATE(surrounds.end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
-            surrounds.room_post_id IN 
-            (SELECT needle.room_post_id FROM {$trackingTable} AS needle WHERE 
-            (DATE(needle.start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
-            (DATE(needle.end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
-            needle.hash_guest_firstname = %s AND needle.hash_guest_lastname = %s AND
-            ((needle.hash_guest_email = %s) OR (needle.hash_guest_phone = %s))) 
-            ORDER BY surrounds.start", $prepare_vals), ARRAY_A); // returns assoc array
+            $wpdb->prepare("SELECT 
+                tracking.start, tracking.end, tracking.room_name, tracking.room_street, tracking.room_zip, tracking.room_city, tracking.hash_guest_email, tracking.hash_guest_phone, tracking.hash_guest_firstname, tracking.hash_guest_lastname 
+                FROM {$trackingTable} tracking
+                INNER JOIN  {$trackingTable} start_tracking ON (start_tracking.start = tracking.start)
+                INNER JOIN {$trackingTable} end_tracking ON (end_tracking.start = tracking.end)
+                WHERE 
+                tracking.room_post_id = start_tracking.room_post_id AND 
+                tracking.room_post_id = end_tracking.room_post_id AND 
+                tracking.hash_guest_email = %s AND 
+                (DATE(tracking.start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
+                (DATE(tracking.end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY))", $prepare_vals), ARRAY_A); // returns assoc array
+
+Tracking::logError('getUsersInRoomAtDate BK TEST');
+
+
+        if ($wpdb->last_error){
+            Tracking::logError('getUsersInRoomAtDate');
+            return [];
+        }
+
         array_walk($aRows, 'self::deCryptField');
         return $aRows;
     }
@@ -346,7 +450,7 @@ class Tracking {
         $charsetCollate = $wpdb->get_charset_collate();
         $trackingTable = Tracking::getTableName($tableType);
 
-        // BK 2DO:
+        // BK 2DO 2020-09-07:
         // this is not a good solution
         // read https://wordpress.stackexchange.com/questions/78667/dbdelta-alter-table-syntax
         // ==> better use dbDelta strickly 
@@ -378,8 +482,9 @@ class Tracking {
         $sql = "CREATE TABLE " . $trackingTable . " (
             id bigint(20) UNSIGNED NOT NULL auto_increment,
             blog_id bigint(20) NOT NULL,
-            ts_updated timestamp DEFAULT CURRENT_TIMESTAMP,
-            ts_inserted timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            booking_id bigint(20) NOT NULL,
+            ts_inserted timestamp DEFAULT CURRENT_TIMESTAMP,
+            ts_updated timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             start datetime NOT NULL,
             end datetime NOT NULL,
             room_post_id bigint(20) NOT NULL,
@@ -393,9 +498,8 @@ class Tracking {
             hash_guest_email char(64) NOT NULL,
             hash_guest_phone char(64) NOT NULL,
             PRIMARY KEY  (id),
-            KEY k_blog_id (blog_id)
+            UNIQUE KEY uk_blog_booking (blog_id, booking_id)
             ) $charsetCollate;";
-            // ,UNIQUE KEY uk_guest_room_time (start,end,room_post_id,seat_name,hash_guest_firstname,hash_guest_lastname,hash_guest_email,hash_guest_phone)            
 
         // echo "<script>console.log('sql = " . $sql . "' );</script>";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -406,12 +510,14 @@ class Tracking {
 
     public static function getTableName( string $tableType = 'network', int $blogID = 0 ): string {
         global $wpdb;
+
         return ( $tableType == 'network' ? $wpdb->base_prefix : $wpdb->get_blog_prefix($blogID) ) . static::DB_TABLE;
     }
 
 
     protected function checkTableExists(string $tableName): bool{
         global $wpdb;
+
         $ret = $wpdb->get_results("SELECT * FROM information_schema.tables WHERE table_schema = '{$wpdb->dbname}' AND table_name = '{$tableName}' LIMIT 1", ARRAY_A);
         return ( $ret ? true : false ); // $ret can be false, 0 or any integer
     }
@@ -419,15 +525,24 @@ class Tracking {
 
     protected function dropTable(string $tableName): bool{
         global $wpdb;
-        return $wpdb->query(
+
+        $ret = $wpdb->query(
                $wpdb->prepare("DROP TABLE IF EXISTS {$tableName}", array($tableName))); // returns true/false
+
+        if (false === $ret){
+            Tracking::logError('dropTable');
+        }
+        return $ret;
     }
 
 
     protected function backupTable(string $tableName){
         global $wpdb;
-        return $wpdb->query("RENAME TABLE '$tableName' TO '$tableName" . '_backup_' . date('Y_m_d_His') . "'"); // returns true/false
 
-        // $wpdb->last_result;
+        $ret = $wpdb->query("RENAME TABLE $tableName TO $tableName" . '_backup_' . date('Y_m_d_His')); // returns true/false
+        if (false === $ret){
+            Tracking::logError('backupTable');
+        }
+        return $ret;
     }
 }

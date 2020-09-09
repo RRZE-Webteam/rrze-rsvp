@@ -146,8 +146,8 @@ class Bookings extends Shortcodes {
 	    $alert .= '</div>';
             return $alert;
         }
-	$bookingmode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
-	if (empty($bookingmode) && !$this->nonce) {
+	$bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
+	if ($bookingMode == 'check-only' && !$this->nonce) {
 	    
 	    $alert = '<div class="alert alert-info" role="alert">';
 	    $alert .= '<p><strong>'.__('Checkin in room','rrze-rsvp').'</strong><br>';
@@ -231,7 +231,6 @@ class Bookings extends Shortcodes {
 //	$output .= '<fieldset>';  
 	// FIELDSET muss noch rein oder unten <legend> raus. Wenn fieldset drin ist, ist die Ausstattungsanzeige des Sitzplatzes allerdings broken.
 	// Wahrscheinlich Problem mit dem JS?
-	
         if ($get_instant) {
             $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
         }
@@ -274,7 +273,7 @@ class Bookings extends Shortcodes {
             $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
         }
         $output .= '</div>'; //.rsvp-seat-container
-//	$output .= '</fieldset>';  
+//	$output .= '</fieldset>';
 	$output .= '<fieldset>';  
         $output .= '<legend>' . __('Your data', 'rrze-rsvp') . ' <span class="notice-required">('. __('Required','rrze-rsvp'). ')</span></legend>';
         if ($ssoRequired) {
@@ -485,9 +484,10 @@ class Bookings extends Shortcodes {
         if (!$booking) {
             return '';
         }
-
+        
         $data = [];
         $roomId = $booking['room'];
+        $bookingMode = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true);
         $roomMeta = get_post_meta($roomId);
 
         $data['autoconfirmation'] = (isset($roomMeta['rrze-rsvp-room-auto-confirmation']) && $roomMeta['rrze-rsvp-room-auto-confirmation'][0] == 'on');
@@ -500,7 +500,7 @@ class Bookings extends Shortcodes {
         $data['time_label'] = __('Time', 'rrze-rsvp');
         $data['room_name'] = $booking['room_name'];
         $data['room_label'] = __('Room', 'rrze-rsvp');
-        $data['seat_name'] = $booking['seat_name'];
+        $data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
         $data['seat_label'] = __('Seat', 'rrze-rsvp');        
         $data['customer']['name'] = sprintf('%s %s', $booking['guest_firstname'], $booking['guest_lastname']);
         $data['customer']['email'] = $booking['guest_email'];
@@ -778,21 +778,26 @@ class Bookings extends Shortcodes {
         update_post_meta($booking_id, 'rrze-rsvp-booking-guest-phone', $booking_phone);
 
         // Set booking status
-        $bookingmode = get_post_meta($room_id, 'rrze-rsvp-room-bookingmode', true);
-        if (empty($bookingmode)) {
-            $status = 'confirmed';
-            $timestamp = current_time('timestamp');
-            if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
-                $status = 'checked-in';
-            }
-        } elseif ($autoconfirmation) {
-            $status = 'confirmed';
-            $timestamp = current_time('timestamp');
-            if (($booking_instant || $instantCheckIn) && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
-                $status = 'checked-in';
-            }
-        } else {
-            $status = 'booked';
+        $timestamp = current_time('timestamp');
+        $bookingMode = get_post_meta($room_id, 'rrze-rsvp-room-bookingmode', true);
+
+        switch($bookingMode) {
+            case 'check-only':
+                $status = 'confirmed';
+                if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+                    $status = 'checked-in';
+                }
+            break;
+            case 'reservation':
+            case 'consultation':
+                $status = $autoconfirmation ? 'confirmed' : 'booked';
+                $timestamp = current_time('timestamp');
+                if (($booking_instant || $instantCheckIn) && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
+                    $status = 'checked-in';
+                }
+            break;
+            default:
+                //
         }
 
         update_post_meta( $booking_id, 'rrze-rsvp-booking-status', $status );
@@ -805,29 +810,37 @@ class Bookings extends Shortcodes {
         }
 
         // E-Mail senden
-        if (empty($bookingmode)) {
-            if ($status == 'confirmed') {
-                $this->email->bookingConfirmedCustomer($booking_id);
-            } else {
-                $this->email->bookingConfirmedCustomer($booking_id, true);
-            }
-        } elseif ($autoconfirmation) {
-            if ($status == 'confirmed') {
-                $this->email->bookingConfirmedCustomer($booking_id);
-            } else {
-                $this->email->bookingConfirmedCustomer($booking_id, true);
-            }
-        } else {
-            if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
-                $to = $this->options->email_notification_email;
-                $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
-                $this->email->bookingRequestedAdmin($to, $subject, $booking_id);
-            }
+        switch($bookingMode) {
+            case 'check-only':
+                if ($status == 'confirmed') {
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingMode);
+                } else {
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingMode, $status);
+                }
+            break;
+            case 'reservation':
+            case 'consultation':
+                if ($status == 'confirmed') {
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingMode);
+                } elseif ($status == 'checked-in') {
+                    $this->email->bookingConfirmedCustomer($booking_id, $bookingMode, $status);
+                } elseif ($status == 'booked' && $forceToConfirm) {
+                    $this->email->bookingRequestedCustomer($booking_id, $bookingMode);
+                } else {
+                    if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
+                        $to = $this->options->email_notification_email;
+                        $subject = _x('[RSVP] New booking received', 'Mail Subject for room admin: new booking received', 'rrze-rsvp');
+                        $this->email->bookingRequestedAdmin($to, $subject, $booking_id, $bookingMode);
+                    }
+                }
+            break;
+            default:
+                //
         }
 
         // Redirect zur Seat-Seite, falls
         if ($status == 'checked-in') {
-            do_action('rrze-rsvp-checked-in', get_current_blog_id(), $booking_id);
+            do_action('rrze-rsvp-tracking', get_current_blog_id(), $booking_id);
             $redirectUrl = add_query_arg(
                 [
                     'id' => $booking_id,
@@ -1029,33 +1042,32 @@ class Bookings extends Shortcodes {
         if ($date) {
             $response['time'] = $this->buildTimeslotSelect($roomID, $date, $time, $availability);
             if ($time) {
-                $response['seat'] = $this->buildSeatSelect($roomID, $date, $time, $seat, $availability);
+                $seatSelect = $this->buildSeatSelect($roomID, $date, $time, $seat, $availability);
+                $seatInfo = ($seat) ? $this->buildSeatInfo($seat) : '';
+                $response['seat'] = $seatSelect . $seatInfo;
             }
         }
         wp_send_json($response);
     }
 
-    public function ajaxShowItemInfo() {
-        if (!isset($_POST['id'])) {
-            echo '';
-            wp_die();
+    public function buildSeatInfo($seatID = '') {
+        if ($seatID == '') {
+            return '';
         }
-        $id = (int)$_POST['id'];
         $output = '';
-        $seat_name = get_the_title($id);
-        $equipment = get_the_terms($id, 'rrze-rsvp-equipment');
-        $output .= '<div class="rsvp-item-info">';
+        $seat_name = get_the_title($seatID);
+        $equipment = get_the_terms($seatID, 'rrze-rsvp-equipment');
         if ($equipment !== false) {
+            $output .= '<div class="rsvp-item-info">';
             $output .= '<div class="rsvp-item-equipment"><h5>' . sprintf( __( 'Seat %s', 'rrze-rsvp' ), $seat_name ) . '</h5>';
             foreach  ($equipment as $e) {
                 $e_arr[] = $e->name;
             }
             $output .= '<p><strong>' . __('Equipment','rrze-rsvp') . '</strong>: ' . implode(', ', $e_arr) . '</p>';
             $output .= '</div>';
+            $output .= '</div>';
         }
-        $output .= '</div>';
-        echo $output;
-        wp_die();
+        return $output;
     }
 
     private function buildTimeslotSelect($roomID, $date, $time = false, $availability) {

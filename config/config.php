@@ -38,8 +38,35 @@ function getConstants() {
         return $options; // Standard-Array für zukünftige Optionen
     }
 
+
+// used in wp_kses_custom() and for 'desc' of 'contact_tracking_note'  
+function getAllowedHTML(){
+    return [
+        'a' => [
+            'href' => [],
+        ],
+        'br' => [],
+        'h3' => [],
+        'li' => [],
+        'p' => [],
+        'ul' => [],
+    ];
+}    
+
+// sanitizes but allows defined tags and protocols
+function wp_kses_custom($str){
+    $allowed_html = getAllowedHTML();
+
+    $allowed_protocols = [
+        'http' => [],
+        'https' => [],
+        'mailto' => [],
+    ];
+
+    return wp_kses( $str, $allowed_html, $allowed_protocols );
+}
     
- function  defaultOptions()  {
+function defaultOptions()  {
 
     $sender_name = '';
     $notification_email = '';
@@ -54,7 +81,7 @@ function getConstants() {
 
         return [
             'single_room_availability_table' => 'yes_link',
-            'contact_tracking_note' => "Contact your SuperAdmin $sender_name ($sender_email) to receive contact tracking informations.", // <a href="mailto:' . $sender_email . '>' . $sender_name . '</a> (see: https://github.com/RRZE-Webteam/rrze-rsvp/issues/111 )
+            'contact_tracking_note' => '<h3>Hinweis</h3><p>Bei Anfragen des Gesundheitsamtes oder anderer Behörden ist auf die Adresse <a href="mailto:kanzler@fau.de">kanzler@fau.de</a> zu verweisen. Eine Abfrage der Daten zur Kontaktverfolgung wird auf Anforderung und Freigabe des Kanzlerbüros zentral durch das RRZE vorgenommen. Bei technischen Fragen hierzu wenden Sie sich an <a href="mailto:webmaster@fau.de">webmaster@fau.de</a>.</p><p>Weitergehende Informationen finden sie hier:</p><ul><li><a href="https://www.verwaltung.zuv.fau.de/arbeitssicherheit/gefaehrungen-am-arbeitsplatz/biologische-arbeitsstoffe/#sprungmarke2">Empfehlungen zu Hygienemaßnahmen des Referats Arbeitssicherheit</a></li><li><a href="https://www.verwaltung.zuv.fau.de/arbeitssicherheit/dokumentation-im-arbeitsschutz/gefaehrdungsbeurteilung/#sprungmarke7">Handlungshilfen des Referats Arbeitssicherheit</a></li><li><a href="https://www.wordpress.rrze.fau.de/plugins/fau-und-rrze-plugins/rsvp/hilfsmittel-und-hinweise-zur-nutzung/">Hilfsmittel und Hinweise zur Nutzung der Platzbuchungssystems</a></li></ul>', 
             'notification_email' => $notification_email,
             'notification_if_new' => 'yes',
             'notification_if_cancel' => 'yes',
@@ -229,10 +256,10 @@ function getFields(){
             [
                 'name'    => 'contact_tracking_note',
                 'label'   => __('Note for admins', 'rrze-rsvp'),
-                'desc'    => __('Enter a note for administrators that are not superadministrators.', 'rrze-rsvp'),
+                'desc'    => __('Allowed HTML-Tags are:', 'rrze-rsvp') . esc_html(' <' . implode('> <', array_keys(getAllowedHTML())) . '>'),
                 'type'    => 'textarea',
                 'default' =>  $defaults['contact_tracking_note'],
-                'sanitize_callback' => 'sanitize_textarea_field'                
+                'sanitize_callback' => 'wp_kses_custom'                
             ],
         ],
         'email' => [

@@ -2,7 +2,7 @@
 
 	<div class="container">
 		{{is_locale_not_english}}
-		<p class="english-version">(English version below)</p>
+		<p class="english-version">(<a href="#english">English version below</a>)</p>
 		{{/is_locale_not_english}}
 
 		{{booking_cancel}}
@@ -46,9 +46,12 @@
 		{{/action_not_available}}
 
 		<p class="date {{=class_cancelled}}">
-			{{=room_name}}<br>
 			{{=date}}<br>
-			{{=time}}
+			{{=time}}<br>
+			{{=room_name}}<br>
+			{{seat_name}}
+			{{=seat_name}}
+			{{/seat_name}}		
 		</p>		
 
 		{{booking_cancel}}
@@ -56,8 +59,9 @@
 		{{/booking_cancel}}
 
 		{{is_locale_not_english}}
-		<p class='lang-hr'>&nbsp;</p>		
-
+		<div lang="en">
+		<p class='lang-hr'><a name="english">&nbsp;</a></p>		
+		
 		{{booking_cancel}}
 		<h2>{{=booking_cancel_en}}</h2>
 		<p>{{=really_want_to_cancel_the_booking_en}}</p>
@@ -99,15 +103,18 @@
 		{{/action_not_available}}
 
 		<p class="date {{=class_cancelled}}">
-			{{=room_name}}<br>
 			{{=date_en}}<br>
-			{{=time_en}}
+			{{=time_en}}<br>
+			{{=room_name}}<br>
+			{{seat_name}}
+			{{=seat_name}}
+			{{/seat_name}}			
 		</p>
 	
 		{{booking_cancel}}
 			{{=cancel_btn_en}}
 		{{/booking_cancel}}
-
+		</div>
 		{{/is_locale_not_english}}		
 	</div>
 

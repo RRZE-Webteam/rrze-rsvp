@@ -4,13 +4,11 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-require_once plugin()->getPath('vendor/cmb2') . 'init.php';
-
 class Metaboxes
 {
     public function __construct()
     {
-        //
+        require_once plugin()->getPath('vendor/cmb2') . 'init.php';
     }
 
     public function onLoaded()
@@ -194,10 +192,11 @@ class Metaboxes
             // 'desc'             => __('', 'rrze-rsvp'),
             'id'               => 'rrze-rsvp-room-bookingmode',
             'type'             => 'select',
-            'default'          => '',
+            'default'          => 'reservation',
             'options' => array(
-                '0' => __('Check-in and check-out only on site', 'rrze-rsvp'), // Nur Ein- und Auschecken vor Ort
-                'rrze-rsvp-additionals' => __('Activate additional reservation functions', 'rrze-rsvp'), // Zusätzliche Reservierungsfunktionen aktivieren
+                'check-only' => __('Check-in and check-out only on site', 'rrze-rsvp'), // Nur Ein- und Auschecken vor Ort
+                'reservation' => __('Reservation', 'rrze-rsvp'),
+                'consultation' => __('Consultation', 'rrze-rsvp')
             )
         ));
 
@@ -231,17 +230,26 @@ class Metaboxes
         ));
 
         $cmb_general->add_field(array(
-            'name' => __('Allow Instant Check-In', 'rrze-rsvp'),
-            'desc' => __('Seats can be booked and checked-in in one step. This only works if automatic confirmation activated!', 'rrze-rsvp'),
-            'id'   => 'rrze-rsvp-room-instant-check-in',
+            'name' => __('Email confirmation is required', 'rrze-rsvp'),
+            'desc' => __('The customer must confirm his reservation within one hour. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-force-to-confirm',
             'type' => 'checkbox',
-            'default' => '',
+            'default' => ''
         ));
 
         $cmb_general->add_field(array(
-            'name' => __('Force to confirm', 'rrze-rsvp'),
-            'desc' => __('The customer is forced to confirm his booking within a period of one hour. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
-            'id'   => 'rrze-rsvp-room-force-to-confirm',
+            'name' => __('Send to an email address', 'rrze-rsvp'),
+            'desc' => __('A copy of the confirmed booking will be sent to the specified email address with a calendar file (.ics) as an attachment.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-send-to-email',
+            'type' => 'text_email',
+            'default' => '',
+            'after_row' => '<div id="rrze-rsvp-consultation">'
+        ));        
+
+        $cmb_general->add_field(array(
+            'name' => __('Allow Instant Check-In', 'rrze-rsvp'),
+            'desc' => __('Seats can be booked and checked-in in one step. This only works if automatic confirmation activated!', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-instant-check-in',
             'type' => 'checkbox',
             'default' => '',
         ));
@@ -268,7 +276,7 @@ class Metaboxes
             'type' => 'text',
             'id'   => 'rrze-rsvp-room-notes-label',
             'default' => __('Additional information', 'rrze-rsvp'),
-            'after_row' => '</div>' // closes <div id="additional-reservation-functions">
+            'after_row' => '</div></div>' // .rrze-rsvp-consultation .additional-reservation-functions
         ));
 
         $cmb_general->add_field(array(
