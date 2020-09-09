@@ -50,7 +50,7 @@ class Tracking {
             add_action( 'admin_menu', [$this, 'add_tracking_menu'] );
             $this->createTable('local');
         }
-        add_action( 'rrze-rsvp-tracking', [$this, 'insertOrUpdateTracking'], 10, 2 );
+        add_action( 'rrze-rsvp-tracking', [$this, 'doTracking'], 10, 2 );
         add_action( 'wp_ajax_csv_pull', [$this, 'tracking_csv_pull'] );
     }
     
@@ -179,9 +179,9 @@ class Tracking {
     public function tracking_csv_pull() {
         $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
         $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
-        $hash_guest_firstname = filter_input(INPUT_GET, 'hash_guest_firstname', FILTER_SANITIZE_STRING);
-        $hash_guest_lastname = filter_input(INPUT_GET, 'hash_guest_lastname', FILTER_SANITIZE_STRING);
-        $hash_guest_email = filter_input(INPUT_GET, 'hash_guest_email', FILTER_VALIDATE_EMAIL);
+        // $hash_guest_firstname = filter_input(INPUT_GET, 'hash_guest_firstname', FILTER_SANITIZE_STRING);
+        // $hash_guest_lastname = filter_input(INPUT_GET, 'hash_guest_lastname', FILTER_SANITIZE_STRING);
+        $hash_guest_email = filter_input(INPUT_GET, 'hash_guest_email', FILTER_SANITIZE_STRING);
 
         // $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
         $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email);
@@ -221,16 +221,29 @@ class Tracking {
     }
 
 
-    public function insertOrUpdateTracking(int $blogID, int $bookingID) {
+    /*
+    * inserts, updates or deletes booking infos in table tracking
+    */ 
+    public function doTracking(int $blogID, int $bookingID) {
+        // if row does not exist: insert
+        // if row exists in table tracking and $booking['status'] != 'cancelled update
+        // if row exists in table tracking and $booking['status'] == 'cancelled: delete
+
         global $wpdb;
 
         $trackBookingStatus = [
             'checked-in', // is in the room at the moment
-            'checked-out' // has been in the room
+            'checked-out', // has been in the room
+            'cancelled', // booking has been cancelled
         ];
 
         $booking = Functions::getBooking($bookingID);
-        if (!$booking || !in_array($booking['status'], $trackBookingStatus)) {
+        if (!$booking) {
+            do_action('rrze.log.error', 'rrze-rsvp : BOOKING NOT FOUND | Functions::getBooking() returns [] in Tracking->insertOrUpdateTracking() with $bookingID = ' . $bookingID);
+            return;
+        }
+
+        if (!in_array($booking['status'], $trackBookingStatus)) {
             return;
         }
 
@@ -239,26 +252,28 @@ class Tracking {
         $trackingID = $this->getTrackingID($blogID, $bookingID, $trackingTable);
 
         if ($trackingID){
-            $this->updateTracking($trackingID, $bookingID, $trackingTable);
+            if ($booking['status'] == 'cancelled'){
+                $this->deleteTracking($trackingID, $trackingTable);
+            }else{
+                $this->updateTracking($trackingID, $booking, $trackingTable);
+            }
         }else{
-            $this->insertTracking($blogID, $bookingID, $trackingTable);
+            $this->insertTracking($blogID, $booking, $trackingTable);
         }
 
     } 
 
 
-    private function insertTracking(int $blogID, int $bookingID, string $trackingTable) {
+    private function insertTracking(int $blogID, array &$booking, string $trackingTable) {
         global $wpdb;
         $ret = false;
 
-        $start = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-start', true));
-        $end = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-end', true));
-
-        $booking = Functions::getBooking($bookingID);
+        $start = date('Y-m-d H:i:s', get_post_meta($booking['id'], 'rrze-rsvp-booking-start', true));
+        $end = date('Y-m-d H:i:s', get_post_meta($booking['id'], 'rrze-rsvp-booking-end', true));
 
         $fields = [
             'blog_id' => $blogID,
-            'booking_id' => $bookingID,
+            'booking_id' => $booking['id'],
             'start' => $start,
             'end' => $end,
             'room_post_id' => (int)$booking['room'],
@@ -306,13 +321,11 @@ class Tracking {
     }
 
 
-    private function updateTracking(int $trackingID, int $bookingID, string $trackingTable) {
+    private function updateTracking(int $trackingID, array &$booking, string $trackingTable) {
         global $wpdb;
 
-        $start = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-start', true));
-        $end = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-end', true));
-
-        $booking = Functions::getBooking($bookingID);
+        $start = date('Y-m-d H:i:s', get_post_meta($booking['id'], 'rrze-rsvp-booking-start', true));
+        $end = date('Y-m-d H:i:s', get_post_meta($booking['id'], 'rrze-rsvp-booking-end', true));
 
         $fields = [
             'start' => $start,
@@ -368,8 +381,20 @@ class Tracking {
     }
 
 
-    private static function deCryptField(&$item, string $key): string{
-        // $item can be of different types (int, string, ...)
+    private function deleteTracking(int $trackingID, string $trackingTable) {
+        global $wpdb;
+
+        $ret = $wpdb->delete( $trackingTable, array( 'id' => $trackingID ) );
+
+        if (false === $ret){
+            Tracking::logError('deleteTracking');
+        }
+
+        return $ret;
+    }
+
+    private static function deCryptField(&$item, string $key){
+        // $item can be of different types (int, string, ...) and so does return type
         $aFields = [
             'hash_guest_firstname',
             'hash_guest_lastname',
@@ -385,6 +410,7 @@ class Tracking {
     // public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_firstname, string $hash_guest_lastname, string $hash_guest_email): array {
     public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_email): array {
         global $wpdb;
+        $aRet = [];
 
         if (!$hash_guest_email && !$hash_guest_firstname && !$hash_guest_lastname){
             // we have nothing to search for
@@ -411,29 +437,49 @@ class Tracking {
             $delta,
         ];
 
-        $aRows = $wpdb->get_results( 
-            $wpdb->prepare("SELECT 
-                tracking.start, tracking.end, tracking.room_name, tracking.room_street, tracking.room_zip, tracking.room_city, tracking.hash_guest_email, tracking.hash_guest_phone, tracking.hash_guest_firstname, tracking.hash_guest_lastname 
-                FROM {$trackingTable} tracking
-                INNER JOIN  {$trackingTable} start_tracking ON (start_tracking.start = tracking.start)
-                INNER JOIN {$trackingTable} end_tracking ON (end_tracking.start = tracking.end)
-                WHERE 
-                tracking.room_post_id = start_tracking.room_post_id AND 
-                tracking.room_post_id = end_tracking.room_post_id AND 
-                tracking.hash_guest_email = %s AND 
-                (DATE(tracking.start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
-                (DATE(tracking.end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY))", $prepare_vals), ARRAY_A); // returns assoc array
-
-Tracking::logError('getUsersInRoomAtDate BK TEST');
-
+        // 1. get all room_post_id where hash_guest_email has been in the date-span 
+        $aRoomsNeedle = $wpdb->get_results( 
+            $wpdb->prepare("SELECT room_post_id, start, end  
+                FROM {$trackingTable} 
+                WHERE hash_guest_email = %s AND 
+                (DATE(start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
+                (DATE(end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY))", $prepare_vals), ARRAY_A); // returns assoc array
 
         if ($wpdb->last_error){
             Tracking::logError('getUsersInRoomAtDate');
             return [];
         }
 
-        array_walk($aRows, 'self::deCryptField');
-        return $aRows;
+        // 2. get needle plus all guests in those room_post_id and datetimes
+        if ($aRoomsNeedle){
+            foreach($aRoomsNeedle as $aRowNeedle){
+                $prepare_vals = [
+                    $aRowNeedle['room_post_id'],
+                    $aRowNeedle['start'],
+                    $aRowNeedle['end'],
+                ];
+
+                $aGuests = $wpdb->get_results( 
+                    $wpdb->prepare("SELECT 
+                        start, end, room_name, room_street, room_zip, room_city, hash_guest_email, hash_guest_phone, hash_guest_firstname, hash_guest_lastname 
+                        FROM {$trackingTable}
+                        WHERE room_post_id = %d AND
+                        start = %s AND
+                        end = %s", $prepare_vals), ARRAY_A); // returns assoc array
+
+                foreach($aGuests as $aRowGuests){
+                    array_walk($aRowGuests, 'self::deCryptField');
+                    $aRet[] = $aRowGuests;
+                }
+
+                if ($wpdb->last_error){
+                    Tracking::logError('getUsersInRoomAtDate');
+                    return [];
+                }
+            }
+        }
+
+        return $aRet;
     }
 
 

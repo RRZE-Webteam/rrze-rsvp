@@ -54,7 +54,8 @@ class Actions
 			$this->ajaxResult(['result' => false]);
 		}
 
-		$this->ajaxResult(['result' => true]);
+        $this->ajaxResult(['result' => true]);
+        do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
 	public function handleActions()
@@ -82,6 +83,8 @@ class Actions
 			} elseif ($action == 'restore') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
 			}
+
+            do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 
 			wp_redirect(get_admin_url() . 'edit.php?post_type=booking');
 			exit;
@@ -147,7 +150,6 @@ class Actions
 			//
 		}
 
-		// 2020-09-07 every time booking is saved:
 		do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
@@ -264,7 +266,9 @@ class Actions
 
 		add_filter('the_content', function ($content) use ($data) {
 			return $this->template->getContent('reply/booking-admin', $data);
-		});
+        });
+        
+        do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
 	protected function bookingReplyCustomer(int $bookingId, array $booking, string $action)
@@ -294,7 +298,6 @@ class Actions
 			if (($start - $offset) <= $now && ($end - $offset) >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
 				$bookingCkeckedIn = true;
-				do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 			}
 		} elseif (!$bookingCancelled && !$bookingCkeckedOut && $bookingCkeckedIn && $action == 'checkout') {
 			if ($start <= $now && $end >= $now) {
@@ -400,7 +403,9 @@ class Actions
 
 		add_filter('the_content', function ($content) use ($data) {
 			return $this->template->getContent('reply/booking-customer', $data);
-		});
+        });
+     
+        do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
 	protected function ajaxResult(array $returnAry)
