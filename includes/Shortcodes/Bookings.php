@@ -824,6 +824,8 @@ class Bookings extends Shortcodes {
                     $this->email->bookingConfirmedCustomer($booking_id, $bookingMode);
                 } elseif ($status == 'checked-in') {
                     $this->email->bookingConfirmedCustomer($booking_id, $bookingMode, $status);
+                } elseif ($status == 'booked' && $forceToConfirm) {
+                    $this->email->bookingRequestedCustomer($booking_id, $bookingMode);
                 } else {
                     if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
                         $to = $this->options->email_notification_email;
