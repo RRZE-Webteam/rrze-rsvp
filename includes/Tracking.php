@@ -8,7 +8,7 @@ use RRZE\RSVP\Settings;
 
 class Tracking {
     const DB_TABLE = 'rrze_rsvp_tracking';
-    const DB_VERSION = '1.3.1';
+    const DB_VERSION = '1.3.2';
     const DB_VERSION_OPTION_NAME = 'rrze_rsvp_tracking_db_version';
 
     protected $settings;
@@ -101,8 +101,8 @@ class Tracking {
     public function admin_page_tracking_form() {
         $searchdate = '';
         $delta = 0;
-        $guest_firstname = '';
-        $guest_lastname = '';
+        // $guest_firstname = '';
+        // $guest_lastname = '';
         $guest_email = '';
 
         echo '<div class="wrap">';
@@ -111,16 +111,18 @@ class Tracking {
         if ( isset( $_GET['submit'])) {
             $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
             $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
-            $guest_firstname = filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING);
-            $guest_lastname = filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING);
+            // $guest_firstname = filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING);
+            // $guest_lastname = filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING);
             $guest_email = filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL);
-            $hash_guest_firstname = Functions::crypt($guest_firstname, 'encrypt');
-            $hash_guest_lastname = Functions::crypt($guest_lastname, 'encrypt');
+            // $hash_guest_firstname = Functions::crypt($guest_firstname, 'encrypt');
+            // $hash_guest_lastname = Functions::crypt($guest_lastname, 'encrypt');
             $hash_guest_email = Functions::crypt($guest_email, 'encrypt');
-            $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
+            // $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
+            $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email);
 
             if ($aGuests){
-                $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&hash_guest_firstname=' . urlencode($hash_guest_firstname) . '&hash_guest_lastname=' . urlencode($hash_guest_lastname) . '&hash_guest_email=' . urlencode($hash_guest_email);
+                // $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&hash_guest_firstname=' . urlencode($hash_guest_firstname) . '&hash_guest_lastname=' . urlencode($hash_guest_lastname) . '&hash_guest_email=' . urlencode($hash_guest_email);
+                $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&hash_guest_email=' . urlencode($hash_guest_email);
                 echo '<div class="notice notice-success is-dismissible">'
                     . '<h2>' . __('Guests found!', 'rrze-rsvp') . '</h2>'
                     . "<a href='$ajax_url'>" . __('Download CSV', 'rrze-rsvp') . '</a>'
@@ -144,16 +146,16 @@ class Tracking {
             . '<th scope="row"><label for="delta">' . '&#177; ' . __('days', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="number" id="delta" name="delta" min="0" required value="' . $delta . '"></td>'
             . '</tr>';
-        echo '<tr>'
-            . '<th scope="row"><label for="guest_firstname">' . __('First name', 'rrze-rsvp') . '</label></th>'
-            . '<td><input type="text" id="guest_firstname" name="guest_firstname" value="' . $guest_firstname . '">'
-            . '</td>'
-            . '</tr>';
-        echo '<tr>'
-            . '<th scope="row"><label for="guest_lastname">' . __('Last name', 'rrze-rsvp') . '</label></th>'
-            . '<td><input type="text" id="guest_lastname" name="guest_lastname" value="' . $guest_lastname . '">'
-            . '</td>'
-            . '</tr>';
+        // echo '<tr>'
+        //     . '<th scope="row"><label for="guest_firstname">' . __('First name', 'rrze-rsvp') . '</label></th>'
+        //     . '<td><input type="text" id="guest_firstname" name="guest_firstname" value="' . $guest_firstname . '">'
+        //     . '</td>'
+        //     . '</tr>';
+        // echo '<tr>'
+        //     . '<th scope="row"><label for="guest_lastname">' . __('Last name', 'rrze-rsvp') . '</label></th>'
+        //     . '<td><input type="text" id="guest_lastname" name="guest_lastname" value="' . $guest_lastname . '">'
+        //     . '</td>'
+        //     . '</tr>';
         echo '<tr>'
             . '<th scope="row"><label for="guest_email">' . __('Email', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="text" id="guest_email" name="guest_email" value="' . $guest_email . '">'
@@ -181,7 +183,8 @@ class Tracking {
         $hash_guest_lastname = filter_input(INPUT_GET, 'hash_guest_lastname', FILTER_SANITIZE_STRING);
         $hash_guest_email = filter_input(INPUT_GET, 'hash_guest_email', FILTER_VALIDATE_EMAIL);
 
-        $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
+        // $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
+        $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email);
 
         $file = 'rrze_tracking_csv';
         $csv_output = 'START,END,ROOM,STREET,ZIP,CITY,EMAIL,PHONE,FIRSTNAME,LASTNAME'."\n";
@@ -206,8 +209,6 @@ class Tracking {
     private function getTrackingID(int $blogID, int $bookingID, $trackingTable): int {
         global $wpdb;
         
-        $ret = false;
-
         $prepare_vals = [
             $blogID,
             $bookingID
@@ -216,11 +217,7 @@ class Tracking {
         $row = $wpdb->get_results( 
             $wpdb->prepare("SELECT ID FROM {$trackingTable} WHERE blog_id = %d AND booking_id = %d", $prepare_vals), ARRAY_A);
 
-        if (isset($row["ID"])){
-            $ret = $row["ID"];
-        } 
-
-        return $ret;
+        return ( isset($row[0]['ID']) ? $row[0]['ID'] : 0 );
     }
 
 
@@ -242,7 +239,7 @@ class Tracking {
         $trackingID = $this->getTrackingID($blogID, $bookingID, $trackingTable);
 
         if ($trackingID){
-            $this->updateTracking($trackingID, $trackingTable);
+            $this->updateTracking($trackingID, $bookingID, $trackingTable);
         }else{
             $this->insertTracking($blogID, $bookingID, $trackingTable);
         }
@@ -309,7 +306,7 @@ class Tracking {
     }
 
 
-    private function updateTracking(int $trackingID, string $trackingTable) {
+    private function updateTracking(int $trackingID, int $bookingID, string $trackingTable) {
         global $wpdb;
 
         $start = date('Y-m-d H:i:s', get_post_meta($bookingID, 'rrze-rsvp-booking-start', true));
@@ -385,7 +382,8 @@ class Tracking {
     }
 
 
-    public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_firstname, string $hash_guest_lastname, string $hash_guest_email): array {
+    // public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_firstname, string $hash_guest_lastname, string $hash_guest_email): array {
+    public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_email): array {
         global $wpdb;
 
         if (!$hash_guest_email && !$hash_guest_firstname && !$hash_guest_lastname){
@@ -402,8 +400,6 @@ class Tracking {
         $trackingTable = Tracking::getTableName($tableType);
 
         $prepare_vals = [
-            $hash_guest_firstname,
-            $hash_guest_lastname,
             $hash_guest_email,
             $searchdate,
             $delta,
@@ -424,11 +420,12 @@ class Tracking {
                 WHERE 
                 tracking.room_post_id = start_tracking.room_post_id AND 
                 tracking.room_post_id = end_tracking.room_post_id AND 
-                tracking.hash_guest_firstname = %s AND 
-                tracking.hash_guest_lastname = %s AND 
                 tracking.hash_guest_email = %s AND 
                 (DATE(tracking.start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
                 (DATE(tracking.end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY))", $prepare_vals), ARRAY_A); // returns assoc array
+
+Tracking::logError('getUsersInRoomAtDate BK TEST');
+
 
         if ($wpdb->last_error){
             Tracking::logError('getUsersInRoomAtDate');
@@ -486,8 +483,8 @@ class Tracking {
             id bigint(20) UNSIGNED NOT NULL auto_increment,
             blog_id bigint(20) NOT NULL,
             booking_id bigint(20) NOT NULL,
-            ts_updated timestamp DEFAULT CURRENT_TIMESTAMP,
-            ts_inserted timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            ts_inserted timestamp DEFAULT CURRENT_TIMESTAMP,
+            ts_updated timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             start datetime NOT NULL,
             end datetime NOT NULL,
             room_post_id bigint(20) NOT NULL,
