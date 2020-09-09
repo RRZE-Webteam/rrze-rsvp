@@ -285,10 +285,10 @@ class Email
      * the respective links included in the email message.
      * @param integer $bookingId Booking Id
      * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
-     * @param boolean $checkedIn Is booking checked in?
+     * @param boolean $status Status of the booking
      * @return void
      */
-    public function bookingConfirmedCustomer(int $bookingId, string $bookingMode = 'reservation', bool $checkedIn = false)
+    public function bookingConfirmedCustomer(int $bookingId, string $bookingMode = 'reservation', string $status = 'confirmed')
     {
         $booking = Functions::getBooking($bookingId);
         if (empty($booking)) {
@@ -321,9 +321,9 @@ class Email
         $data['time'] = $booking['time'];
         $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
-        $data['seat_name'] = $booking['seat_name'];
+        $data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
         // Checked in
-        $data['checked_in'] = $checkedIn;
+        $data['checked_in'] = ($status == 'checked-in');
         // Check in booking
         $data['checkin_url'] = $checkInUrl;
         $data['checkin_btn'] = __('Check In', 'rrze-rsvp');
@@ -360,15 +360,36 @@ class Email
             $altMessage = $this->template->getContent('email/booking-confirmed-customer.txt', $data);
         }
 
-        if ($checkedIn) {
-            $attachment = '';
-        } else {
-            $icsFilename = sanitize_title($booking['room_name']) . '-' . date('YmdHi', $booking['start']) . '.ics';
+        $attachment = '';
+        if ($status == 'confirmed') {
+            $icsFilename = sprintf('%s-%s.ics', sanitize_title($booking['room_name']), date('YmdHi', $booking['start']));
             $icsContent = ICS::generate($bookingId, $icsFilename);
             $attachment = $this->tempFile($icsFilename, $icsContent);
         }
 
         $this->send($booking['guest_email'], $subject, $message, $altMessage, $attachment);
+
+        $sendToEmail = get_post_meta($booking['room'], 'rrze-rsvp-room-send-to-email', true);
+        if (is_email($sendToEmail) && ($status == 'confirmed') && in_array($bookingMode, ['reservation', 'consultation'])) {
+            $subject = __('A booking has been confirmed', 'rrze-rsvp');
+            $text = __('The booking has been confirmed by the customer.', 'rrze-rsvp');
+            $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
+            $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
+
+            $data['subject'] = $subject;
+            $data['text'] = $text;
+            $data['customer']['name'] = $customerName;
+            $data['customer']['email'] = $customerEmail;
+
+            $message = $this->template->getContent('email/booking-confirmed-send-to-email', $data);
+            $altMessage = $this->template->getContent('email/booking-confirmed-send-to-email.txt', $data);
+            
+            $icsFilename = sprintf('%s-%s-copy.ics', sanitize_title($booking['room_name']), date('YmdHi', $booking['start']));
+            $icsContent = ICS::generate($bookingId, $icsFilename, 'send-to-email');
+            $attachment = $this->tempFile($icsFilename, $icsContent);            
+            
+            $this->send($sendToEmail, $subject, $message, $altMessage, $attachment);
+        }
     }
 
     /**
