@@ -8,7 +8,7 @@ use DateTime;
 
 class ICS
 {
-	public static function generate(int $bookingId, string $filename): string
+	public static function generate(int $bookingId, string $filename, string $recipient = 'customer'): string
 	{
 		$booking = Functions::getBooking($bookingId);
 		if (empty($booking)) {
@@ -19,12 +19,12 @@ class ICS
 		$output .= "BEGIN:VCALENDAR\r\n";
 		$output .= "VERSION:2.0\r\n";
 		$output .= "PRODID:-//rrze//rsvp//EN\r\n";
-		$output .= self::vevent($booking);
+		$output .= self::vevent($booking, $recipient);
 		$output .= "END:VCALENDAR\r\n";
 		return $output;
 	}
 
-	protected static function vevent(array $booking): string
+	protected static function vevent(array $booking, string $recipient = 'customer'): string
 	{
 		$timezoneString = get_option('timezone_string');
 		$dtstamp = date('Ymd\THis');
@@ -38,11 +38,12 @@ class ICS
 
 		$summary = $booking['room_name'];
 
-		$cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $booking['id'], $booking['start']), $booking['id']);
-
 		$description = $booking['room_name'] . '\\n';
 		$description .= !empty($booking['seat_name']) ? $booking['seat_name'] . '\\n' : '';
-		$description .= "\\n\\n" . __('Cancel Booking', 'rrze-rsvp') . ':\\n' . $cancelUrl;
+		if ($recipient == 'customer') {
+			$cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $booking['id'], $booking['start']), $booking['id']);
+			$description .= "\\n\\n" . __('Cancel Booking', 'rrze-rsvp') . ':\\n' . $cancelUrl;	
+		}
 		$description .= "\\n\\n" . __('Generated', 'rrze-rsvp') . ': ' . $dtstampFormat;
 
 		$output = '';
