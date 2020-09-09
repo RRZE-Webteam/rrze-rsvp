@@ -198,8 +198,8 @@ class Schedule
                 ],
                 'booking_status_clause' => [
                     'key'       => 'rrze-rsvp-booking-status',
-                    'value'     => ['booked', 'confirmed'],
-                    'compare'   => 'IN'
+                    'value'     => 'booked',
+                    'compare'   => '='
                 ]
             ]
         ];
