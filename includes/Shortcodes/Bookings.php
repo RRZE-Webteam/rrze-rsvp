@@ -26,7 +26,7 @@ class Bookings extends Shortcodes {
     protected $email;
     protected $idm;
     protected $sso = false;
-
+    protected $ssoRequired;
     protected $nonce;
 
     public function __construct($pluginFile, $settings)
@@ -38,7 +38,6 @@ class Bookings extends Shortcodes {
         $this->idm = new IdM;
         $this->template = new Template;
     }
-
 
     public function onLoaded()
     {
@@ -59,11 +58,17 @@ class Bookings extends Shortcodes {
         if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
             return;
         }
-        $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
-        if ($this->hasShortcodeSSO($post->post_content, 'rsvp-booking')
-            || $this->nonce
-        ) {
+        $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
+        if (isset($_GET['room_id']) && $this->nonce) {
+            $roomId = absint($_GET['room_id']);
+            $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
+        } else {
+            $roomId = absint($this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'room'));
+            $shortcodeSSO = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
+            $this->ssoRequired = !is_null($shortcodeSSO) ? Functions::getBoolValueFromAtt($shortcodeSSO) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));    
+        }
+        if ($this->ssoRequired || $this->nonce) {
             $this->sso = $this->idm->tryLogIn();
         }     
     }
@@ -137,80 +142,76 @@ class Bookings extends Shortcodes {
         $days = $shortcode_atts[ 'days' ] != '' ? (int)$shortcode_atts[ 'days' ] : $roomMeta['rrze-rsvp-room-days-in-advance'][0];
         $comment = (isset($roomMeta['rrze-rsvp-room-notes-check']) && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on');
 
-        $ssoRequired = Functions::getBoolValueFromAtt($shortcode_atts['sso']);
-
-        if ($ssoRequired && !$this->sso) {
+        if ($this->ssoRequired && !$this->sso) {
 	    $alert = '<div class="alert alert-warning" role="alert">';
 	    $alert .= '<p><strong>'.__('SSO not available.','rrze-rsvp').'</strong><br>';
 	    $alert .= __('Please activate SSO authentication or remove the SSO attribute from your shortcode.','rrze-rsvp').'</p>';
 	    $alert .= '</div>';
             return $alert;
         }
-	$bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
-	if ($bookingMode == 'check-only' && !$this->nonce) {
-	    
-	    $alert = '<div class="alert alert-info" role="alert">';
-	    $alert .= '<p><strong>'.__('Checkin in room','rrze-rsvp').'</strong><br>';
-	    $alert .= __('Reservations disabled. Please checkin at the seats in the room.','rrze-rsvp').'</p>';
-	    $alert .= '</div>';
-	    
-	    
-	    if (shortcode_exists('collapsibles')) {
-		$scheduleinfo = '';
-		// Schedule
-		$scheduleData = Functions::getRoomSchedule($roomID);
-		$schedule = '';
-		$weekdays = Functions::daysOfWeekAry(1);
-		if (!empty($scheduleData)) {
-		    $schedule .= '<table class="rsvp-schedule">';
-		    $schedule .= '<tr>'
-			. '<th>'. __('Weekday', 'rrze-rsvp') . '</th>'
-			. '<th>'. __('Time slots', 'rrze-rsvp') . '</th>';
-		    $schedule .= '</tr>';
-		    foreach ($scheduleData as $weekday => $dailySlots) {
-			$schedule .= '<tr>'
-			    .'<td>' . $weekdays[$weekday] . '</td>'
-			    . '<td>';
-			$ts = [];
-			foreach ($dailySlots as $start => $end) {
-			    $ts[] = $start . ' - ' . $end;
-			}
-			$schedule .= implode('<br />', $ts);
-			$schedule .= '</td>'
-			    . '</tr>';
-		    }
-		    $schedule .= "</table>";
-		}
-		if (!empty($schedule)) {
-		    $scheduleinfo .= '[collapsibles expand-all-link="true"]'
-		    . '[collapse title="'.__('Schedule','rrze-rsvp').'" name="schedule" load="open"]'
-		    . $schedule
-		    . '[/collapse]';
-		
-		
-		}
-		
-		$scheduleinfo .= '[collapse title="'.__('Current Room Occupancy', 'rrze-rsvp').'" name="occupancy"]'
-		    . Functions::getOccupancyByRoomIdNextHTML($roomID)
-		    . '[/collapse]';
-		
-		$scheduleinfo .= '[/collapsibles]';
-		$schedulehtml = do_shortcode($scheduleinfo);
-		$alert  .= $schedulehtml;
-	    } else {
-		
-		$scheduleinfo = '<h2>' . __('Schedule', 'rrze-rsvp') . '</h2>'
+
+        $bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
+        if ($bookingMode == 'check-only' && !$this->nonce) {
+            
+            $alert = '<div class="alert alert-info" role="alert">';
+            $alert .= '<p><strong>'.__('Checkin in room','rrze-rsvp').'</strong><br>';
+            $alert .= __('Reservations disabled. Please checkin at the seats in the room.','rrze-rsvp').'</p>';
+            $alert .= '</div>';
+            
+            
+            if (shortcode_exists('collapsibles')) {
+            $scheduleinfo = '';
+            // Schedule
+            $scheduleData = Functions::getRoomSchedule($roomID);
+            $schedule = '';
+            $weekdays = Functions::daysOfWeekAry(1);
+            if (!empty($scheduleData)) {
+                $schedule .= '<table class="rsvp-schedule">';
+                $schedule .= '<tr>'
+                . '<th>'. __('Weekday', 'rrze-rsvp') . '</th>'
+                . '<th>'. __('Time slots', 'rrze-rsvp') . '</th>';
+                $schedule .= '</tr>';
+                foreach ($scheduleData as $weekday => $dailySlots) {
+                $schedule .= '<tr>'
+                    .'<td>' . $weekdays[$weekday] . '</td>'
+                    . '<td>';
+                $ts = [];
+                foreach ($dailySlots as $start => $end) {
+                    $ts[] = $start . ' - ' . $end;
+                }
+                $schedule .= implode('<br />', $ts);
+                $schedule .= '</td>'
+                    . '</tr>';
+                }
+                $schedule .= "</table>";
+            }
+            if (!empty($schedule)) {
+                $scheduleinfo .= '[collapsibles expand-all-link="true"]'
+                . '[collapse title="'.__('Schedule','rrze-rsvp').'" name="schedule" load="open"]'
                 . $schedule
-                //. '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
-                . Functions::getOccupancyByRoomIdNextHTML($postID);
-		$alert  .= $scheduleinfo;
-        
-	    }
-	    return $alert;
-	}
-	
-	
-	
+                . '[/collapse]';
+            
+            
+            }
+            
+            $scheduleinfo .= '[collapse title="'.__('Current Room Occupancy', 'rrze-rsvp').'" name="occupancy"]'
+                . Functions::getOccupancyByRoomIdNextHTML($roomID)
+                . '[/collapse]';
+            
+            $scheduleinfo .= '[/collapsibles]';
+            $schedulehtml = do_shortcode($scheduleinfo);
+            $alert  .= $schedulehtml;
+            } else {
+            
+            $scheduleinfo = '<h2>' . __('Schedule', 'rrze-rsvp') . '</h2>'
+                    //. $schedule
+                    //. '<h3>' . __('Room occupancy for today', 'rrze-rsvp') . '</h3>';
+                    . Functions::getOccupancyByRoomIdNextHTML($postID);
+            $alert  .= $scheduleinfo;
+            
+            }
+            return $alert;
+        }
 	
         $get_date = isset($_GET[ 'bookingdate' ]) ? sanitize_text_field($_GET[ 'bookingdate' ]) : date('Y-m-d', current_time('timestamp'));
         $get_time = isset($_GET[ 'timeslot' ]) ? sanitize_text_field($_GET[ 'timeslot' ]) : false;
@@ -276,7 +277,7 @@ class Bookings extends Shortcodes {
 //	$output .= '</fieldset>';
 	$output .= '<fieldset>';  
         $output .= '<legend>' . __('Your data', 'rrze-rsvp') . ' <span class="notice-required">('. __('Required','rrze-rsvp'). ')</span></legend>';
-        if ($ssoRequired) {
+        if ($this->ssoRequired) {
             $data = $this->idm->getCustomerData();
             $output .= '<input type="hidden" value="' . $data['customer_lastname'] . '" id="rsvp_lastname" name="rsvp_lastname">';
             $output .= '<input type="hidden" value="' . $data['customer_firstname'] . '" id="rsvp_firstname" name="rsvp_firstname">';
@@ -824,6 +825,8 @@ class Bookings extends Shortcodes {
                     $this->email->bookingConfirmedCustomer($booking_id, $bookingMode);
                 } elseif ($status == 'checked-in') {
                     $this->email->bookingConfirmedCustomer($booking_id, $bookingMode, $status);
+                } elseif ($status == 'booked' && $forceToConfirm) {
+                    $this->email->bookingRequestedCustomer($booking_id, $bookingMode);
                 } else {
                     if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
                         $to = $this->options->email_notification_email;
@@ -1112,7 +1115,7 @@ class Bookings extends Shortcodes {
         return '<h4>' . __('Available seats:', 'rrze-rsvp') . '</h4><div class="rsvp-seat-select">' . $seatSelects . '</div>';
     }
 
-    protected function hasShortcodeSSO(string $content, string $shortcode): bool
+    protected function hasShortcodeAtt(string $content, string $shortcode, string $att)
     {
         if (has_shortcode($content, $shortcode)) {
             $result = [];
@@ -1128,11 +1131,11 @@ class Bookings extends Shortcodes {
                 }
             }
             foreach ($result as $key => $value) {
-                if (isset($value[$shortcode]['sso']) && Functions::getBoolValueFromAtt($value[$shortcode]['sso'])) {
-                    return true;
+                if (isset($value[$shortcode][$att])) {
+                    return $value[$shortcode][$att];
                 }                
             }
         }
-        return false;
+        return null;
     }
 }
