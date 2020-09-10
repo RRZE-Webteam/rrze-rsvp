@@ -55,8 +55,9 @@ class Actions
 			$this->ajaxResult(['result' => false]);
 		}
 
-		$this->ajaxResult(['result' => true]);
 		do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+		
+		$this->ajaxResult(['result' => true]);
 	}
 
 	public function handleActions()
@@ -69,6 +70,8 @@ class Actions
 			if (!$booking) {
 				return;
 			}
+
+			$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 			$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
 			if ($action == 'confirm') {
@@ -76,11 +79,13 @@ class Actions
 				update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
 				if ($forceToConfirm) {
 					update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'booked');
+					$this->email->bookingRequestedCustomer($bookingId, $bookingMode);
+				} else {
+					$this->email->bookingConfirmedCustomer($bookingId, $bookingMode);
 				}
 			} elseif ($action == 'cancel') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
-			} elseif ($action == 'delete') {
-				wp_delete_post($bookingId);
+				$this->email->bookingCancelledCustomer($bookingId, $bookingMode);
 			} elseif ($action == 'restore') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
 			}
