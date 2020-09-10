@@ -76,6 +76,12 @@ class Main
 			//$api = new API;
 			//$api->register_routes();
 		});
+
+		add_action('init', [$this, 'init']);
+	}
+
+	public function init() {
+		loadTextdomain();
 	}
 
 	public function adminEnqueueScripts()
