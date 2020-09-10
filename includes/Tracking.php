@@ -186,22 +186,20 @@ class Tracking {
         // $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
         $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email);
 
-        $file = 'rrze_tracking_csv';
-        $csv_output = 'START,END,ROOM,STREET,ZIP,CITY,EMAIL,PHONE,FIRSTNAME,LASTNAME'."\n";
+        $filename = 'rrze_tracking_csv_' . date("Y-m-d_H-i", time());
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename={$filename}.csv");
+        $fp = fopen('php://output', 'w');
+
+        $aHeadings = ['START','END','ROOM','STREET','ZIP','CITY','EMAIL','PHONE','FIRSTNAME','LASTNAME'];
 
         if ($aGuests){
-            foreach ($aGuests as $row){
-                $row = array_values($row);
-                $row = implode(",", $row);
-                $csv_output .= $row."\n";
+            fputcsv($fp, $aHeadings, ';');
+            foreach ($aGuests as $aRow){
+                fputcsv($fp, $aRow, ';');
              }
         }
- 
-        $filename = $file . "_" . date("Y-m-d_H-i", time());
-        header( "Content-type: application/vnd.ms-excel" );
-        header( "Content-disposition: csv" . date("Y-m-d") . ".csv" );
-        header( "Content-disposition: filename=" . $filename . ".csv" );
-        print $csv_output;
         exit;
     }
 
@@ -226,8 +224,8 @@ class Tracking {
     */ 
     public function doTracking(int $blogID, int $bookingID) {
         // if row does not exist: insert
-        // if row exists in table tracking and $booking['status'] != 'cancelled update
-        // if row exists in table tracking and $booking['status'] == 'cancelled: delete
+        // if row exists in table tracking and $booking['status'] != 'cancelled' : update
+        // if row exists in table tracking and $booking['status'] == 'cancelled' : delete
 
         global $wpdb;
 
@@ -394,7 +392,7 @@ class Tracking {
     }
 
     private static function deCryptField(&$item, string $key){
-        // $item can be of different types (int, string, ...) and so does return type
+        // $item can be of different types (int, string, ...)
         $aFields = [
             'hash_guest_firstname',
             'hash_guest_lastname',
@@ -404,6 +402,7 @@ class Tracking {
         if (in_array($key, $aFields)){
             $item = Functions::crypt($item, 'decrypt');
         }
+        $item = (string) $item;
     }
 
 
