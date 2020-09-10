@@ -179,22 +179,25 @@ class Actions
 			return;
 		}
 
+		if (!isset($_POST['rrze-rsvp-booking-status'])) {
+			return;
+		}
+
 		$bookingId = $post->ID;
 		$booking = Functions::getBooking($bookingId);
-		
-		$bookingStatus = isset($_POST['rrze-rsvp-booking-status']) ? $_POST['rrze-rsvp-booking-status'] : $booking['status'];
 
-		$bookingBooked = ($booking['status'] == 'booked');
-		$bookingConfirmed = ($booking['status'] == 'confirmed');
-		$bookingCancelled = ($booking['status'] == 'cancelled');
-		$bookingCkeckedIn = ($booking['status'] == 'checked-in');
-		$bookingCkeckedOut = ($booking['status'] == 'checked-out');
+		$bookingStatus = sanitize_text_field($_POST['rrze-rsvp-booking-status']);
+
+		$bookingBooked = ($bookingStatus == 'booked');
+		$bookingConfirmed = ($bookingStatus == 'confirmed');
+		$bookingCancelled = ($bookingStatus == 'cancelled');
+		$bookingCkeckedIn = ($bookingStatus == 'checked-in');
+		$bookingCkeckedOut = ($bookingStatus == 'checked-out');
 
 		$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 		$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
 		if (($bookingBooked || $bookingCancelled) && $bookingStatus == 'confirmed') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', $bookingStatus);
 			update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
 			if ($forceToConfirm) {
 				update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'booked');
@@ -203,11 +206,13 @@ class Actions
 				$this->email->bookingConfirmedCustomer($bookingId, $bookingMode);
 			}
 		} elseif (($bookingBooked || $bookingConfirmed) && $bookingStatus == 'cancelled') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', $bookingStatus);
 			$this->email->bookingCancelledCustomer($bookingId, $bookingMode);
 		} elseif ($bookingCkeckedIn) {
+			//
 		} elseif ($bookingCkeckedOut) {
 			//
+		} else {
+			return;
 		}
 
 		do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
