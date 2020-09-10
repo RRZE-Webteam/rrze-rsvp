@@ -220,7 +220,8 @@ class Bookings
                     }
                     if (!in_array($booking['status'], ['checked-in', 'checked-out'])) {
                         $button = sprintf(
-                            '<a href="edit.php?post_type=%1$s&action=delete&id=%2$d&_wpnonce=%3$s" class="delete">%4$s</a>',
+                            '%s<br><a href="edit.php?post_type=%s&action=delete&id=%d&_wpnonce=%s" class="delete">%s</a>',
+                            $button,
                             'booking',
                             $booking['id'],
                             $_wpnonce,
