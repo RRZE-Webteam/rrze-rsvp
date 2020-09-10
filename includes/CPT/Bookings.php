@@ -195,7 +195,7 @@ class Bookings
                         'booking',
                         $booking['id'],
                         $_wpnonce,
-                        __('Restore', 'rrze-rsvp')
+                        _x('Restore', 'Booking', 'rrze-rsvp')
                     );
                     $button = $cancelledButton . $restoreButton;
                 } else {
@@ -204,16 +204,16 @@ class Bookings
                             $button = _x('Cancelled', 'Booking', 'rrze-rsvp');
                             break;
                         case 'booked':
-                            $button = __('Booked', 'rrze-rsvp');
+                            $button = _x('Booked', 'Booking', 'rrze-rsvp');
                             break;
                         case 'confirmed':
-                            $button = __('Confirmed', 'rrze-rsvp');
+                            $button = _x('Confirmed', 'Booking', 'rrze-rsvp');
                             break;
                         case 'checked-in':
-                            $button = __('Checked-In', 'rrze-rsvp');
+                            $button = _x('Checked-In', 'Booking', 'rrze-rsvp');
                             break;
                         case 'checked-out':
-                            $button = __('Checked-Out', 'rrze-rsvp');
+                            $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
                             break;
                         default:
                             $button = '';
@@ -225,7 +225,7 @@ class Bookings
                             'booking',
                             $booking['id'],
                             $_wpnonce,
-                            __('Delete', 'rrze-rsvp')
+                            _x('Delete', 'Booking', 'rrze-rsvp')
                         );
                     }
                 }
@@ -250,7 +250,7 @@ class Bookings
                         'booking',
                         $booking['id'],
                         $_wpnonce,
-                        __('Confirm', 'rrze-rsvp')
+                        _x('Confirm', 'Booking', 'rrze-rsvp')
                     );
                 }
                 echo $button . $bookingDate;
