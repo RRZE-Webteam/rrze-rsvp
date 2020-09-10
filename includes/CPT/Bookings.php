@@ -65,19 +65,19 @@ class Bookings
             'description'               => __('Add and edit Booking informations', 'rrze-rsvp'),
             'labels'                    => $labels,
             'supports'                  => ['author', 'revisions'],
-            'hierarchical'                 => false,
-            'public'                     => false,
-            'show_ui'                     => true,
-            'show_in_menu'                 => true,
-            'show_in_nav_menus'         => true,
+            'hierarchical'              => false,
+            'public'                    => false,
+            'show_ui'                   => true,
+            'show_in_menu'              => true,
             'show_in_admin_bar'         => true,
             'menu_position'             => 5,
             'menu_icon'                 => 'dashicons-calendar-alt',
-            'can_export'                 => false,
-            'has_archive'                 => false,
-            'exclude_from_search'         => true,
-            'publicly_queryable'         => false,
-            'capability_type'             => Capabilities::getCptCapabilityType('booking'),
+            'can_export'                => false,
+            'has_archive'               => false,
+            'exclude_from_search'       => true,
+            'publicly_queryable'        => false,
+            'delete_with_user'          => false,
+            'capability_type'           => Capabilities::getCptCapabilityType('booking'),
             'capabilities'              => (array) Capabilities::getCptCaps('booking'),
             'map_meta_cap'              => Capabilities::getCptMapMetaCap('booking')
         ];
@@ -195,7 +195,7 @@ class Bookings
                         'booking',
                         $booking['id'],
                         $_wpnonce,
-                        __('Restore', 'rrze-rsvp')
+                        _x('Restore', 'Booking', 'rrze-rsvp')
                     );
                     $button = $cancelledButton . $restoreButton;
                 } else {
@@ -204,28 +204,29 @@ class Bookings
                             $button = _x('Cancelled', 'Booking', 'rrze-rsvp');
                             break;
                         case 'booked':
-                            $button = __('Booked', 'rrze-rsvp');
+                            $button = _x('Booked', 'Booking', 'rrze-rsvp');
                             break;
                         case 'confirmed':
-                            $button = __('Confirmed', 'rrze-rsvp');
+                            $button = _x('Confirmed', 'Booking', 'rrze-rsvp');
                             break;
                         case 'checked-in':
-                            $button = __('Checked-In', 'rrze-rsvp');
+                            $button = _x('Checked-In', 'Booking', 'rrze-rsvp');
                             break;
                         case 'checked-out':
-                            $button = __('Checked-Out', 'rrze-rsvp');
+                            $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
                             break;
+                        default:
+                            $button = '';
                     }
                     if (!in_array($booking['status'], ['checked-in', 'checked-out'])) {
                         $button = sprintf(
-                            '<a href="edit.php?post_type=%1$s&action=delete&id=%2$d&_wpnonce=%3$s" class="delete">%4$s</a>',
+                            '%s<br><a href="edit.php?post_type=%s&action=delete&id=%d&_wpnonce=%s" class="delete">%s</a>',
+                            $button,
                             'booking',
                             $booking['id'],
                             $_wpnonce,
-                            __('Delete', 'rrze-rsvp')
+                            _x('Delete', 'Booking', 'rrze-rsvp')
                         );
-                    } else {
-                        $button = '';
                     }
                 }
                 echo $button . $bookingDate;
@@ -249,7 +250,7 @@ class Bookings
                         'booking',
                         $booking['id'],
                         $_wpnonce,
-                        __('Confirm', 'rrze-rsvp')
+                        _x('Confirm', 'Booking', 'rrze-rsvp')
                     );
                 }
                 echo $button . $bookingDate;
