@@ -48,9 +48,9 @@
 		<p class="date {{=class_cancelled}}">
 			{{=date}}<br>
 			{{=time}}<br>
-			{{=room_name}}<br>
+			Raum {{=room_name}}<br>
 			{{seat_name}}
-			{{=seat_name}}
+			Platz {{=seat_name}}
 			{{/seat_name}}		
 		</p>		
 
@@ -60,7 +60,7 @@
 
 		{{is_locale_not_english}}
 		<div lang="en">
-		<p class='lang-hr'><a name="english">&nbsp;</a></p>		
+		<p name="english" id="english" class="lang-hr">&nbsp;</p>		
 		
 		{{booking_cancel}}
 		<h2>{{=booking_cancel_en}}</h2>
@@ -105,9 +105,9 @@
 		<p class="date {{=class_cancelled}}">
 			{{=date_en}}<br>
 			{{=time_en}}<br>
-			{{=room_name}}<br>
+			Room {{=room_name}}<br>
 			{{seat_name}}
-			{{=seat_name}}
+			Seat {{=seat_name}}
 			{{/seat_name}}			
 		</p>
 	

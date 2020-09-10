@@ -214,6 +214,7 @@ class Schedule
                 if (get_post_meta($roomId, 'rrze-rsvp-room-force-to-confirm', true)) {
                     update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'cancelled');
                     $this->email->bookingCancelledCustomer(get_the_ID());
+                    do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
                 }
             }
             wp_reset_postdata();
@@ -271,6 +272,7 @@ class Schedule
                 } elseif (get_post_meta($roomId, 'rrze-rsvp-room-force-to-checkin', true)) {
                     update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'cancelled');
                     $this->email->bookingCancelledCustomer(get_the_ID());
+                    do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
                 }
             }
             wp_reset_postdata();
@@ -314,6 +316,7 @@ class Schedule
             while ($query->have_posts()) {
                 $query->the_post();
                 update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'checked-out');
+                do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
             }
             wp_reset_postdata();
         }

@@ -20,6 +20,7 @@ class Actions
 	{
 		add_action('admin_init', [$this, 'handleActions']);
 		add_action('wp_ajax_booking_action', [$this, 'ajaxBookingAction']);
+		add_filter('post_row_actions', [$this, 'bookingRowAction'], 10, 2);
 		add_action('pre_post_update', [$this, 'preBookingUpdate'], 10, 2);
 		add_action('transition_post_status', [$this, 'transitionBookingStatus'], 10, 3);
 		add_action('wp', [$this, 'bookingReply']);
@@ -54,6 +55,8 @@ class Actions
 			$this->ajaxResult(['result' => false]);
 		}
 
+		do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+		
 		$this->ajaxResult(['result' => true]);
 	}
 
@@ -67,6 +70,8 @@ class Actions
 			if (!$booking) {
 				return;
 			}
+
+			$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 			$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
 			if ($action == 'confirm') {
@@ -74,18 +79,80 @@ class Actions
 				update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
 				if ($forceToConfirm) {
 					update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'booked');
+					$this->email->bookingRequestedCustomer($bookingId, $bookingMode);
+				} else {
+					$this->email->bookingConfirmedCustomer($bookingId, $bookingMode);
 				}
 			} elseif ($action == 'cancel') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
-			} elseif ($action == 'delete') {
-				wp_delete_post($bookingId);
+				$this->email->bookingCancelledCustomer($bookingId, $bookingMode);
 			} elseif ($action == 'restore') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
 			}
 
+			do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+
 			wp_redirect(get_admin_url() . 'edit.php?post_type=booking');
 			exit;
 		}
+	}
+
+	/**
+	 * Filters the array of row action links on the booking list table.
+	 * The filter is evaluated only for hierarchical post types (booking).
+	 * @param array $actions An array of row action links.
+	 * @param object $post The post object (WP_Post).
+	 * @return array $actions
+	 */
+	public function bookingRowAction($actions, $post)
+	{
+		if ($post->post_type != 'booking' || $post->post_status == 'trash') {
+			return $actions;
+		}
+
+		$booking = Functions::getBooking($post->ID);
+		$showActions = !in_array($booking['status'], ['checked-in', 'checked-out']);
+		$canEditBooking = current_user_can('edit_post', $post->ID);
+		$actions = [];
+		$title = _draft_or_post_title();
+
+		if ($showActions && $canEditBooking && 'trash' !== $post->post_status) {
+			$actions['edit'] = sprintf(
+				'<a href="%s" aria-label="%s">%s</a>',
+				get_edit_post_link($post->ID),
+				/* translators: %s: Post title. */
+				esc_attr(sprintf(__('Edit &#8220;%s&#8221;'), $title)),
+				__('Edit')
+			);
+
+			if ('wp_block' !== $post->post_type) {
+				unset($actions['inline hide-if-no-js']);
+			}
+		}
+
+		if ($showActions) {
+			if (current_user_can('delete_post', $post->ID)) {
+				if (EMPTY_TRASH_DAYS) {
+					$actions['trash'] = sprintf(
+						'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
+						get_delete_post_link($post->ID),
+						/* translators: %s: Post title. */
+						esc_attr(sprintf(__('Move &#8220;%s&#8221; to the Trash'), $title)),
+						_x('Delete', 'Booking', 'rrze-rsvp')
+					);
+				} else {
+					$actions['delete'] = sprintf(
+						'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
+						get_delete_post_link($post->ID, '', true),
+						/* translators: %s: Post title. */
+						esc_attr(sprintf(__('Delete &#8220;%s&#8221; permanently'), $title)),
+						__('Delete Permanently')
+					);
+				}
+			}
+		}
+
+		return $actions;
 	}
 
 	public function preBookingUpdate($postId, $data)
@@ -94,7 +161,7 @@ class Actions
 		if ($postType != 'booking') {
 			return;
 		}
-		// ...
+
 		$errorMessage = '';
 		if (!$errorMessage) {
 			return;
@@ -116,22 +183,25 @@ class Actions
 			return;
 		}
 
+		if (!isset($_POST['rrze-rsvp-booking-status'])) {
+			return;
+		}
+
 		$bookingId = $post->ID;
-
-		$bookingStatus = isset($_POST['rrze-rsvp-booking-status']) ? $_POST['rrze-rsvp-booking-status'] : '';
-
 		$booking = Functions::getBooking($bookingId);
-		$bookingBooked = ($booking['status'] == 'booked');
-		$bookingConfirmed = ($booking['status'] == 'confirmed');
-		$bookingCancelled = ($booking['status'] == 'cancelled');
-		$bookingCkeckedIn = ($booking['status'] == 'checked-in');
-		$bookingCkeckedOut = ($booking['status'] == 'checked-out');
+
+		$bookingStatus = sanitize_text_field($_POST['rrze-rsvp-booking-status']);
+
+		$bookingBooked = ($bookingStatus == 'booked');
+		$bookingConfirmed = ($bookingStatus == 'confirmed');
+		$bookingCancelled = ($bookingStatus == 'cancelled');
+		$bookingCkeckedIn = ($bookingStatus == 'checked-in');
+		$bookingCkeckedOut = ($bookingStatus == 'checked-out');
 
 		$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 		$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
 		if (($bookingBooked || $bookingCancelled) && $bookingStatus == 'confirmed') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', $bookingStatus);
 			update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
 			if ($forceToConfirm) {
 				update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'booked');
@@ -140,14 +210,15 @@ class Actions
 				$this->email->bookingConfirmedCustomer($bookingId, $bookingMode);
 			}
 		} elseif (($bookingBooked || $bookingConfirmed) && $bookingStatus == 'cancelled') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', $bookingStatus);
 			$this->email->bookingCancelledCustomer($bookingId, $bookingMode);
 		} elseif ($bookingCkeckedIn) {
+			//
 		} elseif ($bookingCkeckedOut) {
 			//
+		} else {
+			return;
 		}
 
-		// 2020-09-07 every time booking is saved:
 		do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
@@ -265,6 +336,8 @@ class Actions
 		add_filter('the_content', function ($content) use ($data) {
 			return $this->template->getContent('reply/booking-admin', $data);
 		});
+
+		do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
 	protected function bookingReplyCustomer(int $bookingId, array $booking, string $action)
@@ -294,7 +367,6 @@ class Actions
 			if (($start - $offset) <= $now && ($end - $offset) >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
 				$bookingCkeckedIn = true;
-				do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 			}
 		} elseif (!$bookingCancelled && !$bookingCkeckedOut && $bookingCkeckedIn && $action == 'checkout') {
 			if ($start <= $now && $end >= $now) {
@@ -401,6 +473,8 @@ class Actions
 		add_filter('the_content', function ($content) use ($data) {
 			return $this->template->getContent('reply/booking-customer', $data);
 		});
+
+		do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
 	protected function ajaxResult(array $returnAry)
