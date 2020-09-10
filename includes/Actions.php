@@ -106,12 +106,12 @@ class Actions
 		}
 
 		$booking = Functions::getBooking($post->ID);
-		$post_type_object = get_post_type_object($post->post_type);
-		$can_edit_post = current_user_can('edit_post', $post->ID);
+		$showActions = !in_array($booking['status'], ['checked-in', 'checked-out']);
+		$canEditBooking = current_user_can('edit_post', $post->ID);
 		$actions = [];
 		$title = _draft_or_post_title();
 
-		if ($can_edit_post && 'trash' !== $post->post_status) {
+		if ($showActions && $canEditBooking && 'trash' !== $post->post_status) {
 			$actions['edit'] = sprintf(
 				'<a href="%s" aria-label="%s">%s</a>',
 				get_edit_post_link($post->ID),
@@ -125,7 +125,7 @@ class Actions
 			}
 		}
 
-		if (!in_array($booking['status'], ['checked-in', 'checked-out'])) {
+		if ($showActions) {
 			if (current_user_can('delete_post', $post->ID)) {
 				if (EMPTY_TRASH_DAYS) {
 					$actions['trash'] = sprintf(
@@ -133,7 +133,7 @@ class Actions
 						get_delete_post_link($post->ID),
 						/* translators: %s: Post title. */
 						esc_attr(sprintf(__('Move &#8220;%s&#8221; to the Trash'), $title)),
-						_x('Trash', 'verb')
+						__('Delete', 'rrze-rsvp')
 					);
 				}
 				if (!EMPTY_TRASH_DAYS) {
@@ -157,7 +157,7 @@ class Actions
 		if ($postType != 'booking') {
 			return;
 		}
-		// ...
+
 		$errorMessage = '';
 		if (!$errorMessage) {
 			return;
