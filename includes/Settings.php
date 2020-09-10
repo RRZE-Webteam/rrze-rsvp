@@ -735,6 +735,32 @@ class Settings
         echo $html;
     }
 
+
+    /**
+     * Zeigt ein nur lesbares Textfeld für ein Einstellungsfeld an.
+     * @param array   $args Argumente des Einstellungsfelds
+     */
+    public function callbackTextareareadonly($args) // not callbackTextareaReadonly because of ucfirst() in generating method-name in adminInit()
+    {
+        $value = esc_textarea($this->getOption($args['section'], $args['id'], $args['default']));
+        $size = isset($args['size']) && !is_null($args['size']) ? $args['size'] : 'regular';
+        $placeholder = empty($args['placeholder']) ? '' : ' placeholder="' . $args['placeholder'] . '"';
+
+        $html = sprintf(
+            '<textarea readonly rows="5" cols="55" class="%1$s-text" id="%3$s-%4$s" name="%2$s[%3$s_%4$s]"%5$s>%6$s</textarea>',
+            $size,
+            $this->optionName,
+            $args['section'],
+            $args['id'],
+            $placeholder,
+            $value
+        );
+        $html .= $this->getFieldDescription($args);
+
+        echo $html;
+    }
+
+
     /**
      * Zeigt ein Rich-Text-Textfeld (WP-Editor) für ein Einstellungsfeld an.
      * @param array   $args Argumente des Einstellungsfelds
