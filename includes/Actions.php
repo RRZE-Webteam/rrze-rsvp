@@ -20,6 +20,7 @@ class Actions
 	{
 		add_action('admin_init', [$this, 'handleActions']);
 		add_action('wp_ajax_booking_action', [$this, 'ajaxBookingAction']);
+		add_filter('post_row_actions', [$this, 'bookingRowAction'], 10, 2);
 		add_action('pre_post_update', [$this, 'preBookingUpdate'], 10, 2);
 		add_action('transition_post_status', [$this, 'transitionBookingStatus'], 10, 3);
 		add_action('wp', [$this, 'bookingReply']);
@@ -54,8 +55,8 @@ class Actions
 			$this->ajaxResult(['result' => false]);
 		}
 
-        $this->ajaxResult(['result' => true]);
-        do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+		$this->ajaxResult(['result' => true]);
+		do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
 	public function handleActions()
@@ -84,11 +85,70 @@ class Actions
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
 			}
 
-            do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+			do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 
 			wp_redirect(get_admin_url() . 'edit.php?post_type=booking');
 			exit;
 		}
+	}
+
+	/**
+	 * Filters the array of row action links on the booking list table.
+	 * The filter is evaluated only for hierarchical post types (booking).
+	 * @param array $actions An array of row action links.
+	 * @param object $post The post object (WP_Post).
+	 * @return array $actions
+	 */
+	public function bookingRowAction($actions, $post)
+	{
+		if ($post->post_type != 'booking' || $post->post_status == 'trash') {
+			return $actions;
+		}
+
+		$booking = Functions::getBooking($post->ID);
+		$post_type_object = get_post_type_object($post->post_type);
+		$can_edit_post = current_user_can('edit_post', $post->ID);
+		$actions = [];
+		$title = _draft_or_post_title();
+
+		if ($can_edit_post && 'trash' !== $post->post_status) {
+			$actions['edit'] = sprintf(
+				'<a href="%s" aria-label="%s">%s</a>',
+				get_edit_post_link($post->ID),
+				/* translators: %s: Post title. */
+				esc_attr(sprintf(__('Edit &#8220;%s&#8221;'), $title)),
+				__('Edit')
+			);
+
+			if ('wp_block' !== $post->post_type) {
+				unset($actions['inline hide-if-no-js']);
+			}
+		}
+
+		if (!in_array($booking['status'], ['checked-in', 'checked-out'])) {
+			if (current_user_can('delete_post', $post->ID)) {
+				if (EMPTY_TRASH_DAYS) {
+					$actions['trash'] = sprintf(
+						'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
+						get_delete_post_link($post->ID),
+						/* translators: %s: Post title. */
+						esc_attr(sprintf(__('Move &#8220;%s&#8221; to the Trash'), $title)),
+						_x('Trash', 'verb')
+					);
+				}
+				if (!EMPTY_TRASH_DAYS) {
+					$actions['delete'] = sprintf(
+						'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
+						get_delete_post_link($post->ID, '', true),
+						/* translators: %s: Post title. */
+						esc_attr(sprintf(__('Delete &#8220;%s&#8221; permanently'), $title)),
+						__('Delete Permanently')
+					);
+				}
+			}
+		}
+
+		return $actions;
 	}
 
 	public function preBookingUpdate($postId, $data)
@@ -120,10 +180,10 @@ class Actions
 		}
 
 		$bookingId = $post->ID;
-
-		$bookingStatus = isset($_POST['rrze-rsvp-booking-status']) ? $_POST['rrze-rsvp-booking-status'] : '';
-
 		$booking = Functions::getBooking($bookingId);
+		
+		$bookingStatus = isset($_POST['rrze-rsvp-booking-status']) ? $_POST['rrze-rsvp-booking-status'] : $booking['status'];
+
 		$bookingBooked = ($booking['status'] == 'booked');
 		$bookingConfirmed = ($booking['status'] == 'confirmed');
 		$bookingCancelled = ($booking['status'] == 'cancelled');
@@ -266,9 +326,9 @@ class Actions
 
 		add_filter('the_content', function ($content) use ($data) {
 			return $this->template->getContent('reply/booking-admin', $data);
-        });
-        
-        do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+		});
+
+		do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
 	protected function bookingReplyCustomer(int $bookingId, array $booking, string $action)
@@ -403,9 +463,9 @@ class Actions
 
 		add_filter('the_content', function ($content) use ($data) {
 			return $this->template->getContent('reply/booking-customer', $data);
-        });
-     
-        do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+		});
+
+		do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
 	protected function ajaxResult(array $returnAry)
