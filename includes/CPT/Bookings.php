@@ -219,14 +219,26 @@ class Bookings
                             $button = '';
                     }
                     if (!in_array($booking['status'], ['checked-in', 'checked-out'])) {
-                        $button = sprintf(
-                            '%s<br><a href="edit.php?post_type=%s&action=delete&id=%d&_wpnonce=%s" class="delete">%s</a>',
-                            $button,
-                            'booking',
-                            $booking['id'],
-                            $_wpnonce,
-                            _x('Delete', 'Booking', 'rrze-rsvp')
-                        );
+                        if (current_user_can('delete_post', $booking['id'])) {
+                            $title = __('Booking', 'rrze-rsvp');
+                            if (EMPTY_TRASH_DAYS) {
+                                $button = sprintf(
+                                    '<a href="%s" class="delete" aria-label="%s">%s</a>',
+                                    get_delete_post_link($booking['id']),
+                                    /* translators: %s: Post title. */
+                                    esc_attr(sprintf(__('Move &#8220;%s&#8221; to the Trash'), $title)),
+                                    _x('Delete', 'Booking', 'rrze-rsvp')
+                                );
+                            } else {
+                                $button = sprintf(
+                                    '<a href="%s" class="delete" aria-label="%s">%s</a>',
+                                    get_delete_post_link($booking['id'], '', true),
+                                    /* translators: %s: Post title. */
+                                    esc_attr(sprintf(__('Delete &#8220;%s&#8221; permanently'), $title)),
+                                    __('Delete Permanently')
+                                );
+                            }
+                        }
                     }
                 }
                 echo $button . $bookingDate;

@@ -133,10 +133,9 @@ class Actions
 						get_delete_post_link($post->ID),
 						/* translators: %s: Post title. */
 						esc_attr(sprintf(__('Move &#8220;%s&#8221; to the Trash'), $title)),
-						__('Delete', 'rrze-rsvp')
+						_x('Delete', 'Booking', 'rrze-rsvp')
 					);
-				}
-				if (!EMPTY_TRASH_DAYS) {
+				} else {
 					$actions['delete'] = sprintf(
 						'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
 						get_delete_post_link($post->ID, '', true),
