@@ -201,13 +201,13 @@ class Bookings
                 } else {
                     switch ($booking['status']) {
                         case 'cancelled':
-                            $button = _x('Cancelled', 'Booking', 'rrze-rsvp');
+                            $button = '<span class="delete">' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</span>';
                             break;
                         case 'booked':
-                            $button = _x('Booked', 'Booking', 'rrze-rsvp');
+                            $button = '<span class="delete">' . _x('Booked', 'Booking', 'rrze-rsvp') . '</span>';
                             break;
                         case 'confirmed':
-                            $button = _x('Confirmed', 'Booking', 'rrze-rsvp');
+                            $button = '<span class="delete">' . _x('Confirmed', 'Booking', 'rrze-rsvp') . '</span>';
                             break;
                         case 'checked-in':
                             $button = _x('Checked-In', 'Booking', 'rrze-rsvp');
@@ -218,30 +218,8 @@ class Bookings
                         default:
                             $button = '';
                     }
-                    if (!in_array($booking['status'], ['checked-in', 'checked-out'])) {
-                        if (current_user_can('delete_post', $booking['id'])) {
-                            $title = __('Booking', 'rrze-rsvp');
-                            if (EMPTY_TRASH_DAYS) {
-                                $button = sprintf(
-                                    '<a href="%s" class="delete" aria-label="%s">%s</a>',
-                                    get_delete_post_link($booking['id']),
-                                    /* translators: %s: Post title. */
-                                    esc_attr(sprintf(__('Move &#8220;%s&#8221; to the Trash'), $title)),
-                                    _x('Delete', 'Booking', 'rrze-rsvp')
-                                );
-                            } else {
-                                $button = sprintf(
-                                    '<a href="%s" class="delete" aria-label="%s">%s</a>',
-                                    get_delete_post_link($booking['id'], '', true),
-                                    /* translators: %s: Post title. */
-                                    esc_attr(sprintf(__('Delete &#8220;%s&#8221; permanently'), $title)),
-                                    __('Delete Permanently')
-                                );
-                            }
-                        }
-                    }
                 }
-                echo $button . $bookingDate;
+                echo $button, $bookingDate;
             } else {
                 $cancelButton = sprintf(
                     '<a href="edit.php?post_type=%1$s&action=cancel&id=%2$d&_wpnonce=%3$s" class="button button-secondary" data-id="%2$d">%4$s</a>',
@@ -251,11 +229,11 @@ class Bookings
                     _x('Cancel', 'Booking', 'rrze-rsvp')
                 );
                 if ($booking['status'] == 'confirmed') {
-                    $button = $cancelButton . "<button class='button button-primary' disabled>" . __('Confirmed', 'rrze-rsvp') . "</button>";
+                    $button = $cancelButton . '<button class="button button-primary" disabled>' . _x('Confirmed', 'Booking', 'rrze-rsvp') . '</button>';
                 } elseif ($booking['status'] == 'checked-in') {
-                    $button = "<button class='button button-secondary' disabled>" . __('Checked-In', 'rrze-rsvp') . "</button>";
+                    $button = _x('Checked-In', 'Booking', 'rrze-rsvp');
                 } elseif ($booking['status'] == 'checked-out') {
-                    $button = "<button class='button button-secondary' disabled>" . __('Checked-Out', 'rrze-rsvp') . "</button>";
+                    $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
                 } else {
                     $button = $cancelButton . sprintf(
                         '<a href="edit.php?post_type=%1$s&action=confirm&id=%2$d&_wpnonce=%3$s" class="button button-primary" data-id="%2$d">%4$s</a>',
@@ -265,7 +243,7 @@ class Bookings
                         _x('Confirm', 'Booking', 'rrze-rsvp')
                     );
                 }
-                echo $button . $bookingDate;
+                echo $button, $bookingDate;
             }
         }
     }

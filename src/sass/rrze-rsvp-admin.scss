@@ -19,6 +19,7 @@ table {
 
 		td.status {
 			text-align: center;
+			width: 20%;
 
 			a, button {
 				margin: 2px 4px;
@@ -26,7 +27,7 @@ table {
 				text-align: center;						
 			}
 
-			a.delete {
+			.delete {
 				color: #a00;
 			}
 
