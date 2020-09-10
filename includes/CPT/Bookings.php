@@ -215,6 +215,8 @@ class Bookings
                         case 'checked-out':
                             $button = __('Checked-Out', 'rrze-rsvp');
                             break;
+                        default:
+                            $button = '';
                     }
                     if (!in_array($booking['status'], ['checked-in', 'checked-out'])) {
                         $button = sprintf(
@@ -224,8 +226,6 @@ class Bookings
                             $_wpnonce,
                             __('Delete', 'rrze-rsvp')
                         );
-                    } else {
-                        $button = '';
                     }
                 }
                 echo $button . $bookingDate;
