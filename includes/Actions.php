@@ -25,7 +25,7 @@ class Actions
 		add_filter('handle_bulk_actions-edit-booking', [$this, 'bookingBulkActionsHandler'], 10, 3);
 		add_action('admin_init', [$this, 'bookingBulkActionsHandlerSubmitted']);
 		add_action('admin_notices', [$this, 'bookingBulkActionsHandlerAdminNotice']);
-		add_action('pre_post_update', [$this, 'preBookingUpdate'], 10, 2);
+		add_action('pre_post_update', [$this, 'preBookingUpdate']);
 		add_action('transition_post_status', [$this, 'transitionBookingStatus'], 10, 3);
 		add_action('wp', [$this, 'bookingReply']);
 	}
@@ -114,13 +114,14 @@ class Actions
 			return $actions;
 		}
 
-		$booking = Functions::getBooking($post->ID);
-		$showActions = !in_array($booking['status'], ['checked-in', 'checked-out']);
-		$canEditBooking = current_user_can('edit_post', $post->ID);
 		$actions = [];
-		$title = _draft_or_post_title();
+		$title = _draft_or_post_title();		
+		$canEdit = current_user_can('edit_post', $post->ID);
+		$canDelete = $this->canDeleteBooking($post->ID);
 
-		if ($showActions && $canEditBooking && 'trash' !== $post->post_status) {
+		$status = get_post_meta($post->ID, 'rrze-rsvp-booking-status', true);
+
+		if ($status == 'booked' && $canEdit && 'trash' !== $post->post_status) {
 			$actions['edit'] = sprintf(
 				'<a href="%s" aria-label="%s">%s</a>',
 				get_edit_post_link($post->ID),
@@ -134,7 +135,7 @@ class Actions
 			}
 		}
 
-		if ($showActions) {
+		if ($canDelete) {
 			if (current_user_can('delete_post', $post->ID)) {
 				if (EMPTY_TRASH_DAYS) {
 					$actions['trash'] = sprintf(
@@ -203,28 +204,19 @@ class Actions
 				$trashed = 0;
 				$locked  = 0;
 				foreach ((array) $postIds as $postId) {
-					$now = current_time('timestamp');
-					$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
-					$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
-					$end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
-					$end = $end ? $end : $start->endOfDay()->getTimestamp();
-					$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
-					$archive = ($status == 'cancelled') || ($end < $now);
-					if ($archive) {
-						if (!in_array($status, ['checked-in', 'checked-out']) && $start->endOfDay()->lt(new Carbon('now'))) {
-							if (!current_user_can('delete_post', $postId)) {
-								wp_die(__('Sorry, you are not allowed to move this item to the Trash.'));
-							}
-							if (wp_check_post_lock($postId)) {
-								$locked++;
-								continue;
-							}
-							if (!wp_trash_post($postId)) {
-								wp_die(__('Error in moving the item to Trash.'));
-							}
-							$trashed++;
+					if ($this->canDeleteBooking($postId)) {
+						if (!current_user_can('delete_post', $postId)) {
+							wp_die(__('Sorry, you are not allowed to move this item to the Trash.'));
 						}
-					}
+						if (wp_check_post_lock($postId)) {
+							$locked++;
+							continue;
+						}
+						if (!wp_trash_post($postId)) {
+							wp_die(__('Error in moving the item to Trash.'));
+						}
+						$trashed++;
+					}					
 				}
 				$redirectTo = add_query_arg(
 					[
@@ -238,30 +230,21 @@ class Actions
 			case 'delete_booking':
 				$deleted = 0;
 				foreach ((array) $postIds as $postId) {
-					$now = current_time('timestamp');
-					$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
-					$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
-					$end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
-					$end = $end ? $end : $start->endOfDay()->getTimestamp();
-					$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
-					$archive = ($status == 'cancelled') || ($end < $now);
-					if ($archive) {
-						if (!in_array($status, ['checked-in', 'checked-out']) && $start->endOfDay()->lt(new Carbon('now'))) {
-							$postDel = get_post($postId);
-							if (!current_user_can('delete_post', $postId)) {
-								wp_die(__('Sorry, you are not allowed to delete this item.'));
-							}
-							if ('attachment' === $postDel->post_type) {
-								if (!wp_delete_attachment($postId)) {
-									wp_die(__('Error in deleting the attachment.'));
-								}
-							} else {
-								if (!wp_delete_post($postId)) {
-									wp_die(__('Error in deleting the item.'));
-								}
-							}
-							$deleted++;
+					if ($this->canDeleteBooking($postId)) {
+						$postDel = get_post($postId);
+						if (!current_user_can('delete_post', $postId)) {
+							wp_die(__('Sorry, you are not allowed to delete this item.'));
 						}
+						if ('attachment' === $postDel->post_type) {
+							if (!wp_delete_attachment($postId)) {
+								wp_die(__('Error in deleting the attachment.'));
+							}
+						} else {
+							if (!wp_delete_post($postId)) {
+								wp_die(__('Error in deleting the item.'));
+							}
+						}
+						$deleted++;						
 					}
 				}
 				$redirectTo = add_query_arg(
@@ -334,22 +317,35 @@ class Actions
 		}
 	}
 
-	public function preBookingUpdate($postId, $data)
+	public function preBookingUpdate($postId)
 	{
 		$postType = get_post_type($postId);
 		if ($postType != 'booking') {
 			return;
 		}
 
+		$trash = isset($_REQUEST['trash']) ? $_REQUEST['trash'] : '';
+		$delete = isset($_REQUEST['delete']) ? $_REQUEST['delete'] : '';
+
+		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+
 		$errorMessage = '';
-		if (!$errorMessage) {
-			return;
+
+		if ($trash || $delete) {
+			if (!$this->canDeleteBooking($postId)) {
+				$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
+			}
+		} elseif (in_array($status, ['checked-in', 'checked-out'])) {
+			$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
 		}
-		wp_die(
-			$errorMessage,
-			__('Update Error', 'rrze-rsvp'),
-			['back_link' => true]
-		);
+
+		if ($errorMessage) {
+			wp_die(
+				$errorMessage,
+				__('Update Error', 'rrze-rsvp'),
+				['back_link' => true]
+			);
+		}
 	}
 
 	public function transitionBookingStatus($newStatus, $oldStatus, $post)
@@ -660,5 +656,24 @@ class Actions
 	{
 		echo json_encode($returnAry);
 		exit;
+	}
+
+	protected function canDeleteBooking(int $postId): bool
+	{
+		$now = current_time('timestamp');
+		$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
+		$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
+		$end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
+		$end = $end ? $end : $start->endOfDay()->getTimestamp();
+		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+		$archive = (($status == 'cancelled') || ($end < $now));
+		if (
+			$archive
+			&& !(in_array($status, ['checked-in', 'checked-out']) || $start->endOfDay()->gt(new Carbon('now')))
+		) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
