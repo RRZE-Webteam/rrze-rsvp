@@ -161,9 +161,7 @@ class Actions
 
 	public function bookingBulkActions($actions)
 	{
-		if (isset($actions['edit'])) unset($actions['edit']);
-		if (isset($actions['trash'])) unset($actions['trash']);
-		if (isset($actions['delete'])) unset($actions['delete']);
+		$actions = [];
 		$actions['cancel_booking'] = _x('Cancel', 'Booking', 'rrze-rsvp');
 		$actions['delete_booking'] = _x('Delete', 'Booking', 'rrze-rsvp');
 		return $actions;
