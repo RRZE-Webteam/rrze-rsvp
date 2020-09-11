@@ -411,7 +411,7 @@ class Tracking {
         global $wpdb;
         $aRet = [];
 
-        if (!$hash_guest_email && !$hash_guest_firstname && !$hash_guest_lastname){
+        if (!$hash_guest_email){
             // we have nothing to search for
             return [];
         }
