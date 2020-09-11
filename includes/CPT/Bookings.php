@@ -36,7 +36,7 @@ class Bookings
         add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
         add_filter('parse_query', [$this, 'filterQuery'], 10);
 
-        add_filter('views_edit-booking', [$this, 'bookingViews']);
+        //add_filter('views_edit-booking', [$this, 'bookingViews']);
     }
 
     // Register Custom Post Type
