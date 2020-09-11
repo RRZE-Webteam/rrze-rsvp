@@ -117,13 +117,18 @@ class Main
 			'dateformat' => get_option('date_format'),
 			'text_cancel' => __('Do you want to cancel?', 'rrze-rsvp'),
 			'text_cancelled' => _x('Cancelled', 'Booking', 'rrze-rsvp'),
-			'text_confirmed' => __('Confirmed', 'rrze-rsvp'),
+			'text_confirmed' => _x('Confirmed', 'Booking', 'rrze-rsvp'),
 			'ajaxurl' => admin_url('admin-ajax.php'),
 			// Strings für CPT Booking Backend
 			'alert_no_seat_date' => __('Please select a seat and a date first.', 'rrze-rsvp')
 		));
 
-		if ($post_type == 'seat') {
+		if ($post_type == 'booking') {
+			wp_dequeue_script('autosave');
+		} elseif ($post_type == 'room') {
+			wp_dequeue_script('autosave');
+		} elseif ($post_type == 'seat') {
+			wp_dequeue_script('autosave');
 			wp_enqueue_script(
 				'rrze-rsvp-seat',
 				plugins_url('assets/js/rrze-rsvp-seat.js', plugin()->getBasename()),
