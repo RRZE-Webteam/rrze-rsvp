@@ -257,7 +257,7 @@ function getFields(){
                 'name'    => 'contact_tracking_note',
                 'label'   => __('Note for admins', 'rrze-rsvp'),
                 'desc'    => __('Allowed HTML-Tags are:', 'rrze-rsvp') . esc_html(' <' . implode('> <', array_keys(getAllowedHTML())) . '>'),
-                'type'    => 'textarea',
+                'type'    => 'textarea' . (is_super_admin() ? '' : 'readonly'),
                 'default' =>  $defaults['contact_tracking_note'],
                 'sanitize_callback' => 'wp_kses_custom'                
             ],
