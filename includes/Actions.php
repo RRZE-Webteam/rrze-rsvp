@@ -163,7 +163,11 @@ class Actions
 	{
 		$actions = [];
 		$actions['cancel_booking'] = _x('Cancel', 'Booking', 'rrze-rsvp');
-		$actions['delete_booking'] = _x('Delete', 'Booking', 'rrze-rsvp');
+		if (EMPTY_TRASH_DAYS) {
+			$actions['trash_booking'] = _x('Delete', 'Booking', 'rrze-rsvp');
+		} else {
+			$actions['delete_booking'] = __('Delete Permanently');
+		}
 		return $actions;
 	}
 
@@ -173,7 +177,7 @@ class Actions
 			case 'cancel_booking':
 				$cancelled = 0;
 				$locked  = 0;
-				foreach ($postIds as $postId) {
+				foreach ((array) $postIds as $postId) {
 					$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
 					if (wp_check_post_lock($postId)) {
 						$locked++;
@@ -195,10 +199,10 @@ class Actions
 					$redirectTo
 				);
 				break;
-			case 'delete_booking':
-				$deleted = 0;
+			case 'trash_booking':
+				$trashed = 0;
 				$locked  = 0;
-				foreach ($postIds as $postId) {
+				foreach ((array) $postIds as $postId) {
 					$now = current_time('timestamp');
 					$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
 					$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
@@ -218,15 +222,51 @@ class Actions
 							if (!wp_trash_post($postId)) {
 								wp_die(__('Error in moving the item to Trash.'));
 							}
+							$trashed++;
+						}
+					}
+				}
+				$redirectTo = add_query_arg(
+					[
+						'booking_trashed' => $trashed,
+						'booking_ids' => join(',', $postIds),
+						'booking_locked'  => $locked,
+					],
+					$redirectTo
+				);
+				break;
+			case 'delete_booking':
+				$deleted = 0;
+				foreach ((array) $postIds as $postId) {
+					$now = current_time('timestamp');
+					$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
+					$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
+					$end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
+					$end = $end ? $end : $start->endOfDay()->getTimestamp();
+					$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+					$archive = ($status == 'cancelled') || ($end < $now);
+					if ($archive) {
+						if (!in_array($status, ['checked-in', 'checked-out']) && $start->endOfDay()->lt(new Carbon('now'))) {
+							$postDel = get_post($postId);
+							if (!current_user_can('delete_post', $postId)) {
+								wp_die(__('Sorry, you are not allowed to delete this item.'));
+							}
+							if ('attachment' === $postDel->post_type) {
+								if (!wp_delete_attachment($postId)) {
+									wp_die(__('Error in deleting the attachment.'));
+								}
+							} else {
+								if (!wp_delete_post($postId)) {
+									wp_die(__('Error in deleting the item.'));
+								}
+							}
 							$deleted++;
 						}
 					}
 				}
 				$redirectTo = add_query_arg(
 					[
-						'booking_deleted' => $deleted,
-						'booking_ids' => join(',', $postIds),
-						'booking_locked'  => $locked,
+						'booking_deleted' => $deleted
 					],
 					$redirectTo
 				);
@@ -239,17 +279,19 @@ class Actions
 
 	public function bookingBulkActionsHandlerSubmitted()
 	{
-		if (!isset($_REQUEST['booking_cancelled']) && !isset($_REQUEST['booking_deleted'])) {
+		if (!isset($_REQUEST['booking_cancelled']) && !isset($_REQUEST['booking_trashed']) && !isset($_REQUEST['booking_deleted'])) {
 			return;
 		}
 		$bulkCounts = [
 			'cancelled' => absint($_REQUEST['booking_cancelled']),
+			'trashed' => absint($_REQUEST['booking_trashed']),
 			'deleted' => absint($_REQUEST['booking_deleted']),
 			'locked' => isset($_REQUEST['booking_locked']) ? absint($_REQUEST['booking_locked']) : 0
 		];
 		$bulkMessages = [
 			'cancelled' => _n('%s post cancelled.', '%s post cancelled.', $bulkCounts['cancelled']),
-			'deleted' => _n('%s post moved to the Trash.', '%s posts moved to the Trash.', $bulkCounts['deleted']),
+			'trashed' => _n('%s post moved to the Trash.', '%s posts moved to the Trash.', $bulkCounts['trashed']),
+			'deleted' => _n('%s post permanently deleted.', '%s posts permanently deleted.', $bulkCounts['deleted']),
 			'locked' => ($bulkCounts['locked'] === 1) ? __('1 post not updated, somebody is editing it.') :
 				_n('%s post not updated, somebody is editing it.', '%s posts not updated, somebody is editing them.', $bulkCounts['locked'])
 		];
@@ -258,7 +300,7 @@ class Actions
 			if (isset($bulkMessages[$message]) && $count) {
 				$messages[] = sprintf($bulkMessages[$message], number_format_i18n($count));
 			}
-			if ($message == 'deleted' && $count && isset($_REQUEST['booking_ids'])) {
+			if ($message == 'trashed' && $count && isset($_REQUEST['booking_ids'])) {
 				$ids = preg_replace('/[^0-9,]/', '', $_REQUEST['booking_ids']);
 				$messages[] = '<a href="' . esc_url(wp_nonce_url("edit.php?post_type=booking&doaction=undo&action=untrash&ids=$ids", 'bulk-posts')) . '">' . __('Undo') . '</a>';
 			}
@@ -272,7 +314,7 @@ class Actions
 					'transient-data' => $transientData->getTransient(),
 					'nonce' => $this->nonce
 				],
-				remove_query_arg(['booking_cancelled', 'booking_locked', 'booking_deleted', 'booking_ids'], wp_get_referer())
+				remove_query_arg(['booking_cancelled', 'booking_locked', 'booking_trashed', 'booking_deleted', 'booking_ids'], wp_get_referer())
 			);
 			wp_redirect($redirectUrl);
 			exit;
