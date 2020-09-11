@@ -35,29 +35,31 @@ class Bookings
         add_action('wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots']);
         add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
         add_filter('parse_query', [$this, 'filterQuery'], 10);
+
+        add_filter('views_edit-booking', [$this, 'bookingViews']);
     }
 
     // Register Custom Post Type
     public function booking_post_type()
     {
         $labels = [
-            'name'                    => _x('Bookings', 'Post type general name', 'rrze-rsvp'),
-            'singular_name'            => _x('Booking', 'Post type singular name', 'rrze-rsvp'),
-            'menu_name'                => _x('Bookings', 'Admin Menu text', 'rrze-rsvp'),
-            'name_admin_bar'        => _x('Booking', 'Add New on Toolbar', 'rrze-rsvp'),
-            'add_new'                => __('Add New', 'rrze-rsvp'),
-            'add_new_item'            => __('Add New Booking', 'rrze-rsvp'),
-            'new_item'                => __('New Booking', 'rrze-rsvp'),
-            'edit_item'                => __('Edit Booking', 'rrze-rsvp'),
-            'view_item'                => __('View Booking', 'rrze-rsvp'),
-            'all_items'                => __('All Bookings', 'rrze-rsvp'),
-            'search_items'            => __('Search Bookings', 'rrze-rsvp'),
-            'not_found'                => __('No Bookings found.', 'rrze-rsvp'),
-            'not_found_in_trash'    => __('No Bookings found in Trash.', 'rrze-rsvp'),
-            'archives'                => _x('Booking archives', 'The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4', 'rrze-rsvp'),
-            'filter_items_list'        => _x('Filter Bookings list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'rrze-rsvp'),
-            'items_list_navigation'    => _x('Bookings list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'rrze-rsvp'),
-            'items_list'            => _x('Bookings list', 'Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4', 'rrze-rsvp'),
+            'name'                      => _x('Bookings', 'Post type general name', 'rrze-rsvp'),
+            'singular_name'             => _x('Booking', 'Post type singular name', 'rrze-rsvp'),
+            'menu_name'                 => _x('Bookings', 'Admin Menu text', 'rrze-rsvp'),
+            'name_admin_bar'            => _x('Booking', 'Add New on Toolbar', 'rrze-rsvp'),
+            'add_new'                   => __('Add New', 'rrze-rsvp'),
+            'add_new_item'              => __('Add New Booking', 'rrze-rsvp'),
+            'new_item'                  => __('New Booking', 'rrze-rsvp'),
+            'edit_item'                 => __('Edit Booking', 'rrze-rsvp'),
+            'view_item'                 => __('View Booking', 'rrze-rsvp'),
+            'all_items'                 => __('All Bookings', 'rrze-rsvp'),
+            'search_items'              => __('Search Bookings', 'rrze-rsvp'),
+            'not_found'                 => __('No Bookings found.', 'rrze-rsvp'),
+            'not_found_in_trash'        => __('No Bookings found in Trash.', 'rrze-rsvp'),
+            'archives'                  => _x('Booking archives', 'The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4', 'rrze-rsvp'),
+            'filter_items_list'         => _x('Filter Bookings list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'rrze-rsvp'),
+            'items_list_navigation'     => _x('Bookings list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'rrze-rsvp'),
+            'items_list'                => _x('Bookings list', 'Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4', 'rrze-rsvp'),
         ];
 
         $args = [
@@ -156,95 +158,99 @@ class Bookings
         $date = date_i18n(get_option('date_format'), $booking['start']);
         $time = date_i18n(get_option('time_format'), $booking['start']) . ' - ' . date_i18n(get_option('time_format'), $booking['end']);
 
-        if ('bookingdate' === $column) {
-            echo $date;
-        }
-        if ('time' === $column) {
-            echo $time;
-        }
-        if ('room' === $column) {
-            echo get_the_title($booking['room']);
-        }
-        if ('seat' === $column) {
-            echo get_the_title($booking['seat']);
-        }
-        if ('name' === $column) {
-            echo $booking['guest_firstname'] . ' ' . $booking['guest_lastname'];
-        }
-        if ('email' === $column) {
-            echo $booking['guest_email'];
-        }
-        if ('phone' === $column) {
-            echo $booking['guest_phone'];
-        }
-        if ('status' === $column) {
-            $status = $booking['status'];
-            $start = $booking['start'];
-            $end = $booking['end'];
-            $now = current_time('timestamp');
-            $bookingDate = '<span class="booking_date">' . __('Booked on', 'rrze-rsvp') . ' ' . $booking['booking_date'] . '</span>';
-            $archive = ($status == 'cancelled') || ($end < $now);
-            $_wpnonce = wp_create_nonce('status');
+        switch ($column) {
+            case 'bookingdate':
+                echo $date;
+                break;
+            case 'time':
+                echo $time;
+                break;
+            case 'room':
+                echo $booking['room_name'];
+                break;
+            case 'seat':
+                echo $booking['seat_name'];
+                break;
+            case 'name':
+                echo $booking['guest_firstname'] . ' ' . $booking['guest_lastname'];
+                break;
+            case 'email':
+                echo $booking['guest_email'];
+                break;
+            case 'phone':
+                echo $booking['guest_phone'];
+                break;
+            case 'status':
+                $status = $booking['status'];
+                $start = $booking['start'];
+                $end = $booking['end'];
+                $now = current_time('timestamp');
+                $bookingDate = '<span class="booking_date">' . __('Booked on', 'rrze-rsvp') . ' ' . $booking['booking_date'] . '</span>';
+                $archive = ($status == 'cancelled') || ($end < $now);
+                $_wpnonce = wp_create_nonce('status');
 
-            if ($archive) {
-                $start = new Carbon(date('Y-m-d H:i:s', $booking['start']), wp_timezone());
-                if ($booking['status'] == 'cancelled' && $start->endOfDay()->gt(new Carbon('now'))) {
-                    $cancelledButton = '<button class="button button-secondary" disabled>' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</button>';
-                    $restoreButton = sprintf(
-                        '<a href="edit.php?post_type=%1$s&action=restore&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>',
-                        'booking',
-                        $booking['id'],
-                        $_wpnonce,
-                        _x('Restore', 'Booking', 'rrze-rsvp')
-                    );
-                    $button = $cancelledButton . $restoreButton;
-                } else {
-                    switch ($booking['status']) {
-                        case 'cancelled':
-                            $button = '<span class="delete">' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</span>';
-                            break;
-                        case 'booked':
-                            $button = '<span class="delete">' . _x('Booked', 'Booking', 'rrze-rsvp') . '</span>';
-                            break;
-                        case 'confirmed':
-                            $button = '<span class="delete">' . _x('Confirmed', 'Booking', 'rrze-rsvp') . '</span>';
-                            break;
-                        case 'checked-in':
-                            $button = _x('Checked-In', 'Booking', 'rrze-rsvp');
-                            break;
-                        case 'checked-out':
-                            $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
-                            break;
-                        default:
-                            $button = '';
+                if ($archive) {
+                    $start = new Carbon(date('Y-m-d H:i:s', $booking['start']), wp_timezone());
+                    if ($booking['status'] == 'cancelled' && $start->endOfDay()->gt(new Carbon('now'))) {
+                        $cancelledButton = '<button class="button button-secondary" disabled>' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</button>';
+                        $restoreButton = sprintf(
+                            '<a href="edit.php?post_type=%1$s&action=restore&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>',
+                            'booking',
+                            $booking['id'],
+                            $_wpnonce,
+                            _x('Restore', 'Booking', 'rrze-rsvp')
+                        );
+                        $button = $cancelledButton . $restoreButton;
+                    } else {
+                        switch ($booking['status']) {
+                            case 'cancelled':
+                                $button = '<span class="delete">' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</span>';
+                                break;
+                            case 'booked':
+                                $button = '<span class="delete">' . _x('Booked', 'Booking', 'rrze-rsvp') . '</span>';
+                                break;
+                            case 'confirmed':
+                                $button = '<span class="delete">' . _x('Confirmed', 'Booking', 'rrze-rsvp') . '</span>';
+                                break;
+                            case 'checked-in':
+                                $button = _x('Checked-In', 'Booking', 'rrze-rsvp');
+                                break;
+                            case 'checked-out':
+                                $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
+                                break;
+                            default:
+                                $button = '';
+                        }
                     }
-                }
-                echo $button, $bookingDate;
-            } else {
-                $cancelButton = sprintf(
-                    '<a href="edit.php?post_type=%1$s&action=cancel&id=%2$d&_wpnonce=%3$s" class="button button-secondary" data-id="%2$d">%4$s</a>',
-                    'booking',
-                    $booking['id'],
-                    $_wpnonce,
-                    _x('Cancel', 'Booking', 'rrze-rsvp')
-                );
-                if ($booking['status'] == 'confirmed') {
-                    $button = $cancelButton . '<button class="button button-primary" disabled>' . _x('Confirmed', 'Booking', 'rrze-rsvp') . '</button>';
-                } elseif ($booking['status'] == 'checked-in') {
-                    $button = _x('Checked-In', 'Booking', 'rrze-rsvp');
-                } elseif ($booking['status'] == 'checked-out') {
-                    $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
+                    echo $button, $bookingDate;
                 } else {
-                    $button = $cancelButton . sprintf(
-                        '<a href="edit.php?post_type=%1$s&action=confirm&id=%2$d&_wpnonce=%3$s" class="button button-primary" data-id="%2$d">%4$s</a>',
+                    $cancelButton = sprintf(
+                        '<a href="edit.php?post_type=%1$s&action=cancel&id=%2$d&_wpnonce=%3$s" class="button button-secondary" data-id="%2$d">%4$s</a>',
                         'booking',
                         $booking['id'],
                         $_wpnonce,
-                        _x('Confirm', 'Booking', 'rrze-rsvp')
+                        _x('Cancel', 'Booking', 'rrze-rsvp')
                     );
+                    if ($booking['status'] == 'confirmed') {
+                        $button = $cancelButton . '<button class="button button-primary" disabled>' . _x('Confirmed', 'Booking', 'rrze-rsvp') . '</button>';
+                    } elseif ($booking['status'] == 'checked-in') {
+                        $button = _x('Checked-In', 'Booking', 'rrze-rsvp');
+                    } elseif ($booking['status'] == 'checked-out') {
+                        $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
+                    } else {
+                        $button = $cancelButton . sprintf(
+                            '<a href="edit.php?post_type=%1$s&action=confirm&id=%2$d&_wpnonce=%3$s" class="button button-primary" data-id="%2$d">%4$s</a>',
+                            'booking',
+                            $booking['id'],
+                            $_wpnonce,
+                            _x('Confirm', 'Booking', 'rrze-rsvp')
+                        );
+                    }
+                    echo $button, $bookingDate;
                 }
-                echo $button, $bookingDate;
-            }
+                break;
+            default:
+                //
         }
     }
 
@@ -383,5 +389,13 @@ class Bookings
         }
 
         return $query;
+    }
+
+    public function bookingViews($views)
+    {
+        if (isset($views['all'])) unset($views['all']);
+        if (isset($views['mine'])) unset($views['mine']);
+        if (isset($views['publish'])) unset($views['publish']);
+        return $views;
     }
 }
