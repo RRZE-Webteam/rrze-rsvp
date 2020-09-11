@@ -366,6 +366,32 @@ class Functions
         return $data;
     }
 
+	public static function isBookingArchived(int $postId): bool
+	{
+		$now = current_time('timestamp');
+		$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
+		$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
+		$end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
+		$end = $end ? $end : $start->endOfDay()->getTimestamp();
+		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+		return (($status == 'cancelled') || ($end < $now));
+	}
+
+	public static function canDeleteBooking(int $postId): bool
+	{
+		$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
+		$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
+		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+		if (
+			self::isBookingArchived($postId)
+			&& !(in_array($status, ['checked-in', 'checked-out']) || $start->endOfDay()->gt(new Carbon('now')))
+		) {
+			return true;
+		} else {
+			return false;
+		}
+    }
+        
     public static function bookingReplyUrl(string $action, string $password, int $id): string
     {
         $hash = self::crypt($password);

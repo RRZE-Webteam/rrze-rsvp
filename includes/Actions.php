@@ -35,6 +35,11 @@ class Actions
 		$bookingId = absint($_POST['id']);
 		$action = sanitize_text_field($_POST['type']);
 
+		$post = get_post($bookingId);
+		if ($post->post_status != 'publish') {
+			$this->ajaxResult(['result' => false]);
+		}
+
 		$booking = Functions::getBooking($bookingId);
 		if (!$booking) {
 			$this->ajaxResult(['result' => false]);
@@ -42,8 +47,9 @@ class Actions
 
 		$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 		$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
+		$status = get_post_meta($bookingId, 'rrze-rsvp-booking-status', true);
 
-		if ($action == 'confirm') {
+		if ($status == 'booked' && $action == 'confirm') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 			update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
 			if ($forceToConfirm) {
@@ -52,7 +58,7 @@ class Actions
 			} else {
 				$this->email->bookingConfirmedCustomer($bookingId, $bookingMode);
 			}
-		} else if ($action == 'cancel') {
+		} elseif (in_array($status, ['booked', 'confirmed']) && $action == 'cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 			$this->email->bookingCancelledCustomer($bookingId, $bookingMode);
 		} else {
@@ -70,6 +76,13 @@ class Actions
 			$bookingId = absint($_GET['id']);
 			$action = sanitize_text_field($_GET['action']);
 
+			$post = get_post($bookingId);
+			if ($post->post_status != 'publish') {
+				return;
+			}
+
+			$status = get_post_meta($bookingId, 'rrze-rsvp-booking-status', true);
+
 			$booking = Functions::getBooking($bookingId);
 			if (!$booking) {
 				return;
@@ -78,7 +91,7 @@ class Actions
 			$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 			$forceToConfirm = get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true);
 
-			if ($action == 'confirm') {
+			if ($status == 'booked' && $action == 'confirm') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 				update_post_meta($bookingId, 'rrze-rsvp-customer-status', '');
 				if ($forceToConfirm) {
@@ -87,11 +100,13 @@ class Actions
 				} else {
 					$this->email->bookingConfirmedCustomer($bookingId, $bookingMode);
 				}
-			} elseif ($action == 'cancel') {
+			} elseif (in_array($status, ['booked', 'confirmed']) && $action == 'cancel') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 				$this->email->bookingCancelledCustomer($bookingId, $bookingMode);
-			} elseif ($action == 'restore') {
+			} elseif ($status == 'cancelled' && $action == 'restore') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
+			} elseif ($status == 'checked-in' && $action == 'checkout') {
+				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-out');
 			}
 
 			do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
@@ -110,18 +125,19 @@ class Actions
 	 */
 	public function bookingRowAction($actions, $post)
 	{
-		if ($post->post_type != 'booking' || $post->post_status == 'trash') {
+		if ($post->post_type != 'booking' || $post->post_status != 'publish') {
 			return $actions;
 		}
 
 		$actions = [];
 		$title = _draft_or_post_title();		
 		$canEdit = current_user_can('edit_post', $post->ID);
-		$canDelete = $this->canDeleteBooking($post->ID);
+		$isArchive = Functions::isBookingArchived($post->ID);
+		$canDelete = Functions::canDeleteBooking($post->ID);
 
 		$status = get_post_meta($post->ID, 'rrze-rsvp-booking-status', true);
 
-		if ($status == 'booked' && $canEdit && 'trash' !== $post->post_status) {
+		if (!$isArchive && $status == 'booked' && $canEdit) {
 			$actions['edit'] = sprintf(
 				'<a href="%s" aria-label="%s">%s</a>',
 				get_edit_post_link($post->ID),
@@ -179,12 +195,16 @@ class Actions
 				$cancelled = 0;
 				$locked  = 0;
 				foreach ((array) $postIds as $postId) {
+					$post = get_post($postId);
+					if ($post->post_status != 'publish') {
+						continue;
+					}
 					$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
 					if (wp_check_post_lock($postId)) {
 						$locked++;
 						continue;
 					}
-					if (in_array($status, ['booked', 'confirmed'])) {
+					if (!Functions::isBookingArchived($postId) && in_array($status, ['booked', 'confirmed'])) {
 						update_post_meta($postId, 'rrze-rsvp-booking-status', 'cancelled');
 						$this->email->bookingCancelledCustomer($postId);
 						do_action('rrze-rsvp-tracking', get_current_blog_id(), $postId);
@@ -204,7 +224,11 @@ class Actions
 				$trashed = 0;
 				$locked  = 0;
 				foreach ((array) $postIds as $postId) {
-					if ($this->canDeleteBooking($postId)) {
+					$post = get_post($postId);
+					if ($post->post_status != 'publish') {
+						continue;
+					}
+					if (Functions::canDeleteBooking($postId)) {
 						if (!current_user_can('delete_post', $postId)) {
 							wp_die(__('Sorry, you are not allowed to move this item to the Trash.'));
 						}
@@ -230,7 +254,7 @@ class Actions
 			case 'delete_booking':
 				$deleted = 0;
 				foreach ((array) $postIds as $postId) {
-					if ($this->canDeleteBooking($postId)) {
+					if (Functions::canDeleteBooking($postId)) {
 						$postDel = get_post($postId);
 						if (!current_user_can('delete_post', $postId)) {
 							wp_die(__('Sorry, you are not allowed to delete this item.'));
@@ -319,8 +343,8 @@ class Actions
 
 	public function preBookingUpdate($postId)
 	{
-		$postType = get_post_type($postId);
-		if ($postType != 'booking') {
+		$post = get_post($postId);
+		if ($post->post_status != 'publish' || $post->post_type != 'booking') {
 			return;
 		}
 
@@ -329,13 +353,16 @@ class Actions
 
 		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
 
+		$isArchive = Functions::isBookingArchived($postId);
+		$canDelete = Functions::canDeleteBooking($postId);		
+
 		$errorMessage = '';
 
 		if ($trash || $delete) {
-			if (!$this->canDeleteBooking($postId)) {
+			if (!$canDelete) {
 				$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
 			}
-		} elseif (in_array($status, ['checked-in', 'checked-out'])) {
+		} elseif ($isArchive || $status != 'booked') {
 			$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
 		}
 
@@ -350,7 +377,7 @@ class Actions
 
 	public function transitionBookingStatus($newStatus, $oldStatus, $post)
 	{
-		if (get_post_type($post) != 'booking') {
+		if ($post->post_type != 'booking') {
 			return;
 		}
 
@@ -658,7 +685,7 @@ class Actions
 		exit;
 	}
 
-	protected function canDeleteBooking(int $postId): bool
+	protected function isBookingArchived(int $postId): bool
 	{
 		$now = current_time('timestamp');
 		$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
@@ -666,9 +693,16 @@ class Actions
 		$end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
 		$end = $end ? $end : $start->endOfDay()->getTimestamp();
 		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
-		$archive = (($status == 'cancelled') || ($end < $now));
+		return (($status == 'cancelled') || ($end < $now));
+	}
+
+	protected function canDeleteBooking(int $postId): bool
+	{
+		$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
+		$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
+		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
 		if (
-			$archive
+			$this->isBookingArchived($postId)
 			&& !(in_array($status, ['checked-in', 'checked-out']) || $start->endOfDay()->gt(new Carbon('now')))
 		) {
 			return true;
