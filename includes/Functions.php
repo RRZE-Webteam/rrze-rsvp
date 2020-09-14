@@ -489,6 +489,7 @@ class Functions
         $loopend = strtotime($end);
         while ($loopstart <= $loopend) {
             $weekday = date('w', $loopstart);
+            if ($weekday == '0') $weekday = '7';
             if (isset($slots[$weekday])) {
                 foreach ($slots[$weekday] as $time => $endtime) {
                     $time_parts = explode(':', $time);
@@ -516,6 +517,7 @@ class Functions
         // Für Kalender aus Array-Ebene Timestamp zwei Ebenen (Tag / Zeit) machen
         foreach ($room_availability as $timestamp => $v) {
             $weekday = (date('w', $timestamp));
+            if ($weekday == '0') $weekday = '7';
             $start = date('H:i', $timestamp);
             $end = $slots[$weekday][$start];
             // remove past timeslots from today if needed
