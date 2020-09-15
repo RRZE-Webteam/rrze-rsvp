@@ -3,6 +3,7 @@
 namespace RRZE\RSVP\Shortcodes;
 
 use RRZE\RSVP\Email;
+use RRZE\RSVP\Helper;
 use RRZE\RSVP\IdM;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Template;
@@ -226,7 +227,7 @@ class Bookings extends Shortcodes {
         );
 
         $output .= '<div class="rrze-rsvp">';
-        $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room">'
+        $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room" class="mode-'.$bookingMode.'">'
                     . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
 // TODO:	
 //	$output .= '<fieldset>';  
@@ -239,7 +240,7 @@ class Bookings extends Shortcodes {
         if (isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rsvp-availability')) {
             $output .= '<div><input type="hidden" value="' . $_GET['nonce'] . '" id="rsvp_availability" name="nonce"></div>';
         }
-        $output .= '<p><input type="hidden" value="' . $roomID . '" id="rsvp_room">'
+        $output .= '<p><input type="hidden" value="' . $roomID . '" id="rsvp_room" name="rsvp_room">'
                     . wp_nonce_field('post_nonce', 'rrze_rsvp_post_nonce_field')
                     . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($roomID) . '</strong>'
                     . '</p>';
@@ -549,11 +550,22 @@ class Bookings extends Shortcodes {
         $booking_date = sanitize_text_field($posted_data['rsvp_date']);
         $booking_start = sanitize_text_field($posted_data['rsvp_time']);
         $booking_timestamp_start = strtotime($booking_date . ' ' . $booking_start);
-        $booking_seat = absint($posted_data['rsvp_seat']);
         $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
         $booking_instant = (isset($posted_data['rsvp_instant']) && $posted_data['rsvp_instant'] == '1');
         $booking_comment = (isset($posted_data['rsvp_comment']) ? sanitize_textarea_field($posted_data['rsvp_comment']) : '');
         $booking_dsgvo = (isset($posted_data['rsvp_dsgvo']) && $posted_data['rsvp_dsgvo'] == '1');
+        $booking_room = absint($posted_data['rsvp_room']);
+        $booking_mode = get_post_meta($booking_room, 'rrze-rsvp-room-bookingmode', true);
+        if ($booking_mode == 'consultation') {
+            $room_seats = get_posts([
+                'post_type' => 'seat',
+                'meta_key' => 'rrze-rsvp-seat-room',
+                'meta_value' => $booking_room,
+            ]);
+            $booking_seat = $room_seats[0]->ID;
+        } else {
+            $booking_seat = absint($posted_data['rsvp_seat']);
+        }
 
         if ($this->sso) {
             if ($this->idm->isAuthenticated()){
@@ -699,7 +711,7 @@ class Bookings extends Shortcodes {
         }
 
         // Überprüfen ob Timeslot in der Vergangenheit liegt
-        $room_id = get_post_meta($booking_seat, 'rrze-rsvp-seat-room', true);
+        $room_id = $booking_room;
         $room_meta = get_post_meta($room_id);
         $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : '';
         foreach ($room_timeslots as $week) {
@@ -1044,10 +1056,10 @@ class Bookings extends Shortcodes {
             $response['seat'] = '<div class="rsvp-seat-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
         }
         $availability = Functions::getRoomAvailability($roomID, $date, date('Y-m-d', strtotime($date. ' +1 days')), false);
-
+        $bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
         if ($date) {
             $response['time'] = $this->buildTimeslotSelect($roomID, $date, $time, $availability);
-            if ($time) {
+            if ($time && ($bookingMode != 'consultation')) {
                 $seatSelect = $this->buildSeatSelect($roomID, $date, $time, $seat, $availability);
                 $seatInfo = ($seat) ? $this->buildSeatInfo($seat) : '';
                 $response['seat'] = $seatSelect . $seatInfo;
