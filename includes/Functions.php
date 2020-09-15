@@ -392,6 +392,83 @@ class Functions
 		}
     }
         
+    public static function canDeleteSeat(int $postId): bool
+    {
+        $args = [
+            'fields'            => 'ids',
+            'post_type'         => 'booking',
+            'post_status'       => 'publish',
+            'nopaging'          => true,
+            'meta_query'        => [
+                [
+                    'key'       => 'rrze-rsvp-booking-seat',
+                    'value'     => $postId,
+                    'compare'   => '='
+                ]
+            ]
+        ];
+        $query = new \WP_Query($args);
+        if ($query->have_posts()) {
+            wp_reset_postdata();
+            return false;
+        }
+        return true;
+    }
+
+    public static function canDeleteRoom(int $postId): bool
+    {
+        $seats = self::getAllRoomSeats($postId);
+        if(empty($seats)) {
+            return true;
+        }
+        $args = [
+            'fields'            => 'ids',
+            'post_type'         => 'booking',
+            'post_status'       => 'publish',
+            'nopaging'          => true,
+            'meta_query'        => [
+                [
+                    'key'       => 'rrze-rsvp-booking-seat',
+                    'value'     => $seats,
+                    'compare'   => 'IN'
+                ]
+            ]
+        ];
+        $query = new \WP_Query($args);
+        if ($query->have_posts()) {
+            wp_reset_postdata();
+            return false;
+        }
+        return true;
+    }
+
+    public static function getAllRoomSeats(int $roomId): array
+    {
+        $seats = [];
+        $args = [
+            'fields'            => 'ids',
+            'post_type'         => 'seat',
+            'post_status'       => 'publish',
+            'nopaging'          => true,
+            'meta_query'        => [
+                [
+                    'key'       => 'rrze-rsvp-seat-room',
+                    'value'     => $roomId,
+                    'compare'   => '='
+                ]
+            ]
+        ];
+        $query = new \WP_Query($args);
+        if ($query->have_posts()) {
+            while ($query->have_posts()) {
+                $query->the_post();
+                $seats[] = get_the_ID();
+            }
+            wp_reset_postdata();
+        }
+        return $seats;
+    }
+        
     public static function bookingReplyUrl(string $action, string $password, int $id): string
     {
         $hash = self::crypt($password);
@@ -489,6 +566,7 @@ class Functions
         $loopend = strtotime($end);
         while ($loopstart <= $loopend) {
             $weekday = date('w', $loopstart);
+            if ($weekday == '0') $weekday = '7';
             if (isset($slots[$weekday])) {
                 foreach ($slots[$weekday] as $time => $endtime) {
                     $time_parts = explode(':', $time);
@@ -516,6 +594,7 @@ class Functions
         // Für Kalender aus Array-Ebene Timestamp zwei Ebenen (Tag / Zeit) machen
         foreach ($room_availability as $timestamp => $v) {
             $weekday = (date('w', $timestamp));
+            if ($weekday == '0') $weekday = '7';
             $start = date('H:i', $timestamp);
             $end = $slots[$weekday][$start];
             // remove past timeslots from today if needed
