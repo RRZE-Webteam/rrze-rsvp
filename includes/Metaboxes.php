@@ -18,6 +18,19 @@ class Metaboxes
         add_action('cmb2_admin_init', [$this, 'seat']);
     }
 
+    public function cb_encrypt($value){
+        if ($value){
+            return Functions::crypt($value, 'encrypt');
+        }
+    }
+
+    public function cb_decrypt($value){
+        if ($value){
+            return Functions::crypt($value, 'decrypt');
+        }
+    }
+
+
     public function booking()
     {
         $cmb = new_cmb2_box(array(
@@ -90,22 +103,29 @@ class Metaboxes
             ),
         ));
 
+
         $cmb->add_field(array(
             'name'    => __('Last name', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-booking-guest-lastname',
             'type'    => 'text',
+		    'sanitization_cb' => [$this, 'cb_encrypt'], // encrypt before storing
+            'escape_cb'       => [$this, 'cb_decrypt'], // decrypt before displaying
         ));
 
         $cmb->add_field(array(
             'name'    => __('First name', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-booking-guest-firstname',
             'type'    => 'text',
+		    'sanitization_cb' => [$this, 'cb_encrypt'],
+            'escape_cb'       => [$this, 'cb_decrypt'],
         ));
 
         $cmb->add_field(array(
             'name'    => __('Email', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-booking-guest-email',
             'type'    => 'text_email',
+		    'sanitization_cb' => [$this, 'cb_encrypt'],
+            'escape_cb'       => [$this, 'cb_decrypt'],
         ));
 
         $cmb->add_field(array(
@@ -115,6 +135,8 @@ class Metaboxes
             'attributes' => array(
                 'type' => 'tel',
             ),
+		    'sanitization_cb' => [$this, 'cb_encrypt'],
+            'escape_cb'       => [$this, 'cb_decrypt'],
         ));
 
         $cmb->add_field(array(

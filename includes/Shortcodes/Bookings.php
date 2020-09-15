@@ -578,6 +578,11 @@ class Bookings extends Shortcodes {
             $booking_email = sanitize_email($posted_data['rsvp_email']);
         }
 
+        // encrypt user data
+        $booking_firstname = Functions::crypt($booking_firstname, 'encrypt');
+        $booking_lastname = Functions::crypt($booking_lastname, 'encrypt');
+        $booking_email = Functions::crypt($booking_email, 'encrypt');
+        $booking_phone = Functions::crypt($booking_phone, 'encrypt');
 
         // Postdaten überprüfen
         $transientData = new TransientData(bin2hex(random_bytes(8)));
