@@ -280,10 +280,10 @@ class Tracking {
             'room_zip' => (int)$booking['room_zip'],
             'room_city' => $booking['room_city'],
             'seat_name' => $booking['seat_name'],
-            'hash_guest_firstname' => Functions::crypt($booking['guest_firstname'], 'encrypt'),
-            'hash_guest_lastname' => Functions::crypt($booking['guest_lastname'], 'encrypt'),
-            'hash_guest_email' => Functions::crypt($booking['guest_email'], 'encrypt'),
-            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt')
+            'hash_guest_firstname' => $booking['guest_firstname'],
+            'hash_guest_lastname' => $booking['guest_lastname'],
+            'hash_guest_email' => $booking['guest_email'],
+            'hash_guest_phone' => $booking['guest_phone']
         ];
 
         $fields_format = [
@@ -334,10 +334,10 @@ class Tracking {
             'room_zip' => (int)$booking['room_zip'],
             'room_city' => $booking['room_city'],
             'seat_name' => $booking['seat_name'],
-            'hash_guest_firstname' => Functions::crypt($booking['guest_firstname'], 'encrypt'),
-            'hash_guest_lastname' => Functions::crypt($booking['guest_lastname'], 'encrypt'),
-            'hash_guest_email' => Functions::crypt($booking['guest_email'], 'encrypt'),
-            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt')
+            'hash_guest_firstname' => $booking['guest_firstname'],
+            'hash_guest_lastname' => $booking['guest_lastname'],
+            'hash_guest_email' => $booking['guest_email'],
+            'hash_guest_phone' => $booking['guest_phone'],
         ];
 
         $fields_format = [
