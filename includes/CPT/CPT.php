@@ -6,6 +6,7 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Main;
 use RRZE\RSVP\Capabilities;
+use RRZE\RSVP\Functions;
 
 /**
  * Laden und definieren der Posttypes
@@ -39,6 +40,8 @@ class CPT extends Main
                 }
             );
         }
+
+        add_action('admin_menu', [$this, 'customSubmitdiv']);
     }
 
     public function activation()
@@ -175,5 +178,62 @@ class CPT extends Main
             . '<div class="rsvp-occupancy-links"></div>'
             . '<div class="rsvp-occupancy-container"></div>'
             . '</div>';
+    }
+
+    public function customSubmitdiv()
+    {
+        $cpts = array_keys(Capabilities::getCurrentCptArgs());
+        foreach ($cpts as  $cpt) {
+            remove_meta_box('submitdiv', $cpt, 'core');
+            add_meta_box('submitdiv', __('Publish'), [$this, 'addCustomSubmitdiv'], $cpt, 'side', 'low');
+        }
+    }
+
+    public function addCustomSubmitdiv()
+    {
+        global $post;
+
+        $postType = $post->post_type;       
+        $postTypeObject = get_post_type_object($postType);
+        $canPublish = current_user_can($postTypeObject->cap->publish_posts);
+        $canDelete = Functions::canDeletePost($post->ID, $postType);
+        ?>
+        <div class="submitbox" id="submitpost">
+            <div id="major-publishing-actions">
+                <?php
+                do_action('post_submitbox_start');
+                ?>
+                <div id="delete-action">
+                    <?php
+                    if ($canDelete && current_user_can('delete_post', $post->ID)) {
+                        if (!EMPTY_TRASH_DAYS)
+                            $delete_text = __('Delete Permanently');
+                        else
+                            $delete_text = __('Move to Trash');
+                        ?>
+                        <a class="submitdelete deletion" href="<?php echo get_delete_post_link($post->ID); ?>"><?php echo $delete_text; ?></a>
+                    <?php 
+                    } ?>
+                </div>
+                <div id="publishing-action">
+                    <span class="spinner"></span>
+                    <?php
+                    if (!in_array($post->post_status, array('publish', 'future', 'private')) || 0 == $post->ID) {
+                        if ($canPublish) : ?>
+                            <input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Add Tab') ?>" />
+                            <?php submit_button(__('Publish'), 'primary button-large', 'publish', false); ?>
+                        <?php
+                        endif;
+                    } else { ?>
+                        <input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Update'); ?>" />
+                        <input name="save" type="submit" class="button button-primary button-large" id="publish" value="<?php esc_attr_e('Update'); ?>">
+                    <?php
+                    } 
+                    ?>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <?php
     }
 }
