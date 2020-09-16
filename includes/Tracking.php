@@ -8,7 +8,7 @@ use RRZE\RSVP\Settings;
 
 class Tracking {
     const DB_TABLE = 'rrze_rsvp_tracking';
-    const DB_VERSION = '1.3.2';
+    const DB_VERSION = '1.4.0';
     const DB_VERSION_OPTION_NAME = 'rrze_rsvp_tracking_db_version';
 
     protected $settings;
@@ -58,7 +58,6 @@ class Tracking {
     private static function logError(string $method){
         // uses plugin rrze-log
         global $wpdb;
-
         do_action('rrze.log.error', 'rrze-rsvp ' . $method . '() returns false $wpdb->last_result= ' . json_encode($wpdb->last_result) . '| $wpdb->last_query= ' . json_encode($wpdb->last_query . '| $wpdb->last_error= ' . json_encode($wpdb->last_error)));
     }
 
@@ -474,35 +473,6 @@ class Tracking {
         $charsetCollate = $wpdb->get_charset_collate();
         $trackingTable = Tracking::getTableName($tableType);
 
-        // BK 2DO 2020-09-07:
-        // this is not a good solution
-        // read https://wordpress.stackexchange.com/questions/78667/dbdelta-alter-table-syntax
-        // ==> better use dbDelta strickly 
-        // documented here: https://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
-
-        // backup and drop table if it exists
-        if ($this->checkTableExists($trackingTable)){
-            if ($this->backupTable($trackingTable)){
-                if ($this->dropTable($trackingTable)){
-                    $msg = __('Warning! Database version has changed: tracking table has been backuped. New tracking table is now empty. Contact your SuperAdmin to restore tracking data!', 'rrze-rsvp');
-                }else{
-                    $msg = __('Error! Database version has changed but could not drop tracking table. Contact your SuperAdmin!', 'rrze-rsvp');
-                }
-            }else{
-                $msg = __('Error! Database version has changed but could not backup tracking table. Contact your SuperAdmin!', 'rrze-rsvp');
-            }
-            $pluginData = get_plugin_data(plugin()->getFile());
-            $pluginName = $pluginData['Name'];
-            $tag = is_plugin_active_for_network(plugin()->getBaseName()) ? 'network_admin_notices' : 'admin_notices';
-            add_action($tag, function () use ($pluginName, $msg) {
-                printf(
-                    '<div class="notice notice-error"><p>' . __('Plugins: %1$s: %2$s', 'rrze-rsvp') . '</p></div>',
-                    esc_html($pluginName),
-                    esc_html($msg)
-                );
-            });
-        }
-
         $sql = "CREATE TABLE " . $trackingTable . " (
             id bigint(20) UNSIGNED NOT NULL auto_increment,
             blog_id bigint(20) NOT NULL,
@@ -525,10 +495,10 @@ class Tracking {
             UNIQUE KEY uk_blog_booking (blog_id, booking_id)
             ) $charsetCollate;";
 
-        // echo "<script>console.log('sql = " . $sql . "' );</script>";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         $aRet = dbDelta($sql);
-        // echo "<script>console.log('dbDelta returns " . json_encode($aRet) . "' );</script>";
+        do_action('rrze.log.info', 'rrze-rsvp: Tracking DB Update v' . $this->dbVersion . ' | $sql = ' . json_encode($sql));
+        do_action('rrze.log.info', 'rrze-rsvp: Tracking DB Update v' . $this->dbVersion . ' | dbDelta() returned ' . json_encode($aRet));
     }
 
 
@@ -538,35 +508,4 @@ class Tracking {
         return ( $tableType == 'network' ? $wpdb->base_prefix : $wpdb->get_blog_prefix($blogID) ) . static::DB_TABLE;
     }
 
-
-    protected function checkTableExists(string $tableName): bool{
-        global $wpdb;
-
-        $ret = $wpdb->get_results("SELECT * FROM information_schema.tables WHERE table_schema = '{$wpdb->dbname}' AND table_name = '{$tableName}' LIMIT 1", ARRAY_A);
-        return ( $ret ? true : false ); // $ret can be false, 0 or any integer
-    }
-
-
-    protected function dropTable(string $tableName): bool{
-        global $wpdb;
-
-        $ret = $wpdb->query(
-               $wpdb->prepare("DROP TABLE IF EXISTS {$tableName}", array($tableName))); // returns true/false
-
-        if (false === $ret){
-            Tracking::logError('dropTable');
-        }
-        return $ret;
-    }
-
-
-    protected function backupTable(string $tableName){
-        global $wpdb;
-
-        $ret = $wpdb->query("RENAME TABLE $tableName TO $tableName" . '_backup_' . date('Y_m_d_His')); // returns true/false
-        if (false === $ret){
-            Tracking::logError('backupTable');
-        }
-        return $ret;
-    }
 }
