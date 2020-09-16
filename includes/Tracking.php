@@ -216,10 +216,6 @@ class Tracking {
 
         $booking = Functions::getBooking($bookingID);
 
-        // BK DEBUG
-        do_action('rrze.log.error', 'BK DEBUG' . json_encode($booking));
-
-
         if (!$booking) {
             do_action('rrze.log.error', 'rrze-rsvp : BOOKING NOT FOUND | Functions::getBooking() returns [] in Tracking->insertOrUpdateTracking() with $bookingID = ' . $bookingID);
             return;
