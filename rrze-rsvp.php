@@ -75,7 +75,7 @@ function systemRequirements(): string
  */
 function activation()
 {
-    add_action('init', __NAMESPACE__ . '\loadTextdomain');
+    loadTextdomain();
 
     if ($error = systemRequirements()) {
         deactivate_plugins(plugin_basename(__FILE__));
