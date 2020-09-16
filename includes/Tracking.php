@@ -101,8 +101,6 @@ class Tracking {
     public function admin_page_tracking_form() {
         $searchdate = '';
         $delta = 0;
-        // $guest_firstname = '';
-        // $guest_lastname = '';
         $guest_email = '';
 
         echo '<div class="wrap">';
@@ -111,17 +109,11 @@ class Tracking {
         if ( isset( $_GET['submit'])) {
             $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
             $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
-            // $guest_firstname = filter_input(INPUT_GET, 'guest_firstname', FILTER_SANITIZE_STRING);
-            // $guest_lastname = filter_input(INPUT_GET, 'guest_lastname', FILTER_SANITIZE_STRING);
             $guest_email = filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL);
-            // $hash_guest_firstname = Functions::crypt($guest_firstname, 'encrypt');
-            // $hash_guest_lastname = Functions::crypt($guest_lastname, 'encrypt');
             $hash_guest_email = Functions::crypt($guest_email, 'encrypt');
-            // $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
             $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email);
 
             if ($aGuests){
-                // $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&hash_guest_firstname=' . urlencode($hash_guest_firstname) . '&hash_guest_lastname=' . urlencode($hash_guest_lastname) . '&hash_guest_email=' . urlencode($hash_guest_email);
                 $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&hash_guest_email=' . urlencode($hash_guest_email);
                 echo '<div class="notice notice-success is-dismissible">'
                     . '<h2>' . __('Guests found!', 'rrze-rsvp') . '</h2>'
@@ -146,16 +138,6 @@ class Tracking {
             . '<th scope="row"><label for="delta">' . '&#177; ' . __('days', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="number" id="delta" name="delta" min="0" required value="' . $delta . '"></td>'
             . '</tr>';
-        // echo '<tr>'
-        //     . '<th scope="row"><label for="guest_firstname">' . __('First name', 'rrze-rsvp') . '</label></th>'
-        //     . '<td><input type="text" id="guest_firstname" name="guest_firstname" value="' . $guest_firstname . '">'
-        //     . '</td>'
-        //     . '</tr>';
-        // echo '<tr>'
-        //     . '<th scope="row"><label for="guest_lastname">' . __('Last name', 'rrze-rsvp') . '</label></th>'
-        //     . '<td><input type="text" id="guest_lastname" name="guest_lastname" value="' . $guest_lastname . '">'
-        //     . '</td>'
-        //     . '</tr>';
         echo '<tr>'
             . '<th scope="row"><label for="guest_email">' . __('Email', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="text" id="guest_email" name="guest_email" value="' . $guest_email . '">'
@@ -179,11 +161,8 @@ class Tracking {
     public function tracking_csv_pull() {
         $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
         $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
-        // $hash_guest_firstname = filter_input(INPUT_GET, 'hash_guest_firstname', FILTER_SANITIZE_STRING);
-        // $hash_guest_lastname = filter_input(INPUT_GET, 'hash_guest_lastname', FILTER_SANITIZE_STRING);
         $hash_guest_email = filter_input(INPUT_GET, 'hash_guest_email', FILTER_SANITIZE_STRING);
 
-        // $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_firstname, $hash_guest_lastname, $hash_guest_email);
         $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email);
 
         $filename = 'rrze_tracking_csv_' . date("Y-m-d_H-i", time());
@@ -236,6 +215,11 @@ class Tracking {
         ];
 
         $booking = Functions::getBooking($bookingID);
+
+        // BK DEBUG
+        do_action('rrze.log.error', 'BK DEBUG' . json_encode($booking));
+
+
         if (!$booking) {
             do_action('rrze.log.error', 'rrze-rsvp : BOOKING NOT FOUND | Functions::getBooking() returns [] in Tracking->insertOrUpdateTracking() with $bookingID = ' . $bookingID);
             return;
@@ -280,10 +264,10 @@ class Tracking {
             'room_zip' => (int)$booking['room_zip'],
             'room_city' => $booking['room_city'],
             'seat_name' => $booking['seat_name'],
-            'hash_guest_firstname' => $booking['guest_firstname'],
-            'hash_guest_lastname' => $booking['guest_lastname'],
-            'hash_guest_email' => $booking['guest_email'],
-            'hash_guest_phone' => $booking['guest_phone']
+            'hash_guest_firstname' => Functions::crypt($booking['guest_firstname'], 'encrypt'),
+            'hash_guest_lastname' => Functions::crypt($booking['guest_lastname'], 'encrypt'),
+            'hash_guest_email' => Functions::crypt($booking['guest_email'], 'encrypt'),
+            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt')
         ];
 
         $fields_format = [
@@ -334,10 +318,10 @@ class Tracking {
             'room_zip' => (int)$booking['room_zip'],
             'room_city' => $booking['room_city'],
             'seat_name' => $booking['seat_name'],
-            'hash_guest_firstname' => $booking['guest_firstname'],
-            'hash_guest_lastname' => $booking['guest_lastname'],
-            'hash_guest_email' => $booking['guest_email'],
-            'hash_guest_phone' => $booking['guest_phone'],
+            'hash_guest_firstname' => Functions::crypt($booking['guest_firstname'], 'encrypt'),
+            'hash_guest_lastname' => Functions::crypt($booking['guest_lastname'], 'encrypt'),
+            'hash_guest_email' => Functions::crypt($booking['guest_email'], 'encrypt'),
+            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt'),
         ];
 
         $fields_format = [
@@ -406,7 +390,6 @@ class Tracking {
     }
 
 
-    // public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_firstname, string $hash_guest_lastname, string $hash_guest_email): array {
     public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_email): array {
         global $wpdb;
         $aRet = [];
