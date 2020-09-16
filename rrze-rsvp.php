@@ -4,7 +4,7 @@
 Plugin Name:     RRZE RSVP
 Plugin URI:      https://github.com/RRZE-Webteam/rrze-rsvp
 Description:     FAU Reservation Tool
-Version:         0.5.4
+Version:         0.5.7
 Author:          RRZE-Webteam
 Author URI:      https://blogs.fau.de/webworking/
 License:         GNU General Public License v2
@@ -41,7 +41,7 @@ spl_autoload_register(function ($class) {
 });
 
 const RRZE_PHP_VERSION = '7.4';
-const RRZE_WP_VERSION = '5.4';
+const RRZE_WP_VERSION = '5.5';
 
 register_activation_hook(__FILE__, __NAMESPACE__ . '\activation');
 register_deactivation_hook(__FILE__, __NAMESPACE__ . '\deactivation');
@@ -121,7 +121,7 @@ function plugin(): object
  */
 function loaded()
 {
-    loadTextdomain();
+    add_action('init', __NAMESPACE__ . '\loadTextdomain');
     plugin()->onLoaded();
 
     if ($error = systemRequirements()) {
