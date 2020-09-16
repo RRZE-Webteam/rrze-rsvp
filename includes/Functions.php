@@ -373,8 +373,7 @@ class Functions
 		$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
 		$end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
 		$end = $end ? $end : $start->endOfDay()->getTimestamp();
-		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
-		return (($status == 'cancelled') || ($end < $now));
+		return ($end < $now);
 	}
 
     public static function canDeletePost(int $postId, string $postType): bool
