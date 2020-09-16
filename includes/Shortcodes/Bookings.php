@@ -590,12 +590,6 @@ class Bookings extends Shortcodes {
             $booking_email = sanitize_email($posted_data['rsvp_email']);
         }
 
-        // encrypt user data
-        $booking_firstname = Functions::crypt($booking_firstname, 'encrypt');
-        $booking_lastname = Functions::crypt($booking_lastname, 'encrypt');
-        $booking_email = Functions::crypt($booking_email, 'encrypt');
-        $booking_phone = Functions::crypt($booking_phone, 'encrypt');
-
         // Postdaten überprüfen
         $transientData = new TransientData(bin2hex(random_bytes(8)));
 
@@ -634,6 +628,9 @@ class Bookings extends Shortcodes {
                     'message' => __('Your last name is required.', 'rrze-rsvp')
                 ]
             );
+        }else{
+            // encrypt user data
+            $booking_lastname = Functions::crypt($booking_lastname, 'encrypt');
         }
         if (empty($booking_firstname)) {
             $transientData->addData(
@@ -643,15 +640,21 @@ class Bookings extends Shortcodes {
                     'message' => __('Your name is required.', 'rrze-rsvp')
                 ]
             );
+        }else{
+            // encrypt user data
+            $booking_firstname = Functions::crypt($booking_firstname, 'encrypt');
         }        
         if (!filter_var($booking_email, FILTER_VALIDATE_EMAIL)) {
             $transientData->addData('
-            rsvp_date', 
-            [
-                'value' => $booking_email,
-                'message' => __('The email address is not valid.', 'rrze-rsvp')
-            ]
-        );
+                rsvp_date', 
+                [
+                    'value' => $booking_email,
+                    'message' => __('The email address is not valid.', 'rrze-rsvp')
+                ]
+            );
+        }else{
+            // encrypt user data
+            $booking_email = Functions::crypt($booking_email, 'encrypt');
         }
         if (!Functions::validatePhone($booking_phone)) {
             $transientData->addData(
@@ -661,6 +664,9 @@ class Bookings extends Shortcodes {
                     'message' => __('Your phone number is not valid.', 'rrze-rsvp')
                 ]
             );
+        }else{
+            // encrypt user data
+            $booking_phone = Functions::crypt($booking_phone, 'encrypt');
         }
 
         if (!empty($transientData->getData(false))) {           

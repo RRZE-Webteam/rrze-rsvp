@@ -184,17 +184,36 @@ class Bookings
                 break;
             case 'status':
                 $status = $booking['status'];
-                $start = $booking['start'];
                 $end = $booking['end'];
                 $now = current_time('timestamp');
                 $bookingDate = '<span class="booking_date">' . __('Booked on', 'rrze-rsvp') . ' ' . $booking['booking_date'] . '</span>';
-                $archive = ($status == 'cancelled') || ($end < $now);
+                $archive = ($end < $now);
                 $_wpnonce = wp_create_nonce('status');
                 $publish = ($post->post_status == 'publish');
 
                 if ($publish && $archive) {
-                    $start = new Carbon(date('Y-m-d H:i:s', $booking['start']), wp_timezone());
-                    if ($booking['status'] == 'cancelled' && $start->endOfDay()->gt(new Carbon('now'))) {
+                    switch ($status) {
+                        case 'cancelled':
+                            $button = '<span class="delete">' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</span>';
+                            break;
+                        case 'booked':
+                            $button = '<span class="delete">' . _x('Booked', 'Booking', 'rrze-rsvp') . '</span>';
+                            break;
+                        case 'confirmed':
+                            $button = '<span class="delete">' . _x('Confirmed', 'Booking', 'rrze-rsvp') . '</span>';
+                            break;
+                        case 'checked-in':
+                            $button = _x('Checked-In', 'Booking', 'rrze-rsvp');
+                            break;
+                        case 'checked-out':
+                            $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
+                            break;
+                        default:
+                            $button = '';
+                    }
+                    echo $button, $bookingDate;
+                } elseif ($publish) {
+                    if ($status == 'cancelled') {
                         $cancelledButton = '<button class="button button-secondary" disabled>' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</button>';
                         $restoreButton = sprintf(
                             '<a href="edit.php?post_type=%1$s&action=restore&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>',
@@ -205,57 +224,36 @@ class Bookings
                         );
                         $button = $cancelledButton . $restoreButton;
                     } else {
-                        switch ($booking['status']) {
-                            case 'cancelled':
-                                $button = '<span class="delete">' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</span>';
-                                break;
-                            case 'booked':
-                                $button = '<span class="delete">' . _x('Booked', 'Booking', 'rrze-rsvp') . '</span>';
-                                break;
-                            case 'confirmed':
-                                $button = '<span class="delete">' . _x('Confirmed', 'Booking', 'rrze-rsvp') . '</span>';
-                                break;
-                            case 'checked-in':
-                                $button = _x('Checked-In', 'Booking', 'rrze-rsvp');
-                                break;
-                            case 'checked-out':
-                                $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
-                                break;
-                            default:
-                                $button = '';
-                        }
-                    }
-                    echo $button, $bookingDate;
-                } elseif ($publish) {
-                    $cancelButton = sprintf(
-                        '<a href="edit.php?post_type=%1$s&action=cancel&id=%2$d&_wpnonce=%3$s" class="button button-secondary" data-id="%2$d">%4$s</a>',
-                        'booking',
-                        $booking['id'],
-                        $_wpnonce,
-                        _x('Cancel', 'Booking', 'rrze-rsvp')
-                    );
-                    $checkoutButton = sprintf(
-                        '<a href="edit.php?post_type=%1$s&action=checkout&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>',
-                        'booking',
-                        $booking['id'],
-                        $_wpnonce,
-                        _x('Check-Out', 'Booking', 'rrze-rsvp')
-                    );                    
-                    if ($booking['status'] == 'confirmed') {
-                        $button = $cancelButton . '<button class="button button-primary" disabled>' . _x('Confirmed', 'Booking', 'rrze-rsvp') . '</button>';
-                    } elseif ($booking['status'] == 'checked-in') {
-                        $button = '<button class="button button-primary" disabled>' . _x('Checked-In', 'Booking', 'rrze-rsvp') . '</button>' . $checkoutButton;
-                    } elseif ($booking['status'] == 'checked-out') {
-                        $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
-                    } else {
-                        $button = $cancelButton . sprintf(
-                            '<a href="edit.php?post_type=%1$s&action=confirm&id=%2$d&_wpnonce=%3$s" class="button button-primary" data-id="%2$d">%4$s</a>',
+                        $cancelButton = sprintf(
+                            '<a href="edit.php?post_type=%1$s&action=cancel&id=%2$d&_wpnonce=%3$s" class="button button-secondary" data-id="%2$d">%4$s</a>',
                             'booking',
                             $booking['id'],
                             $_wpnonce,
-                            _x('Confirm', 'Booking', 'rrze-rsvp')
+                            _x('Cancel', 'Booking', 'rrze-rsvp')
                         );
-                    }
+                        $checkoutButton = sprintf(
+                            '<a href="edit.php?post_type=%1$s&action=checkout&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>',
+                            'booking',
+                            $booking['id'],
+                            $_wpnonce,
+                            _x('Check-Out', 'Booking', 'rrze-rsvp')
+                        );                    
+                        if ($status == 'confirmed') {
+                            $button = $cancelButton . '<button class="button button-primary" disabled>' . _x('Confirmed', 'Booking', 'rrze-rsvp') . '</button>';
+                        } elseif ($status == 'checked-in') {
+                            $button = '<button class="button button-primary" disabled>' . _x('Checked-In', 'Booking', 'rrze-rsvp') . '</button>' . $checkoutButton;
+                        } elseif ($status == 'checked-out') {
+                            $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
+                        } else {
+                            $button = $cancelButton . sprintf(
+                                '<a href="edit.php?post_type=%1$s&action=confirm&id=%2$d&_wpnonce=%3$s" class="button button-primary" data-id="%2$d">%4$s</a>',
+                                'booking',
+                                $booking['id'],
+                                $_wpnonce,
+                                _x('Confirm', 'Booking', 'rrze-rsvp')
+                            );
+                        }                        
+                    }                    
                     echo $button, $bookingDate;
                 } else {
                     echo '&mdash;';

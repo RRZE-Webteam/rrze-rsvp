@@ -143,9 +143,7 @@ class Actions
 		$isArchive = Functions::isBookingArchived($post->ID);
 		$canDelete = Functions::canDeleteBooking($post->ID);
 
-		$status = get_post_meta($post->ID, 'rrze-rsvp-booking-status', true);
-
-		if (!$isArchive && $status == 'booked' && $canEdit) {
+		if (!$isArchive && $canEdit) {
 			$actions['edit'] = sprintf(
 				'<a href="%s" aria-label="%s">%s</a>',
 				get_edit_post_link($post->ID),
@@ -560,7 +558,7 @@ class Actions
 			if (!$canDelete) {
 				$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
 			}
-		} elseif ($isArchive || $status != 'booked') {
+		} elseif ($isArchive) {
 			$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
 		}
 

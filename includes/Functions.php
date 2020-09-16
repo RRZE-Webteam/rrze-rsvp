@@ -373,9 +373,22 @@ class Functions
 		$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
 		$end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
 		$end = $end ? $end : $start->endOfDay()->getTimestamp();
-		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
-		return (($status == 'cancelled') || ($end < $now));
+		return ($end < $now);
 	}
+
+    public static function canDeletePost(int $postId, string $postType): bool
+    {
+        switch ($postType) {
+            case 'booking':
+                return Functions::canDeleteBooking($postId);
+            case 'room':
+                return Functions::canDeleteRoom($postId);
+            case 'seat':
+                return Functions::canDeleteSeat($postId);
+            default:
+                return false;
+        }        
+    }
 
 	public static function canDeleteBooking(int $postId): bool
 	{
@@ -785,17 +798,6 @@ class Functions
 
     }
  
-    public static function searchArrayByKey(array $aInput, string $key, string $value): array
-    {
-        $aResults = [];
-        foreach ($aInput as $row) {
-            if ($row[$field] == $value){
-                $aResults[] = $row;
-            }
-        }
-        return $aResults;
-    }
-
     public static function getBoolValueFromAtt($att): bool
     {
         $att = (string) $att;
