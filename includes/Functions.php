@@ -377,6 +377,20 @@ class Functions
 		return (($status == 'cancelled') || ($end < $now));
 	}
 
+    public static function canDeletePost(int $postId, string $postType): bool
+    {
+        switch ($postType) {
+            case 'booking':
+                return Functions::canDeleteBooking($postId);
+            case 'room':
+                return Functions::canDeleteRoom($postId);
+            case 'seat':
+                return Functions::canDeleteSeat($postId);
+            default:
+                return false;
+        }        
+    }
+
 	public static function canDeleteBooking(int $postId): bool
 	{
 		$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
