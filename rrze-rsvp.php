@@ -41,7 +41,7 @@ spl_autoload_register(function ($class) {
 });
 
 const RRZE_PHP_VERSION = '7.4';
-const RRZE_WP_VERSION = '5.4';
+const RRZE_WP_VERSION = '5.5';
 
 register_activation_hook(__FILE__, __NAMESPACE__ . '\activation');
 register_deactivation_hook(__FILE__, __NAMESPACE__ . '\deactivation');
@@ -75,7 +75,7 @@ function systemRequirements(): string
  */
 function activation()
 {
-    loadTextdomain();
+    add_action('init', __NAMESPACE__ . '\loadTextdomain');
 
     if ($error = systemRequirements()) {
         deactivate_plugins(plugin_basename(__FILE__));
@@ -121,7 +121,7 @@ function plugin(): object
  */
 function loaded()
 {
-    loadTextdomain();
+    add_action('init', __NAMESPACE__ . '\loadTextdomain');
     plugin()->onLoaded();
 
     if ($error = systemRequirements()) {
