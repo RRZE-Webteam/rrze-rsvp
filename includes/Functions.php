@@ -785,17 +785,6 @@ class Functions
 
     }
  
-    public static function searchArrayByKey(array $aInput, string $key, string $value): array
-    {
-        $aResults = [];
-        foreach ($aInput as $row) {
-            if ($row[$field] == $value){
-                $aResults[] = $row;
-            }
-        }
-        return $aResults;
-    }
-
     public static function getBoolValueFromAtt($att): bool
     {
         $att = (string) $att;
