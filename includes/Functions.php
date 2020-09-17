@@ -664,7 +664,7 @@ class Functions
                 ],
                 [
                     'key' => 'rrze-rsvp-booking-status',
-                    'value'   => ['confirmed', 'checked-in'],
+                    'value'   => ['booked', 'confirmed', 'checked-in'],
                     'compare' => 'IN'
                 ],
                 [
