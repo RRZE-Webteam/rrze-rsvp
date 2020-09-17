@@ -179,11 +179,11 @@ class Tools
                         $seat_name = $prefix . $label_row . $row . $label_seat . $seat;
                         //echo $label_row . $row . $label_seat . $seat . '<br />';
                         // Check if seat with same name already exists -> overwrite
-                        $check_seats = get_page_by_title($seat_name, OBJECT, 'seat');
-                        if ($check_seats != NULL) {
-                            $seat_id = $check_seats->ID;
-                            $num_overwritten++;
-                        } else {
+                        // $check_seats = get_page_by_title($seat_name, OBJECT, 'seat');
+                        // if ($check_seats != NULL) {
+                        //     $seat_id = $check_seats->ID;
+                        //     $num_overwritten++;
+                        // } else {
                         // If no seat with same name exist -> create
                             $new_seat = [
                                 'post_status' => 'publish',
@@ -192,7 +192,7 @@ class Tools
                             ];
                             $seat_id = wp_insert_post($new_seat);
                             $num_created++;
-                        }
+                        // }
                         if ($seat_id) {
                             update_post_meta($seat_id, 'rrze-rsvp-seat-room', $room_id);
                             if (is_array($equipment)) {

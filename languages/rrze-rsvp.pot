@@ -16,7 +16,7 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"POT-Creation-Date: 2020-09-16 16:29+0000\n"
+"POT-Creation-Date: 2020-09-17 18:39+0000\n"
 "Language: \n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: Loco https://localise.biz/"
@@ -315,7 +315,7 @@ msgid "Days in advance"
 msgstr ""
 
 #: config/config.php:533 includes/Tools.php:105 includes/Tools.php:229
-#: includes/Metaboxes.php:362 includes/CPT/CPT.php:159
+#: includes/Metaboxes.php:388 includes/CPT/CPT.php:159
 #: includes/CPT/Seats.php:117 includes/CPT/Seats.php:137
 #: includes/CPT/Bookings.php:129 includes/CPT/Bookings.php:143
 #: includes/CPT/Bookings.php:272 includes/CPT/Rooms.php:61
@@ -411,14 +411,14 @@ msgid "no@email"
 msgstr ""
 
 #: includes/Email.php:121 includes/Email.php:172 includes/Email.php:376
-#: includes/Actions.php:774 includes/CPT/Bookings.php:131
+#: includes/Actions.php:827 includes/CPT/Bookings.php:131
 #: includes/CPT/Bookings.php:145 includes/CPT/Bookings.php:274
 msgid "Name"
 msgstr ""
 
 #: includes/Email.php:122 includes/Email.php:173 includes/Email.php:377
-#: includes/Actions.php:775 includes/Tracking.php:141
-#: includes/Metaboxes.php:124 includes/CPT/Bookings.php:132
+#: includes/Actions.php:828 includes/Tracking.php:141
+#: includes/Metaboxes.php:137 includes/CPT/Bookings.php:132
 #: includes/CPT/Bookings.php:146 includes/Shortcodes/Bookings.php:290
 #: includes/Shortcodes/Bookings.php:315
 msgid "Email"
@@ -438,7 +438,7 @@ msgid "Confirm the booking."
 msgstr ""
 
 #: includes/Email.php:143 includes/Email.php:265 includes/Email.php:345
-#: includes/Actions.php:244 includes/Actions.php:864
+#: includes/Actions.php:244 includes/Actions.php:919
 #: includes/CPT/Bookings.php:232
 msgctxt "Booking"
 msgid "Cancel"
@@ -503,115 +503,119 @@ msgctxt "Room|Seat"
 msgid "Delete"
 msgstr ""
 
-#: includes/Actions.php:559 includes/Actions.php:590
+#: includes/Actions.php:566 includes/Actions.php:643
 msgid "This item cannot be deleted."
 msgstr ""
 
-#: includes/Actions.php:562
+#: includes/Actions.php:572
 msgid "This item cannot be updated."
 msgstr ""
 
-#: includes/Actions.php:568 includes/Actions.php:597
+#: includes/Actions.php:579 includes/Actions.php:650
 msgid "Update Error"
 msgstr ""
 
-#: includes/Actions.php:751 includes/Actions.php:761 includes/Actions.php:890
+#: includes/Actions.php:620
+msgid "Seat unavailable."
+msgstr ""
+
+#: includes/Actions.php:804 includes/Actions.php:814 includes/Actions.php:945
 msgid "Booking Confirmed"
 msgstr ""
 
-#: includes/Actions.php:752 includes/Actions.php:757
+#: includes/Actions.php:805 includes/Actions.php:810
 #, php-format
 msgid "The booking has been %s"
 msgstr ""
 
-#: includes/Actions.php:752 includes/Actions.php:762
+#: includes/Actions.php:805 includes/Actions.php:815
 msgctxt "Booking"
 msgid "confirmed"
 msgstr ""
 
-#: includes/Actions.php:753
+#: includes/Actions.php:806
 msgid "Your customer has received an email confirmation."
 msgstr ""
 
-#: includes/Actions.php:756 includes/Actions.php:765 includes/Actions.php:876
-#: includes/Actions.php:883
+#: includes/Actions.php:809 includes/Actions.php:818 includes/Actions.php:931
+#: includes/Actions.php:938
 msgid "Booking Cancelled"
 msgstr ""
 
-#: includes/Actions.php:757 includes/Actions.php:766
+#: includes/Actions.php:810 includes/Actions.php:819
 msgctxt "Booking"
 msgid "cancelled"
 msgstr ""
 
-#: includes/Actions.php:758
+#: includes/Actions.php:811
 msgid "Your customer has received an email cancellation."
 msgstr ""
 
-#: includes/Actions.php:762 includes/Actions.php:766
+#: includes/Actions.php:815 includes/Actions.php:819
 #, php-format
 msgid "The booking has already been %s."
 msgstr ""
 
-#: includes/Actions.php:769 includes/Actions.php:920
+#: includes/Actions.php:822 includes/Actions.php:975
 msgid "Action not available"
 msgstr ""
 
-#: includes/Actions.php:770 includes/Actions.php:921
+#: includes/Actions.php:823 includes/Actions.php:976
 msgid "No action was taken."
 msgstr ""
 
-#: includes/Actions.php:869 includes/ICS.php:45
+#: includes/Actions.php:924 includes/ICS.php:45
 msgid "Cancel Booking"
 msgstr ""
 
-#: includes/Actions.php:870
+#: includes/Actions.php:925
 msgid "Do you really want to cancel your booking?"
 msgstr ""
 
-#: includes/Actions.php:877
+#: includes/Actions.php:932
 msgid ""
 "Your booking has been cancelled. Please contact us to find a different "
 "arrangement."
 msgstr ""
 
-#: includes/Actions.php:884
+#: includes/Actions.php:939
 msgid "The booking is already canceled."
 msgstr ""
 
-#: includes/Actions.php:891
+#: includes/Actions.php:946
 msgid "Thank you for confirming your booking."
 msgstr ""
 
-#: includes/Actions.php:896
+#: includes/Actions.php:951
 msgid "Booking Check In"
 msgstr ""
 
-#: includes/Actions.php:897
+#: includes/Actions.php:952
 msgid "Check in is not possible at this time."
 msgstr ""
 
-#: includes/Actions.php:902 includes/templates/single-seat.php:98
+#: includes/Actions.php:957 includes/templates/single-seat.php:98
 #: includes/templates/single-seat.php:141
 msgid "Booking Checked In"
 msgstr ""
 
-#: includes/Actions.php:903 includes/templates/single-seat.php:142
+#: includes/Actions.php:958 includes/templates/single-seat.php:142
 msgid "Check in has been completed."
 msgstr ""
 
-#: includes/Actions.php:908
+#: includes/Actions.php:963
 msgid "Booking Check Out"
 msgstr ""
 
-#: includes/Actions.php:909
+#: includes/Actions.php:964
 msgid "Check-out is not possible at this time."
 msgstr ""
 
-#: includes/Actions.php:914 includes/templates/single-seat.php:156
+#: includes/Actions.php:969 includes/templates/single-seat.php:156
 msgid "Booking Checked Out"
 msgstr ""
 
-#: includes/Actions.php:915 includes/templates/single-seat.php:157
+#: includes/Actions.php:970 includes/templates/single-seat.php:157
 msgid "Check-out has been completed."
 msgstr ""
 
@@ -624,7 +628,7 @@ msgstr ""
 msgid "Do you want to cancel?"
 msgstr ""
 
-#: includes/Main.php:113 includes/Metaboxes.php:100
+#: includes/Main.php:113 includes/Metaboxes.php:104
 #: includes/CPT/Bookings.php:197 includes/CPT/Bookings.php:217
 msgctxt "Booking"
 msgid "Cancelled"
@@ -679,7 +683,7 @@ msgid "Seat name example"
 msgstr ""
 
 #: includes/Tools.php:106 includes/Tools.php:282 includes/CPT/CPT.php:86
-#: includes/CPT/CPT.php:87 includes/Shortcodes/Bookings.php:1090
+#: includes/CPT/CPT.php:87 includes/Shortcodes/Bookings.php:1093
 msgid "Equipment"
 msgstr ""
 
@@ -714,8 +718,8 @@ msgstr ""
 msgid "%s existing seats have been updated."
 msgstr ""
 
-#: includes/Tools.php:232 includes/Metaboxes.php:51 includes/Metaboxes.php:95
-#: includes/Metaboxes.php:366
+#: includes/Tools.php:232 includes/Metaboxes.php:51 includes/Metaboxes.php:99
+#: includes/Metaboxes.php:392
 msgid "Please select"
 msgstr ""
 
@@ -812,208 +816,208 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: includes/Metaboxes.php:38 includes/Metaboxes.php:201
-#: includes/Metaboxes.php:352
+#: includes/Metaboxes.php:38 includes/Metaboxes.php:218
+#: includes/Metaboxes.php:378
 msgid "Details"
 msgstr ""
 
-#: includes/Metaboxes.php:57
+#: includes/Metaboxes.php:60
 msgid "Start"
 msgstr ""
 
-#: includes/Metaboxes.php:74
+#: includes/Metaboxes.php:78
 msgid "End"
 msgstr ""
 
-#: includes/Metaboxes.php:92 includes/CPT/Bookings.php:133
+#: includes/Metaboxes.php:96 includes/CPT/Bookings.php:133
 #: includes/CPT/Bookings.php:152
 msgid "Status"
 msgstr ""
 
-#: includes/Metaboxes.php:98
+#: includes/Metaboxes.php:102
 msgid "Booked"
 msgstr ""
 
-#: includes/Metaboxes.php:99
+#: includes/Metaboxes.php:103
 msgid "Confirmed"
 msgstr ""
 
-#: includes/Metaboxes.php:101
+#: includes/Metaboxes.php:105
 msgid "Checked In"
 msgstr ""
 
-#: includes/Metaboxes.php:102
+#: includes/Metaboxes.php:106
 msgid "Checked Out"
 msgstr ""
 
-#: includes/Metaboxes.php:108 includes/Shortcodes/Bookings.php:288
+#: includes/Metaboxes.php:115 includes/Shortcodes/Bookings.php:288
 #: includes/Shortcodes/Bookings.php:297
 msgid "Last name"
 msgstr ""
 
-#: includes/Metaboxes.php:116 includes/Shortcodes/Bookings.php:289
+#: includes/Metaboxes.php:126 includes/Shortcodes/Bookings.php:289
 #: includes/Shortcodes/Bookings.php:306
 msgid "First name"
 msgstr ""
 
-#: includes/Metaboxes.php:132 includes/CPT/Bookings.php:150
+#: includes/Metaboxes.php:148 includes/CPT/Bookings.php:150
 msgid "Phone"
 msgstr ""
 
-#: includes/Metaboxes.php:143
+#: includes/Metaboxes.php:160
 msgid "Notes"
 msgstr ""
 
-#: includes/Metaboxes.php:146
+#: includes/Metaboxes.php:163
 msgid ""
 "This textarea contains the 'Additional Information' field content if this "
 "option is activated in the room settings. It can also be used for notes for "
 "internal use."
 msgstr ""
 
-#: includes/Metaboxes.php:154
+#: includes/Metaboxes.php:171
 msgid "Timeslots"
 msgstr ""
 
-#: includes/Metaboxes.php:166
+#: includes/Metaboxes.php:183
 msgid "Define bookable time slots."
 msgstr ""
 
-#: includes/Metaboxes.php:168
+#: includes/Metaboxes.php:185
 msgid "Time slot {#}"
 msgstr ""
 
-#: includes/Metaboxes.php:178
+#: includes/Metaboxes.php:195
 msgid "Week day"
 msgstr ""
 
-#: includes/Metaboxes.php:186
+#: includes/Metaboxes.php:203
 msgid "Start time"
 msgstr ""
 
-#: includes/Metaboxes.php:193
+#: includes/Metaboxes.php:210
 msgid "End time"
 msgstr ""
 
-#: includes/Metaboxes.php:213
+#: includes/Metaboxes.php:230
 msgid "Booking mode"
 msgstr ""
 
-#: includes/Metaboxes.php:219
+#: includes/Metaboxes.php:236
 msgid "Check-in and check-out only on site"
 msgstr ""
 
-#: includes/Metaboxes.php:220 includes/templates/single-seat.php:338
+#: includes/Metaboxes.php:237 includes/templates/single-seat.php:338
 msgid "Reservation"
 msgstr ""
 
-#: includes/Metaboxes.php:221 includes/templates/single-seat.php:335
+#: includes/Metaboxes.php:238 includes/templates/single-seat.php:335
 msgid "Consultation"
 msgstr ""
 
-#: includes/Metaboxes.php:226
+#: includes/Metaboxes.php:243
 msgid "SSO is required"
 msgstr ""
 
-#: includes/Metaboxes.php:227
+#: includes/Metaboxes.php:244
 msgid ""
 "If SSO is enabled, the customer must log in via SSO in order to use the "
 "booking system."
 msgstr ""
 
-#: includes/Metaboxes.php:235
+#: includes/Metaboxes.php:252
 msgid "Available days in advance"
 msgstr ""
 
-#: includes/Metaboxes.php:236
+#: includes/Metaboxes.php:253
 msgid "Number of days for which bookings are available in advance."
 msgstr ""
 
-#: includes/Metaboxes.php:247
+#: includes/Metaboxes.php:264
 msgid "Automatic confirmation"
 msgstr ""
 
-#: includes/Metaboxes.php:248
+#: includes/Metaboxes.php:265
 msgid "Incoming bookings do not need to be confirmed by the booking managers"
 msgstr ""
 
-#: includes/Metaboxes.php:255
+#: includes/Metaboxes.php:272
 msgid "Email confirmation is required"
 msgstr ""
 
-#: includes/Metaboxes.php:256
+#: includes/Metaboxes.php:273
 msgid ""
 "The customer must confirm his reservation within one hour. Otherwise the "
 "system will cancel the booking."
 msgstr ""
 
-#: includes/Metaboxes.php:263
+#: includes/Metaboxes.php:280
 msgid "Send to an email address"
 msgstr ""
 
-#: includes/Metaboxes.php:264
+#: includes/Metaboxes.php:281
 msgid ""
 "A copy of the confirmed booking will be sent to the specified email address "
 "with a calendar file (.ics) as an attachment."
 msgstr ""
 
-#: includes/Metaboxes.php:272
+#: includes/Metaboxes.php:289
 msgid "Allow Instant Check-In"
 msgstr ""
 
-#: includes/Metaboxes.php:273
+#: includes/Metaboxes.php:290
 msgid ""
 "Seats can be booked and checked-in in one step. This only works if automatic "
 "confirmation activated!"
 msgstr ""
 
-#: includes/Metaboxes.php:280
+#: includes/Metaboxes.php:297
 msgid "Check-in is required"
 msgstr ""
 
-#: includes/Metaboxes.php:281
+#: includes/Metaboxes.php:298
 msgid ""
 "The customer must check-in their booking within 15 minutes from the start of "
 "the event. Otherwise the system will cancel the booking."
 msgstr ""
 
-#: includes/Metaboxes.php:288
+#: includes/Metaboxes.php:305
 msgid "Show notes/comment input in booking form"
 msgstr ""
 
-#: includes/Metaboxes.php:289
+#: includes/Metaboxes.php:306
 msgid ""
 "If not checked, the comment text input will still be visible in the backend "
 "for booking admins for internal notes."
 msgstr ""
 
-#: includes/Metaboxes.php:296
+#: includes/Metaboxes.php:313
 msgid "Comment input label"
 msgstr ""
 
-#: includes/Metaboxes.php:297
+#: includes/Metaboxes.php:314
 msgid ""
 "Choose a label for the text input on the booking form. E.g. 'Additional "
 "information' or 'Main interests'"
 msgstr ""
 
-#: includes/Metaboxes.php:300
+#: includes/Metaboxes.php:317
 msgid "Additional information"
 msgstr ""
 
-#: includes/Metaboxes.php:305
+#: includes/Metaboxes.php:322
 msgid "Street"
 msgstr ""
 
-#: includes/Metaboxes.php:311
+#: includes/Metaboxes.php:331
 msgid "ZIP"
 msgstr ""
 
-#: includes/Metaboxes.php:317
+#: includes/Metaboxes.php:340
 msgid "City"
 msgstr ""
 
-#: includes/Metaboxes.php:323
+#: includes/Metaboxes.php:349
 msgid "Floor plan"
 msgstr ""
 
@@ -1481,7 +1485,7 @@ msgstr[1] ""
 msgid "Date/Time"
 msgstr ""
 
-#: includes/Shortcodes/Availability.php:55 includes/Shortcodes/Bookings.php:984
+#: includes/Shortcodes/Availability.php:55 includes/Shortcodes/Bookings.php:987
 msgid "Seats available"
 msgstr ""
 
@@ -1562,12 +1566,12 @@ msgstr ""
 msgid "Available time slots:"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:265 includes/Shortcodes/Bookings.php:1059
+#: includes/Shortcodes/Bookings.php:265 includes/Shortcodes/Bookings.php:1062
 msgid "Please select a date."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:275 includes/Shortcodes/Bookings.php:1062
-#: includes/Shortcodes/Bookings.php:1136
+#: includes/Shortcodes/Bookings.php:275 includes/Shortcodes/Bookings.php:1065
+#: includes/Shortcodes/Bookings.php:1139
 msgid "Please select a date and a time slot."
 msgstr ""
 
@@ -1709,61 +1713,61 @@ msgid ""
 "Please remember to <strong>check in</strong> to your seat when you arrive!"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:601
+#: includes/Shortcodes/Bookings.php:604
 msgid "DSGVO field is required."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:610
+#: includes/Shortcodes/Bookings.php:613
 msgid "The date or time of the booking is not valid."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:619
+#: includes/Shortcodes/Bookings.php:622
 msgid "The room does not exist."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:628
+#: includes/Shortcodes/Bookings.php:631
 msgid "Your last name is required."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:640
+#: includes/Shortcodes/Bookings.php:643
 msgid "Your name is required."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:652
+#: includes/Shortcodes/Bookings.php:655
 msgid "The email address is not valid."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:664
+#: includes/Shortcodes/Bookings.php:667
 msgid "Your phone number is not valid."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:856
+#: includes/Shortcodes/Bookings.php:859
 msgctxt "Mail Subject for room admin: new booking received"
 msgid "[RSVP] New booking received"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:971
+#: includes/Shortcodes/Bookings.php:974
 msgid "Not bookable (outside booking period)"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:975
+#: includes/Shortcodes/Bookings.php:978
 msgid "Not bookable (soldout or room blocked)"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:1033
+#: includes/Shortcodes/Bookings.php:1036
 msgid "More"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:1086
+#: includes/Shortcodes/Bookings.php:1089
 #, php-format
 msgid "Seat %s"
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:1110
+#: includes/Shortcodes/Bookings.php:1113
 msgid "No time slots available."
 msgstr ""
 
-#: includes/Shortcodes/Bookings.php:1138
+#: includes/Shortcodes/Bookings.php:1141
 msgid "Available seats:"
 msgstr ""
 

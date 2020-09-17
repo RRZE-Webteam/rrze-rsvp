@@ -41,7 +41,7 @@ class CPT extends Main
             );
         }
 
-        add_action('admin_menu', [$this, 'customSubmitdiv']);
+        add_action('add_meta_boxes', [$this, 'customSubmitdiv']);
     }
 
     public function activation()
@@ -182,16 +182,13 @@ class CPT extends Main
 
     public function customSubmitdiv()
     {
-        $cpts = array_keys(Capabilities::getCurrentCptArgs());
-        foreach ($cpts as  $cpt) {
-            remove_meta_box('submitdiv', $cpt, 'core');
-            add_meta_box('submitdiv', __('Publish'), [$this, 'addCustomSubmitdiv'], $cpt, 'side', 'low');
-        }
+        remove_meta_box('submitdiv', 'booking', 'core');
+        add_meta_box('submitdiv', __('Publish'), [$this, 'addCustomSubmitdiv'], 'booking', 'side', 'high');
     }
 
     public function addCustomSubmitdiv()
     {
-        global $post;
+        $post = get_post();
 
         $postType = $post->post_type;       
         $postTypeObject = get_post_type_object($postType);

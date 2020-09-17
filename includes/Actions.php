@@ -540,33 +540,37 @@ class Actions
 	public function preBookingUpdate($postId)
 	{
 		$post = get_post($postId);
-		if ($post->post_type != 'booking' || $post->post_status != 'publish') {
+		if ($post->post_type != 'booking') {
 			return;
 		}
-
-		$trash = isset($_REQUEST['trash']) ? $_REQUEST['trash'] : '';
-		$delete = isset($_REQUEST['delete']) ? $_REQUEST['delete'] : '';
-
-		//$requestStatus = isset($_REQUEST['rrze-rsvp-booking-status']) ? $_REQUEST['rrze-rsvp-booking-status'] : '';
-		$requestSeat = isset($_REQUEST['rrze-rsvp-booking-seat']) ? $_REQUEST['rrze-rsvp-booking-seat'] : '';
-
-		//$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
-		$seat = get_post_meta($postId, 'rrze-rsvp-booking-seat', true);
-
-		$isArchive = Functions::isBookingArchived($postId);
-		$canDelete = Functions::canDeleteBooking($postId);		
-
+		
 		$errorMessage = '';
 
-		if ($trash || $delete) {
-			if (!$canDelete) {
-				$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
-			}
-		} elseif (
-			$isArchive 
-			|| ($requestSeat != $seat)
-		) {
-			$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
+		if ($post->post_status != 'publish') {
+			$errorMessage = $this->isSeatAvailable();
+		} else {
+			$trash = isset($_REQUEST['trash']) ? $_REQUEST['trash'] : '';
+			$delete = isset($_REQUEST['delete']) ? $_REQUEST['delete'] : '';
+	
+			//$requestStatus = isset($_REQUEST['rrze-rsvp-booking-status']) ? $_REQUEST['rrze-rsvp-booking-status'] : '';
+			$requestSeat = isset($_REQUEST['rrze-rsvp-booking-seat']) ? $_REQUEST['rrze-rsvp-booking-seat'] : '';
+	
+			//$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+			$seat = get_post_meta($postId, 'rrze-rsvp-booking-seat', true);
+	
+			$isArchive = Functions::isBookingArchived($postId);
+			$canDelete = Functions::canDeleteBooking($postId);
+	
+			if ($trash || $delete) {
+				if (!$canDelete) {
+					$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
+				}
+			} elseif (
+				$isArchive 
+				|| ($requestSeat != $seat)
+			) {
+				$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
+			}			
 		}
 
 		if ($errorMessage) {
@@ -576,6 +580,48 @@ class Actions
 				['back_link' => true]
 			);
 		}
+	}
+
+	protected function isSeatAvailable()
+	{
+		$errorMessage = '';
+		$seatId = isset($_REQUEST['rrze-rsvp-booking-seat']) ? $_REQUEST['rrze-rsvp-booking-seat'] : '';
+		$bookingStart = isset($_REQUEST['rrze-rsvp-booking-start']) ? $_REQUEST['rrze-rsvp-booking-start'] : '';
+		$bookingStart = is_array($bookingStart) ? $bookingStart['date'] . ' ' . $bookingStart['time'] : '';
+		$bookingEnd = isset($_REQUEST['rrze-rsvp-booking-end']) ? $_REQUEST['rrze-rsvp-booking-end'] : '';
+		$bookingEnd = is_array($bookingEnd) ? $bookingEnd['date'] . ' ' . $bookingEnd['time'] : '';
+
+        $args = [
+			'fields' => 'ids',
+            'post_type' => 'booking',
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'meta_query' => [
+                [
+                    'key' => 'rrze-rsvp-booking-seat',
+                    'value' => $seatId,
+                ],
+                [
+                    'key' => 'rrze-rsvp-booking-status',
+                    'value' => ['booked', 'confirmed', 'checked-in'],
+                    'compare' => 'IN'
+                ],
+                [
+                    'key' => 'rrze-rsvp-booking-start',
+                    'value' => [strtotime($bookingStart), strtotime($bookingEnd)],
+                    'compare' => 'BETWEEN',
+                    'type' => 'numeric'
+                ],
+            ],
+        ];		
+        $query = new \WP_Query($args);
+
+        if ($query->have_posts()) {
+            $errorMessage = __('Seat unavailable.', 'rrze-rsvp'); 
+            wp_reset_postdata();
+		}
+						
+		return $errorMessage;		
 	}
 
 	public function prePostUpdate($postId)
