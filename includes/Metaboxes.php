@@ -51,6 +51,9 @@ class Metaboxes
             'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
             'default'          => 'custom',
             'options'          => $this->getSeats(),
+            'attributes'  =>  [
+                'required' => 'required',
+            ],             
         ));
 
         $cmb->add_field(array(
@@ -67,6 +70,7 @@ class Metaboxes
                         'stepMinute' => 10,
                     )
                 ),
+                'required' => 'required',
             )
         ));
 
@@ -101,6 +105,9 @@ class Metaboxes
                 'checked-in'     => __('Checked In', 'rrze-rsvp'),
                 'checked-out'     => __('Checked Out', 'rrze-rsvp'),
             ),
+            'attributes'  =>  [
+                'required' => 'required',
+            ],            
         ));
 
 
@@ -110,6 +117,9 @@ class Metaboxes
             'type'    => 'text',
 		    'sanitization_cb' => [$this, 'cb_encrypt'], // encrypt before storing
             'escape_cb'       => [$this, 'cb_decrypt'], // decrypt before displaying
+            'attributes'  =>  [
+                'required' => 'required',
+            ],            
         ));
 
         $cmb->add_field(array(
@@ -118,6 +128,9 @@ class Metaboxes
             'type'    => 'text',
 		    'sanitization_cb' => [$this, 'cb_encrypt'],
             'escape_cb'       => [$this, 'cb_decrypt'],
+            'attributes'  =>  [
+                'required' => 'required',
+            ],             
         ));
 
         $cmb->add_field(array(
@@ -126,6 +139,9 @@ class Metaboxes
             'type'    => 'text_email',
 		    'sanitization_cb' => [$this, 'cb_encrypt'],
             'escape_cb'       => [$this, 'cb_decrypt'],
+            'attributes'  =>  [
+                'required' => 'required',
+            ],             
         ));
 
         $cmb->add_field(array(
@@ -134,6 +150,7 @@ class Metaboxes
             'type'    => 'text_medium',
             'attributes' => array(
                 'type' => 'tel',
+                'required' => 'required',
             ),
 		    'sanitization_cb' => [$this, 'cb_encrypt'],
             'escape_cb'       => [$this, 'cb_decrypt'],
@@ -305,18 +322,27 @@ class Metaboxes
             'name'    => __('Street', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-room-street',
             'type'    => 'text',
+            'attributes'  =>  [
+                'required' => 'required',
+            ],             
         ));
 
         $cmb_general->add_field(array(
             'name'    => __('ZIP', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-room-zip',
             'type'    => 'text',
+            'attributes'  =>  [
+                'required' => 'required',
+            ],             
         ));
 
         $cmb_general->add_field(array(
             'name'    => __('City', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-room-city',
             'type'    => 'text',
+            'attributes'  =>  [
+                'required' => 'required',
+            ],             
         ));
 
         $cmb_general->add_field(array(
@@ -365,7 +391,10 @@ class Metaboxes
             'type'             => 'select',
             'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
             'default'          => '-1',
-            'options'          => $this->getPosts('room')
+            'options'          => $this->getPosts('room'),
+            'attributes'  =>  [
+                'required' => 'required',
+            ],             
         ));
     }
 
