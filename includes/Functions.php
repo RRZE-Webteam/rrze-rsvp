@@ -530,13 +530,20 @@ class Functions
         $timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
         $slots = self::getRoomSchedule($room_id);
         // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
-        $seats = get_posts([
-            'post_type' => 'seat',
+        $bookingMode = get_post_meta($room_id, 'rrze-rsvp-room-bookingmode', true);
+        $args_seats = ['post_type' => 'seat',
             'post_status' => 'publish',
-            'nopaging' => true,
             'meta_key' => 'rrze-rsvp-seat-room',
             'meta_value' => $room_id,
-        ]);
+            'orderby' => 'date',
+            'order' => 'ASC',];
+        if ($bookingMode == 'consultation') {
+            $args_seats['numberposts'] = 1;
+        } else {
+            $args_seats['nopaging'] = true;
+        }
+        $seats = get_posts($args_seats);
+
         $seat_ids = [];
         $seats_booked = [];
         if ($start == $end) {
@@ -619,7 +626,7 @@ class Functions
             }
             $availability[date('Y-m-d', $timestamp)][$start . '-' . $end] = $v;
         }
-
+//echo Helper::get_html_var_dump($availability);
         return $availability;
     }
 
