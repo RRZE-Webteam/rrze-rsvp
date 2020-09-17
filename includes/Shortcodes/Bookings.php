@@ -561,6 +561,9 @@ class Bookings extends Shortcodes {
                 'post_type' => 'seat',
                 'meta_key' => 'rrze-rsvp-seat-room',
                 'meta_value' => $booking_room,
+                'numberposts' => 1,
+                'orderby' => 'date',
+                'order' => 'ASC',
             ]);
             $booking_seat = $room_seats[0]->ID;
         } else {
