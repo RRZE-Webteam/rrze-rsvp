@@ -179,7 +179,7 @@ class Tools
                         $seat_name = $prefix . $label_row . $row . $label_seat . $seat;
                         //echo $label_row . $row . $label_seat . $seat . '<br />';
                         // Check if seat with same name already exists -> overwrite
-                        $check_seats = get_page_by_title($seat_name, OBJECT, 'seat');
+                        // $check_seats = get_page_by_title($seat_name, OBJECT, 'seat');
                         // if ($check_seats != NULL) {
                         //     $seat_id = $check_seats->ID;
                         //     $num_overwritten++;
