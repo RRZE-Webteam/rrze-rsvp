@@ -547,7 +547,11 @@ class Actions
 		$trash = isset($_REQUEST['trash']) ? $_REQUEST['trash'] : '';
 		$delete = isset($_REQUEST['delete']) ? $_REQUEST['delete'] : '';
 
-		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+		//$requestStatus = isset($_REQUEST['rrze-rsvp-booking-status']) ? $_REQUEST['rrze-rsvp-booking-status'] : '';
+		$requestSeat = isset($_REQUEST['rrze-rsvp-booking-seat']) ? $_REQUEST['rrze-rsvp-booking-seat'] : '';
+
+		//$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+		$seat = get_post_meta($postId, 'rrze-rsvp-booking-seat', true);
 
 		$isArchive = Functions::isBookingArchived($postId);
 		$canDelete = Functions::canDeleteBooking($postId);		
@@ -558,7 +562,10 @@ class Actions
 			if (!$canDelete) {
 				$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
 			}
-		} elseif ($isArchive) {
+		} elseif (
+			$isArchive 
+			|| ($requestSeat != $seat)
+		) {
 			$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
 		}
 
@@ -802,12 +809,14 @@ class Actions
 		$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 
 		$userConfirmed = (get_post_meta($bookingId, 'rrze-rsvp-customer-status', true) == 'confirmed');
+		$bookingBooked = ($booking['status'] == 'booked');
 		$bookingConfirmed = ($booking['status'] == 'confirmed');
 		$bookingCkeckedIn = ($booking['status'] == 'checked-in');
 		$bookingCkeckedOut = ($booking['status'] == 'checked-out');
 		$bookingCancelled = ($booking['status'] == 'cancelled');
 
-		if (!$bookingCancelled && !$userConfirmed && $action == 'confirm') {
+		if ($bookingBooked && $action == 'confirm') {			
+			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
 			update_post_meta($bookingId, 'rrze-rsvp-customer-status', 'confirmed');
 			$this->email->bookingConfirmedCustomer($bookingId, $bookingMode);
 			$userConfirmed = true;
