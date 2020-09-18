@@ -185,6 +185,8 @@ class CPT extends Main
     {
         remove_meta_box('submitdiv', 'booking', 'core');
         add_meta_box('submitdiv', __('Publish'), [$this, 'addCustomSubmitdiv'], 'booking', 'side', 'high');
+        remove_meta_box('submitdiv', 'room', 'core');
+        add_meta_box('submitdiv', __('Publish'), [$this, 'addCustomSubmitdiv'], 'room', 'side', 'high');          
         remove_meta_box('submitdiv', 'seat', 'core');
         add_meta_box('submitdiv', __('Publish'), [$this, 'addCustomSubmitdiv'], 'seat', 'side', 'high');
     }
