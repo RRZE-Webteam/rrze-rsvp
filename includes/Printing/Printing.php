@@ -135,7 +135,7 @@ class Printing {
                 $x = $pdf->GetX();
                 $yRoom = $pdf->GetY();
                 $pdf->SetXY($x + $w + $columnMargin, $y);
-                $seat_title = get_the_title($seat_post_id);
+                $seat_title = html_entity_decode(get_the_title($seat_post_id));
                 $pdf->SetFont('helvetica', '', 12, '', true);
                 $pdf->MultiCell(0, 5, __('Seat', 'rrze-rsvp') . ':', 0, 'L', 0);
                 $x = $pdf->GetX();
