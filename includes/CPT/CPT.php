@@ -32,6 +32,9 @@ class CPT extends Main
         add_action('admin_menu', [$this, 'bookingMenu']);
         add_filter('parent_file', [$this, 'filterParentMenu']);
 
+        add_action('add_meta_boxes', [$this, 'customSubmitdiv']);
+        add_action('add_meta_boxes', [$this, 'shortcodeHelper']);
+
         if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
             add_filter(
                 'body_class',
@@ -40,8 +43,6 @@ class CPT extends Main
                 }
             );
         }
-
-        add_action('add_meta_boxes', [$this, 'customSubmitdiv']);
     }
 
     public function activation()
@@ -184,13 +185,16 @@ class CPT extends Main
     {
         remove_meta_box('submitdiv', 'booking', 'core');
         add_meta_box('submitdiv', __('Publish'), [$this, 'addCustomSubmitdiv'], 'booking', 'side', 'high');
+        remove_meta_box('submitdiv', 'room', 'core');
+        add_meta_box('submitdiv', __('Publish'), [$this, 'addCustomSubmitdiv'], 'room', 'side', 'high');          
+        remove_meta_box('submitdiv', 'seat', 'core');
+        add_meta_box('submitdiv', __('Publish'), [$this, 'addCustomSubmitdiv'], 'seat', 'side', 'high');
     }
 
     public function addCustomSubmitdiv()
     {
-        $post = get_post();
-
-        $postType = $post->post_type;       
+        global $post;
+        $postType = $post->post_type;
         $postTypeObject = get_post_type_object($postType);
         $canPublish = current_user_can($postTypeObject->cap->publish_posts);
         $canDelete = Functions::canDeletePost($post->ID, $postType);
@@ -201,16 +205,17 @@ class CPT extends Main
                 do_action('post_submitbox_start');
                 ?>
                 <div id="delete-action">
+                <?php
+                if ($canDelete && current_user_can('delete_post', $post->ID)) {
+                    if (!EMPTY_TRASH_DAYS)
+                        $delete_text = __('Delete Permanently');
+                    else
+                        $delete_text = __('Move to Trash');
+                    ?>
+                    <a class="submitdelete deletion" href="<?php echo get_delete_post_link($post->ID); ?>"><?php echo $delete_text; ?></a>
                     <?php
-                    if ($canDelete && current_user_can('delete_post', $post->ID)) {
-                        if (!EMPTY_TRASH_DAYS)
-                            $delete_text = __('Delete Permanently');
-                        else
-                            $delete_text = __('Move to Trash');
-                        ?>
-                        <a class="submitdelete deletion" href="<?php echo get_delete_post_link($post->ID); ?>"><?php echo $delete_text; ?></a>
-                    <?php 
-                    } ?>
+                }
+                ?>
                 </div>
                 <div id="publishing-action">
                     <span class="spinner"></span>
@@ -225,12 +230,25 @@ class CPT extends Main
                         <input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Update'); ?>" />
                         <input name="save" type="submit" class="button button-primary button-large" id="publish" value="<?php esc_attr_e('Update'); ?>">
                     <?php
-                    } 
+                    }
                     ?>
                 </div>
                 <div class="clear"></div>
             </div>
         </div>
         <?php
+    }
+
+    public function shortcodeHelper()
+    {
+        add_meta_box('rrze-rsvp-room-shortcode-helper', esc_html__('Shortcode', 'rrze-rsvp'), [$this, 'shortcodeHelperCallback'], 'room', 'side', 'high');
+    }
+
+    public function shortcodeHelperCallback()
+    {
+        printf('<p class="description">%s</p>', __('To add a booking form for this room, add the following shortcode to a page:', 'rrze-rsvp'));
+        printf('<p><code>[rsvp-booking room="%s" sso="true"]</code></p>', get_the_ID());
+        printf('<p>%s</p>', __('Skip <code>sso="true"</code> to deactivate SSO authentication.', 'rrze-rsvp'));
+        printf('<p>%s</p>', __('Add <code>days="20"</code> to overwrite the number of days you can book a seat in advance.', 'rrze-rsvp'));
     }
 }

@@ -420,12 +420,7 @@ class Functions
                 ]
             ]
         ];
-        $query = new \WP_Query($args);
-        if ($query->have_posts()) {
-            wp_reset_postdata();
-            return false;
-        }
-        return true;
+        return empty(get_posts($args));
     }
 
     public static function canDeleteRoom(int $postId): bool
@@ -447,17 +442,11 @@ class Functions
                 ]
             ]
         ];
-        $query = new \WP_Query($args);
-        if ($query->have_posts()) {
-            wp_reset_postdata();
-            return false;
-        }
-        return true;
+        return empty(get_posts($args));
     }
 
     public static function getAllRoomSeats(int $roomId): array
     {
-        $seats = [];
         $args = [
             'fields'            => 'ids',
             'post_type'         => 'seat',
@@ -471,15 +460,7 @@ class Functions
                 ]
             ]
         ];
-        $query = new \WP_Query($args);
-        if ($query->have_posts()) {
-            while ($query->have_posts()) {
-                $query->the_post();
-                $seats[] = get_the_ID();
-            }
-            wp_reset_postdata();
-        }
-        return $seats;
+        return get_posts($args);
     }
         
     public static function bookingReplyUrl(string $action, string $password, int $id): string

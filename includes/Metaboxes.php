@@ -416,6 +416,7 @@ class Metaboxes
             $room_title = get_the_title($room);
             $result[$seat->ID] = $room_title . ' – ' . $seat->post_title;
         }
+        natsort($result);
         return $result;
     }
 
