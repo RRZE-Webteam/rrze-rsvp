@@ -27,7 +27,6 @@ class Bookings
     public function onLoaded()
     {
         add_action('init', [$this, 'booking_post_type']);
-        add_action('add_meta_boxes', [$this, 'not_cmb_metabox']);
         //add_filter( 'manage_edit-booking_columns', [$this, 'booking_filter_posts_columns'] );
         add_filter('manage_booking_posts_columns', [$this, 'booking_columns']);
         add_action('manage_booking_posts_custom_column', [$this, 'booking_column'], 10, 2);
@@ -72,14 +71,14 @@ class Bookings
             'show_ui'                   => true,
             'show_in_menu'              => true,
             'show_in_admin_bar'         => true,
-            'menu_position'             => 5,
+            'menu_position'             => 18,
             'menu_icon'                 => 'dashicons-calendar-alt',
             'can_export'                => false,
             'has_archive'               => false,
             'exclude_from_search'       => true,
             'publicly_queryable'        => false,
             'delete_with_user'          => false,
-            //'show_in_rest'              => true,
+            'show_in_rest'              => false,
             'capability_type'           => Capabilities::getCptCapabilityType('booking'),
             'capabilities'              => (array) Capabilities::getCptCaps('booking'),
             'map_meta_cap'              => Capabilities::getCptMapMetaCap('booking')
@@ -90,31 +89,6 @@ class Bookings
 
     public function booking_taxonomies()
     {
-    }
-
-    public function not_cmb_metabox()
-    {
-        add_meta_box('rrze-rsvp-room-shortcode-helper', esc_html__('Shortcode', 'rrze-rsvp'), [$this, 'not_cmb_metabox_callback'], 'room', 'side', 'high');
-    }
-
-    public function not_cmb_metabox_callback()
-    {
-        printf(
-            __('%sTo add a booking form for this room, add the following shortcode to a page:%s'
-                . '[rsvp-booking room="%s" sso="true"]%s'
-                . 'Skip %ssso="true"%s to deactivate SSO authentication.%s'
-                . 'Add %sdays="20"%s to overwrite the number of days you can book a seat in advance.%s', 'rrze-rsvp'),
-            '<p class="description">',
-            '</p><p><code>',
-            get_the_ID(),
-            '</code></p><p>',
-            '<code>',
-            '</code>',
-            '</p><p>',
-            '<code>',
-            '</code>',
-            '</p>'
-        );
     }
 
     /*
