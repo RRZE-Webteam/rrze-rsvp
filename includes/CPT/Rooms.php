@@ -21,8 +21,6 @@ class Rooms
     {
         add_action('init', [$this, 'room_post_type']);
 
-        add_action('add_meta_boxes', [$this, 'not_cmb_metabox']);
-
         add_filter('manage_room_posts_columns', [$this, 'columns']);
         add_action('manage_room_posts_custom_column', [$this, 'customColumn'], 10, 2);
         add_filter('manage_edit-room_sortable_columns', [$this, 'sortableColumns']);
@@ -82,31 +80,6 @@ class Rooms
         ];
 
         register_post_type('room', $args);
-    }
-
-    public function not_cmb_metabox()
-    {
-        add_meta_box('rrze-rsvp-room-shortcode-helper', esc_html__('Shortcode', 'rrze-rsvp'), [$this, 'not_cmb_metabox_callback'], 'room', 'side', 'high');
-    }
-
-    public function not_cmb_metabox_callback()
-    {
-        printf(
-            __('%sTo add a booking form for this room, add the following shortcode to a page:%s'
-                . '[rsvp-booking room="%s" sso="true"]%s'
-                . 'Skip %ssso="true"%s to deactivate SSO authentication.%s'
-                . 'Add %sdays="20"%s to overwrite the number of days you can book a seat in advance.%s', 'rrze-rsvp'),
-            '<p class="description">',
-            '</p><p><code>',
-            get_the_ID(),
-            '</code></p><p>',
-            '<code>',
-            '</code>',
-            '</p><p>',
-            '<code>',
-            '</code>',
-            '</p>'
-        );
     }
 
     public function columns($columns)
