@@ -246,21 +246,9 @@ class CPT extends Main
 
     public function shortcodeHelperCallback()
     {
-        printf(
-            __('%sTo add a booking form for this room, add the following shortcode to a page:%s'
-                . '[rsvp-booking room="%s" sso="true"]%s'
-                . 'Skip %ssso="true"%s to deactivate SSO authentication.%s'
-                . 'Add %sdays="20"%s to overwrite the number of days you can book a seat in advance.%s', 'rrze-rsvp'),
-            '<p class="description">',
-            '</p><p><code>',
-            get_the_ID(),
-            '</code></p><p>',
-            '<code>',
-            '</code>',
-            '</p><p>',
-            '<code>',
-            '</code>',
-            '</p>'
-        );
+        printf('<p class="description">%s</p>', __('To add a booking form for this room, add the following shortcode to a page:', 'rrze-rsvp'));
+        printf('<p><code>[rsvp-booking room="%s" sso="true"]</code></p>', get_the_ID());
+        printf('<p>%s</p>', __('Skip <code>sso="true"</code> to deactivate SSO authentication.', 'rrze-rsvp'));
+        printf('<p>%s</p>', __('Add <code>days="20"</code> to overwrite the number of days you can book a seat in advance.', 'rrze-rsvp'));
     }
 }
