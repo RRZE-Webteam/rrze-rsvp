@@ -247,6 +247,7 @@ class Bookings
             'seat' => __('Seat', 'rrze-rsvp'),
             'name' => __('Name', 'rrze-rsvp'),
         );
+
         return $columns;
     }
 
@@ -289,7 +290,7 @@ class Bookings
         $sAllDates = __('Show all dates', 'rrze-rsvp');
         $sAllRoomes = __('Show all rooms', 'rrze-rsvp');
         $sSelectedDate = (string) filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
-        $sSelectedRoom = (string) filter_input(INPUT_GET, $this->sRoom, FILTER_SANITIZE_STRING);
+        $sSelectedRoom = (string) filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
 
         // 1. get all booking IDs
         $aBookingIds = get_posts([
