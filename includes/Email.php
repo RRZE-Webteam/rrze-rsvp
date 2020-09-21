@@ -400,17 +400,28 @@ class Email
      * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
      * @return void
      */
-    public function bookingCancelledCustomer(int $bookingId, string $bookingMode = 'reservation')
+    public function bookingCancelledCustomer(int $bookingId, string $bookingMode = 'reservation', string $cancelreason = '')
     {
         $booking = Functions::getBooking($bookingId);
         if (empty($booking)) {
             return;
         }
 
-        $subject = $this->options->email_cancel_subject;
+        $subject = $this->options->email_cancel_subject . '';
         $subject = $this->placeholderParser($subject, $booking);
         $subjectEnglish = $this->options->email_cancel_subject_en;
         $subjectEnglish = $this->placeholderParser($subjectEnglish, $booking);
+
+        $reason = '';
+        $reasonEnglish = '';
+        
+        if ($cancelreason == 'notconfirmed'){
+            $reason = $this->options->email_cancel_reason_notconfirmed;
+            $reasonEnglish = $this->options->email_cancel_reason_notconfirmed_en;
+        }elseif ($cancelreason == 'notcheckedin'){
+            $reason = $this->options->email_cancel_reason_notcheckedin;
+            $reasonEnglish = $this->options->email_cancel_reason_notcheckedin_en;
+        }
 
         $text = $this->options->email_cancel_text;
         $textEnglish = $this->options->email_cancel_text_en;
@@ -423,6 +434,8 @@ class Email
 
         $data['subject'] = $subject;
         $data['subject_en'] = $subjectEnglish;
+        $data['reason'] = $reason;
+        $data['reason_en'] = $reasonEnglish;
         $data['text'] = $this->placeholderParser($text, $booking);
         $data['text_en'] = $this->placeholderParser($textEnglish, $booking);
         $data['date'] = $booking['date'];

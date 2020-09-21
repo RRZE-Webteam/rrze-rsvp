@@ -213,7 +213,7 @@ class Schedule
                 $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
                 if (get_post_meta($roomId, 'rrze-rsvp-room-force-to-confirm', true)) {
                     update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'cancelled');
-                    $this->email->bookingCancelledCustomer(get_the_ID());
+                    $this->email->bookingCancelledCustomer(get_the_ID(), 'reservation', 'notconfirmed');
                     do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
                 }
             }
@@ -271,7 +271,7 @@ class Schedule
                     do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
                 } elseif (get_post_meta($roomId, 'rrze-rsvp-room-force-to-checkin', true)) {
                     update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'cancelled');
-                    $this->email->bookingCancelledCustomer(get_the_ID());
+                    $this->email->bookingCancelledCustomer(get_the_ID(), 'reservation', 'notcheckedin');
                     do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
                 }
             }

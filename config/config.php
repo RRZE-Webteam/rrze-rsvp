@@ -101,6 +101,10 @@ function defaultOptions()  {
             'confirm_text_en' => 'We are happy to inform you that your booking has been confirmed.',
             'cancel_subject' => __('Your booking has been cancelled', 'rrze-rsvp'),
             'cancel_subject_en' => 'Your booking has been cancelled',
+            'cancel_reason_notconfirmed' => __('You haven\'t confirmed your reservation.', 'rrze-rsvp'),
+            'cancel_reason_notconfirmed_en' => 'You haven\'t confirmed your reservation.',
+            'cancel_reason_notcheckedin' => __('You haven\'t checked in.', 'rrze-rsvp'),
+            'cancel_reason_notcheckedin_en' => 'You haven\'t  checked in.',
             'cancel_text' => __('Unfortunately we have to cancel your booking on {{date}} at {{time}}.', 'rrze-rsvp'),
             'cancel_text_en' => 'Unfortunately we have to cancel your booking on {{date_en}} at {{time_en}}.',
             'fau_logo' => 'on',
@@ -417,6 +421,40 @@ function getFields(){
                 'sanitize_callback' => 'sanitize_text_field',
                 'exception'         => ['locale' => 'en']
             ],            
+	        [
+                'name'              => 'cancel_reason_notconfirmed',
+                'label'             => __('Reason Cancelling Not Confirmed', 'rrze-rsvp'),
+                'desc'              => __('Reason for cancelling mails because there is no confirmation', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           =>  $defaults['cancel_reason_notconfirmed'],
+                'sanitize_callback' => 'sanitize_text_field'
+            ],
+	        [
+                'name'              => 'cancel_reason_notconfirmed_en',
+                'label'             => __('Reason Cancelling Not Confirmed (english)', 'rrze-rsvp'),
+                'desc'              => __('Reason for cancelling mails because there is no confirmation', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           =>  $defaults['cancel_reason_notconfirmed_en'],
+                'sanitize_callback' => 'sanitize_text_field',
+                'exception'         => ['locale' => 'en']
+            ],
+	        [
+                'name'              => 'cancel_reason_notcheckedin',
+                'label'             => __('Reason Cancelling Not Checked In', 'rrze-rsvp'),
+                'desc'              => __('Reason for cancelling mails because there is no check-in', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           =>  $defaults['cancel_reason_notcheckedin'],
+                'sanitize_callback' => 'sanitize_text_field'
+            ],
+	        [
+                'name'              => 'cancel_reason_notcheckedin_en',
+                'label'             => __('Reason Cancelling Not Checked In (english)', 'rrze-rsvp'),
+                'desc'              => __('Reason for cancelling mails because there is no check-in', 'rrze-rsvp'),
+                'type'              => 'textarea',
+                'default'           =>  $defaults['cancel_reason_notcheckedin_en'],
+                'sanitize_callback' => 'sanitize_text_field',
+                'exception'         => ['locale' => 'en']
+            ],
 	     [
                 'name'              => 'cancel_text',
                 'label'             => __('Cancel Text', 'rrze-rsvp'),
