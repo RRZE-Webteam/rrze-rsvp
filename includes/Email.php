@@ -407,7 +407,7 @@ class Email
             return;
         }
 
-        $subject = $this->options->email_cancel_subject . '';
+        $subject = $this->options->email_cancel_subject;
         $subject = $this->placeholderParser($subject, $booking);
         $subjectEnglish = $this->options->email_cancel_subject_en;
         $subjectEnglish = $this->placeholderParser($subjectEnglish, $booking);

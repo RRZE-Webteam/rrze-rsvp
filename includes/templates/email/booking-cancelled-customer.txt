@@ -23,7 +23,6 @@
 {{=subject_en}}
 {{=reason_en}}
 
-
 {{=text_en}}
 
 {{=date_en}}
