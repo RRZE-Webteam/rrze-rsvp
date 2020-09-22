@@ -49,4 +49,19 @@ table {
 	width: 100%;
 }
 
+div[id^='cmb-group-rrze-rsvp-room-timeslots'] {
+	.cmb-type-text-time,
+	.cmb-type-text-date-timestamp {
+		width: 50%;
+		float: left;
+	}
+	.cmb-th {
+		width: 25%;
+		& + .cmb-td {
+			width: 70%;
+		}
+	}
+
+}
+
 

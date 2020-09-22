@@ -510,6 +510,8 @@ class Functions
         // Array aus verfügbaren Timeslots des Raumes erstellen
         $timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
         $slots = self::getRoomSchedule($room_id);
+        $days_blocked_raw = get_post_meta($room_id, 'rrze-rsvp-room-days-closed', true);
+        $days_blocked = explode("\n", str_replace("\r", '', $days_blocked_raw));
         // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
         $bookingMode = get_post_meta($room_id, 'rrze-rsvp-room-bookingmode', true);
         $args_seats = ['post_type' => 'seat',
@@ -567,8 +569,9 @@ class Functions
         $loopend = strtotime($end);
         while ($loopstart <= $loopend) {
             $weekday = date('w', $loopstart);
+            $dateday = date('Y-m-d', $loopstart);
             if ($weekday == '0') $weekday = '7';
-            if (isset($slots[$weekday])) {
+            if (isset($slots[$weekday]) && !in_array($dateday, $days_blocked)) {
                 foreach ($slots[$weekday] as $time => $endtime) {
                     $time_parts = explode(':', $time);
                     $room_availability[strtotime('+' . intval($time_parts[0]) . ' hours, + ' . $time_parts[1] . ' minutes', $loopstart)] = $seat_ids;
