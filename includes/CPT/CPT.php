@@ -32,7 +32,10 @@ class CPT extends Main
         add_action('admin_menu', [$this, 'bookingMenu']);
         add_filter('parent_file', [$this, 'filterParentMenu']);
 
-        add_action('add_meta_boxes', [$this, 'customSubmitdiv']);
+        // Prüfung: gibt es Buchung zu Raum oder Platz 
+        // add_action('add_meta_boxes', [$this, 'customSubmitdiv']);
+
+
         add_action('add_meta_boxes', [$this, 'shortcodeHelper']);
 
         if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
@@ -183,6 +186,9 @@ class CPT extends Main
 
     public function customSubmitdiv()
     {
+
+        // um zu verhindern, dass der Admin den Status des Posts ändert oder schlimmer noch, ihn versehentlich löscht. 
+
         remove_meta_box('submitdiv', 'booking', 'core');
         add_meta_box('submitdiv', __('Publish'), [$this, 'addCustomSubmitdiv'], 'booking', 'side', 'high');
         remove_meta_box('submitdiv', 'room', 'core');
