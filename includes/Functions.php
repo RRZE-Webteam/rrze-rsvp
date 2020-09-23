@@ -572,14 +572,15 @@ class Functions
             $dateday = date('Y-m-d', $loopstart);
             if ($weekday == '0') $weekday = '7';
             if (isset($slots[$weekday]) && !in_array($dateday, $days_blocked)) {
-                foreach ($slots[$weekday] as $time => $slot_infos) {
-                    $valid_from = $slot_infos['validfrom'];
-                    $valid_to = $slot_infos['validto'] ? strtotime('+23 hours, +59 minutes', $slot_infos['validto']) : false;
-                    $time_parts = explode(':', $time);
-                    if (($valid_from != false && $valid_to != false && $loopstart >= $valid_from && $loopstart <= $valid_to)
-                        || ($valid_from != false && $valid_to == false && $loopstart >= $valid_from)
-                        || ($valid_from == false && $valid_to != false && $loopstart <= $valid_to)
-                        || ($valid_from == false && $valid_to == false)) {
+                foreach ($slots[$weekday] as $valid => $slot_infos) {
+                    $valid_array = explode('-', $valid);
+                    $valid_from = $valid_array[0];
+                    $valid_to = $valid_array[1] == 'unlimited' ? 'unlimited' : strtotime('+23 hours, +59 minutes', $valid_array[1]);
+                    $time_parts = explode(':', $slot_infos['start']);
+                    if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $loopstart >= $valid_from && $loopstart <= $valid_to)
+                        || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $loopstart >= $valid_from)
+                        || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $loopstart <= $valid_to)
+                        || ($valid_from == 'unlimited' && $valid_to == 'unlimited')) {
                         $room_availability[strtotime('+' . intval($time_parts[0]) . ' hours, + ' . $time_parts[1] . ' minutes', $loopstart)] = $seat_ids;
                     }
                 }
@@ -607,7 +608,19 @@ class Functions
             $weekday = (date('w', $timestamp));
             if ($weekday == '0') $weekday = '7';
             $start = date('H:i', $timestamp);
-            $end = $slots[$weekday][$start]['end'];
+            foreach ($slots[$weekday] as $valid => $data) {
+                $valid_array = explode('-', $valid);
+                $valid_from = $valid_array[0];
+                $valid_to = $valid_array[1] == 'unlimited' ? 'unlimited' : strtotime('+23 hours, +59 minutes', $valid_array[1]);
+                if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $timestamp >= $valid_from && $timestamp <= $valid_to)
+                    || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $timestamp >= $valid_from)
+                    || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $timestamp <= $valid_to)
+                    || ($valid_from == 'unlimited' && $valid_to == 'unlimited')) {
+                    if ($data['start'] == $start) {
+                        $end = $data['end'];
+                    }
+                }
+            }
             // remove past timeslots from today if needed
             if ($showPast == false) {
                 $endTimestamp = strtotime(date('Y-m-d', $timestamp). ' ' . $end);
@@ -683,18 +696,20 @@ class Functions
             $dateday = date('Y-m-d', $loopstart);
             if ($weekday == '0') $weekday = '7';
             if (isset($slots[$weekday]) && !in_array($dateday, $days_blocked)) {
-                foreach ($slots[$weekday] as $starttime  => $slot_infos) {
-                    $valid_from = $slot_infos['validfrom'];
-                    $valid_to = $slot_infos['validto'] ? strtotime('+23 hours, +59 minutes', $slot_infos['validto']) : false;
+                foreach ($slots[$weekday] as $valid  => $slot_infos) {
+                    $valid_array = explode('-', $valid);
+                    $valid_from = $valid_array[0];
+                    $valid_to = $valid_array[1] == 'unlimited' ? 'unlimited' : strtotime('+23 hours, +59 minutes', $valid_array[1]);
+                    $starttime = $slot_infos['start'];
                     $start_parts = explode(':', $starttime);
                     $end_parts = explode(':', $slot_infos['end']);
                     $timestamp = strtotime('+' . $start_parts[0] . ' hours, + ' . $start_parts[1] . ' minutes', $loopstart);
                     $timestamp_end = strtotime('+' . $end_parts[0] . ' hours, + ' . $end_parts[1] . ' minutes', $loopstart);
                     if (!in_array($timestamp, $timeslots_booked)) {
-                        if (($valid_from != false && $valid_to != false && $loopstart >= $valid_from && $loopstart <= $valid_to)
-                            || ($valid_from != false && $valid_to == false && $loopstart >= $valid_from)
-                            || ($valid_from == false && $valid_to != false && $loopstart <= $valid_to)
-                            || ($valid_from == false && $valid_to == false)) {
+                        if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $loopstart >= $valid_from && $loopstart <= $valid_to)
+                            || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $loopstart >= $valid_from)
+                            || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $loopstart <= $valid_to)
+                            || ($valid_from == 'unlimited' && $valid_to == 'unlimited')) {
                             $seat_availability[$timestamp] = $timestamp_end;
                         }
                     }
@@ -753,7 +768,9 @@ class Functions
      * getRoomSchedule
      * Returns an array of timeslots per weekday for a specific room.
      * @param int $room_id
-     * @return array [weekday_number(1-7)][starttime(H:i)] => endtime(H:i)
+     * @param boolean $with_duration = false
+     * @return array [weekday_number(1-7)][starttime(H:i)] => endtime(H:i) [if $with_duration == false]
+     * @return array [weekday_number(1-7)][valid_from-valid_to][start] => starttime(H:i) / [end] => endtime(H:i) [if $with_duration == true]
      */
     public static function getRoomSchedule($room_id, $with_duration = false)
     {
@@ -764,9 +781,10 @@ class Functions
                 foreach ($week['rrze-rsvp-room-weekday'] as $day) {
                     if (isset($week['rrze-rsvp-room-starttime']) && isset($week['rrze-rsvp-room-endtime'])) {
                         if ($with_duration == true) {
-                            $schedule[$day][$week['rrze-rsvp-room-starttime']]['validfrom'] = isset($week['rrze-rsvp-room-timeslot-valid-from']) ? $week['rrze-rsvp-room-timeslot-valid-from'] : false;
-                            $schedule[$day][$week['rrze-rsvp-room-starttime']]['validto'] = isset($week['rrze-rsvp-room-timeslot-valid-to']) ? $week['rrze-rsvp-room-timeslot-valid-to'] : false;
-                            $schedule[$day][$week['rrze-rsvp-room-starttime']]['end'] = $week['rrze-rsvp-room-endtime'];
+                            $valid_from = isset($week['rrze-rsvp-room-timeslot-valid-from']) ? $week['rrze-rsvp-room-timeslot-valid-from'] : 'unlimited';
+                            $valid_to = isset($week['rrze-rsvp-room-timeslot-valid-to']) ? $week['rrze-rsvp-room-timeslot-valid-to'] : 'unlimited';
+                            $schedule[$day][$valid_from.'-'.$valid_to]['start'] = $week['rrze-rsvp-room-starttime'];
+                            $schedule[$day][$valid_from.'-'.$valid_to]['end'] = $week['rrze-rsvp-room-endtime'];
                         } else {
                             $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
                         }
