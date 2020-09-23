@@ -32,7 +32,7 @@ class Actions
 		add_action('admin_init', [$this, 'bulkActionsHandlerSubmitted']);
 		add_action('admin_notices', [$this, 'bulkActionsHandlerAdminNotice']);
 		add_action('pre_post_update', [$this, 'preBookingUpdate']);
-		add_action('pre_post_update', [$this, 'prePostUpdate']);
+		add_action('pre_post_update', [$this, 'prePostUpdate'], 10, 2);
 		add_action('transition_post_status', [$this, 'transitionBookingStatus'], 10, 3);
 		add_action('transition_post_status', [$this, 'transitionPostStatus'], 10, 3);
 		add_action('wp', [$this, 'bookingReply']);
@@ -626,31 +626,37 @@ class Actions
 
 
     /*
-    *  prePostUpdate() prevents a seat or a room to be deleted if it is used in a booking
+	*  prePostUpdate() prevents a seat or a room if it is used in a booking
+	* 		a) to be deleted 
+	* 		b) to be set to draft, private or future (= scheduled to be published in a future date)
+	* 		c) to be password protected 
     */ 
-	public function prePostUpdate($postId) {
-        $errorMessage = '';
-        $isDelete = false;
-        $post = get_post($postId);
-
-		if (!in_array($post->post_type, ['room', 'seat'])) {
+	public function prePostUpdate($post_id, $post_data) {
+		$errorMessage = '';
+		
+		if (!in_array($post_data['post_type'], ['room', 'seat'])) {
 			return;
 		}
-        
-        $canDelete = ( $post->post_type == 'room' ? Functions::canDeleteRoom($postId) : Functions::canDeleteSeat($postId) ); // false if there is a booking with this room or seat
+
+        $canDelete = ( $post_data['post_type'] == 'room' ? Functions::canDeleteRoom($post_id) : Functions::canDeleteSeat($post_id) ); // false if there is a booking with this room or seat
 
         if ( !$canDelete ){
+			// prevent delete
             if ( isset($_REQUEST['trash']) || isset($_REQUEST['delete']) || ( isset($_REQUEST['action']) && $_REQUEST['action'] == 'trash' ) ){
-                $isDelete = true;
-            }
-
-            if ( $isDelete ){
 				$errorMessage = __('This item is used in a booking and cannot be deleted.', 'rrze-rsvp');
-            }
+			}
+
+			// prevent status change
+            if (in_array($post_data['post_status'], ['private', 'draft', 'future'])){
+				$errorMessage = __('This item is used in a booking and cannot be set to draft, to private or scheduled to be published in a future date.', 'rrze-rsvp');
+			}
+
+			// prevent password protection
+            if ($post_data['post_password']){
+				$errorMessage = __('This item is used in a booking and cannot be password protected.', 'rrze-rsvp');
+			}
         }
 
-        do_action('rrze.log.info', 'rrze-rsvp prePostUpdate() $postId = ' . $postId . ' NEU $post  = ' . json_encode($post));
-        
 		if ($errorMessage) {
 			wp_die(
 				$errorMessage,
@@ -711,58 +717,25 @@ class Actions
 
 
     /*
-    * transitionPostStatus() prevents 
-    *   a) that a booked seat is assigned to a different room
-    *   b) a room which contains booked seats is set to draft, private or future (= scheduled to be published in a future date)
+    * transitionPostStatus() prevents that a booked seat is assigned to a different room
     */
 	public function transitionPostStatus($newStatus, $oldStatus, $post) {
+		$errorMessage = '';
 
-        // BK EDIT
-        do_action('rrze.log.info', 'rrze-rsvp transitionPostStatus() PRE $newStatus = ' . $newStatus . ' $oldStatus = ' . $oldStatus . ' $_POST  = ' . json_encode($_POST));
-
-		if (!in_array($post->post_type, ['room', 'seat'])) {
+		if ($post->post_type != 'seat') {
 			return;
 		}
 
-        $canDelete = $post->post_type == 'room' ? Functions::canDeleteRoom($post->ID) : Functions::canDeleteSeat($post->ID);
+        $canDelete = Functions::canDeleteSeat($post->ID);
 
         if ( !$canDelete ){
-            if (in_array($newStatus, ['private', 'draft', 'future'])){
-                $_POST['original_post_status'] = 'publish';
-                $_POST['hidden_post_status'] = 'publish';
-                $_POST['post_status'] = 'publish';
-				$errorMessage = __('TEST his item is used in a booking and cannot be set to draft, to private or scheduled to be published in a future date.', 'rrze-rsvp');
-            }elseif ($post->post_type == 'seat') {
-                $roomId = get_post_meta($post->ID, 'rrze-rsvp-seat-room', true);
-                if (isset($_POST['rrze-rsvp-seat-room'])  && $_POST['rrze-rsvp-seat-room'] != $roomId){
-                    $_POST['rrze-rsvp-seat-room'] = $roomId;
-                    $errorMessage = __('This seat is used in a booking and cannot be assigned to a different room.', 'rrze-rsvp');
-                }
-            }
-        }
-
-		// if ('publish' != $newStatus || 'publish' != $oldStatus) {
-		// 	return;
-		// }
-
-
-		// if ($post->post_type == 'seat') {
-		// 	$roomId = get_post_meta($post->ID, 'rrze-rsvp-seat-room', true);
-		// }
-
-		// if ($post->post_type == 'seat'
-		// 	&& !$canDelete
-		// 	&& isset($_POST['rrze-rsvp-seat-room']) 
-		// 	&& $_POST['rrze-rsvp-seat-room'] != $roomId
-		// ) {
-        //     // $_POST['rrze-rsvp-seat-room'] = $roomId;
-        //     $errorMessage = __('This seat is used in a booking and cannot be assigned to a different room.', 'rrze-rsvp');
-
-        //     do_action('rrze.log.info', 'rrze-rsvp transitionPostStatus() ' . $errorMessage);
-		// }
-
-
-        do_action('rrze.log.info', 'rrze-rsvp transitionPostStatus() POST $newStatus = ' . $newStatus . ' $oldStatus = ' . $oldStatus . ' $_POST  = ' . json_encode($_POST));
+			$roomId = get_post_meta($post->ID, 'rrze-rsvp-seat-room', true);
+			if (isset($_POST['rrze-rsvp-seat-room'])  && $_POST['rrze-rsvp-seat-room'] != $roomId){
+				// roomId is about to be changed -> set old roomId
+				$_POST['rrze-rsvp-seat-room'] = $roomId;
+				$errorMessage = __('This seat is used in a booking and cannot be assigned to a different room.', 'rrze-rsvp');
+			}
+		}
 
         if ($errorMessage) {
             wp_die(
@@ -771,7 +744,6 @@ class Actions
                 ['back_link' => true]
             );
         }
-
 	}
 
 	public function bookingReply()
