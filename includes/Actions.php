@@ -31,7 +31,8 @@ class Actions
 		add_action('admin_init', [$this, 'bookingBulkActionsHandlerSubmitted']);
 		add_action('admin_init', [$this, 'bulkActionsHandlerSubmitted']);
 		add_action('admin_notices', [$this, 'bulkActionsHandlerAdminNotice']);
-		add_action('pre_post_update', [$this, 'preBookingUpdate']);
+		// add_action('pre_post_update', [$this, 'preBookingUpdate']);
+		add_action('pre_post_update', [$this, 'preBookingUpdate'], 10, 2);
 		add_action('pre_post_update', [$this, 'prePostUpdate'], 10, 2);
 		add_action('transition_post_status', [$this, 'transitionBookingStatus'], 10, 3);
 		add_action('transition_post_status', [$this, 'transitionPostStatus'], 10, 3);
@@ -537,18 +538,59 @@ class Actions
 		}
 	}
 
-	public function preBookingUpdate($postId)
-	{
-		$post = get_post($postId);
-		if ($post->post_type != 'booking') {
+	// public function preBookingUpdate($postId)
+	// {
+	// 	$post = get_post($postId);
+	// 	if ($post->post_type != 'booking') {
+	// 		return;
+	// 	}
+		
+	// 	$errorMessage = '';
+
+	// 	if ($post->post_status != 'publish') {
+	// 		$errorMessage = $this->isSeatAvailable();
+	// 	} else {
+	// 		$trash = isset($_REQUEST['trash']) ? $_REQUEST['trash'] : '';
+	// 		$delete = isset($_REQUEST['delete']) ? $_REQUEST['delete'] : '';
+	
+	// 		//$requestStatus = isset($_REQUEST['rrze-rsvp-booking-status']) ? $_REQUEST['rrze-rsvp-booking-status'] : '';
+	// 		$requestSeat = isset($_REQUEST['rrze-rsvp-booking-seat']) ? $_REQUEST['rrze-rsvp-booking-seat'] : '';
+	
+	// 		//$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+	// 		$seat = get_post_meta($postId, 'rrze-rsvp-booking-seat', true);
+	
+	// 		$isArchive = Functions::isBookingArchived($postId);
+	// 		$canDelete = Functions::canDeleteBooking($postId);
+	
+	// 		if ($trash || $delete) {
+	// 			if (!$canDelete) {
+	// 				$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
+	// 			}
+	// 		} elseif (
+	// 			$isArchive 
+	// 			|| ($requestSeat != $seat)
+	// 		) {
+	// 			$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
+	// 		}			
+	// 	}
+
+	// 	if ($errorMessage) {
+	// 		wp_die(
+	// 			$errorMessage,
+	// 			__('Update Error', 'rrze-rsvp'),
+	// 			['back_link' => true]
+	// 		);
+	// 	}
+	// }
+
+	public function preBookingUpdate($post_id, $post_data) {
+		if ($post_data['post_type'] != 'booking') {
 			return;
 		}
 		
-		$errorMessage = '';
+		$errorMessage = $this->isSeatAvailable();
 
-		if ($post->post_status != 'publish') {
-			$errorMessage = $this->isSeatAvailable();
-		} else {
+		if (!$errorMessage) {
 			$trash = isset($_REQUEST['trash']) ? $_REQUEST['trash'] : '';
 			$delete = isset($_REQUEST['delete']) ? $_REQUEST['delete'] : '';
 	
@@ -556,19 +598,16 @@ class Actions
 			$requestSeat = isset($_REQUEST['rrze-rsvp-booking-seat']) ? $_REQUEST['rrze-rsvp-booking-seat'] : '';
 	
 			//$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
-			$seat = get_post_meta($postId, 'rrze-rsvp-booking-seat', true);
+			$seat = get_post_meta($post_id, 'rrze-rsvp-booking-seat', true);
 	
-			$isArchive = Functions::isBookingArchived($postId);
-			$canDelete = Functions::canDeleteBooking($postId);
+			$isArchive = Functions::isBookingArchived($post_id);
+			$canDelete = Functions::canDeleteBooking($post_id);
 	
 			if ($trash || $delete) {
 				if (!$canDelete) {
 					$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
 				}
-			} elseif (
-				$isArchive 
-				|| ($requestSeat != $seat)
-			) {
+			} elseif ( $isArchive  || ($requestSeat != $seat) ) {
 				$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
 			}			
 		}
