@@ -121,7 +121,9 @@ function plugin(): object
  */
 function loaded()
 {
-    add_action('init', __NAMESPACE__ . '\loadTextdomain');
+    // add_action('init', __NAMESPACE__ . '\loadTextdomain');
+    loadTextdomain();
+
     plugin()->onLoaded();
 
     if ($error = systemRequirements()) {
