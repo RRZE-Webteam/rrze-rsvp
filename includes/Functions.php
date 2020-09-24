@@ -575,7 +575,7 @@ class Functions
                 foreach ($slots[$weekday] as $valid => $slot_infos) {
                     $valid_array = explode('-', $valid);
                     $valid_from = $valid_array[0];
-                    $valid_to = $valid_array[1] == 'unlimited' ? 'unlimited' : strtotime('+23 hours, +59 minutes', $valid_array[1]);
+                    $valid_to = $valid_array[1] == 'unlimited' ? 'unlimited' : strtotime('+23 hours, +59 minutes', intval($valid_array[1]));
                     $time_parts = explode(':', $slot_infos['start']);
                     if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $loopstart >= $valid_from && $loopstart <= $valid_to)
                         || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $loopstart >= $valid_from)
@@ -611,7 +611,7 @@ class Functions
             foreach ($slots[$weekday] as $valid => $data) {
                 $valid_array = explode('-', $valid);
                 $valid_from = $valid_array[0];
-                $valid_to = $valid_array[1] == 'unlimited' ? 'unlimited' : strtotime('+23 hours, +59 minutes', $valid_array[1]);
+                $valid_to = $valid_array[1] == 'unlimited' ? 'unlimited' : strtotime('+23 hours, +59 minutes', intval($valid_array[1]));
                 if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $timestamp >= $valid_from && $timestamp <= $valid_to)
                     || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $timestamp >= $valid_from)
                     || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $timestamp <= $valid_to)
@@ -699,7 +699,7 @@ class Functions
                 foreach ($slots[$weekday] as $valid  => $slot_infos) {
                     $valid_array = explode('-', $valid);
                     $valid_from = $valid_array[0];
-                    $valid_to = $valid_array[1] == 'unlimited' ? 'unlimited' : strtotime('+23 hours, +59 minutes', $valid_array[1]);
+                    $valid_to = $valid_array[1] == 'unlimited' ? 'unlimited' : strtotime('+23 hours, +59 minutes', intval($valid_array[1]));
                     $starttime = $slot_infos['start'];
                     $start_parts = explode(':', $starttime);
                     $end_parts = explode(':', $slot_infos['end']);
@@ -783,8 +783,8 @@ class Functions
                         if ($with_duration == true) {
                             $valid_from = isset($week['rrze-rsvp-room-timeslot-valid-from']) ? $week['rrze-rsvp-room-timeslot-valid-from'] : 'unlimited';
                             $valid_to = isset($week['rrze-rsvp-room-timeslot-valid-to']) ? $week['rrze-rsvp-room-timeslot-valid-to'] : 'unlimited';
-                            $schedule[$day][$valid_from.'-'.$valid_to]['start'] = $week['rrze-rsvp-room-starttime'];
-                            $schedule[$day][$valid_from.'-'.$valid_to]['end'] = $week['rrze-rsvp-room-endtime'];
+                            $schedule[$day][$valid_from.'-'.$valid_to.'-'.$week['rrze-rsvp-room-starttime'].'-'.$week['rrze-rsvp-room-endtime']]['start'] = $week['rrze-rsvp-room-starttime'];
+                            $schedule[$day][$valid_from.'-'.$valid_to.'-'.$week['rrze-rsvp-room-starttime'].'-'.$week['rrze-rsvp-room-endtime']]['end'] = $week['rrze-rsvp-room-endtime'];
                         } else {
                             $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
                         }
