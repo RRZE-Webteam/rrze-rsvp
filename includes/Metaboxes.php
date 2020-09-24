@@ -229,7 +229,7 @@ class Metaboxes
 
         $cmb_timeslots->add_field(array(
             'name' => __('Days closed', 'rrze-rsvp'),
-            'desc' => 'Enter days when this room is not available (format YYY-MM-DD). One date per line. Will overwrite timeslots (e.g. Room is available every Monday, except 2020-09-21.)',
+            'desc' => __('Enter days when this room is not available (format YYYY-MM-DD). One date per line. Will overwrite timeslots (e.g. Room is available every Monday, except 2020-09-21.)', 'rrze-rsvp'),
             //'default' => 'standard value (optional)',
             'id' => 'rrze-rsvp-room-days-closed',
             'type' => 'textarea_small'

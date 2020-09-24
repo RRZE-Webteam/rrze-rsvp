@@ -406,16 +406,16 @@ function getFields(){
             ],            
 	        [
                 'name'              => 'cancel_subject',
-                'label'             => __('Subject Canceling', 'rrze-rsvp'),
-                'desc'              => __('Subject for canceling mails', 'rrze-rsvp'),
+                'label'             => __('Subject Cancelling', 'rrze-rsvp'),
+                'desc'              => __('Subject for cancelling mails', 'rrze-rsvp'),
                 'type'              => 'text',
                 'default'           =>  $defaults['cancel_subject'],
                 'sanitize_callback' => 'sanitize_text_field'
             ],
 	        [
                 'name'              => 'cancel_subject_en',
-                'label'             => __('Subject Canceling (english)', 'rrze-rsvp'),
-                'desc'              => __('Subject for canceling mails', 'rrze-rsvp'),
+                'label'             => __('Subject Cancelling (english)', 'rrze-rsvp'),
+                'desc'              => __('Subject for cancelling mails', 'rrze-rsvp'),
                 'type'              => 'text',
                 'default'           =>  $defaults['cancel_subject_en'],
                 'sanitize_callback' => 'sanitize_text_field',
