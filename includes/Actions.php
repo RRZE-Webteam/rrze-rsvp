@@ -32,7 +32,8 @@ class Actions
 		add_action('admin_init', [$this, 'bulkActionsHandlerSubmitted']);
 		add_action('admin_notices', [$this, 'bulkActionsHandlerAdminNotice']);
 		add_action('pre_post_update', [$this, 'preBookingUpdate']);
-		add_action('pre_post_update', [$this, 'prePostUpdate']);
+		// add_action('pre_post_update', [$this, 'preBookingUpdate'], 10, 2);
+		add_action('pre_post_update', [$this, 'prePostUpdate'], 10, 2);
 		add_action('transition_post_status', [$this, 'transitionBookingStatus'], 10, 3);
 		add_action('transition_post_status', [$this, 'transitionPostStatus'], 10, 3);
 		add_action('wp', [$this, 'bookingReply']);
@@ -582,6 +583,44 @@ class Actions
 		}
 	}
 
+	// public function preBookingUpdate($post_id, $post_data) {
+	// 	if ($post_data['post_type'] != 'booking') {
+	// 		return;
+	// 	}
+		
+	// 	$errorMessage = $this->isSeatAvailable();
+
+	// 	if (!$errorMessage) {
+	// 		$trash = isset($_REQUEST['trash']) ? $_REQUEST['trash'] : '';
+	// 		$delete = isset($_REQUEST['delete']) ? $_REQUEST['delete'] : '';
+	
+	// 		//$requestStatus = isset($_REQUEST['rrze-rsvp-booking-status']) ? $_REQUEST['rrze-rsvp-booking-status'] : '';
+	// 		$requestSeat = isset($_REQUEST['rrze-rsvp-booking-seat']) ? $_REQUEST['rrze-rsvp-booking-seat'] : '';
+	
+	// 		//$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+	// 		$seat = get_post_meta($post_id, 'rrze-rsvp-booking-seat', true);
+	
+	// 		$isArchive = Functions::isBookingArchived($post_id);
+	// 		$canDelete = Functions::canDeleteBooking($post_id);
+	
+	// 		if ($trash || $delete) {
+	// 			if (!$canDelete) {
+	// 				$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
+	// 			}
+	// 		} elseif ( $isArchive  || ($requestSeat != $seat) ) {
+	// 			$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
+	// 		}			
+	// 	}
+
+	// 	if ($errorMessage) {
+	// 		wp_die(
+	// 			$errorMessage,
+	// 			__('Update Error', 'rrze-rsvp'),
+	// 			['back_link' => true]
+	// 		);
+	// 	}
+	// }
+
 	protected function isSeatAvailable()
 	{
 		$errorMessage = '';
@@ -624,33 +663,46 @@ class Actions
 		return $errorMessage;		
 	}
 
-	public function prePostUpdate($postId)
-	{
-		$post = get_post($postId);
-		if (!in_array($post->post_type, ['room', 'seat']) || $post->post_status != 'publish') {
+
+    /*
+	*  prePostUpdate() prevents a seat or a room if it is used in a booking
+	* 		a) to be deleted 
+	* 		b) to be set to draft, private or future (= scheduled to be published in a future date)
+	* 		c) to be password protected 
+    */ 
+	public function prePostUpdate($post_id, $post_data) {
+		$errorMessage = '';
+		
+		if (!in_array($post_data['post_type'], ['room', 'seat'])) {
 			return;
 		}
 
-		$trash = isset($_REQUEST['trash']) ? $_REQUEST['trash'] : '';
-		$delete = isset($_REQUEST['delete']) ? $_REQUEST['delete'] : '';
+        $canDelete = ( $post_data['post_type'] == 'room' ? Functions::canDeleteRoom($post_id) : Functions::canDeleteSeat($post_id) ); // false if there is a booking with this room or seat
 
-		$canDelete = $post->post_type == 'room' ? Functions::canDeleteRoom($postId) : Functions::canDeleteSeat($postId);
-
-		$errorMessage = '';
-
-		if ($trash || $delete) {
-			if (!$canDelete) {
-				$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
+        if ( !$canDelete ){
+			// prevent delete
+            if ( isset($_REQUEST['trash']) || isset($_REQUEST['delete']) || ( isset($_REQUEST['action']) && $_REQUEST['action'] == 'trash' ) ){
+				$errorMessage = __('This item is used in a booking and cannot be deleted.', 'rrze-rsvp');
 			}
-		}
+
+			// prevent status change
+            if (in_array($post_data['post_status'], ['private', 'draft', 'future'])){
+				$errorMessage = __('This item is used in a booking and cannot be set to draft, to private or scheduled to be published in a future date.', 'rrze-rsvp');
+			}
+
+			// prevent password protection
+            if ($post_data['post_password']){
+				$errorMessage = __('This item is used in a booking and cannot be password protected.', 'rrze-rsvp');
+			}
+        }
 
 		if ($errorMessage) {
 			wp_die(
 				$errorMessage,
 				__('Update Error', 'rrze-rsvp'),
 				['back_link' => true]
-			);
-		}
+            );
+        }
 	}	
 
 	public function transitionBookingStatus($newStatus, $oldStatus, $post)
@@ -702,30 +754,35 @@ class Actions
 		do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 	}
 
-	public function transitionPostStatus($newStatus, $oldStatus, $post)
-	{
-		if (!in_array($post->post_type, ['room', 'seat'])) {
+
+    /*
+    * transitionPostStatus() prevents that a booked seat is assigned to a different room
+    */
+	public function transitionPostStatus($newStatus, $oldStatus, $post) {
+		$errorMessage = '';
+
+		if ($post->post_type != 'seat') {
 			return;
 		}
 
-		if ('publish' != $newStatus || 'publish' != $oldStatus) {
-			return;
-		}
+        $canDelete = Functions::canDeleteSeat($post->ID);
 
-		$canDelete = $post->post_type == 'room' ? Functions::canDeleteRoom($post->ID) : Functions::canDeleteSeat($post->ID);
-
-		if ($post->post_type == 'seat') {
+        if ( !$canDelete ){
 			$roomId = get_post_meta($post->ID, 'rrze-rsvp-seat-room', true);
+			if (isset($_POST['rrze-rsvp-seat-room'])  && $_POST['rrze-rsvp-seat-room'] != $roomId){
+				// roomId is about to be changed -> set old roomId
+				$_POST['rrze-rsvp-seat-room'] = $roomId;
+				$errorMessage = __('This seat is used in a booking and cannot be assigned to a different room.', 'rrze-rsvp');
+			}
 		}
 
-		if ($post->post_type == 'seat'
-			&& !$canDelete
-			&& isset($_POST['rrze-rsvp-seat-room']) 
-			&& $_POST['rrze-rsvp-seat-room'] != $roomId
-		) {
-			$_POST['rrze-rsvp-seat-room'] = $roomId;
-		}
-
+        if ($errorMessage) {
+            wp_die(
+                $errorMessage,
+                __('Update Error', 'rrze-rsvp'),
+                ['back_link' => true]
+            );
+        }
 	}
 
 	public function bookingReply()

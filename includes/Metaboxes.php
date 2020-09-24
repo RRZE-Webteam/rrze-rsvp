@@ -213,6 +213,29 @@ class Metaboxes
             'time_format' => 'H:i',
         ));
 
+        $cmb_timeslots->add_group_field($group_field_id,  array(
+            'name' => __('Valid from (optional)', 'rrze-rsvp'),
+            'id' => 'rrze-rsvp-room-timeslot-valid-from',
+            'type' => 'text_date_timestamp',
+            'date_format' => 'd.m.Y',
+        ));
+
+        $cmb_timeslots->add_group_field($group_field_id,  array(
+            'name' => __('Valid until (optional)', 'rrze-rsvp'),
+            'id' => 'rrze-rsvp-room-timeslot-valid-to',
+            'type' => 'text_date_timestamp',
+            'date_format' => 'd.m.Y',
+        ));
+
+        $cmb_timeslots->add_field(array(
+            'name' => __('Days closed', 'rrze-rsvp'),
+            'desc' => __('Enter days when this room is not available (format YYYY-MM-DD). One date per line. Will overwrite timeslots (e.g. Room is available every Monday, except 2020-09-21.)', 'rrze-rsvp'),
+            //'default' => 'standard value (optional)',
+            'id' => 'rrze-rsvp-room-days-closed',
+            'type' => 'textarea_small'
+        ));
+
+
         $cmb_general = new_cmb2_box(array(
             'id'            => 'rrze_rsvp_general-meta',
             'title'         => __('Details', 'rrze-rsvp'),
@@ -223,8 +246,6 @@ class Metaboxes
             // 'cmb_styles' => false, // false to disable the CMB stylesheet
             // 'closed'     => true, // Keep the metabox closed by default
         ));
-
-
 
         $cmb_general->add_field(array(
             'name'             => __('Booking mode', 'rrze-rsvp'),
