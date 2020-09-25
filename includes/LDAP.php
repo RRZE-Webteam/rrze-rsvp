@@ -27,13 +27,13 @@ class LDAP {
     public function ldapTest($atts, $content = ''){
         if(isset($_POST['username']) && isset($_POST['password'])){
             $ldapconn = ldap_connect($this->ldap_server);
-            ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
-            ldap_set_option($ldapconn, LDAP_OPT_REFERRALS, 0);
         
             if (!$ldapconn){
                 $content = 'LDAP-error no.' . ldap_errno($ldapconn) . ': ' . ldap_error($ldapconn);
                 do_action('rrze.log.error', 'rrze-rsvp : ldapTest() : ' . $content . ' using ldap_connect() with ' . $this->ldap_server);
             }else{
+                ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
+                ldap_set_option($ldapconn, LDAP_OPT_REFERRALS, 0);
                 $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
                 $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
             
