@@ -48,6 +48,10 @@ class Main
 		$tracking = new Tracking;
 		$tracking->onLoaded();
 
+		// LDAP
+		$ldap = new LDAP;
+		$ldap->onLoaded();
+
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();
 
