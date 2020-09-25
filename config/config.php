@@ -555,7 +555,7 @@ function getFields(){
             ],
             [
                 'name'    => 'domain',
-                'label'   => __('Port numer', 'rrze-rsvp'),
+                'label'   => __('Domain', 'rrze-rsvp'),
                 'desc'   => __('Domain', 'rrze-rsvp'),
                 'type'    => 'text',
                 'default' => $defaults['domain'],
