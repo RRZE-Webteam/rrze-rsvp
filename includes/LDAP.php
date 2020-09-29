@@ -38,6 +38,9 @@ class LDAP {
 
     public function ldapTest($atts, $content = ''){
         if(isset($_POST['username']) && isset($_POST['password'])){
+            $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+            $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
+
             $this->link_identifier = ldap_connect($this->server, $this->port);
         
             if (!$this->link_identifier){
@@ -45,9 +48,6 @@ class LDAP {
             }else{
                 ldap_set_option($this->link_identifier, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($this->link_identifier, LDAP_OPT_REFERRALS, 0);
-
-                $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-                $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
             
                 $bind = @ldap_bind($this->link_identifier, $username . '@' . $this->base_dn, $password);
 
