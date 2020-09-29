@@ -14,18 +14,16 @@ class LDAP {
     protected $domain;
     protected $distinguished_name;
     protected $base_dn;
-    protected $filter;
+    protected $search_filter;
     protected $attributes;
 
     public function __construct() {
         $this->settings = new Settings(plugin()->getFile());
-        $this->server = 'ubaddc1.bib.uni-erlangen.de';
-        $this->port = '389';
-        $this->distinguished_name = 'CN=UB Bib User,OU=Groups,OU=UB,DC=ubad,DC=fau,DC=de';
-        $this->base_dn = 'ubad.fau.de';
-        $this->filter = '(sAMAccountName=UB_Bib_User)';
-
-        $this->attributes = array("mail", "displayName", "givenName", "title");
+        $this->server = $this->settings->getOption('ldap', 'server');
+        $this->port = $this->settings->getOption('ldap', 'port');
+        $this->distinguished_name = $this->settings->getOption('ldap', 'distinguished_name');
+        $this->base_dn = $this->settings->getOption('ldap', 'base_dn');
+        $this->search_filter = $this->settings->getOption('ldap', 'search_filter');
     }
 
     public function onLoaded() {
@@ -56,7 +54,7 @@ class LDAP {
                 if (!$bind) {
                     $content = $this->logError('ldap_bind()');
                 }else{
-                    $result_identifier = @ldap_search($this->link_identifier, $this->distinguished_name, $this->filter);
+                    $result_identifier = @ldap_search($this->link_identifier, $this->distinguished_name, $this->search_filter);
                     
                     if ($result_identifier === false){
                         $content = $this->logError('ldap_search()');
