@@ -119,6 +119,8 @@ function defaultOptions()  {
             'seat_equipment' => 'off',
             'room-notes-label' => __('Additional informations', 'rrze-rsvp'),
             'dsgvo-declaration' => __('Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden erfasst.', 'rrze-rsvp'),
+            'server' => '',
+            'domain' => '',
         ];
     }
     
@@ -159,7 +161,11 @@ function getSections()
         [
             'id'    => 'pdf',
             'title' => __('QR PDF Settings', 'rrze-rsvp')
-        ]
+        ],
+        [
+            'id'    => 'ldap',
+            'title' => __('LDAP Settings', 'rrze-rsvp')
+        ],
     ];
 }
 
@@ -536,6 +542,24 @@ function getFields(){
                 'label' => __('Print seats\' equipment', 'rrze-rsvp'),
                 'default' => $defaults['seat_equipment'],
                 'type'  => 'checkbox'
+            ],
+        ],
+        'ldap' => [
+            [
+                'name'    => 'server',
+                'label'   => __('Server', 'rrze-rsvp'),
+                'desc'   => __('LDAP server URL', 'rrze-rsvp'),
+                'type'    => 'text',
+                'default' => $defaults['server'],
+		        'sanitize_callback' => 'esc_url'
+            ],
+            [
+                'name'    => 'domain',
+                'label'   => __('Domain', 'rrze-rsvp'),
+                'desc'   => __('Domain', 'rrze-rsvp'),
+                'type'    => 'text',
+                'default' => $defaults['domain'],
+		        'sanitize_callback' => 'esc_url'
             ],
         ]
     ];

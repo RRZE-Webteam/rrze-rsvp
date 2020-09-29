@@ -1018,26 +1018,6 @@ class Bookings extends Shortcodes {
         return $calendar;
     }
 
-    public function buildDateBoxes($days = 14) {
-        $output = '';
-        for ($i = 0; $i <= $days; $i++) {
-            $timestamp = mktime(0, 0, 0, date("m")  , date("d")+$i, date("Y"));
-            $techtime1 = date('Y-m-d_09-00', $timestamp);
-            $techtime2 = date('Y-m-d_14-30', $timestamp);
-            $output .= '<div class="rsvp-datebox">';
-            $output .= date_i18n("D", $timestamp) . ', ' . date_i18n(get_option('date_format'), $timestamp);
-            $output .= '<br /> <input type="radio" id="seat_'. $techtime1 . '" name="datetime" value="'. $techtime1 . '" disabled>'
-                . '<label for="seat_'. $techtime1 . '" class="disabled"> 09:00-13:30 Uhr</label>';
-            $output .= '<br /> <input type="radio" id="seat_'. $techtime2 . '" name="datetime" value="'. $techtime2 . '" disabled>'
-                . '<label for="seat_'. $techtime2 . '" class="disabled"> 14:30-19:00 Uhr</label><br />';
-            $output .= '';
-            $output .= '</div>';
-        }
-        $output .= '<button class="show-more btn btn-default btn-block">&hellip;'.__('More','rrze-rsvp').'&hellip;</button>';
-
-        return $output;
-    }
-
     public function ajaxUpdateCalendar() {
         check_ajax_referer( 'rsvp-ajax-nonce', 'nonce' );
         $period = explode('-', $_POST['month']);

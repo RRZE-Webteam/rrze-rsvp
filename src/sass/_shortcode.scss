@@ -61,7 +61,6 @@
 
     }
     table.rsvp_calendar {
-       
         border: 2px solid #dfe6ec;
 	width: 100%;
 	float: none;
@@ -83,10 +82,12 @@
         .cal-next {
             display: inline-block;
             float: right;
+            margin-left: 5px;
         }
         .cal-prev {
             display: inline-block;
             float: left;
+            margin-right: 5px;
         }
         th {
             padding: 5px 10px;

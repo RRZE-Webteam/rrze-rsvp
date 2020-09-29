@@ -197,6 +197,7 @@ class Actions
 		}
 
 		$generatePdfLink = !empty($actions['generate-pdf']) ? $actions['generate-pdf'] : '';
+        $view = $actions['view'];
 		$actions = [];
 		$title = _draft_or_post_title();		
 		$canEdit = current_user_can('edit_post', $post->ID);
@@ -232,7 +233,10 @@ class Actions
 					);
 				}
 			}
-		}
+        }
+
+        $actions['view'] = $view;
+        
 		if ($generatePdfLink) {
 			$actions['generate-pdf'] = $generatePdfLink;
 		}

@@ -31,6 +31,7 @@ class CPT extends Main
 
         add_action('admin_menu', [$this, 'bookingMenu']);
         add_filter('parent_file', [$this, 'filterParentMenu']);
+        add_action('pre_get_posts', [$this, 'archiveShowAllRooms']);
 
         // Prüfung: gibt es Buchung zu Raum oder Platz 
         // add_action('add_meta_boxes', [$this, 'customSubmitdiv']);
@@ -256,5 +257,13 @@ class CPT extends Main
         printf('<p><code>[rsvp-booking room="%s" sso="true"]</code></p>', get_the_ID());
         printf('<p>%s</p>', __('Skip <code>sso="true"</code> to deactivate SSO authentication.', 'rrze-rsvp'));
         printf('<p>%s</p>', __('Add <code>days="20"</code> to overwrite the number of days you can book a seat in advance.', 'rrze-rsvp'));
+    }
+
+    public function archiveShowAllRooms($query) {
+        if ( ! is_admin() && $query->is_main_query() ) {
+            if ( is_post_type_archive( 'room' ) ) {
+                $query->set('posts_per_page', -1 );
+            }
+        }
     }
 }
