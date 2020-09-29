@@ -798,6 +798,9 @@ class Functions
                 }
             }
         }
+        foreach ($schedule as $k => &$v) {
+            ksort($v);
+        }
         return $schedule;
     }
 
