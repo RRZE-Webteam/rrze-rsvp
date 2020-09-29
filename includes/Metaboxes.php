@@ -343,27 +343,27 @@ class Metaboxes
             'name'    => __('Street', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-room-street',
             'type'    => 'text',
-            'attributes'  =>  [
-                'required' => 'required',
-            ],             
+//            'attributes'  =>  [
+//                'required' => 'required',
+//            ],
         ));
 
         $cmb_general->add_field(array(
             'name'    => __('ZIP', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-room-zip',
             'type'    => 'text',
-            'attributes'  =>  [
-                'required' => 'required',
-            ],             
+//            'attributes'  =>  [
+//                'required' => 'required',
+//            ],
         ));
 
         $cmb_general->add_field(array(
             'name'    => __('City', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-room-city',
             'type'    => 'text',
-            'attributes'  =>  [
-                'required' => 'required',
-            ],             
+//            'attributes'  =>  [
+//                'required' => 'required',
+//            ],
         ));
 
         $cmb_general->add_field(array(
