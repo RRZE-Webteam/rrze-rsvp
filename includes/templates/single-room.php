@@ -75,7 +75,11 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
                 echo $schedule;
                 break;
             case 'availability':
-                echo do_shortcode('[rsvp-availability room=' . $roomId . ' days=10]');
+                $daysInAdvance = get_post_meta($roomId, 'rrze-rsvp-room-days-in-advance', true);
+                if (empty($daysInAdvance)) {
+                    $daysInAdvance = '10';
+                }
+                echo do_shortcode('[rsvp-availability room=' . $roomId . ' days=' . $daysInAdvance . ']');
                 break;
             case 'occupancy':
                 echo Functions::getOccupancyByRoomIdHTML($roomId);
@@ -151,6 +155,11 @@ while (have_posts()) : the_post();
                 $booking_link = 'booking_link=true';
             }
         }
+        $daysInAdvance = get_post_meta($roomId, 'rrze-rsvp-room-days-in-advance', true);
+        if (empty($daysInAdvance)) {
+            $daysInAdvance = '10';
+        }
+
         if (shortcode_exists('collapsibles')) {
             $shortcode = '[collapsibles expand-all-link="true"]'
                 . '[collapse title="' . __('Schedule', 'rrze-rsvp') . '" name="schedule" load="open"]'
@@ -162,9 +171,8 @@ while (have_posts()) : the_post();
             if ($options->general_single_room_availability_table != 'no') {
                 $bookingmode = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true);
                 if ($bookingmode != 'check-only') {
-
                     $shortcode .= '[collapse title="' . __('Availability', 'rrze-rsvp') . '" name="availability"]'
-                        . do_shortcode('[rsvp-availability room=' . $roomId . ' days=10 ' . $booking_link . ']')
+                        . do_shortcode('[rsvp-availability room=' . $roomId . ' days=' . $daysInAdvance . ' ' . $booking_link . ']')
                         . '[/collapse]';
                 }
             }
@@ -181,7 +189,7 @@ while (have_posts()) : the_post();
                 if ($bookingmode != 'check-only') {
 
                     $timetables .= '<h3>' . __('Availability', 'rrze-rsvp') . '</h3>'
-                        . do_shortcode('[rsvp-availability room=' . $roomId . ' days=10 ' . $booking_link . ']');
+                        . do_shortcode('[rsvp-availability room=' . $roomId . ' days=' . $daysInAdvance . ' ' . $booking_link . ']');
                 }
             }
         }

@@ -654,7 +654,7 @@ function getShortcodeSettings(){
                 'message' => __( 'Find the settings on the right side', 'rrze-rsvp' ) // erscheint bei Auswahl des Blocks, wenn "show_block" auf 'right' gesetzt ist
             ],
             'days' => [
-                'default' => 14,
+                'default' => '',
                 'field_type' => 'text', // Art des Feldes im Gutenberg Editor
                 'label' => __( 'Days in advance', 'rrze-rsvp' ),
                 'type' => 'number' // Variablentyp der Eingabe
