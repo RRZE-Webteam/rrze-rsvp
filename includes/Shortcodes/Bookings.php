@@ -747,7 +747,7 @@ class Bookings extends Shortcodes {
         }
 
         // Überprüfen ob der Platz in der Zwischenzeit bereits anderweitig gebucht wurde
-        $check_availability = Functions::getSeatAvailability($booking_seat, $booking_date, date('Y-m-d', strtotime($booking_date. ' +1 days')));
+        $check_availability = Functions::getSeatAvailability($booking_seat, $booking_date, $booking_date);
         $seat_available = false;
         foreach ($check_availability[$booking_date] as $timeslot) {
             if (strpos($timeslot, $booking_start) == 0) {
