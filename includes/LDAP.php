@@ -67,11 +67,11 @@ class LDAP {
                     // SAMAccountName 
 
 
-                    (sAMAccountName=268435456)
-                    (sAMAccountName=02802102606)
-                    (SAMAccountName=268435456)
-                    (SAMAccountName=02802102606)
-                    (sAMAccountName=UB_Bib_User)
+                    // (sAMAccountName=268435456)
+                    // (sAMAccountName=02802102606)
+                    // (SAMAccountName=268435456)
+                    // (SAMAccountName=02802102606)
+                    // (sAMAccountName=UB_Bib_User)
 
                     $result_identifier = @ldap_search($this->link_identifier, $this->distinguished_name, $this->search_filter);
                     
@@ -81,15 +81,15 @@ class LDAP {
                         $aEntry = @ldap_get_entries($this->link_identifier, $result_identifier);
 
 
-                        echo 'BK TEST <pre>';
-                        var_dump($aEntry);
-                        exit;
+                        // echo 'BK TEST <pre>';
+                        // var_dump($aEntry);
+                        // exit;
 
                         if (isset($aEntry['count']) && $aEntry['count'] > 0){
                             if (isset($aEntry[0]['cn'][0])){
                                 $content = '<p>Hello <strong>' . $aEntry[0]['cn'][0] . '</strong><br>' . json_encode($aEntry); 
                                 // BK TEST
-                                $this->logError('KEIN FEHLER - json_encode($aEntry) = ' . print_r($aEntry));
+                                // $this->logError('KEIN FEHLER - json_encode($aEntry) = ' . print_r($aEntry));
                             }else{
                                 $content = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0]');
                             }
