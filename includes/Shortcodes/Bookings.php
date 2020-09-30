@@ -324,11 +324,8 @@ class Bookings extends Shortcodes {
         $message = isset($fieldErrors['rsvp_phone']['message']) ? $fieldErrors['rsvp_phone']['message'] : '';
         $output .= '<div class="form-group' . $error . '"><label for="rsvp_phone">'
             . __('Phone Number', 'rrze-rsvp') . '</label>'
-            . '<input type="text" name="rsvp_phone" value="' . $value . '" pattern="^([+])?(\d{1,3})?\s?(\(\d{3,5}\)|\d{3,5})?\s?(\d{1,3}\s?|\d{1,3}[-])?(\d{3,8})$" id="rsvp_phone" required aria-required="true">'
-            . '<div class="error-message">' . $message . '</div>'
-            . '<p class="description">'
-            . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
-            . '</div>';
+            . '<input type="text" name="rsvp_phone" value="' . $value . '" pattern="^([+])?(\d{1,3})?\s?(\(\d{3,5}\)|\d{3,5})?\s?(\d{1,3}\s?|\d{1,3}[-])?(\d{3,8})$" id="rsvp_phone">'
+            . '<div class="error-message">' . $message . '</div>';
         $defaults = defaultOptions();
         if ($comment) {
             $label = $roomMeta['rrze-rsvp-room-notes-label'][0];
