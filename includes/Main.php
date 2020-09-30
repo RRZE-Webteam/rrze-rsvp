@@ -48,7 +48,7 @@ class Main
 		$tracking = new Tracking;
 		$tracking->onLoaded();
 
-		// LDAP (in development)
+		// LDAP
 		// $ldap = new LDAP;
 		// $ldap->onLoaded();
 

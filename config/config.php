@@ -65,6 +65,12 @@ function wp_kses_custom($str){
 
     return wp_kses( $str, $allowed_html, $allowed_protocols );
 }
+
+// sanitzes natural number (positive INT)
+function sanitize_natint_field( $input ) {
+    return filter_var($input, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+}
+
     
 function defaultOptions()  {
 
@@ -119,8 +125,11 @@ function defaultOptions()  {
             'seat_equipment' => 'off',
             'room-notes-label' => __('Additional informations', 'rrze-rsvp'),
             'dsgvo-declaration' => __('Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden erfasst.', 'rrze-rsvp'),
-            'server' => '',
-            'domain' => '',
+            'server' => 'ubaddc1.bib.uni-erlangen.de',
+            'port' => '389',
+            'distinguished_name' => 'CN=UB Bib User,OU=Groups,OU=UB,DC=ubad,DC=fau,DC=de',
+            'base_dn' => 'ubad.fau.de',
+            'search_filter' => '(sAMAccountName=UB_Bib_User)',
         ];
     }
     
@@ -551,16 +560,48 @@ function getFields(){
                 'desc'   => __('LDAP server URL', 'rrze-rsvp'),
                 'type'    => 'text',
                 'default' => $defaults['server'],
-		        'sanitize_callback' => 'esc_url'
+		        'sanitize_callback' => 'sanitize_text_field'
             ],
             [
-                'name'    => 'domain',
-                'label'   => __('Domain', 'rrze-rsvp'),
-                'desc'   => __('Domain', 'rrze-rsvp'),
-                'type'    => 'text',
-                'default' => $defaults['domain'],
-		        'sanitize_callback' => 'esc_url'
+                'name'    => 'port',
+                'label'   => __('Port', 'rrze-rsvp'),
+                'desc'   => __('Port', 'rrze-rsvp'),
+                'type'    => 'number',
+                'default' => $defaults['port'],
+		        'sanitize_callback' => 'sanitize_natint_field'
             ],
+            [
+                'name'    => 'distinguished_name',
+                'label'   => __('Distinguished Name', 'rrze-rsvp'),
+                'desc'   => __('Distinguished Name', 'rrze-rsvp'),
+                'type'    => 'text',
+                'default' => $defaults['distinguished_name'],
+		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+            [
+                'name'    => 'base_dn',
+                'label'   => __('Base DN', 'rrze-rsvp'),
+                'desc'   => __('Base DN', 'rrze-rsvp'),
+                'type'    => 'text',
+                'default' => $defaults['base_dn'],
+		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+            [
+                'name'    => 'search_filter',
+                'label'   => __('Search filter', 'rrze-rsvp'),
+                'desc'   => __('Search filter', 'rrze-rsvp'),
+                'type'    => 'text',
+                'default' => $defaults['search_filter'],
+		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+            // [
+            //     'name'    => 'port',
+            //     'label'   => __('Port', 'rrze-rsvp'),
+            //     'desc'   => __('Port', 'rrze-rsvp'),
+            //     'type'    => 'number',
+            //     'default' => $defaults['port'],
+		    //     'sanitize_callback' => 'sanitize_int'
+            // ],
         ]
     ];
 }
@@ -613,7 +654,7 @@ function getShortcodeSettings(){
                 'message' => __( 'Find the settings on the right side', 'rrze-rsvp' ) // erscheint bei Auswahl des Blocks, wenn "show_block" auf 'right' gesetzt ist
             ],
             'days' => [
-                'default' => 14,
+                'default' => '',
                 'field_type' => 'text', // Art des Feldes im Gutenberg Editor
                 'label' => __( 'Days in advance', 'rrze-rsvp' ),
                 'type' => 'number' // Variablentyp der Eingabe
