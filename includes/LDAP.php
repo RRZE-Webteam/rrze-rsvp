@@ -29,7 +29,7 @@ class LDAP {
     }
 
     public function onLoaded() {
-        add_shortcode('rsvp-ldap-test', [$this, 'ldapTest'], 10, 2);
+        // add_shortcode('rsvp-ldap-test', [$this, 'ldapTest'], 10, 2);
         add_action('wp', [$this, 'requireAuth']);
     }
     
@@ -39,7 +39,7 @@ class LDAP {
         return $msg;
     }
 
-    public function ldapTest($atts, $content = ''){
+    public function ldapForm(){
         if(isset($_POST['username']) && isset($_POST['password'])){
             $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
             $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
@@ -133,7 +133,7 @@ class LDAP {
         );
 
         $data = [];
-        $loginUrl = $this->simplesamlAuth->getLoginURL();
+        $loginUrl = 'URL-UEBER-requireAuth';
         $data['title'] = __('Authentication Required', 'rrze-rsvp');
         $data['please_login'] = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
 
@@ -162,21 +162,11 @@ class LDAP {
             exit;
         }
 
-        $this->setAttributes();
+        // $this->setAttributes();
 
         return true;
     }
 
-    public function setAttributes()
-    {
-        $this->mail = isset($this->personAttributes['urn:mace:dir:attribute-def:mail'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:mail'][0] : null;
-    }
-
-    public function getCustomerData(){
-        return [
-            'customer_email' => $this->mail ? $this->mail : __('no@email', 'rrze-rsvp')
-        ];
-    }
 
 
     public function getAuth(){
@@ -186,7 +176,7 @@ class LDAP {
 
 
     public function getLoginURL(){
-        return 'BAUSTELLE-HIER-FEHLT-URL';
+        return 'URL-GETLOGINURL';
     }
 
 

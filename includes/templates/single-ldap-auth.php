@@ -1,5 +1,4 @@
 <?php
-
 namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
@@ -26,7 +25,7 @@ if ($ldap->getAuth()) {
 $data = [];
 $loginUrl = $ldap->getLoginURL();
 $data['title'] = __('Authentication Required', 'rrze-rsvp');
-$data['please_login'] = sprintf(__('<a href="%s">Please login with your UB-AD username</a>.', 'rrze-rsvp'), $loginUrl);
+$data['please_login'] = __('Please login with your UB-AD username', 'rrze-rsvp');
 
 get_header();
 
@@ -69,6 +68,7 @@ if (Helper::isFauTheme()) {
 echo $divOpen;
 
 echo $template->getContent('auth/require-ldap-auth', $data);
+echo $ldap->ldapForm();
 
 echo $divClose;
 
