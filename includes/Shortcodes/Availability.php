@@ -129,7 +129,9 @@ class Availability extends Shortcodes
                         if ($booking_link) {
                             $permalink = get_permalink($room_id);
                             $timeslot = explode('-', $time)[0];
-                            $booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$timeslot&nonce=$nonce\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "'>";
+                            // Auskommentiert wg. Bug https://github.com/RRZE-Webteam/rrze-rsvp/issues/164
+                            //$booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$timeslot&nonce=$nonce\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "'>";
+                            $booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$timeslot\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "'>";
                             $booking_link_close = '</a>';
                             $glue = '';
                         }
