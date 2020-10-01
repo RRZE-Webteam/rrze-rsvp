@@ -119,7 +119,7 @@ class LDAP {
         $bookingId = isset($_GET['id']) && !$roomId ? sprintf('?id=%s', absint($_GET['id'])) : '';
         $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';        
 
-        if ($this->simplesamlAuth() && $this->simplesamlAuth->isAuthenticated()) {
+        if ($this->isAuthenticated) {
             $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
             wp_redirect($redirectUrl);
             exit;
@@ -133,24 +133,13 @@ class LDAP {
         );
 
         $data = [];
-        if ($this->simplesamlAuth()) {
-            $loginUrl = $this->simplesamlAuth->getLoginURL();
-            $data['title'] = __('Authentication Required', 'rrze-rsvp');
-            $data['please_login'] = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
-        } else {
-            header('HTTP/1.0 403 Forbidden');
-            wp_redirect(get_site_url());
-            exit;
-        }
+        $loginUrl = $this->simplesamlAuth->getLoginURL();
+        $data['title'] = __('Authentication Required', 'rrze-rsvp');
+        $data['please_login'] = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
 
         add_filter('the_content', function ($content) use ($data) {
             return $this->template->getContent('auth/require-ldap-auth', $data);
         });
-    }
-
-    public function isAuthenticated()
-    {
-        return $this->simplesamlAuth && $this->simplesamlAuth->isAuthenticated();
     }
 
 
@@ -165,7 +154,7 @@ class LDAP {
         $bookingId = isset($_GET['id']) && !$roomId ? sprintf('&id=%s', absint($_GET['id'])) : '';
         $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
 
-        if (!$this->simplesamlAuth->isAuthenticated()) {
+        if (!$this->isAuthenticated) {
             $authNonce = sprintf('?require-ldap-auth=%s', wp_create_nonce('require-ldap-auth'));
             $redirectUrl = sprintf('%s%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $authNonce, $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
             header('HTTP/1.0 403 Forbidden');

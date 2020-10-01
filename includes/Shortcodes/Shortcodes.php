@@ -5,6 +5,7 @@ namespace RRZE\RSVP\Shortcodes;
 defined('ABSPATH') || exit;
 
 use RRZE\RSVP\IdM;
+use RRZE\RSVP\LDAP;
 use RRZE\RSVP\Shortcodes\Bookings;
 use RRZE\RSVP\Shortcodes\Availability;
 use RRZE\RSVP\Shortcodes\QR;
@@ -24,12 +25,15 @@ class Shortcodes
 
     protected $idm;
 
+    protected $ldap;
+
     public function __construct($pluginFile, $settings)
     {
         $this->pluginFile = $pluginFile;
         $this->settings = $settings;
         $this->shortcodesettings = getShortcodeSettings();
         $this->idm = new IdM;
+        $this->ldap = new LDAP;
     }
 
     public function onLoaded()
@@ -122,6 +126,10 @@ class Shortcodes
 
         if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
             $this->idm->tryLogIn();
+        }     
+
+        if (isset($_REQUEST['ldap_nonce']) && wp_verify_nonce($_REQUEST['ldap_nonce'], 'rrze-rsvp-seat-check-inout')) {
+            $this->ldap->tryLogIn();
         }     
     }
 }
