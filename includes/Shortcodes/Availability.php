@@ -40,8 +40,7 @@ class Availability extends Shortcodes
         $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
         $output = '';
         $today = date('Y-m-d');
-        // Auskommentiert wg. Bug https://github.com/RRZE-Webteam/rrze-rsvp/issues/164
-        //$nonce = wp_create_nonce('rsvp-availability');
+        $nonce = wp_create_nonce('rsvp-availability');
         $booking_link = (isset($shortcode_atts['booking_link']) && Functions::getBoolValueFromAtt($shortcode_atts['booking_link']));
         $days = sanitize_text_field($shortcode_atts['days']); // kann today, tomorrow oder eine Zahl sein (kommende X Tage)
 
@@ -70,9 +69,7 @@ class Availability extends Shortcodes
                             if ($booking_link) {
                                 $permalink = get_permalink($room);
                                 $timeslot = explode('-', $time)[0];
-                                // Auskommentiert wg. Bug https://github.com/RRZE-Webteam/rrze-rsvp/issues/164
-                                //$booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$timeslot&nonce=$nonce\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "' class='seat-link'>";
-                                $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$timeslot\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "' class='seat-link'>";
+                                $booking_link_open = "<a href=\"$permalink?room_id=$room&seat_id=$seat_id&bookingdate=$date&timeslot=$timeslot&nonce=$nonce\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "' class='seat-link'>";
                                 $booking_link_close = '</a>';
                                 $glue = '';
                             }
@@ -129,9 +126,7 @@ class Availability extends Shortcodes
                         if ($booking_link) {
                             $permalink = get_permalink($room_id);
                             $timeslot = explode('-', $time)[0];
-                            // Auskommentiert wg. Bug https://github.com/RRZE-Webteam/rrze-rsvp/issues/164
-                            //$booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$timeslot&nonce=$nonce\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "'>";
-                            $booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$timeslot\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "'>";
+                            $booking_link_open = "<a href=\"$permalink?room_id=$room_id&seat_id=$seat_id&bookingdate=$date&timeslot=$timeslot&nonce=$nonce\" title='" . __('Book this seat/timeslot now', 'rrze-rsvp') . "'>";
                             $booking_link_close = '</a>';
                             $glue = '';
                         }

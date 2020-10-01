@@ -71,9 +71,9 @@ class Bookings extends Shortcodes {
         } else {
             $roomId = absint($this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'room'));
             $shortcodeSSO = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
-            $this->ssoRequired = !is_null($shortcodeSSO) ? Functions::getBoolValueFromAtt($shortcodeSSO) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));    
+            $this->ssoRequired = !is_null($shortcodeSSO) ? Functions::getBoolValueFromAtt($shortcodeSSO) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
         }
-        if ($this->ssoRequired || $this->nonce) {
+        if ($this->ssoRequired) {
             $this->sso = $this->idm->tryLogIn();
         }     
         // BK 2DO 2020-10-01: $this->nonce : Unterscheidung zw sso und ldap <- ssoRequired OR nonce !
@@ -1165,7 +1165,11 @@ class Bookings extends Shortcodes {
             }
             foreach ($result as $key => $value) {
                 if (isset($value[$shortcode][$att])) {
-                    return $value[$shortcode][$att];
+                    if (is_array($value[$shortcode][$att])) {
+                        return $value[$shortcode][$att];
+                    } else {
+                        return trim($value[$shortcode][$att],'"');
+                    }
                 }                
             }
         }
