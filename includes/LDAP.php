@@ -179,4 +179,9 @@ class LDAP {
     }
 
 
+    public function getLoginURL(){
+        return 'BAUSTELLE-HIER-FEHLT-URL';
+    }
+
+
 }
