@@ -101,19 +101,26 @@ class Tracking {
         $searchdate = '';
         $delta = 0;
         $guest_email = '';
+        $hash_guest_email = '';
+        $guest_phone = '';
+        $hash_guest_phone = '';
+        $aGuests = [];
 
         echo '<div class="wrap">';
         echo '<h1>' . esc_html_x( 'Contact tracking', 'admin page title', 'rrze-rsvp' ) . '</h1>';
 
-        if ( isset( $_GET['submit'])) {
+        if ( isset( $_GET['submit']) ) {
             $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
             $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
             $guest_email = filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL);
-            $hash_guest_email = Functions::crypt($guest_email, 'encrypt');
-            $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email);
+            $hash_guest_email = ($guest_email ? Functions::crypt($guest_email, 'encrypt') : '');
+            $guest_phone = filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING);
+            $hash_guest_phone = ($guest_phone ? Functions::crypt($guest_phone, 'encrypt') : '');
+
+            $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email, $hash_guest_phone);
 
             if ($aGuests){
-                $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&hash_guest_email=' . urlencode($hash_guest_email);
+                $ajax_url = admin_url('admin-ajax.php?action=csv_pull') . '&page=rrze-rsvp-tracking&searchdate=' . urlencode($searchdate) . '&delta=' . urlencode($delta) . '&hash_guest_email=' . urlencode($hash_guest_email) . '&hash_guest_phone=' . urlencode($hash_guest_phone);
                 echo '<div class="notice notice-success is-dismissible">'
                     . '<h2>' . __('Guests found!', 'rrze-rsvp') . '</h2>'
                     . "<a href='$ajax_url'>" . __('Download CSV', 'rrze-rsvp') . '</a>'
@@ -124,6 +131,7 @@ class Tracking {
                     . '</div>';
             }
         }
+
 
         echo '<form id="rsvp-search-tracking" method="get">';
         echo '<input type="hidden" name="page" value="rrze-rsvp-tracking">';
@@ -140,6 +148,11 @@ class Tracking {
         echo '<tr>'
             . '<th scope="row"><label for="guest_email">' . __('Email', 'rrze-rsvp') . '</label></th>'
             . '<td><input type="text" id="guest_email" name="guest_email" value="' . $guest_email . '">'
+            . '</td>'
+            . '</tr>';
+        echo '<tr>'
+            . '<th scope="row"><label for="guest_phone">' . __('Phone', 'rrze-rsvp') . '</label></th>'
+            . '<td><input type="text" id="guest_phone" name="guest_phone" value="' . $guest_phone . '">'
             . '</td>'
             . '</tr>';
         echo '</tbody></table>';
@@ -161,8 +174,9 @@ class Tracking {
         $searchdate = filter_input(INPUT_GET, 'searchdate', FILTER_SANITIZE_STRING); // filter stimmt nicht
         $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
         $hash_guest_email = filter_input(INPUT_GET, 'hash_guest_email', FILTER_SANITIZE_STRING);
+        $hash_guest_phone = filter_input(INPUT_GET, 'hash_guest_phone', FILTER_SANITIZE_STRING);
 
-        $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email);
+        $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email, $hash_guest_phone);
 
         $filename = 'rrze_tracking_csv_' . date("Y-m-d_H-i", time());
 
@@ -385,11 +399,11 @@ class Tracking {
     }
 
 
-    public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_email): array {
+    public static function getUsersInRoomAtDate(string $searchdate, int $delta, string $hash_guest_email, string $hash_guest_phone): array {
         global $wpdb;
         $aRet = [];
 
-        if (!$hash_guest_email){
+        if (!$hash_guest_email && !$hash_guest_phone) {
             // we have nothing to search for
             return [];
         }
@@ -404,6 +418,7 @@ class Tracking {
 
         $prepare_vals = [
             $hash_guest_email,
+            $hash_guest_phone,
             $searchdate,
             $delta,
             $searchdate,
@@ -414,11 +429,11 @@ class Tracking {
             $delta,
         ];
 
-        // 1. get all room_post_id where hash_guest_email has been in the date-span 
+        // 1. get all room_post_id where hash_guest_email or hash_guest_phone has been in the date-span 
         $aRoomsNeedle = $wpdb->get_results( 
             $wpdb->prepare("SELECT room_post_id, start, end  
                 FROM {$trackingTable} 
-                WHERE hash_guest_email = %s AND 
+                WHERE (hash_guest_email = %s OR hash_guest_phone = %s) AND 
                 (DATE(start) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY)) AND 
                 (DATE(end) BETWEEN DATE_SUB(%s, INTERVAL %d DAY) AND DATE_ADD(%s, INTERVAL %d DAY))", $prepare_vals), ARRAY_A); // returns assoc array
 
