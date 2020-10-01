@@ -65,7 +65,7 @@ class LDAP {
 
                         if (isset($aEntry['count']) && $aEntry['count'] > 0){
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])){
-                                $content = '<p>Hello <strong>' . $aEntry[0]['cn'][0] . '</strong><br>' . $aEntry[0]['mail'][0]; 
+                                $content = $aEntry[0]['mail'][0]; 
                             }else{
                                 $content = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0]');
                             }
@@ -85,4 +85,29 @@ class LDAP {
         }
         return $content;   
     } 
+
+    public function tryLogIn(){
+        $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
+        $room = $roomId ? sprintf('&room_id=%d', $roomId) : '';
+        $seat = isset($_GET['seat_id']) ? sprintf('&seat_id=%d', absint($_GET['seat_id'])) : '';
+        $bookingDate = isset($_GET['bookingdate']) ? sprintf('&bookingdate=%s', sanitize_text_field($_GET['bookingdate'])) : '';
+        $timeslot = isset($_GET['timeslot']) ? sprintf('&timeslot=%s', sanitize_text_field($_GET['timeslot'])) : '';
+        $nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET['nonce'])) : '';
+
+        $bookingId = isset($_GET['id']) && !$roomId ? sprintf('&id=%s', absint($_GET['id'])) : '';
+        $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
+
+        if (!$this->simplesamlAuth->isAuthenticated()) {
+            $authNonce = sprintf('?require-ldap-auth=%s', wp_create_nonce('require-ldap-auth'));
+            $redirectUrl = sprintf('%s%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $authNonce, $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
+            header('HTTP/1.0 403 Forbidden');
+            wp_redirect($redirectUrl);
+            exit;
+        }
+
+        $this->setAttributes();
+
+        return true;
+    }
+
 }

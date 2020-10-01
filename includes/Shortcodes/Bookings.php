@@ -5,6 +5,7 @@ namespace RRZE\RSVP\Shortcodes;
 use RRZE\RSVP\Email;
 use RRZE\RSVP\Helper;
 use RRZE\RSVP\IdM;
+// use RRZE\RSVP\LDAP;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Template;
 use RRZE\RSVP\TransientData;
@@ -28,6 +29,8 @@ class Bookings extends Shortcodes {
     protected $idm;
     protected $sso = false;
     protected $ssoRequired;
+    // protected $ldap = false;
+    // protected $ldapRequired;
     protected $nonce;
 
     public function __construct($pluginFile, $settings)
@@ -37,6 +40,7 @@ class Bookings extends Shortcodes {
         $this->options = (object) $settings->getOptions();
         $this->email = new Email;
         $this->idm = new IdM;
+        // $this->ldap = new LDAP;
         $this->template = new Template;
     }
 
@@ -72,6 +76,14 @@ class Bookings extends Shortcodes {
         if ($this->ssoRequired || $this->nonce) {
             $this->sso = $this->idm->tryLogIn();
         }     
+        // BK 2DO 2020-10-01: $this->nonce : Unterscheidung zw sso und ldap <- ssoRequired OR nonce !
+        // if ($this->nonce){
+        //     if ($this->ssoRequired) {
+        //         $this->sso = $this->idm->tryLogIn();
+        //     }elseif ($this->ldapRequired) {
+        //         $this->ldap = $this->ldap->tryLogIn();
+        //     }     
+        // }     
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
@@ -144,13 +156,20 @@ class Bookings extends Shortcodes {
         $comment = (isset($roomMeta['rrze-rsvp-room-notes-check']) && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on');
 
         if ($this->ssoRequired && !$this->sso) {
-	    $alert = '<div class="alert alert-warning" role="alert">';
-	    $alert .= '<p><strong>'.__('SSO not available.','rrze-rsvp').'</strong><br>';
-	    $alert .= __('Please activate SSO authentication or remove the SSO attribute from your shortcode.','rrze-rsvp').'</p>';
-	    $alert .= '</div>';
+            $alert = '<div class="alert alert-warning" role="alert">';
+            $alert .= '<p><strong>'.__('SSO not available.','rrze-rsvp').'</strong><br>';
+            $alert .= __('Please activate SSO authentication or remove the SSO attribute from your shortcode.','rrze-rsvp').'</p>';
+            $alert .= '</div>';
             return $alert;
         }
-
+        // if ($this->ldapRequired && !$this->ldap) {
+        //     $alert = '<div class="alert alert-warning" role="alert">';
+        //     $alert .= '<p><strong>'.__('LDAP not available.','rrze-rsvp').'</strong><br>';
+        //     $alert .= __('Please activate LDAP authentication or remove the LDAP attribute from your shortcode.','rrze-rsvp').'</p>';
+        //     $alert .= '</div>';
+        //     return $alert;
+        // }
+    
         $bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
         if ($bookingMode == 'check-only' && !$this->nonce) {
             
@@ -289,6 +308,17 @@ class Bookings extends Shortcodes {
                 . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
                 . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
                 . '</div>';
+        // }else if ($this->ldapRequired) {
+        //     $data = $this->ldap->getCustomerData();
+        //     $output .= '<input type="hidden" value="' . $data['customer_lastname'] . '" id="rsvp_lastname" name="rsvp_lastname">';
+        //     $output .= '<input type="hidden" value="' . $data['customer_firstname'] . '" id="rsvp_firstname" name="rsvp_firstname">';
+        //     $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
+
+        //     $output .= '<div class="form-group">'
+        //         . '<p>' . __('Last name', 'rrze-rsvp') . ': <strong>' . $data['customer_lastname'] . '</strong></p>'
+        //         . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
+        //         . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
+        //         . '</div>';
         } else {
             $error = isset($fieldErrors['rsvp_lastname']) ? ' error' : '';
             $value = isset($fieldErrors['rsvp_lastname']['value']) ? $fieldErrors['rsvp_lastname']['value'] : '';
