@@ -58,10 +58,9 @@ class Bookings extends Shortcodes {
         add_action( 'wp_ajax_nopriv_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );     
     }
 
-    public function maybeAuthenticate()
-    {
+    public function maybeAuthenticate(){
         global $post;
-        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
+        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
             return;
         }
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
@@ -76,13 +75,14 @@ class Bookings extends Shortcodes {
             $shortcodeSSO = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
             $shortcodeLDAP = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
             $this->ssoRequired = !is_null($shortcodeSSO) ? Functions::getBoolValueFromAtt($shortcodeSSO) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
-            $this->ldapRequired = !is_null($shortcodeSSO) ? Functions::getBoolValueFromAtt($shortcodeLDAP) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
+            $this->ldapRequired = !is_null($shortcodeLDAP) ? Functions::getBoolValueFromAtt($shortcodeLDAP) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
         }
-        if ($this->nonce || $this->ssoRequired) {
-            $this->sso = $this->idm->tryLogIn();
-        }     
-        if ($this->ldap_nonce || $this->ldapRequired) {
-            $this->ldap = $this->ldap->tryLogIn();
+        if ($this->nonce){
+            if ($this->ssoRequired) {
+                $this->sso = $this->idm->tryLogIn();
+            }else if ($this->ldap_nonce || $this->ldapRequired) {
+                $this->ldap = $this->ldap->tryLogIn();
+            }     
         }     
     }
 

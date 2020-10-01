@@ -15,6 +15,7 @@ class LDAP {
     protected $bind_base_dn;
     protected $search_base_dn;
     protected $search_filter;
+    protected $isAuthenticated;
 
     protected $mail = null;
 
@@ -91,8 +92,7 @@ class LDAP {
 
 
 
-    public function requireAuth()
-    {
+    public function requireAuth(){
         global $post;
         if (!is_a($post, '\WP_Post')) {
             return;
@@ -176,6 +176,12 @@ class LDAP {
         return [
             'customer_email' => $this->mail ? $this->mail : __('no@email', 'rrze-rsvp')
         ];
+    }
+
+
+    public function getAuth(){
+        return $this->isAuthenticated;
+
     }
 
 
