@@ -2,13 +2,10 @@
 
 {{=text}}
 
-{{=date}}
-{{=time}}
-
 {{=room_name}}
-{{seat_name}}
 {{=seat_name}}
-{{/seat_name}}
+
+{{=date}}, {{=time}}
 
 
 {{=site_name}}

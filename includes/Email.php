@@ -215,17 +215,17 @@ class Email
         $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
         $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
 
-        $text = __('A customer has checked out from a seat.', 'rrze-rsvp');
+        $text = __('A customer has checked out from a seat:', 'rrze-rsvp');
 
         $data = [];
         $data['header_image'] = has_header_image() ? get_header_image() : false;
 
         $data['subject'] = $subject;
         $data['text'] = $this->placeholderParser($text, $booking);
-        $data['date'] = $booking['date'];
+        $data['date'] = __('Booking', 'rrze-rsvp') . ': ' . $booking['date'];
         $data['time'] = $booking['time'];
-        $data['room_name'] = $booking['room_name'];
-        $data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
+        $data['room_name'] = __('Room', 'rrze-rsvp') . ': ' . $booking['room_name'];
+        $data['seat_name'] = __('Seat', 'rrze-rsvp') . ': ' . $booking['seat_name'];
         $data['customer']['name'] = $customerName;
         $data['customer']['email'] = $customerEmail;
         // Site URL
