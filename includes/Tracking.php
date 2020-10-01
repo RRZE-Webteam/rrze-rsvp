@@ -115,6 +115,7 @@ class Tracking {
             $guest_email = filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL);
             $hash_guest_email = ($guest_email ? Functions::crypt($guest_email, 'encrypt') : '');
             $guest_phone = filter_input(INPUT_GET, 'guest_phone', FILTER_SANITIZE_STRING);
+            $guest_phone = preg_replace('/[^0-9]/', '', $guest_phone);
             $hash_guest_phone = ($guest_phone ? Functions::crypt($guest_phone, 'encrypt') : '');
 
             $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email, $hash_guest_phone);
@@ -262,6 +263,9 @@ class Tracking {
         $start = date('Y-m-d H:i:s', get_post_meta($booking['id'], 'rrze-rsvp-booking-start', true));
         $end = date('Y-m-d H:i:s', get_post_meta($booking['id'], 'rrze-rsvp-booking-end', true));
 
+        $guest_phone = preg_replace('/[^0-9]/', '', $booking['guest_phone']);
+        $hash_guest_phone = Functions::crypt($guest_phone, 'encrypt');
+
         $fields = [
             'blog_id' => $blogID,
             'booking_id' => $booking['id'],
@@ -276,7 +280,7 @@ class Tracking {
             'hash_guest_firstname' => Functions::crypt($booking['guest_firstname'], 'encrypt'),
             'hash_guest_lastname' => Functions::crypt($booking['guest_lastname'], 'encrypt'),
             'hash_guest_email' => Functions::crypt($booking['guest_email'], 'encrypt'),
-            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt')
+            'hash_guest_phone' => $hash_guest_phone
         ];
 
         $fields_format = [
@@ -318,6 +322,9 @@ class Tracking {
         $start = date('Y-m-d H:i:s', get_post_meta($booking['id'], 'rrze-rsvp-booking-start', true));
         $end = date('Y-m-d H:i:s', get_post_meta($booking['id'], 'rrze-rsvp-booking-end', true));
 
+        $guest_phone = preg_replace('/[^0-9]/', '', $booking['guest_phone']);
+        $hash_guest_phone = Functions::crypt($guest_phone, 'encrypt');
+
         $fields = [
             'start' => $start,
             'end' => $end,
@@ -330,7 +337,7 @@ class Tracking {
             'hash_guest_firstname' => Functions::crypt($booking['guest_firstname'], 'encrypt'),
             'hash_guest_lastname' => Functions::crypt($booking['guest_lastname'], 'encrypt'),
             'hash_guest_email' => Functions::crypt($booking['guest_email'], 'encrypt'),
-            'hash_guest_phone' => Functions::crypt($booking['guest_phone'], 'encrypt'),
+            'hash_guest_phone' => $hash_guest_phone
         ];
 
         $fields_format = [
