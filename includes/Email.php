@@ -196,6 +196,49 @@ class Email
     }
 
     /**
+     * bookingCheckedoutAdmin
+     * Send an email to the admin when the customer has checked out from the seat.
+     * @param integer $bookingId Booking Id
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
+     * @return void
+     */
+    public function bookingCheckedoutAdmin(int $bookingId, string $bookingMode = 'reservation')
+    {
+        $booking = Functions::getBooking($bookingId);
+        if (empty($booking)) {
+            return;
+        }
+
+        $to = $this->options->email_notification_email;
+        $subject = __('Seat checked out', 'rrze-rsvp');
+
+        $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
+        $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
+
+        $text = __('A customer has checked out from a seat.', 'rrze-rsvp');
+
+        $data = [];
+        $data['header_image'] = has_header_image() ? get_header_image() : false;
+
+        $data['subject'] = $subject;
+        $data['text'] = $this->placeholderParser($text, $booking);
+        $data['date'] = $booking['date'];
+        $data['time'] = $booking['time'];
+        $data['room_name'] = $booking['room_name'];
+        $data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
+        $data['customer']['name'] = $customerName;
+        $data['customer']['email'] = $customerEmail;
+        // Site URL
+        $data['site_url'] = site_url();
+        $data['site_name'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
+
+        $message = $this->template->getContent('email/booking-checkedout-admin', $data);
+        $altMessage = $this->template->getContent('email/booking-checkedout-admin.txt', $data);
+
+        $this->send($to, $subject, $message, $altMessage);
+    }
+
+    /**
      * bookingRequestedCustomer
      * Send an email to the customer if a new booking is requested. The booking 
      * is not yet confirmed. An admin action is required for confirmation or 

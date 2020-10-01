@@ -914,6 +914,7 @@ class Actions
 		$now = current_time('timestamp');
 
 		$bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
+		$sendCheckoutNotification = (get_post_meta($booking['room'], 'rrze-rsvp-room-checkout-notification', true) == 'on');
 
 		$userConfirmed = (get_post_meta($bookingId, 'rrze-rsvp-customer-status', true) == 'confirmed');
 		$bookingBooked = ($booking['status'] == 'booked');
@@ -940,6 +941,9 @@ class Actions
 		} elseif (!$bookingCancelled && !$bookingCkeckedOut && $bookingCkeckedIn && $action == 'checkout') {
 			if ($start <= $now && $end >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-out');
+                if ($sendCheckoutNotification) {
+                    $this->email->bookingCheckedoutAdmin($bookingId, $bookingMode);
+                }
 				$bookingCkeckedOut = true;
 			}
 		}

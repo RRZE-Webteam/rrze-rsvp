@@ -298,6 +298,14 @@ class Metaboxes
         ));
 
         $cmb_general->add_field(array(
+            'name' => __('Checkout notification', 'rrze-rsvp'),
+            'desc' => __('Send an email to the booking manager when customer has checked out.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-checkout-notification',
+            'type' => 'checkbox',
+            'default' => ''
+        ));
+
+        $cmb_general->add_field(array(
             'name' => __('Send to an email address', 'rrze-rsvp'),
             'desc' => __('A copy of the confirmed booking will be sent to the specified email address with a calendar file (.ics) as an attachment.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-send-to-email',
