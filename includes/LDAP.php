@@ -70,6 +70,11 @@ class LDAP {
                         if (isset($aEntry['count']) && $aEntry['count'] > 0){
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])){
                                 $content = $aEntry[0]['mail'][0]; 
+                                // $this->mail = $aEntry[0]['mail'][0]; 
+                                // $this->isAuthenticated = true;
+                                // $this->tryLogIn();
+                                // exit;
+
                             }else{
                                 $content = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0] and $aEntry[0][\'mail\'][0]');
                             }
