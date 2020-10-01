@@ -29,7 +29,7 @@ class LDAP {
     }
 
     public function onLoaded() {
-        // add_shortcode('rsvp-ldap-test', [$this, 'ldapTest'], 10, 2);
+        add_shortcode('rsvp-ldap-login', [$this, 'ldapForm'], 10, 0);
         add_action('wp', [$this, 'requireAuth']);
     }
     
