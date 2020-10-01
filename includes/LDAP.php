@@ -16,6 +16,8 @@ class LDAP {
     protected $search_base_dn;
     protected $search_filter;
 
+    protected $mail = null;
+
     public function __construct() {
         $this->settings = new Settings(plugin()->getFile());
         $this->server = $this->settings->getOption('ldap', 'server');
@@ -27,6 +29,7 @@ class LDAP {
 
     public function onLoaded() {
         add_shortcode('rsvp-ldap-test', [$this, 'ldapTest'], 10, 2);
+        add_action('wp', [$this, 'requireAuth']);
     }
     
     private function logError(string $method): string{
@@ -67,7 +70,7 @@ class LDAP {
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])){
                                 $content = $aEntry[0]['mail'][0]; 
                             }else{
-                                $content = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0]');
+                                $content = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0] and $aEntry[0][\'mail\'][0]');
                             }
                         }else{
                             $content = 'User not found';
@@ -86,13 +89,78 @@ class LDAP {
         return $content;   
     } 
 
+
+
+    public function requireAuth()
+    {
+        global $post;
+        if (!is_a($post, '\WP_Post')) {
+            return;
+        }
+
+        $nonce = isset($_GET['require-ldap-auth']) ? sanitize_text_field($_GET['require-ldap-auth']) : false;
+
+        if (!$nonce) {
+            return;
+        }
+        if (!wp_verify_nonce($nonce, 'require-ldap-auth')) {
+            header('HTTP/1.0 403 Forbidden');
+            wp_redirect(get_site_url());
+            exit;            
+        }
+
+        $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
+        $room = $roomId ? sprintf('?room_id=%d', $roomId) : '';
+        $seat = isset($_GET['seat_id']) ? sprintf('&seat_id=%d', absint($_GET['seat_id'])) : '';
+        $bookingDate = isset($_GET['bookingdate']) ? sprintf('&bookingdate=%s', sanitize_text_field($_GET['bookingdate'])) : '';
+        $timeslot = isset($_GET['timeslot']) ? sprintf('&timeslot=%s', sanitize_text_field($_GET['timeslot'])) : '';
+        $nonce = isset($_GET['ldap-nonce']) ? sprintf('&ldap-nonce=%s', sanitize_text_field($_GET['ldap-nonce'])) : '';
+        
+        $bookingId = isset($_GET['id']) && !$roomId ? sprintf('?id=%s', absint($_GET['id'])) : '';
+        $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';        
+
+        if ($this->simplesamlAuth() && $this->simplesamlAuth->isAuthenticated()) {
+            $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
+            wp_redirect($redirectUrl);
+            exit;
+        }
+
+        wp_enqueue_style(
+            'rrze-rsvp-require-auth',
+            plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename()),
+            [],
+            plugin()->getVersion()
+        );
+
+        $data = [];
+        if ($this->simplesamlAuth()) {
+            $loginUrl = $this->simplesamlAuth->getLoginURL();
+            $data['title'] = __('Authentication Required', 'rrze-rsvp');
+            $data['please_login'] = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
+        } else {
+            header('HTTP/1.0 403 Forbidden');
+            wp_redirect(get_site_url());
+            exit;
+        }
+
+        add_filter('the_content', function ($content) use ($data) {
+            return $this->template->getContent('auth/require-ldap-auth', $data);
+        });
+    }
+
+    public function isAuthenticated()
+    {
+        return $this->simplesamlAuth && $this->simplesamlAuth->isAuthenticated();
+    }
+
+
     public function tryLogIn(){
         $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
         $room = $roomId ? sprintf('&room_id=%d', $roomId) : '';
         $seat = isset($_GET['seat_id']) ? sprintf('&seat_id=%d', absint($_GET['seat_id'])) : '';
         $bookingDate = isset($_GET['bookingdate']) ? sprintf('&bookingdate=%s', sanitize_text_field($_GET['bookingdate'])) : '';
         $timeslot = isset($_GET['timeslot']) ? sprintf('&timeslot=%s', sanitize_text_field($_GET['timeslot'])) : '';
-        $nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET['nonce'])) : '';
+        $nonce = isset($_GET['ldap-nonce']) ? sprintf('&ldap-nonce=%s', sanitize_text_field($_GET['ldap-nonce'])) : '';
 
         $bookingId = isset($_GET['id']) && !$roomId ? sprintf('&id=%s', absint($_GET['id'])) : '';
         $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
@@ -109,5 +177,17 @@ class LDAP {
 
         return true;
     }
+
+    public function setAttributes()
+    {
+        $this->mail = isset($this->personAttributes['urn:mace:dir:attribute-def:mail'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:mail'][0] : null;
+    }
+
+    public function getCustomerData(){
+        return [
+            'customer_email' => $this->mail ? $this->mail : __('no@email', 'rrze-rsvp')
+        ];
+    }
+
 
 }
