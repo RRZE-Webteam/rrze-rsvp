@@ -6,9 +6,6 @@ defined('ABSPATH') || exit;
 
 $roomId = isset($_REQUEST['room_id']) ? absint($_REQUEST['room_id']) : null;
 $room = $roomId ? sprintf(' room=%d', $roomId) : '';
-$sso = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true)) ? ' sso=true' : '';
-$daysInAdvance = absint(get_post_meta($roomId, 'rrze-rsvp-room-days-in-advance', true));
-$days =  $daysInAdvance ? sprintf(' days=%d', $daysInAdvance) : sprintf(' days=%d', 7);
 
 get_header();
 
@@ -50,7 +47,7 @@ if (Helper::isFauTheme()) {
  */
 echo $divOpen;
 
-echo do_shortcode(sprintf('[rsvp-booking%s%s%s]', $room, $days, $sso));
+echo do_shortcode(sprintf('[rsvp-booking%s]', $room));
 
 echo $divClose;
 

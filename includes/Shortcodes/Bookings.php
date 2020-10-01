@@ -5,6 +5,7 @@ namespace RRZE\RSVP\Shortcodes;
 use RRZE\RSVP\Email;
 use RRZE\RSVP\Helper;
 use RRZE\RSVP\IdM;
+// use RRZE\RSVP\LDAP;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Template;
 use RRZE\RSVP\TransientData;
@@ -28,6 +29,8 @@ class Bookings extends Shortcodes {
     protected $idm;
     protected $sso = false;
     protected $ssoRequired;
+    // protected $ldap = false;
+    // protected $ldapRequired;
     protected $nonce;
 
     public function __construct($pluginFile, $settings)
@@ -37,6 +40,7 @@ class Bookings extends Shortcodes {
         $this->options = (object) $settings->getOptions();
         $this->email = new Email;
         $this->idm = new IdM;
+        // $this->ldap = new LDAP;
         $this->template = new Template;
     }
 
@@ -67,11 +71,19 @@ class Bookings extends Shortcodes {
         } else {
             $roomId = absint($this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'room'));
             $shortcodeSSO = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
-            $this->ssoRequired = !is_null($shortcodeSSO) ? Functions::getBoolValueFromAtt($shortcodeSSO) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));    
+            $this->ssoRequired = !is_null($shortcodeSSO) ? Functions::getBoolValueFromAtt($shortcodeSSO) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
         }
-        if ($this->ssoRequired || $this->nonce) {
+        if ($this->ssoRequired) {
             $this->sso = $this->idm->tryLogIn();
         }     
+        // BK 2DO 2020-10-01: $this->nonce : Unterscheidung zw sso und ldap <- ssoRequired OR nonce !
+        // if ($this->nonce){
+        //     if ($this->ssoRequired) {
+        //         $this->sso = $this->idm->tryLogIn();
+        //     }elseif ($this->ldapRequired) {
+        //         $this->ldap = $this->ldap->tryLogIn();
+        //     }     
+        // }     
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
@@ -144,13 +156,20 @@ class Bookings extends Shortcodes {
         $comment = (isset($roomMeta['rrze-rsvp-room-notes-check']) && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on');
 
         if ($this->ssoRequired && !$this->sso) {
-	    $alert = '<div class="alert alert-warning" role="alert">';
-	    $alert .= '<p><strong>'.__('SSO not available.','rrze-rsvp').'</strong><br>';
-	    $alert .= __('Please activate SSO authentication or remove the SSO attribute from your shortcode.','rrze-rsvp').'</p>';
-	    $alert .= '</div>';
+            $alert = '<div class="alert alert-warning" role="alert">';
+            $alert .= '<p><strong>'.__('SSO not available.','rrze-rsvp').'</strong><br>';
+            $alert .= __('Please activate SSO authentication or remove the SSO attribute from your shortcode.','rrze-rsvp').'</p>';
+            $alert .= '</div>';
             return $alert;
         }
-
+        // if ($this->ldapRequired && !$this->ldap) {
+        //     $alert = '<div class="alert alert-warning" role="alert">';
+        //     $alert .= '<p><strong>'.__('LDAP not available.','rrze-rsvp').'</strong><br>';
+        //     $alert .= __('Please activate LDAP authentication or remove the LDAP attribute from your shortcode.','rrze-rsvp').'</p>';
+        //     $alert .= '</div>';
+        //     return $alert;
+        // }
+    
         $bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
         if ($bookingMode == 'check-only' && !$this->nonce) {
             
@@ -289,6 +308,17 @@ class Bookings extends Shortcodes {
                 . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
                 . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
                 . '</div>';
+        // }else if ($this->ldapRequired) {
+        //     $data = $this->ldap->getCustomerData();
+        //     $output .= '<input type="hidden" value="' . $data['customer_lastname'] . '" id="rsvp_lastname" name="rsvp_lastname">';
+        //     $output .= '<input type="hidden" value="' . $data['customer_firstname'] . '" id="rsvp_firstname" name="rsvp_firstname">';
+        //     $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
+
+        //     $output .= '<div class="form-group">'
+        //         . '<p>' . __('Last name', 'rrze-rsvp') . ': <strong>' . $data['customer_lastname'] . '</strong></p>'
+        //         . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
+        //         . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
+        //         . '</div>';
         } else {
             $error = isset($fieldErrors['rsvp_lastname']) ? ' error' : '';
             $value = isset($fieldErrors['rsvp_lastname']['value']) ? $fieldErrors['rsvp_lastname']['value'] : '';
@@ -324,11 +354,8 @@ class Bookings extends Shortcodes {
         $message = isset($fieldErrors['rsvp_phone']['message']) ? $fieldErrors['rsvp_phone']['message'] : '';
         $output .= '<div class="form-group' . $error . '"><label for="rsvp_phone">'
             . __('Phone Number', 'rrze-rsvp') . '</label>'
-            . '<input type="text" name="rsvp_phone" value="' . $value . '" pattern="^([+])?(\d{1,3})?\s?(\(\d{3,5}\)|\d{3,5})?\s?(\d{1,3}\s?|\d{1,3}[-])?(\d{3,8})$" id="rsvp_phone" required aria-required="true">'
-            . '<div class="error-message">' . $message . '</div>'
-            . '<p class="description">'
-            . __('In order to track contacts during the measures against the corona pandemic, it is necessary to record the telephone number.','rrze-rsvp') . '</p>'
-            . '</div>';
+            . '<input type="text" name="rsvp_phone" value="' . $value . '" pattern="^([+])?(\d{1,3})?\s?(\(\d{3,5}\)|\d{3,5})?\s?(\d{1,3}\s?|\d{1,3}[-])?(\d{3,8})$" id="rsvp_phone">'
+            . '<div class="error-message">' . $message . '</div>';
         $defaults = defaultOptions();
         if ($comment) {
             $label = $roomMeta['rrze-rsvp-room-notes-label'][0];
@@ -1138,7 +1165,11 @@ class Bookings extends Shortcodes {
             }
             foreach ($result as $key => $value) {
                 if (isset($value[$shortcode][$att])) {
-                    return $value[$shortcode][$att];
+                    if (is_array($value[$shortcode][$att])) {
+                        return $value[$shortcode][$att];
+                    } else {
+                        return trim($value[$shortcode][$att],'"');
+                    }
                 }                
             }
         }

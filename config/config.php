@@ -128,8 +128,8 @@ function defaultOptions()  {
             'server' => 'ubaddc1.bib.uni-erlangen.de',
             'port' => '389',
             'distinguished_name' => 'CN=UB Bib User,OU=Groups,OU=UB,DC=ubad,DC=fau,DC=de',
-            'base_dn' => 'ubad.fau.de',
-            'search_filter' => '(sAMAccountName=UB_Bib_User)',
+            'bind_base_dn' => 'ubad.fau.de',
+            'search_base_dn' => 'DC=ubad,DC=fau,DC=de',
         ];
     }
     
@@ -579,19 +579,19 @@ function getFields(){
 		        'sanitize_callback' => 'sanitize_text_field'
             ],
             [
-                'name'    => 'base_dn',
-                'label'   => __('Base DN', 'rrze-rsvp'),
-                'desc'   => __('Base DN', 'rrze-rsvp'),
+                'name'    => 'bind_base_dn',
+                'label'   => __('Bind Base DN', 'rrze-rsvp'),
+                'desc'   => __('DN to bind on', 'rrze-rsvp'),
                 'type'    => 'text',
-                'default' => $defaults['base_dn'],
+                'default' => $defaults['bind_base_dn'],
 		        'sanitize_callback' => 'sanitize_text_field'
             ],
             [
-                'name'    => 'search_filter',
-                'label'   => __('Search filter', 'rrze-rsvp'),
-                'desc'   => __('Search filter', 'rrze-rsvp'),
+                'name'    => 'search_base_dn',
+                'label'   => __('Search Base DN', 'rrze-rsvp'),
+                'desc'   => __('DN to search in', 'rrze-rsvp'),
                 'type'    => 'text',
-                'default' => $defaults['search_filter'],
+                'default' => $defaults['search_base_dn'],
 		        'sanitize_callback' => 'sanitize_text_field'
             ],
             // [
@@ -642,6 +642,12 @@ function getShortcodeSettings(){
                 'type' => 'boolean',
                 'default'   => false
             ],
+            // 'ldap' => [
+            //     'field_type' => 'toggle',
+            //     'label' => __( 'Require LDAP Authentication', 'rrze-rsvp' ),
+            //     'type' => 'boolean',
+            //     'default'   => false
+            // ],
         ],
         'rsvp-availability' => [
             'block' => [

@@ -11,19 +11,18 @@ class LDAP {
     protected $server;
     protected $link_identifier = '';
     protected $port;
-    protected $domain;
     protected $distinguished_name;
-    protected $base_dn;
+    protected $bind_base_dn;
+    protected $search_base_dn;
     protected $search_filter;
-    protected $attributes;
 
     public function __construct() {
         $this->settings = new Settings(plugin()->getFile());
         $this->server = $this->settings->getOption('ldap', 'server');
         $this->port = $this->settings->getOption('ldap', 'port');
         $this->distinguished_name = $this->settings->getOption('ldap', 'distinguished_name');
-        $this->base_dn = $this->settings->getOption('ldap', 'base_dn');
-        $this->search_filter = $this->settings->getOption('ldap', 'search_filter');
+        $this->bind_base_dn = $this->settings->getOption('ldap', 'bind_base_dn');
+        $this->search_base_dn = $this->settings->getOption('ldap', 'search_base_dn');
     }
 
     public function onLoaded() {
@@ -49,12 +48,15 @@ class LDAP {
                 ldap_set_option($this->link_identifier, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($this->link_identifier, LDAP_OPT_REFERRALS, 0);
             
-                $bind = @ldap_bind($this->link_identifier, $username . '@' . $this->base_dn, $password);
+                $bind = @ldap_bind($this->link_identifier, $username . '@' . $this->bind_base_dn, $password);
+
 
                 if (!$bind) {
                     $content = $this->logError('ldap_bind()');
                 }else{
-                    $result_identifier = @ldap_search($this->link_identifier, $this->distinguished_name, $this->search_filter);
+
+                    $this->search_filter = '(sAMAccountName=' . $username . ')';
+                    $result_identifier = @ldap_search($this->link_identifier, $this->search_base_dn, $this->search_filter);
                     
                     if ($result_identifier === false){
                         $content = $this->logError('ldap_search()');
@@ -62,8 +64,8 @@ class LDAP {
                         $aEntry = @ldap_get_entries($this->link_identifier, $result_identifier);
 
                         if (isset($aEntry['count']) && $aEntry['count'] > 0){
-                            if (isset($aEntry[0]['cn'][0])){
-                                $content = '<p>Hello <strong>' . $aEntry[0]['cn'][0] . '</strong><br>' . json_encode($aEntry); 
+                            if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])){
+                                $content = $aEntry[0]['mail'][0]; 
                             }else{
                                 $content = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0]');
                             }
@@ -83,4 +85,29 @@ class LDAP {
         }
         return $content;   
     } 
+
+    public function tryLogIn(){
+        $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
+        $room = $roomId ? sprintf('&room_id=%d', $roomId) : '';
+        $seat = isset($_GET['seat_id']) ? sprintf('&seat_id=%d', absint($_GET['seat_id'])) : '';
+        $bookingDate = isset($_GET['bookingdate']) ? sprintf('&bookingdate=%s', sanitize_text_field($_GET['bookingdate'])) : '';
+        $timeslot = isset($_GET['timeslot']) ? sprintf('&timeslot=%s', sanitize_text_field($_GET['timeslot'])) : '';
+        $nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET['nonce'])) : '';
+
+        $bookingId = isset($_GET['id']) && !$roomId ? sprintf('&id=%s', absint($_GET['id'])) : '';
+        $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
+
+        if (!$this->simplesamlAuth->isAuthenticated()) {
+            $authNonce = sprintf('?require-ldap-auth=%s', wp_create_nonce('require-ldap-auth'));
+            $redirectUrl = sprintf('%s%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $authNonce, $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
+            header('HTTP/1.0 403 Forbidden');
+            wp_redirect($redirectUrl);
+            exit;
+        }
+
+        $this->setAttributes();
+
+        return true;
+    }
+
 }

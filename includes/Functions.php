@@ -29,10 +29,10 @@ class Functions
         return self::validateDate($date, $format);
     }
 
-    // The phone number must be at least 3 digits long.
+    // The phone number must be empty or at least 3 digits long.
     public static function validatePhone(string $phone): bool
     {
-        return (preg_match_all('/\d/', $phone) >= 3);
+        return (empty($phone) || preg_match_all('/\d/', $phone) >= 3);
     }
 
     public static function isLocaleEnglish()
