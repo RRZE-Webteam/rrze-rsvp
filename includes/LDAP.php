@@ -38,6 +38,7 @@ class LDAP {
         do_action('rrze.log.error', 'rrze-rsvp : ' . $msg);
         return $msg;
     }
+    
 
     public function ldapForm(){
         if(isset($_POST['username']) && isset($_POST['password'])){
@@ -70,7 +71,7 @@ class LDAP {
                         if (isset($aEntry['count']) && $aEntry['count'] > 0){
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])){
                                 $content = $aEntry[0]['mail'][0]; 
-                                // $this->mail = $aEntry[0]['mail'][0]; 
+                                $this->mail = $aEntry[0]['mail'][0]; 
                                 // $this->isAuthenticated = true;
                                 // $this->tryLogIn();
                                 // exit;
@@ -172,6 +173,16 @@ class LDAP {
         return true;
     }
 
+    // public function setAttributes(){
+    //     $this->personAttributes = $this->simplesamlAuth->getAttributes();
+
+    //     $this->uid = isset($this->personAttributes['urn:mace:dir:attribute-def:uid'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:uid'][0] : null;
+    //     $this->mail = isset($this->personAttributes['urn:mace:dir:attribute-def:mail'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:mail'][0] : null;
+    //     $this->displayName = isset($this->personAttributes['urn:mace:dir:attribute-def:displayName'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:displayName'][0] : null;
+    //     $this->eduPersonAffiliation = isset($this->personAttributes['urn:mace:dir:attribute-def:eduPersonAffiliation']) ? $this->personAttributes['urn:mace:dir:attribute-def:eduPersonAffiliation'] : null;
+    //     $this->eduPersonEntitlement = isset($this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement']) ? $this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement'] : null;
+    // }
+
 
 
     public function getAuth(){
@@ -182,6 +193,13 @@ class LDAP {
 
     public function getLoginURL(){
         return 'URL-GETLOGINURL';
+    }
+
+
+    public function getCustomerData(){
+        return [
+            'customer_email' => $this->mail ? $this->mail : __('no@email', 'rrze-rsvp')
+        ];
     }
 
 

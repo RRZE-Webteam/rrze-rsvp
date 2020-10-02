@@ -310,8 +310,6 @@ class Bookings extends Shortcodes {
                 . '</div>';
         }else if ($this->ldapRequired) {
             $data = $this->ldap->getCustomerData();
-            $output .= '<input type="hidden" value="' . $data['customer_lastname'] . '" id="rsvp_lastname" name="rsvp_lastname">';
-            $output .= '<input type="hidden" value="' . $data['customer_firstname'] . '" id="rsvp_firstname" name="rsvp_firstname">';
             $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
 
             $output .= '<div class="form-group">'
@@ -605,6 +603,22 @@ class Bookings extends Shortcodes {
                 $redirectUrl = add_query_arg(
                     [
                         'booking' => wp_create_nonce('sso_authentication'),
+                        'nonce' => $this->nonce
+                    ],
+                    get_permalink()
+                );
+                wp_redirect($redirectUrl);
+                exit;
+            }
+
+        }else if ($this->ldap) {
+            if ($this->ldap->isAuthenticated()){
+                $sso_data = $this->ldap->getCustomerData();
+                $booking_email  = $sso_data['customer_email'];
+            } else {
+                $redirectUrl = add_query_arg(
+                    [
+                        'booking' => wp_create_nonce('ldap_authentication'),
                         'nonce' => $this->nonce
                     ],
                     get_permalink()

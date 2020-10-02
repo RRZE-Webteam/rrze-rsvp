@@ -28,15 +28,33 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
         $room = $seatCheckInOut['room'];
         $customerEmail = $seatCheckInOut['guest_email'];
         $ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-sso-required', true));
+
+        $noSSO = false;
         if (!$ssoRequired || !($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated())) {
+            $noSSO = true;
+        }
+
+        $noLDAP = false;
+        if (!$ldapRequired || (!$ldap->isAuthenticated())) {
+            $noLDAP = true;
+        }
+
+        // if (!$ssoRequired || !($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated())) {
+        if ($noSSO && $noLDAP) {
             $action = 'no-auth';
-        } else {
+        } else if ($noLDAP) {
             $idm->setAttributes();
             $customerData = $idm->getCustomerData();
             if ($customerEmail  != $customerData['customer_email']) {
                 $action = 'no-auth';
             }
-        }
+        } else if ($noSSO) {
+            $ldap->setAttributes();
+            $customerData = $ldap->getCustomerData();
+            if ($customerEmail  != $customerData['customer_email']) {
+                $action = 'no-auth';
+            }
+        }                
     }
 }
 
