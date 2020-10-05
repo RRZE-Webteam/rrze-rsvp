@@ -30,6 +30,46 @@ class Metaboxes
         }
     }
 
+    /*
+     * Set Timeslot weekday, start time and end time to disabled if there are bookings for this timeslot.
+     * Valid from/to can still be modified.
+     */
+    public function cbTimeslotAttributes($args, $field) {
+        $seats = Functions::getAllRoomSeats($field->object_id);
+        $bookings = get_posts([
+            'post_type' => 'booking',
+            'post_statue' => 'publish',
+            'nopaging' => true,
+            'orderby' => 'title',
+            'order' => 'ASC',
+            'meta_key' => 'rrze-rsvp-booking-seat',
+            'meta_value' => $seats,
+            'meta_compare' => 'IN',
+        ]);
+        $fieldKey = str_replace(array('+','-'), '', filter_var($args['_name'], FILTER_SANITIZE_NUMBER_INT));
+        $timeslots = get_post_meta($field->object_id, 'rrze-rsvp-room-timeslots', true);
+        $weekdays = $timeslots[$fieldKey]['rrze-rsvp-room-weekday'];
+        $starttime = $timeslots[$fieldKey]['rrze-rsvp-room-starttime'];
+        $endtime = $timeslots[$fieldKey]['rrze-rsvp-room-endtime'];
+        $validfrom = (isset($timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from']) && $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from'] !== false) ? $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from'] : 0;
+        $validto = (isset($timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to']) && $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to'] !== false) ? $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to'] : 9999999999;
+        foreach ($bookings as $booking) {
+            $bookingMeta = get_post_meta($booking->ID);
+            if (!isset($bookingMeta['rrze-rsvp-booking-start']) || !isset($bookingMeta['rrze-rsvp-booking-end']))
+                continue;
+            $startTimestamp = $bookingMeta['rrze-rsvp-booking-start'][0];
+            $endTimestamp = $bookingMeta['rrze-rsvp-booking-end'][0];
+            if (date('H:i', $startTimestamp) == $starttime
+                && date('H:i', $endTimestamp) == $endtime
+                && in_array(date('N', $startTimestamp), $weekdays)
+                && $startTimestamp > $validfrom
+                && $startTimestamp < $validto) {
+                    $field->args['attributes']['disabled'] = 'disabled';
+                    break;
+            }
+        }
+    }
+
 
     public function booking()
     {
@@ -197,6 +237,7 @@ class Metaboxes
             'id'      => 'rrze-rsvp-room-weekday',
             'type'    => 'multicheck',
             'options' => Functions::daysOfWeekAry(1),
+            'before' => [$this, 'cbTimeslotAttributes'],
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
@@ -204,6 +245,7 @@ class Metaboxes
             'id' => 'rrze-rsvp-room-starttime',
             'type' => 'text_time',
             'time_format' => 'H:i',
+            'before' => [$this, 'cbTimeslotAttributes'],
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
@@ -211,6 +253,7 @@ class Metaboxes
             'id' => 'rrze-rsvp-room-endtime',
             'type' => 'text_time',
             'time_format' => 'H:i',
+            'before' => [$this, 'cbTimeslotAttributes'],
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
