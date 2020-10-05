@@ -64,4 +64,16 @@ div[id^='cmb-group-rrze-rsvp-room-timeslots'] {
 
 }
 
+div.cmb2-id-rrze-rsvp-room-bookingmode .info-bookingmode {
+	display: inline-block;
+	margin-top: 3px;
+	margin-left: 3px;
+	font-size:2em;
+	color:#757575;
+	cursor: pointer;
+	&:hover, &:focus, &:active {
+		color: #0073aa;
+	}
+}
+
 

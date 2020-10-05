@@ -57,6 +57,15 @@ jQuery(document).ready(function ($) {
     /*
      * CPT Booking Backend
      */
+
+	// Hide booking mode info text on loading, insert booking mode info icon
+	$('select#rrze-rsvp-room-bookingmode').after('<a><span class="dashicons dashicons-editor-help info-bookingmode" title="Informationen zum Buchungsmodus anzeigen" aria-hidden="true"></span><span class="screen-reader-text">Informationen zum Buchungsmodus anzeigen</span></a>');
+	$('.cmb2-id-rrze-rsvp-room-bookingmode .cmb2-metabox-description').hide();
+	$('.cmb2-id-rrze-rsvp-room-bookingmode').find('.info-bookingmode').click(function() {
+		$('.cmb2-id-rrze-rsvp-room-bookingmode .cmb2-metabox-description').slideToggle();
+	});
+
+	// Fill date/time inputs with timeslot selector
 	var details = jQuery('div#rrze-rsvp-booking-details'),
 		seat = details.find('select#rrze-rsvp-booking-seat'),
 		startdate = details.find('input#rrze-rsvp-booking-start_date'),
@@ -98,8 +107,8 @@ jQuery(document).ready(function ($) {
 	$('div.cmb2-id-rrze-rsvp-booking-start').on('change', 'select.select_timeslot', (function() {
 		var select_start = jQuery(this).val();
 		var select_end   = jQuery(this).find(':selected').data('end');
-		console.log(select_start);
-		console.log(select_end);
+		//console.log(select_start);
+		//console.log(select_end);
 		starttime.val(select_start);
 		endtime.val(select_end);
 	}));
