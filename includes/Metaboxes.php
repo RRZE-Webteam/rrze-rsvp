@@ -150,7 +150,7 @@ class Metaboxes
             'type'    => 'text_medium',
             'attributes' => array(
                 'type' => 'tel',
-                'required' => 'required',
+//                'required' => 'required',
             ),
 		    'sanitization_cb' => [$this, 'cb_encrypt'],
             'escape_cb'       => [$this, 'cb_decrypt'],
