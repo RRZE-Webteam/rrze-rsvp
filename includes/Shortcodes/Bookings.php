@@ -77,13 +77,11 @@ class Bookings extends Shortcodes {
             $this->ssoRequired = !is_null($shortcodeSSO) ? Functions::getBoolValueFromAtt($shortcodeSSO) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
             $this->ldapRequired = !is_null($shortcodeLDAP) ? Functions::getBoolValueFromAtt($shortcodeLDAP) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
         }
-        if ($this->nonce){
-            if ($this->ssoRequired) {
-                $this->sso = $this->idm->tryLogIn();
-            }else if ($this->ldap_nonce || $this->ldapRequired) {
-                $this->ldap = $this->ldap->tryLogIn();
-            }     
-        }     
+        if ($this->ssoRequired) {
+            $this->sso = $this->idm->tryLogIn();
+        } else if ($this->ldap_nonce || $this->ldapRequired) {
+            $this->ldap = $this->ldap->tryLogIn();
+        }
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
