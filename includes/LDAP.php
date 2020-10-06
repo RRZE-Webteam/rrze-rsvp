@@ -15,7 +15,7 @@ class LDAP {
     protected $bind_base_dn;
     protected $search_base_dn;
     protected $search_filter;
-    protected $isAuthenticated;
+    protected $isLoggedIn;
 
     protected $mail = null;
 
@@ -72,7 +72,7 @@ class LDAP {
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])){
                                 $content = $aEntry[0]['mail'][0]; 
                                 $this->mail = $aEntry[0]['mail'][0]; 
-                                // $this->isAuthenticated = true;
+                                $this->isLoggedIn = true;
                                 // $this->tryLogIn();
                                 // exit;
 
@@ -125,7 +125,7 @@ class LDAP {
         $bookingId = isset($_GET['id']) && !$roomId ? sprintf('?id=%s', absint($_GET['id'])) : '';
         $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';        
 
-        if ($this->isAuthenticated) {
+        if ($this->isLoggedIn) {
             $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
             wp_redirect($redirectUrl);
             exit;
@@ -160,7 +160,7 @@ class LDAP {
         $bookingId = isset($_GET['id']) && !$roomId ? sprintf('&id=%s', absint($_GET['id'])) : '';
         $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
 
-        if (!$this->isAuthenticated) {
+        if (!$this->isLoggedIn) {
             $authNonce = sprintf('?require-ldap-auth=%s', wp_create_nonce('require-ldap-auth'));
             $redirectUrl = sprintf('%s%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $authNonce, $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
             header('HTTP/1.0 403 Forbidden');
@@ -185,8 +185,8 @@ class LDAP {
 
 
 
-    public function getAuth(){
-        return $this->isAuthenticated;
+    public function isAuthenticated(){
+        return $this->isLoggedIn;
 
     }
 

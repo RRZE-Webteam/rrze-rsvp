@@ -42,13 +42,13 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
         // if (!$ssoRequired || !($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated())) {
         if ($noSSO && $noLDAP) {
             $action = 'no-auth';
-        } else if ($noLDAP) {
+        } elseif ($noLDAP) {
             $idm->setAttributes();
             $customerData = $idm->getCustomerData();
             if ($customerEmail  != $customerData['customer_email']) {
                 $action = 'no-auth';
             }
-        } else if ($noSSO) {
+        } elseif ($noSSO) {
             $ldap->setAttributes();
             $customerData = $ldap->getCustomerData();
             if ($customerEmail  != $customerData['customer_email']) {

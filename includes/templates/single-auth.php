@@ -5,6 +5,7 @@ namespace RRZE\RSVP;
 defined('ABSPATH') || exit;
 
 $idm = new IdM;
+$ldap = new LDAP;
 $template = new Template;
 
 $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
@@ -21,14 +22,23 @@ if ($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated()) {
     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
     wp_redirect($redirectUrl);
     exit;
+}elseif ($ldap->isAuthenticated()) {
+    $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
+    wp_redirect($redirectUrl);
+    exit;
 }
+
 
 $data = [];
 if ($idm->simplesamlAuth()) {
     $loginUrl = $idm->simplesamlAuth->getLoginURL();
     $data['title'] = __('Authentication Required', 'rrze-rsvp');
     $data['please_login'] = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
-} else {
+}elseif (!$ldap->isAuthenticated()) {
+    $loginUrl = 'LDAP LOGIN URL HERE';
+    $data['title'] = __('Authentication Required', 'rrze-rsvp');
+    $data['please_login'] = sprintf(__('<a href="%s">Please login with your LDAP username</a>.', 'rrze-rsvp'), $loginUrl);
+}else {
     header('HTTP/1.0 403 Forbidden');
     wp_redirect(get_site_url());
     exit;
@@ -74,7 +84,11 @@ if (Helper::isFauTheme()) {
  */
 echo $divOpen;
 
-echo $template->getContent('auth/require-sso-auth', $data);
+if ($idm->simplesamlAuth()) {
+    echo $template->getContent('auth/require-sso-auth', $data);
+}elseif (!$ldap->isAuthenticated()){
+    echo $template->getContent('auth/require-ldap-auth', $data);
+}
 
 echo $divClose;
 
