@@ -65,6 +65,17 @@ jQuery(document).ready(function ($) {
 		$('.cmb2-id-rrze-rsvp-room-bookingmode .cmb2-metabox-description').slideToggle();
 	});
 
+	// CPT Room: Set timeslot remove buttons to disabled if timeslot bookings for this timeslot exist
+	var timeslotgroup = $('body.wp-admin.post-type-room #rrze-rsvp-room-timeslots_repeat div.cmb-repeatable-grouping');
+	$(timeslotgroup).each(function (index) {
+		// console.log($(this).find("input[id$='rrze-rsvp-room-starttime']").prop('disabled'));
+		if ($(this).find("input[id$='rrze-rsvp-room-starttime']").prop('disabled') == true) {
+			$(this).find('button.cmb-remove-group-row').prop({
+				disabled: true
+			});
+		}
+	});
+
 	// Fill date/time inputs with timeslot selector
 	var details = jQuery('div#rrze-rsvp-booking-details'),
 		seat = details.find('select#rrze-rsvp-booking-seat'),
