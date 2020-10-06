@@ -48,9 +48,9 @@ class Metaboxes
         ]);
         $fieldKey = str_replace(array('+','-'), '', filter_var($args['_name'], FILTER_SANITIZE_NUMBER_INT));
         $timeslots = get_post_meta($field->object_id, 'rrze-rsvp-room-timeslots', true);
-        $weekdays = $timeslots[$fieldKey]['rrze-rsvp-room-weekday'];
-        $starttime = $timeslots[$fieldKey]['rrze-rsvp-room-starttime'];
-        $endtime = $timeslots[$fieldKey]['rrze-rsvp-room-endtime'];
+        $weekdays = isset($timeslots[$fieldKey]['rrze-rsvp-room-weekday']) ? $timeslots[$fieldKey]['rrze-rsvp-room-weekday'] : [];
+        $starttime = isset($timeslots[$fieldKey]['rrze-rsvp-room-starttime']) ? $timeslots[$fieldKey]['rrze-rsvp-room-starttime'] : '';
+        $endtime = isset($timeslots[$fieldKey]['rrze-rsvp-room-endtime']) ? $timeslots[$fieldKey]['rrze-rsvp-room-endtime'] : '';
         $validfrom = (isset($timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from']) && $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from'] !== false) ? $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from'] : 0;
         $validto = (isset($timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to']) && $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to'] !== false) ? $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to'] : 9999999999;
         foreach ($bookings as $booking) {

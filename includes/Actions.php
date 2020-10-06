@@ -765,20 +765,73 @@ class Actions
 	public function transitionPostStatus($newStatus, $oldStatus, $post) {
 		$errorMessage = '';
 
-		if ($post->post_type != 'seat') {
-			return;
-		}
+		if ($post->post_type == 'seat') {
 
-        $canDelete = Functions::canDeleteSeat($post->ID);
+		    $canDelete = Functions::canDeleteSeat($post->ID);
+            if ( !$canDelete ){
+                $roomId = get_post_meta($post->ID, 'rrze-rsvp-seat-room', true);
+                if (isset($_POST['rrze-rsvp-seat-room'])  && $_POST['rrze-rsvp-seat-room'] != $roomId){
+                    // roomId is about to be changed -> set old roomId
+                    $_POST['rrze-rsvp-seat-room'] = $roomId;
+                    $errorMessage = __('This seat is used in a booking and cannot be assigned to a different room.', 'rrze-rsvp');
+                }
+            }
+        } elseif ($post->post_type == 'room') {
 
-        if ( !$canDelete ){
-			$roomId = get_post_meta($post->ID, 'rrze-rsvp-seat-room', true);
-			if (isset($_POST['rrze-rsvp-seat-room'])  && $_POST['rrze-rsvp-seat-room'] != $roomId){
-				// roomId is about to be changed -> set old roomId
-				$_POST['rrze-rsvp-seat-room'] = $roomId;
-				$errorMessage = __('This seat is used in a booking and cannot be assigned to a different room.', 'rrze-rsvp');
-			}
-		}
+            $oldTimeslots = get_post_meta($post->ID, 'rrze-rsvp-room-timeslots', true);
+            if (isset($_POST['rrze-rsvp-room-timeslots'])  && $_POST['rrze-rsvp-room-timeslots'] != $oldTimeslots) {
+                $newTimeslots = $_POST['rrze-rsvp-room-timeslots'];
+                $errorTimeslotKeys = [];
+                $seats = Functions::getAllRoomSeats($post->ID);
+                $bookings = get_posts([
+                    'post_type' => 'booking',
+                    'post_statue' => 'publish',
+                    'nopaging' => true,
+                    'orderby' => 'title',
+                    'order' => 'ASC',
+                    'meta_key' => 'rrze-rsvp-booking-seat',
+                    'meta_value' => $seats,
+                    'meta_compare' => 'IN',
+                ]);
+                foreach($newTimeslots as $k => $newTimeslot) {
+                    if (isset($newTimeslot['rrze-rsvp-room-timeslot-valid-from']) && $newTimeslot['rrze-rsvp-room-timeslot-valid-from'] != '') {
+                        $dateRaw = date_create_from_format('d.m.Y', $newTimeslot['rrze-rsvp-room-timeslot-valid-from']);
+                        $tsValidFrom = date_timestamp_get($dateRaw);
+                    } else {
+                        $tsValidFrom = 0;
+                    }
+                    if (isset($newTimeslot['rrze-rsvp-room-timeslot-valid-to']) && $newTimeslot['rrze-rsvp-room-timeslot-valid-to'] != '') {
+                        $dateRaw = date_create_from_format('d.m.Y', $newTimeslot['rrze-rsvp-room-timeslot-valid-to']);
+                        $tsValidTo = date_timestamp_get($dateRaw);
+                    } else {
+                        $tsValidTo = 9999999999;
+                    }
+                    $tsWeekdays = $newTimeslot['rrze-rsvp-room-weekday'];
+                    $tsStarttime = $newTimeslot['rrze-rsvp-room-starttime'];
+                    $tsEndtime = $newTimeslot['rrze-rsvp-room-endtime'];
+                    foreach ($bookings as $booking) {
+                        $bookingMeta = get_post_meta($booking->ID);
+                        if (!isset($bookingMeta['rrze-rsvp-booking-start']) || !isset($bookingMeta['rrze-rsvp-booking-end']))
+                            continue;
+                        $startTimestamp = $bookingMeta['rrze-rsvp-booking-start'][0];
+                        $endTimestamp = $bookingMeta['rrze-rsvp-booking-end'][0];
+                        if (date('H:i', $startTimestamp) == $tsStarttime
+                            && date('H:i', $endTimestamp) == $tsEndtime
+                            && in_array(date('N', $startTimestamp), $tsWeekdays)
+                            && (($startTimestamp < $tsValidFrom) || ($endTimestamp > $tsValidTo))
+                        ) {
+                            $errorTimeslotKeys[] = $k + 1;
+                        }
+                    }
+                }
+                if (!empty($errorTimeslotKeys)) {
+                    $errorTimeslotKeysUnique = array_unique($errorTimeslotKeys);
+                    $_POST['rrze-rsvp-room-timeslots'] = $oldTimeslots;
+                    $sTimeslots = implode(' and ', $errorTimeslotKeysUnique);
+                    $errorMessage = sprintf(_n('Unable to save post: At least one existing booking would be outside the new valid period of timeslot no. %s.', 'Unable to save post: Some existing bookings would be outside the new valid periods of timeslots no. %s.', count($errorTimeslotKeysUnique), 'rrze-rsvp'), $sTimeslots);
+                }
+            }
+        }
 
         if ($errorMessage) {
             wp_die(

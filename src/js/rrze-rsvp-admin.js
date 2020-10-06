@@ -76,6 +76,13 @@ jQuery(document).ready(function ($) {
 		}
 	});
 
+	// Remove disabled attribute from protected timeslot fields before submit
+	$('body.wp-admin.post-type-room form').submit(function(e) {
+		$('#rrze-rsvp-room-timeslots_repeat :disabled').each(function(e) {
+			$(this).removeAttr('disabled');
+		})
+	});
+
 	// Fill date/time inputs with timeslot selector
 	var details = jQuery('div#rrze-rsvp-booking-details'),
 		seat = details.find('select#rrze-rsvp-booking-seat'),
