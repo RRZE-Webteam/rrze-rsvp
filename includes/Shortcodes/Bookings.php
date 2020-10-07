@@ -60,7 +60,7 @@ class Bookings extends Shortcodes {
     }
 
     public function maybeAuthenticate(){
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         global $post;
         if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
@@ -87,12 +87,12 @@ class Bookings extends Shortcodes {
             $this->sso = $this->idm->tryLogIn();
         } elseif ($this->ldapRequired) {
             $this->ldap = $this->ldapInstance->tryLogIn();
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldap is set');
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldap is set');
         }
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         global $post;
         $postID = $post->ID;
@@ -615,7 +615,7 @@ class Bookings extends Shortcodes {
         } else {
             $booking_seat = absint($posted_data['rsvp_seat']);
         }
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         if ($this->sso) {
             if ($this->idm->isAuthenticated()){
@@ -635,10 +635,10 @@ class Bookings extends Shortcodes {
                 exit;
             }
         }elseif ($this->ldapRequired) {
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is required');
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is required');
 
             if ($this->ldapInstance->isAuthenticated()){
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap isAuth');
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap isAuth');
 
                 $data = $this->ldapInstance->getCustomerData();
                 $booking_email  = $data['customer_email'];
@@ -650,12 +650,12 @@ class Bookings extends Shortcodes {
                     ],
                     get_permalink()
                 );
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is not auth - redirect = ' . $redirectUrl);
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is not auth - redirect = ' . $redirectUrl);
                 wp_redirect($redirectUrl);
                 exit;
             }
         } else {
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'neither sso nor ldap is required');
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'neither sso nor ldap is required');
             $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
             $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
             $booking_email = sanitize_email($posted_data['rsvp_email']);
