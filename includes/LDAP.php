@@ -28,7 +28,6 @@ class LDAP {
         $this->distinguished_name = $this->settings->getOption('ldap', 'distinguished_name');
         $this->bind_base_dn = $this->settings->getOption('ldap', 'bind_base_dn');
         $this->search_base_dn = $this->settings->getOption('ldap', 'search_base_dn');
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'constructed');
     }
 
     public function onLoaded() {

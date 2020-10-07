@@ -44,7 +44,6 @@ class Bookings extends Shortcodes {
         $this->idm = new IdM;
         $this->ldapInstance = new LDAP;
         $this->template = new Template;
-        Helper::debugLog(__LINE__, __CLASS__ . '->' . __METHOD__ . '()', 'constructed');
     }
 
     public function onLoaded()
@@ -86,7 +85,7 @@ class Bookings extends Shortcodes {
             $this->sso = $this->idm->tryLogIn();
         } elseif ($this->ldapRequired) {
             $this->ldap = $this->ldapInstance->tryLogIn();
-            Helper::debugLog(__LINE__, __CLASS__ . '->' . __METHOD__ . '()', '$this->ldap is set');
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldap is set');
         }
     }
 
