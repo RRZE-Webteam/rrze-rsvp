@@ -261,7 +261,7 @@ class CPT extends Main
         printf('<h3 style="margin-bottom: 0">%s</h3>', __('Availability Table', 'rrze-rsvp'));
         printf('<p><code>[rsvp-availability room="%s"]</code></p>', get_the_ID());
         printf('<p>%s</p>', __('Add <code>booking_link="true"</code> to link the available timeslots to the pre-filled booking form.', 'rrze-rsvp'));
-        printf('<p>%s</p>', __('Add <code>days="20"</code> to overwrite the default number of days.', 'rrze-rsvp'));
+
     }
 
     public function archiveShowAllRooms($query) {

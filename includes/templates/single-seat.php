@@ -357,8 +357,8 @@ if ($checkInBooking) {
                 echo '<h2>' . __('Consultation', 'rrze-rsvp') . '</h2>';
                 echo '<p>' . __('Please reserve a time slot for a consultation.', 'rrze-rsvp') . '</p>';
             } elseif ($bookingmode == 'check-only') {
-                echo '<h2>' . __('Availability information', 'rrze-rsvp') . '</h2>';
-                echo '<p>' . __('This seat is for instant check-in only and cannot be reserved. These are the next available time slots:', 'rrze-rsvp') . '</p>';
+                echo '<h2>' . __('Seat ', 'rrze-rsvp') . '</h2>';
+                echo '<p>' . __('This seat is for instant check-in only and cannot be reserved. These are the next available time slots', 'rrze-rsvp') . '</p>';
             } else {
                 echo '<h2>' . __('Reservation', 'rrze-rsvp') . '</h2>';
                 echo '<p>' . __('Please reserve a time slot for this seat', 'rrze-rsvp') . '</p>';
