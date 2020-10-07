@@ -75,12 +75,15 @@ class Bookings extends Shortcodes {
                 $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
             }
         } else {
-            $roomId = absint($this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'room'));
-            $shortcodeSSO = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
-            $this->ssoRequired = !is_null($shortcodeSSO) ? Functions::getBoolValueFromAtt($shortcodeSSO) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
-            $shortcodeLDAP = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
-            $this->ldapRequired = !is_null($shortcodeLDAP) ? Functions::getBoolValueFromAtt($shortcodeLDAP) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
+            $roomId = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'room');
+
+            $shortcodeSSO = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
+            $this->ssoRequired = ( $shortcodeSSO ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true)) );
+
+            $shortcodeLDAP = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
+            $this->ldapRequired = ( $shortcodeLDAP ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true)) );
         }
+        
         if ($this->ssoRequired) {
             $this->sso = $this->idm->tryLogIn();
         } elseif ($this->ldapRequired) {
@@ -1192,8 +1195,9 @@ class Bookings extends Shortcodes {
         return '<h4>' . __('Available seats:', 'rrze-rsvp') . '</h4><div class="rsvp-seat-select">' . $seatSelects . '</div>';
     }
 
-    protected function hasShortcodeAtt(string $content, string $shortcode, string $att)
+    protected function getShortcodeAtt(string $content, string $shortcode, string $att)
     {
+        $ret = 0;
         if (has_shortcode($content, $shortcode)) {
             $result = [];
             $pattern = get_shortcode_regex();
@@ -1210,13 +1214,13 @@ class Bookings extends Shortcodes {
             foreach ($result as $key => $value) {
                 if (isset($value[$shortcode][$att])) {
                     if (is_array($value[$shortcode][$att])) {
-                        return $value[$shortcode][$att];
+                        $ret = $value[$shortcode][$att];
                     } else {
-                        return trim($value[$shortcode][$att],'"');
+                        $ret = trim($value[$shortcode][$att],'"');
                     }
                 }                
             }
         }
-        return null;
+        return absint($ret);
     }
 }
