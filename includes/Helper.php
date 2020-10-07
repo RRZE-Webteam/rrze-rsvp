@@ -37,11 +37,11 @@ class Helper {
 	// use: $msg = 'My debug message is: $variable=' . $variable;
 	//      Helper::debugLog(__FILE__, __LINE__, __METHOD__, $msg);
 	//      Helper::debugLog(__FILE__, __LINE__, __FUNCTION__, $msg);
-	// view output on /wp-admin/network/admin.php?page=rrze-log (turn on plugin RRZE-Log)
+	// check output on /wp-admin/network/admin.php?page=rrze-log (turn on plugin RRZE-Log)
 	public static function debugLog($fileName, $lineNr, $calledBy, $msg = ''){
 		global $wpdb;
 		$msg = "rrze-rsvp : $fileName line $lineNr: $calledBy() $msg";
-		if ($wpdb->last_query && $wpdb->last_error){
+		if ($wpdb->last_error){
 			$msg .= ' $wpdb->last_result = |' . json_encode($wpdb->last_result) . '| $wpdb->last_query = |' . json_encode($wpdb->last_query) . '| $wpdb->last_error = |' . json_encode($wpdb->last_error) . '|';
 		}
 		do_action('rrze.log.info', $msg);
