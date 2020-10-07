@@ -4,6 +4,7 @@ namespace RRZE\RSVP\Shortcodes;
 
 defined('ABSPATH') || exit;
 
+use RRZE\RSVP\Helper;
 use RRZE\RSVP\IdM;
 use RRZE\RSVP\LDAP;
 use RRZE\RSVP\Shortcodes\Bookings;

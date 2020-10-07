@@ -37,7 +37,7 @@ class LDAP {
     
     private function logError(string $method): string{
         $msg = 'LDAP-error ' . ldap_errno($this->link_identifier) . ' ' . ldap_error($this->link_identifier) . " using $method | server = {$this->server}:{$this->port}";
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, $msg);
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, $msg);
         do_action('rrze.log.error', 'rrze-rsvp : ' . $msg);
         return $msg;
     }
@@ -76,7 +76,7 @@ class LDAP {
                                 $content = $aEntry[0]['mail'][0]; 
                                 $this->mail = $aEntry[0]['mail'][0]; 
                                 $this->isLoggedIn = true;
-                                Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->mail=' . $this->mail);
+                                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->mail=' . $this->mail);
                             }else{
                                 $content = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0] and $aEntry[0][\'mail\'][0]');
                             }
@@ -94,7 +94,7 @@ class LDAP {
                 . '<input type="submit" name="submit" value="Submit" />'
                 . '</form>';
         }
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
         return $content;   
     } 
 
@@ -111,14 +111,14 @@ class LDAP {
         if (!$nonce) {
             return;
         }
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$nonce=' . $nonce);
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$nonce=' . $nonce);
 
         if (!wp_verify_nonce($nonce, 'require-ldap-auth')) {
             header('HTTP/1.0 403 Forbidden');
             wp_redirect(get_site_url());
             exit;            
         }
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'verified $nonce=' . $nonce);
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'verified $nonce=' . $nonce);
 
         $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
         $room = $roomId ? sprintf('?room_id=%d', $roomId) : '';
@@ -132,7 +132,7 @@ class LDAP {
 
         if ($this->isLoggedIn) {
             $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'isLoggedIn $redirectUrl=' . $redirectUrl);
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'isLoggedIn $redirectUrl=' . $redirectUrl);
             wp_redirect($redirectUrl);
             exit;
         }
@@ -152,8 +152,7 @@ class LDAP {
         add_filter('the_content', function ($content) use ($data) {
             return $this->template->getContent('auth/require-ldap-auth', $data);
         });
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'filter added =' . $nonce);
-
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'filter added =' . $nonce);
     }
 
 

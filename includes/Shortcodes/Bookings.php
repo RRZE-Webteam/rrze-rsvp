@@ -68,19 +68,17 @@ class Bookings extends Shortcodes {
         }
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
-        // $this->ldap_nonce = (isset($_REQUEST['ldap-nonce']) && wp_verify_nonce($_REQUEST['ldap-nonce'], 'rsvp-availability')) ? $_REQUEST['ldap-nonce'] : '';
         if (isset($_GET['room_id'])) {            
             $roomId = absint($_GET['room_id']);
             if ($this->nonce){
                 $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
-            // }elseif($this->ldap_nonce){
                 $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
             }
         } else {
             $roomId = absint($this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'room'));
             $shortcodeSSO = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
-            $shortcodeLDAP = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
             $this->ssoRequired = !is_null($shortcodeSSO) ? Functions::getBoolValueFromAtt($shortcodeSSO) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
+            $shortcodeLDAP = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
             $this->ldapRequired = !is_null($shortcodeLDAP) ? Functions::getBoolValueFromAtt($shortcodeLDAP) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
         }
         if ($this->ssoRequired) {
@@ -89,6 +87,10 @@ class Bookings extends Shortcodes {
             $this->ldap = $this->ldapInstance->tryLogIn();
             // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldap is set');
         }
+
+// BK EDIT 2020-10-07
+// hier stimmt etwas nicht: $this->ldapRequired müsste true sein:
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired) . ' $shortcodeLDAP = ' . json_encode($shortcodeLDAP) . ' rrze-rsvp-room-ldap-required = '  . get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
@@ -107,6 +109,7 @@ class Bookings extends Shortcodes {
                     ],
                     get_permalink()
                 );
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, json_encode($redirectUrl));
                 wp_redirect($redirectUrl);
                 exit;
             }           
