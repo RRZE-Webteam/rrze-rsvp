@@ -46,7 +46,14 @@ class Availability extends Shortcodes
 
         if (isset($shortcode_atts['room']) && $shortcode_atts['room'] != '') {
             $room = (int)$shortcode_atts['room'];
-            $bookingmode = get_post_meta($room, 'rrze-rsvp-room-bookingmode', true);
+            if ($days == '') {
+                $bookingmode = get_post_meta($room, 'rrze-rsvp-room-bookingmode', true);
+                if ($bookingmode == 'check-only') {
+                    $days = '7';
+                } else {
+                    $days = get_post_meta($room, 'rrze-rsvp-room-days-in-advance', true);
+                }
+            }
             $availability = Functions::getRoomAvailability($room, $today, date('Y-m-d', strtotime($today . ' +' . $days . ' days')), false);
             if (!empty($availability)) {
                 $output .= '<table class="rsvp-room-availability">';
@@ -107,6 +114,14 @@ class Availability extends Shortcodes
                 }
             }
             $room_id = get_post_meta($seat_id, 'rrze-rsvp-seat-room', true);
+            if ($days == '') {
+                $bookingmode = get_post_meta($room_id, 'rrze-rsvp-room-bookingmode', true);
+                if ($bookingmode == 'check-only') {
+                    $days = '7';
+                } else {
+                    $days = get_post_meta($room_id, 'rrze-rsvp-room-days-in-advance', true);
+                }
+            }
 
             $availability = Functions::getSeatAvailability($seat_id, $today, date('Y-m-d', strtotime($today . ' +' . $days . ' days')), false);
 
