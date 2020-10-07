@@ -33,7 +33,6 @@ class LDAP {
     public function onLoaded() {
         add_shortcode('rsvp-ldap-login', [$this, 'ldapForm'], 10, 0);
         add_action('wp', [$this, 'requireAuth']);
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
     }
     
     private function logError(string $method): string{

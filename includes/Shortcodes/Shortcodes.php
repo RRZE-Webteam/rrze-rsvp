@@ -119,6 +119,8 @@ class Shortcodes
 
     public function maybeAuthenticate()
     {
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+
         global $post;
         if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
             return;
@@ -126,9 +128,6 @@ class Shortcodes
 
         if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
             $this->idm->tryLogIn();
-        }     
-
-        if (isset($_REQUEST['ldap_nonce']) && wp_verify_nonce($_REQUEST['ldap_nonce'], 'rrze-rsvp-seat-check-inout')) {
             $this->ldap->tryLogIn();
         }     
     }

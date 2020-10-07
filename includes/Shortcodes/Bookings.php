@@ -60,18 +60,20 @@ class Bookings extends Shortcodes {
     }
 
     public function maybeAuthenticate(){
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+
         global $post;
         if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
             return;
         }
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
-        $this->ldap_nonce = (isset($_REQUEST['ldap-nonce']) && wp_verify_nonce($_REQUEST['ldap-nonce'], 'rsvp-availability')) ? $_REQUEST['ldap-nonce'] : '';
+        // $this->ldap_nonce = (isset($_REQUEST['ldap-nonce']) && wp_verify_nonce($_REQUEST['ldap-nonce'], 'rsvp-availability')) ? $_REQUEST['ldap-nonce'] : '';
         if (isset($_GET['room_id'])) {            
             $roomId = absint($_GET['room_id']);
             if ($this->nonce){
                 $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
-            }elseif($this->ldap_nonce){
+            // }elseif($this->ldap_nonce){
                 $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
             }
         } else {
@@ -90,6 +92,8 @@ class Bookings extends Shortcodes {
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+
         global $post;
         $postID = $post->ID;
 
@@ -162,13 +166,6 @@ class Bookings extends Shortcodes {
             $alert = '<div class="alert alert-warning" role="alert">';
             $alert .= '<p><strong>'.__('SSO not available.','rrze-rsvp').'</strong><br>';
             $alert .= __('Please activate SSO authentication or remove the SSO attribute from your shortcode.','rrze-rsvp').'</p>';
-            $alert .= '</div>';
-            return $alert;
-        }
-        if ($this->ldapRequired && !$this->ldap) {
-            $alert = '<div class="alert alert-warning" role="alert">';
-            $alert .= '<p><strong>'.__('LDAP not available.','rrze-rsvp').'</strong><br>';
-            $alert .= __('Please activate LDAP authentication or remove the LDAP attribute from your shortcode.','rrze-rsvp').'</p>';
             $alert .= '</div>';
             return $alert;
         }
@@ -322,7 +319,7 @@ class Bookings extends Shortcodes {
             //	$output .= '</fieldset>';
         }
 
-	$output .= '<fieldset>';  
+	    $output .= '<fieldset>';  
         $output .= '<legend>' . __('Your data', 'rrze-rsvp') . ' <span class="notice-required">('. __('Required','rrze-rsvp'). ')</span></legend>';
         if ($this->ssoRequired) {
             $data = $this->idm->getCustomerData();
@@ -618,6 +615,7 @@ class Bookings extends Shortcodes {
         } else {
             $booking_seat = absint($posted_data['rsvp_seat']);
         }
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         if ($this->sso) {
             if ($this->idm->isAuthenticated()){
@@ -637,7 +635,11 @@ class Bookings extends Shortcodes {
                 exit;
             }
         }elseif ($this->ldapRequired) {
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is required');
+
             if ($this->ldapInstance->isAuthenticated()){
+                Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap isAuth');
+
                 $data = $this->ldapInstance->getCustomerData();
                 $booking_email  = $data['customer_email'];
             } else {
@@ -648,10 +650,12 @@ class Bookings extends Shortcodes {
                     ],
                     get_permalink()
                 );
+                Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is not auth - redirect = ' . $redirectUrl);
                 wp_redirect($redirectUrl);
                 exit;
             }
         } else {
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'neither sso nor ldap is required');
             $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
             $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
             $booking_email = sanitize_email($posted_data['rsvp_email']);
