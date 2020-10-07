@@ -268,37 +268,61 @@ class Bookings extends Shortcodes {
                     . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($roomID) . '</strong>'
                     . '</p>';
 
-        $output .= '<div class="rsvp-datetime-container form-group clearfix">'; 	
-	$output .= '<legend>' . __( 'Select date and time','rrze-rsvp') . '</legend>';
-        $output .=  '<div class="rsvp-date-container">';
-        $dateComponents = getdate(strtotime($get_date));
-        $month          = $dateComponents[ 'mon' ];
-        $year           = $dateComponents[ 'year' ];
-        $start          = date_create();
-        $end            = date_create();
-        date_modify($end, '+' . $days . ' days');
-        $output .= $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date);
-        $output .= '</div>'; //.rsvp-date-container
-
-        $output .= '<div class="rsvp-time-container">'
-                    . '<h4>' . __('Available time slots:', 'rrze-rsvp') . '</h4>';
-        if ($get_date) {
-            $output .= $this->buildTimeslotSelect($roomID, $get_date, $get_time, $availability);
+        if ($bookingMode == 'check-only') {
+            // replace Calendar, time and place inputs by get parameters to avoid reservations for future timeslots
+            $timeslots = isset($availability[$get_date]) ? $availability[$get_date] : [];
+            $timeslot = '';
+            foreach($timeslots as $key => $data) {
+                if (substr($key, 0, strlen($get_time) ) == $get_time) {
+                    $timeslot = $key;
+                } else {
+                    $timeslot = __('Timeslot not available.', 'rrze-rsvp');
+                }
+            }
+            $output .= '<input type="hidden" name="rsvp_date" value="' . $get_date . '">'
+                . '<input type="hidden" name="rsvp_time" value="' . $get_time . '">'
+                . '<input type="hidden" name="rsvp_seat" value="' . $get_seat . '">'
+                . '<div class="form-group">'
+                . '<h2>' . __( 'Your booking','rrze-rsvp') . '</h2>'
+                . '<p>' . __('Date', 'rrze-rsvp') . ': <strong>' . date_i18n(get_option('date_format'), strtotime($get_date)).  '</strong></p>'
+                . '<p>' . __('Time', 'rrze-rsvp') . ': <strong>' . $timeslot . '</strong></p>'
+                . '<p>' . __('Room', 'rrze-rsvp') . ': <strong>' . get_the_title($roomID) . '</strong></p>'
+                . '<p>' . __('Seat', 'rrze-rsvp') . ': <strong>' . get_the_title($get_seat) . '</strong></p>'
+                . '</div>';
         } else {
-            $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
-        }
-        $output .= '</div>'; //.rsvp-time-container
-	
-        $output .= '</div>'; //.rsvp-datetime-container
+            $output .= '<div class="rsvp-datetime-container form-group clearfix">';
+            $output .= '<legend>' . __( 'Select date and time','rrze-rsvp') . '</legend>';
+            $output .=  '<div class="rsvp-date-container">';
+            $dateComponents = getdate(strtotime($get_date));
+            $month          = $dateComponents[ 'mon' ];
+            $year           = $dateComponents[ 'year' ];
+            $start          = date_create();
+            $end            = date_create();
+            date_modify($end, '+' . $days . ' days');
+            $output .= $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date);
+            $output .= '</div>'; //.rsvp-date-container
 
-        $output .= '<div class="rsvp-seat-container">';
-        if ($get_date && $get_time) {
-            $output .= $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability);
-        } else {
-            $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
+            $output .= '<div class="rsvp-time-container">'
+                . '<h4>' . __('Available time slots:', 'rrze-rsvp') . '</h4>';
+            if ($get_date) {
+                $output .= $this->buildTimeslotSelect($roomID, $get_date, $get_time, $availability);
+            } else {
+                $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
+            }
+            $output .= '</div>'; //.rsvp-time-container
+
+            $output .= '</div>'; //.rsvp-datetime-container
+
+            $output .= '<div class="rsvp-seat-container">';
+            if ($get_date && $get_time) {
+                $output .= $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability);
+            } else {
+                $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
+            }
+            $output .= '</div>'; //.rsvp-seat-container
+            //	$output .= '</fieldset>';
         }
-        $output .= '</div>'; //.rsvp-seat-container
-//	$output .= '</fieldset>';
+
 	$output .= '<fieldset>';  
         $output .= '<legend>' . __('Your data', 'rrze-rsvp') . ' <span class="notice-required">('. __('Required','rrze-rsvp'). ')</span></legend>';
         if ($this->ssoRequired) {

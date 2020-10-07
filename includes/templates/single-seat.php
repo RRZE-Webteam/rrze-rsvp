@@ -352,12 +352,16 @@ if ($checkInBooking) {
             if ($bookingmode == 'consultation') {
                 echo '<h2>' . __('Consultation', 'rrze-rsvp') . '</h2>';
                 echo '<p>' . __('Please reserve a time slot for a consultation.', 'rrze-rsvp') . '</p>';
+            } elseif ($bookingmode == 'check-only') {
+                echo '<h2>' . __('Seat ', 'rrze-rsvp') . '</h2>';
+                echo '<p>' . __('This seat is for instant check-in only and cannot be reserved. These are the next available time slots', 'rrze-rsvp') . '</p>';
             } else {
                 echo '<h2>' . __('Reservation', 'rrze-rsvp') . '</h2>';
                 echo '<p>' . __('Please reserve a time slot for this seat', 'rrze-rsvp') . '</p>';
             }
+            $bookingLink = $bookingmode == 'check-only' ? 'false' : 'true';
             echo do_shortcode('[rsvp-qr seat=' . $seatId . ']');
-            echo do_shortcode(sprintf('[rsvp-availability seat=%s days=%s booking_link=true]', $seatId, $daysInAdvance));
+            echo do_shortcode(sprintf('[rsvp-availability seat=%s days=%s booking_link=%s]', $seatId, $daysInAdvance, $bookingLink));
         }
     }
 }
