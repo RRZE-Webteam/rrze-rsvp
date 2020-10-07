@@ -27,6 +27,7 @@ class Bookings extends Shortcodes {
 
     protected $email;
     protected $idm;
+    protected $ldapInstance;
     protected $sso = false;
     protected $ssoRequired;
     protected $ldap = false;
@@ -41,7 +42,7 @@ class Bookings extends Shortcodes {
         $this->options = (object) $settings->getOptions();
         $this->email = new Email;
         $this->idm = new IdM;
-        $this->ldap = new LDAP;
+        $this->ldapInstance = new LDAP;
         $this->template = new Template;
     }
 
@@ -66,10 +67,13 @@ class Bookings extends Shortcodes {
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
         $this->ldap_nonce = (isset($_REQUEST['ldap-nonce']) && wp_verify_nonce($_REQUEST['ldap-nonce'], 'rsvp-availability')) ? $_REQUEST['ldap-nonce'] : '';
-        if (isset($_GET['room_id']) && $this->nonce) {
+        if (isset($_GET['room_id'])) {            
             $roomId = absint($_GET['room_id']);
-            $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
-            $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
+            if ($this->nonce){
+                $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
+            }elseif($this->ldap_nonce){
+                $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
+            }
         } else {
             $roomId = absint($this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'room'));
             $shortcodeSSO = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
@@ -79,8 +83,12 @@ class Bookings extends Shortcodes {
         }
         if ($this->ssoRequired) {
             $this->sso = $this->idm->tryLogIn();
-        } else if ($this->ldap_nonce || $this->ldapRequired) {
-            $this->ldap = $this->ldap->tryLogIn();
+        } elseif ($this->ldapRequired) {
+
+            do_action('rrze.log.info', 'rrze-rsvp bookingSubmitted() ldap wird gesetzt 88');
+
+
+            $this->ldap = $this->ldapInstance->tryLogIn();
         }
     }
 
@@ -307,7 +315,7 @@ class Bookings extends Shortcodes {
                 . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
                 . '</div>';
         }else if ($this->ldapRequired) {
-            $data = $this->ldap->getCustomerData();
+            $data = $this->ldapInstance->getCustomerData();
             $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
 
             $output .= '<div class="form-group">'
@@ -552,8 +560,7 @@ class Bookings extends Shortcodes {
         return $this->template->getContent('shortcode/booking-booked', $data);
     }
 
-    public function bookingSubmitted()
-    {
+    public function bookingSubmitted() {
         if (!isset($_POST['rrze_rsvp_post_nonce_field']) || !wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
             return;
         }
@@ -608,16 +615,15 @@ class Bookings extends Shortcodes {
                 wp_redirect($redirectUrl);
                 exit;
             }
-
-        }else if ($this->ldap) {
-            if ($this->ldap->isAuthenticated()){
-                $sso_data = $this->ldap->getCustomerData();
-                $booking_email  = $sso_data['customer_email'];
+        }elseif ($this->ldapRequired) {
+            if ($this->ldapInstance->isAuthenticated()){
+                $data = $this->ldapInstance->getCustomerData();
+                $booking_email  = $data['customer_email'];
             } else {
                 $redirectUrl = add_query_arg(
                     [
                         'booking' => wp_create_nonce('ldap_authentication'),
-                        'nonce' => $this->nonce
+                        'ldap_nonce' => $this->ldap_nonce
                     ],
                     get_permalink()
                 );
