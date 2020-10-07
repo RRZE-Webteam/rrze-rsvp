@@ -44,6 +44,7 @@ class Bookings extends Shortcodes {
         $this->idm = new IdM;
         $this->ldapInstance = new LDAP;
         $this->template = new Template;
+        Helper::debugLog(__LINE__, __CLASS__ . '->' . __METHOD__ . '()', 'constructed');
     }
 
     public function onLoaded()
@@ -84,11 +85,8 @@ class Bookings extends Shortcodes {
         if ($this->ssoRequired) {
             $this->sso = $this->idm->tryLogIn();
         } elseif ($this->ldapRequired) {
-
-            do_action('rrze.log.info', 'rrze-rsvp bookingSubmitted() ldap wird gesetzt 88');
-
-
             $this->ldap = $this->ldapInstance->tryLogIn();
+            Helper::debugLog(__LINE__, __CLASS__ . '->' . __METHOD__ . '()', '$this->ldap is set');
         }
     }
 
