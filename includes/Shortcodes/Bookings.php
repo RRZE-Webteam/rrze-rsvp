@@ -75,9 +75,12 @@ class Bookings extends Shortcodes {
         Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'GET parameter = ' . json_encode($_GET) );
         Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'REQUEST parameter = ' . json_encode($_REQUEST) );
 
+
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'trace: ' . json_encode(debug_backtrace()) );
+
         global $post;
-        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth']) || isset($_GET['require-sso-auth']) || isset($_REQUEST['require-ldap-auth'])) {
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'RETURNED! DAS IST EIN BUG');
+        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'RETURNED! DAS IST EIN BUG, oder? ' . (is_a($post, '\WP_Post')?'is a post':'is not a post'));
             
             if( isset( $GLOBALS['current_theme_template'] ) ){
                 Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'TEMPLATE = ' . $GLOBALS['current_theme_template']);
