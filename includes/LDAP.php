@@ -56,6 +56,7 @@ class LDAP {
             if (!$this->link_identifier){
                 $content = $this->logError('ldap_connect()');
             }else{
+                Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                 ldap_set_option($this->link_identifier, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($this->link_identifier, LDAP_OPT_REFERRALS, 0);
             
@@ -69,28 +70,35 @@ class LDAP {
                     $this->search_filter = '(sAMAccountName=' . $username . ')';
                     $result_identifier = @ldap_search($this->link_identifier, $this->search_base_dn, $this->search_filter);
                     
+                    Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                     if ($result_identifier === false){
                         $content = $this->logError('ldap_search()');
                     }else{
                         $aEntry = @ldap_get_entries($this->link_identifier, $result_identifier);
 
+                        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                         if (isset($aEntry['count']) && $aEntry['count'] > 0){
+                            Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])){
                                 $content = $aEntry[0]['mail'][0]; 
                                 $this->mail = $aEntry[0]['mail'][0]; 
                                 $this->isLoggedIn = true;
                                 Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->mail=' . $this->mail);
                             }else{
+                                Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                                 $content = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0] and $aEntry[0][\'mail\'][0]');
                             }
                         }else{
+                            Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                             $content = 'User not found';
                         }
+                        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                         @ldap_close($this->connection);
                     }
                 }
             }
         }else{
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__);
             $content = '<form action="#" method="POST">'
                 . '<label for="username">Username: </label><input id="username" type="text" name="username" />'
                 . '<label for="password">Password: </label><input id="password" type="password" name="password" />'
