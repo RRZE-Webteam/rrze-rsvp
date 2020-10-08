@@ -58,7 +58,7 @@ class LDAP {
             $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
             $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
 
-            $this->link_identifier = ldap_connect($this->server, $this->port);
+            $this->link_identifier = @ldap_connect($this->server, $this->port);
         
             if (!$this->link_identifier){
                 Helper::debugLog(__FILE__, __LINE__, __METHOD__);
