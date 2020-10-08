@@ -35,8 +35,8 @@ class Helper {
 	
 
 	// use: $msg = 'My debug message is: $variable=' . $variable;
-	//      Helper::debugLog(__FILE__, __LINE__, __METHOD__, $msg);
-	//      Helper::debugLog(__FILE__, __LINE__, __FUNCTION__, $msg);
+	// 		Helper::debugLog(__FILE__, __LINE__, __METHOD__, $msg);
+	// 		Helper::debugLog(__FILE__, __LINE__, __FUNCTION__, $msg);
 	// check output on /wp-admin/network/admin.php?page=rrze-log (turn on plugin RRZE-Log)
 	public static function debugLog($fileName, $lineNr, $calledBy, $msg = ''){
 		global $wpdb;

@@ -72,66 +72,63 @@ class Bookings extends Shortcodes {
 
 
     public function maybeAuthenticate(){
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'GET parameter = ' . json_encode($_GET) );
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'REQUEST parameter = ' . json_encode($_REQUEST) );
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'GET parameter = ' . json_encode($_GET) );
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'REQUEST parameter = ' . json_encode($_REQUEST) );
 
 
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'trace: ' . json_encode(debug_backtrace()) );
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'trace: ' . json_encode(debug_backtrace()) );
 
         global $post;
         if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'RETURNED! DAS IST EIN BUG, oder? ' . (is_a($post, '\WP_Post')?'is a post':'is not a post'));
-            
             if( isset( $GLOBALS['current_theme_template'] ) ){
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'TEMPLATE = ' . $GLOBALS['current_theme_template']);
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'TEMPLATE = ' . $GLOBALS['current_theme_template']);
             }
-
 
             return;
         }
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->nonce = ' . $this->nonce . ' rsvp-availability isset($_REQUEST[nonce]=' . (isset($_REQUEST['nonce'])?$_REQUEST['nonce']:' is not set'));
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->nonce = ' . $this->nonce . ' rsvp-availability isset($_REQUEST[nonce]=' . (isset($_REQUEST['nonce'])?$_REQUEST['nonce']:' is not set'));
 
         if (isset($_GET['room_id'])) {            
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben eine room_id');
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben eine room_id');
             $roomId = absint($_GET['room_id']);
             if ($this->nonce){
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben KEINEN nonce! BUG!');
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben KEINEN nonce! BUG!');
                 $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ssoRequired = ' . json_encode($this->ssoRequired));
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ssoRequired = ' . json_encode($this->ssoRequired));
                 $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired));
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired));
             }
         } else {
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben keine room_id ! WARUM?');
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben keine room_id ! WARUM?');
             $roomId = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'room');
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$roomId = ' . $roomId);
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$roomId = ' . $roomId);
 
             $shortcodeSSO = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
             $this->ssoRequired = ( $shortcodeSSO ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true)) );
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ssoRequired = ' . json_encode($this->ssoRequired));
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ssoRequired = ' . json_encode($this->ssoRequired));
 
             $shortcodeLDAP = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
             $this->ldapRequired = ( $shortcodeLDAP ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true)) );
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired));
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired));
         }
 
         if ($this->ssoRequired) {
             $this->sso = $this->idm->tryLogIn();
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->sso is set');
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->sso is set');
         } elseif ($this->ldapRequired) {
             $this->ldap = $this->ldapInstance->tryLogIn();
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldap is set');
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldap is set');
         }
 
 // BK EDIT 2020-10-07
 // hier stimmt etwas nicht: $this->ldapRequired müsste true sein:
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired) . ' $shortcodeLDAP = ' . json_encode($shortcodeLDAP) . ' rrze-rsvp-room-ldap-required = '  . get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired) . ' $shortcodeLDAP = ' . json_encode($shortcodeLDAP) . ' rrze-rsvp-room-ldap-required = '  . get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         global $post;
         $postID = $post->ID;
@@ -146,7 +143,7 @@ class Bookings extends Shortcodes {
                     ],
                     get_permalink()
                 );
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__, json_encode($redirectUrl));
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, json_encode($redirectUrl));
                 wp_redirect($redirectUrl);
                 exit;
             }           
@@ -655,7 +652,7 @@ class Bookings extends Shortcodes {
         } else {
             $booking_seat = absint($posted_data['rsvp_seat']);
         }
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         if ($this->sso) {
             if ($this->idm->isAuthenticated()){
@@ -675,10 +672,10 @@ class Bookings extends Shortcodes {
                 exit;
             }
         }elseif ($this->ldapRequired) {
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is required');
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is required');
 
             if ($this->ldapInstance->isAuthenticated()){
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap isAuth');
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap isAuth');
 
                 $data = $this->ldapInstance->getCustomerData();
                 $booking_email  = $data['customer_email'];
@@ -690,12 +687,12 @@ class Bookings extends Shortcodes {
                     ],
                     get_permalink()
                 );
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is not auth - redirect = ' . $redirectUrl);
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is not auth - redirect = ' . $redirectUrl);
                 wp_redirect($redirectUrl);
                 exit;
             }
         } else {
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'neither sso nor ldap is required');
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'neither sso nor ldap is required');
             $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
             $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
             $booking_email = sanitize_email($posted_data['rsvp_email']);
