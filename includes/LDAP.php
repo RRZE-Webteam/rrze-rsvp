@@ -47,6 +47,11 @@ class LDAP {
 
         Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldapForm');
 
+        if ($this->isLoggedIn){
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldapForm - isLoggedIn');
+            return;
+        }
+
         if(isset($_POST['username']) && isset($_POST['password'])){
             Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
