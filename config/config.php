@@ -642,12 +642,12 @@ function getShortcodeSettings(){
                 'type' => 'boolean',
                 'default'   => false
             ],
-            // 'ldap' => [
-            //     'field_type' => 'toggle',
-            //     'label' => __( 'Require LDAP Authentication', 'rrze-rsvp' ),
-            //     'type' => 'boolean',
-            //     'default'   => false
-            // ],
+            'ldap' => [
+                'field_type' => 'toggle',
+                'label' => __( 'Require LDAP Authentication', 'rrze-rsvp' ),
+                'type' => 'boolean',
+                'default'   => false
+            ],
         ],
         'rsvp-availability' => [
             'block' => [

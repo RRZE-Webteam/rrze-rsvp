@@ -27,11 +27,13 @@ class Bookings extends Shortcodes {
 
     protected $email;
     protected $idm;
+    // protected $ldapInstance;
     protected $sso = false;
     protected $ssoRequired;
     // protected $ldap = false;
     // protected $ldapRequired;
     protected $nonce;
+    // protected $ldap_nonce;
 
     public function __construct($pluginFile, $settings)
     {
@@ -40,12 +42,16 @@ class Bookings extends Shortcodes {
         $this->options = (object) $settings->getOptions();
         $this->email = new Email;
         $this->idm = new IdM;
-        // $this->ldap = new LDAP;
+        // $this->ldapInstance = new LDAP;
         $this->template = new Template;
     }
 
     public function onLoaded()
     {
+
+        // BK DEBUG filter
+        add_filter( 'template_include', [$this, 'var_template_include'], 1000 );
+
         add_action('template_redirect', [$this, 'maybeAuthenticate']);
         add_action('template_redirect', [$this, 'bookingSubmitted']);
 
@@ -57,36 +63,73 @@ class Bookings extends Shortcodes {
         add_action( 'wp_ajax_nopriv_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );     
     }
 
-    public function maybeAuthenticate()
-    {
+
+    // BK DEBUG filter method
+    public function var_template_include( $t ){
+        $GLOBALS['current_theme_template'] = basename($t);
+        return $t;
+    }
+
+
+    public function maybeAuthenticate(){
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'GET parameter = ' . json_encode($_GET) );
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'REQUEST parameter = ' . json_encode($_REQUEST) );
+
+
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'trace: ' . json_encode(debug_backtrace()) );
+
         global $post;
-        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
+        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
+            if( isset( $GLOBALS['current_theme_template'] ) ){
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'TEMPLATE = ' . $GLOBALS['current_theme_template']);
+            }
+
             return;
         }
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
-        if (isset($_GET['room_id']) && $this->nonce) {
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->nonce = ' . $this->nonce . ' rsvp-availability isset($_REQUEST[nonce]=' . (isset($_REQUEST['nonce'])?$_REQUEST['nonce']:' is not set'));
+
+        if (isset($_GET['room_id'])) {            
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben eine room_id');
             $roomId = absint($_GET['room_id']);
-            $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
+            if ($this->nonce){
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben KEINEN nonce! BUG!');
+                $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ssoRequired = ' . json_encode($this->ssoRequired));
+                // $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired));
+            }
         } else {
-            $roomId = absint($this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'room'));
-            $shortcodeSSO = $this->hasShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
-            $this->ssoRequired = !is_null($shortcodeSSO) ? Functions::getBoolValueFromAtt($shortcodeSSO) : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben keine room_id ! WARUM?');
+            $roomId = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'room');
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$roomId = ' . $roomId);
+
+            $shortcodeSSO = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
+            $this->ssoRequired = ( $shortcodeSSO ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true)) );
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ssoRequired = ' . json_encode($this->ssoRequired));
+
+            // $shortcodeLDAP = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
+            // $this->ldapRequired = ( $shortcodeLDAP ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true)) );
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired));
         }
+
         if ($this->ssoRequired) {
             $this->sso = $this->idm->tryLogIn();
-        }     
-        // BK 2DO 2020-10-01: $this->nonce : Unterscheidung zw sso und ldap <- ssoRequired OR nonce !
-        // if ($this->nonce){
-        //     if ($this->ssoRequired) {
-        //         $this->sso = $this->idm->tryLogIn();
-        //     }elseif ($this->ldapRequired) {
-        //         $this->ldap = $this->ldap->tryLogIn();
-        //     }     
-        // }     
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->sso is set');
+        // } elseif ($this->ldapRequired) {
+        //     $this->ldap = $this->ldapInstance->tryLogIn();
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldap is set');
+        }
+
+// BK EDIT 2020-10-07
+// hier stimmt etwas nicht: $this->ldapRequired müsste true sein:
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired) . ' $shortcodeLDAP = ' . json_encode($shortcodeLDAP) . ' rrze-rsvp-room-ldap-required = '  . get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+
         global $post;
         $postID = $post->ID;
 
@@ -100,6 +143,7 @@ class Bookings extends Shortcodes {
                     ],
                     get_permalink()
                 );
+                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, json_encode($redirectUrl));
                 wp_redirect($redirectUrl);
                 exit;
             }           
@@ -162,13 +206,6 @@ class Bookings extends Shortcodes {
             $alert .= '</div>';
             return $alert;
         }
-        // if ($this->ldapRequired && !$this->ldap) {
-        //     $alert = '<div class="alert alert-warning" role="alert">';
-        //     $alert .= '<p><strong>'.__('LDAP not available.','rrze-rsvp').'</strong><br>';
-        //     $alert .= __('Please activate LDAP authentication or remove the LDAP attribute from your shortcode.','rrze-rsvp').'</p>';
-        //     $alert .= '</div>';
-        //     return $alert;
-        // }
     
         $bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
         if ($bookingMode == 'check-only' && !$this->nonce) {
@@ -264,38 +301,62 @@ class Bookings extends Shortcodes {
                     . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($roomID) . '</strong>'
                     . '</p>';
 
-        $output .= '<div class="rsvp-datetime-container form-group clearfix">'; 	
-	$output .= '<legend>' . __( 'Select date and time','rrze-rsvp') . '</legend>';
-        $output .=  '<div class="rsvp-date-container">';
-        $dateComponents = getdate(strtotime($get_date));
-        $month          = $dateComponents[ 'mon' ];
-        $year           = $dateComponents[ 'year' ];
-        $start          = date_create();
-        $end            = date_create();
-        date_modify($end, '+' . $days . ' days');
-        $output .= $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date);
-        $output .= '</div>'; //.rsvp-date-container
-
-        $output .= '<div class="rsvp-time-container">'
-                    . '<h4>' . __('Available time slots:', 'rrze-rsvp') . '</h4>';
-        if ($get_date) {
-            $output .= $this->buildTimeslotSelect($roomID, $get_date, $get_time, $availability);
+        if ($bookingMode == 'check-only') {
+            // replace Calendar, time and place inputs by get parameters to avoid reservations for future timeslots
+            $timeslots = isset($availability[$get_date]) ? $availability[$get_date] : [];
+            $timeslot = '';
+            foreach($timeslots as $key => $data) {
+                if (substr($key, 0, strlen($get_time) ) == $get_time) {
+                    $timeslot = $key;
+                } else {
+                    $timeslot = __('Timeslot not available.', 'rrze-rsvp');
+                }
+            }
+            $output .= '<input type="hidden" name="rsvp_date" value="' . $get_date . '">'
+                . '<input type="hidden" name="rsvp_time" value="' . $get_time . '">'
+                . '<input type="hidden" name="rsvp_seat" value="' . $get_seat . '">'
+                . '<div class="form-group">'
+                . '<h2>' . __( 'Your booking','rrze-rsvp') . '</h2>'
+                . '<p>' . __('Date', 'rrze-rsvp') . ': <strong>' . date_i18n(get_option('date_format'), strtotime($get_date)).  '</strong></p>'
+                . '<p>' . __('Time', 'rrze-rsvp') . ': <strong>' . $timeslot . '</strong></p>'
+                . '<p>' . __('Room', 'rrze-rsvp') . ': <strong>' . get_the_title($roomID) . '</strong></p>'
+                . '<p>' . __('Seat', 'rrze-rsvp') . ': <strong>' . get_the_title($get_seat) . '</strong></p>'
+                . '</div>';
         } else {
-            $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
-        }
-        $output .= '</div>'; //.rsvp-time-container
-	
-        $output .= '</div>'; //.rsvp-datetime-container
+            $output .= '<div class="rsvp-datetime-container form-group clearfix">';
+            $output .= '<legend>' . __( 'Select date and time','rrze-rsvp') . '</legend>';
+            $output .=  '<div class="rsvp-date-container">';
+            $dateComponents = getdate(strtotime($get_date));
+            $month          = $dateComponents[ 'mon' ];
+            $year           = $dateComponents[ 'year' ];
+            $start          = date_create();
+            $end            = date_create();
+            date_modify($end, '+' . $days . ' days');
+            $output .= $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date);
+            $output .= '</div>'; //.rsvp-date-container
 
-        $output .= '<div class="rsvp-seat-container">';
-        if ($get_date && $get_time) {
-            $output .= $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability);
-        } else {
-            $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
+            $output .= '<div class="rsvp-time-container">'
+                . '<h4>' . __('Available time slots:', 'rrze-rsvp') . '</h4>';
+            if ($get_date) {
+                $output .= $this->buildTimeslotSelect($roomID, $get_date, $get_time, $availability);
+            } else {
+                $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
+            }
+            $output .= '</div>'; //.rsvp-time-container
+
+            $output .= '</div>'; //.rsvp-datetime-container
+
+            $output .= '<div class="rsvp-seat-container">';
+            if ($get_date && $get_time) {
+                $output .= $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability);
+            } else {
+                $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
+            }
+            $output .= '</div>'; //.rsvp-seat-container
+            //	$output .= '</fieldset>';
         }
-        $output .= '</div>'; //.rsvp-seat-container
-//	$output .= '</fieldset>';
-	$output .= '<fieldset>';  
+
+	    $output .= '<fieldset>';  
         $output .= '<legend>' . __('Your data', 'rrze-rsvp') . ' <span class="notice-required">('. __('Required','rrze-rsvp'). ')</span></legend>';
         if ($this->ssoRequired) {
             $data = $this->idm->getCustomerData();
@@ -309,14 +370,10 @@ class Bookings extends Shortcodes {
                 . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
                 . '</div>';
         // }else if ($this->ldapRequired) {
-        //     $data = $this->ldap->getCustomerData();
-        //     $output .= '<input type="hidden" value="' . $data['customer_lastname'] . '" id="rsvp_lastname" name="rsvp_lastname">';
-        //     $output .= '<input type="hidden" value="' . $data['customer_firstname'] . '" id="rsvp_firstname" name="rsvp_firstname">';
+        //     $data = $this->ldapInstance->getCustomerData();
         //     $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
 
         //     $output .= '<div class="form-group">'
-        //         . '<p>' . __('Last name', 'rrze-rsvp') . ': <strong>' . $data['customer_lastname'] . '</strong></p>'
-        //         . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
         //         . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
         //         . '</div>';
         } else {
@@ -558,8 +615,7 @@ class Bookings extends Shortcodes {
         return $this->template->getContent('shortcode/booking-booked', $data);
     }
 
-    public function bookingSubmitted()
-    {
+    public function bookingSubmitted() {
         if (!isset($_POST['rrze_rsvp_post_nonce_field']) || !wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
             return;
         }
@@ -596,6 +652,7 @@ class Bookings extends Shortcodes {
         } else {
             $booking_seat = absint($posted_data['rsvp_seat']);
         }
+        // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         if ($this->sso) {
             if ($this->idm->isAuthenticated()){
@@ -614,7 +671,28 @@ class Bookings extends Shortcodes {
                 wp_redirect($redirectUrl);
                 exit;
             }
+        // }elseif ($this->ldapRequired) {
+        //     // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is required');
+
+        //     if ($this->ldapInstance->isAuthenticated()){
+        //         // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap isAuth');
+
+        //         $data = $this->ldapInstance->getCustomerData();
+        //         $booking_email  = $data['customer_email'];
+        //     } else {
+        //         $redirectUrl = add_query_arg(
+        //             [
+        //                 'booking' => wp_create_nonce('ldap_authentication'),
+        //                 'ldap_nonce' => $this->ldap_nonce
+        //             ],
+        //             get_permalink()
+        //         );
+        //         // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is not auth - redirect = ' . $redirectUrl);
+        //         wp_redirect($redirectUrl);
+        //         exit;
+        //     }
         } else {
+            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'neither sso nor ldap is required');
             $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
             $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
             $booking_email = sanitize_email($posted_data['rsvp_email']);
@@ -1148,8 +1226,9 @@ class Bookings extends Shortcodes {
         return '<h4>' . __('Available seats:', 'rrze-rsvp') . '</h4><div class="rsvp-seat-select">' . $seatSelects . '</div>';
     }
 
-    protected function hasShortcodeAtt(string $content, string $shortcode, string $att)
+    protected function getShortcodeAtt(string $content, string $shortcode, string $att)
     {
+        $ret = 0;
         if (has_shortcode($content, $shortcode)) {
             $result = [];
             $pattern = get_shortcode_regex();
@@ -1166,13 +1245,13 @@ class Bookings extends Shortcodes {
             foreach ($result as $key => $value) {
                 if (isset($value[$shortcode][$att])) {
                     if (is_array($value[$shortcode][$att])) {
-                        return $value[$shortcode][$att];
+                        $ret = $value[$shortcode][$att];
                     } else {
-                        return trim($value[$shortcode][$att],'"');
+                        $ret = trim($value[$shortcode][$att],'"');
                     }
                 }                
             }
         }
-        return null;
+        return absint($ret);
     }
 }

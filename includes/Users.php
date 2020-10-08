@@ -66,7 +66,7 @@ class Users
 
         $capsObj = Capabilities::getCptCaps($cpt);
         foreach ($capsObj as $cap) {
-            if ($roleObj->has_cap($cap)) {
+            if ($cap != 'read' && $roleObj->has_cap($cap)) {
                 $roleObj->remove_cap($cap);
             }
         }

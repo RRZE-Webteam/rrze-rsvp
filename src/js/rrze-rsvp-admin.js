@@ -57,6 +57,33 @@ jQuery(document).ready(function ($) {
     /*
      * CPT Booking Backend
      */
+
+	// Hide booking mode info text on loading, insert booking mode info icon
+	$('select#rrze-rsvp-room-bookingmode').after('<a><span class="dashicons dashicons-editor-help info-bookingmode" title="Informationen zum Buchungsmodus anzeigen" aria-hidden="true"></span><span class="screen-reader-text">Informationen zum Buchungsmodus anzeigen</span></a>');
+	$('.cmb2-id-rrze-rsvp-room-bookingmode .cmb2-metabox-description').hide();
+	$('.cmb2-id-rrze-rsvp-room-bookingmode').find('.info-bookingmode').click(function() {
+		$('.cmb2-id-rrze-rsvp-room-bookingmode .cmb2-metabox-description').slideToggle();
+	});
+
+	// CPT Room: Set timeslot remove buttons to disabled if timeslot bookings for this timeslot exist
+	var timeslotgroup = $('body.wp-admin.post-type-room #rrze-rsvp-room-timeslots_repeat div.cmb-repeatable-grouping');
+	$(timeslotgroup).each(function (index) {
+		// console.log($(this).find("input[id$='rrze-rsvp-room-starttime']").prop('disabled'));
+		if ($(this).find("input[id$='rrze-rsvp-room-starttime']").prop('disabled') == true) {
+			$(this).find('button.cmb-remove-group-row').prop({
+				disabled: true
+			});
+		}
+	});
+
+	// Remove disabled attribute from protected timeslot fields before submit
+	$('body.wp-admin.post-type-room form').submit(function(e) {
+		$('#rrze-rsvp-room-timeslots_repeat :disabled').each(function(e) {
+			$(this).removeAttr('disabled');
+		})
+	});
+
+	// Fill date/time inputs with timeslot selector
 	var details = jQuery('div#rrze-rsvp-booking-details'),
 		seat = details.find('select#rrze-rsvp-booking-seat'),
 		startdate = details.find('input#rrze-rsvp-booking-start_date'),
@@ -98,8 +125,8 @@ jQuery(document).ready(function ($) {
 	$('div.cmb2-id-rrze-rsvp-booking-start').on('change', 'select.select_timeslot', (function() {
 		var select_start = jQuery(this).val();
 		var select_end   = jQuery(this).find(':selected').data('end');
-		console.log(select_start);
-		console.log(select_end);
+		//console.log(select_start);
+		//console.log(select_end);
 		starttime.val(select_start);
 		endtime.val(select_end);
 	}));

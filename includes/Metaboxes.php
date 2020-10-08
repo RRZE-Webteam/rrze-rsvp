@@ -30,6 +30,46 @@ class Metaboxes
         }
     }
 
+    /*
+     * Set Timeslot weekday, start time and end time to disabled if there are bookings for this timeslot.
+     * Valid from/to can still be modified.
+     */
+    public function cbTimeslotAttributes($args, $field) {
+        $seats = Functions::getAllRoomSeats($field->object_id);
+        $bookings = get_posts([
+            'post_type' => 'booking',
+            'post_statue' => 'publish',
+            'nopaging' => true,
+            'orderby' => 'title',
+            'order' => 'ASC',
+            'meta_key' => 'rrze-rsvp-booking-seat',
+            'meta_value' => $seats,
+            'meta_compare' => 'IN',
+        ]);
+        $fieldKey = str_replace(array('+','-'), '', filter_var($args['_name'], FILTER_SANITIZE_NUMBER_INT));
+        $timeslots = get_post_meta($field->object_id, 'rrze-rsvp-room-timeslots', true);
+        $weekdays = isset($timeslots[$fieldKey]['rrze-rsvp-room-weekday']) ? $timeslots[$fieldKey]['rrze-rsvp-room-weekday'] : [];
+        $starttime = isset($timeslots[$fieldKey]['rrze-rsvp-room-starttime']) ? $timeslots[$fieldKey]['rrze-rsvp-room-starttime'] : '';
+        $endtime = isset($timeslots[$fieldKey]['rrze-rsvp-room-endtime']) ? $timeslots[$fieldKey]['rrze-rsvp-room-endtime'] : '';
+        $validfrom = (isset($timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from']) && $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from'] !== false) ? $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from'] : 0;
+        $validto = (isset($timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to']) && $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to'] !== false) ? $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to'] : 9999999999;
+        foreach ($bookings as $booking) {
+            $bookingMeta = get_post_meta($booking->ID);
+            if (!isset($bookingMeta['rrze-rsvp-booking-start']) || !isset($bookingMeta['rrze-rsvp-booking-end']))
+                continue;
+            $startTimestamp = $bookingMeta['rrze-rsvp-booking-start'][0];
+            $endTimestamp = $bookingMeta['rrze-rsvp-booking-end'][0];
+            if (date('H:i', $startTimestamp) == $starttime
+                && date('H:i', $endTimestamp) == $endtime
+                && in_array(date('N', $startTimestamp), $weekdays)
+                && $startTimestamp > $validfrom
+                && $startTimestamp < $validto) {
+                    $field->args['attributes']['disabled'] = 'disabled';
+                    break;
+            }
+        }
+    }
+
 
     public function booking()
     {
@@ -150,7 +190,7 @@ class Metaboxes
             'type'    => 'text_medium',
             'attributes' => array(
                 'type' => 'tel',
-                'required' => 'required',
+//                'required' => 'required',
             ),
 		    'sanitization_cb' => [$this, 'cb_encrypt'],
             'escape_cb'       => [$this, 'cb_decrypt'],
@@ -197,6 +237,7 @@ class Metaboxes
             'id'      => 'rrze-rsvp-room-weekday',
             'type'    => 'multicheck',
             'options' => Functions::daysOfWeekAry(1),
+            'before' => [$this, 'cbTimeslotAttributes'],
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
@@ -204,6 +245,7 @@ class Metaboxes
             'id' => 'rrze-rsvp-room-starttime',
             'type' => 'text_time',
             'time_format' => 'H:i',
+            'before' => [$this, 'cbTimeslotAttributes'],
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
@@ -211,6 +253,7 @@ class Metaboxes
             'id' => 'rrze-rsvp-room-endtime',
             'type' => 'text_time',
             'time_format' => 'H:i',
+            'before' => [$this, 'cbTimeslotAttributes'],
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
@@ -254,10 +297,16 @@ class Metaboxes
             'type'             => 'select',
             'default'          => 'reservation',
             'options' => array(
-                'check-only' => __('Check-in and check-out only on site', 'rrze-rsvp'), // Nur Ein- und Auschecken vor Ort
                 'reservation' => __('Reservation', 'rrze-rsvp'),
-                'consultation' => __('Consultation', 'rrze-rsvp')
-            )
+                'consultation' => __('Consultation', 'rrze-rsvp'),
+                'check-only' => __('Check-in and check-out only on site', 'rrze-rsvp'), // Nur Ein- und Auschecken vor Ort
+            ),
+            'description' => 'Der Buchungsmodus legt den grundlegenden Workflow für eine Buchung fest:<br />
+    <b>Platzreservierung:</b> Registrierung und Anmeldung für einen Termin und einen Platz + Einchecken und Auschecken am Platz beim Erreichen des Termins + Speicherung der Daten der Teilnehmer zur Kontaktverfolgung.</br />
+    <b>Sprechstunde:</b> Nur Registrierung und Anmeldung für einen Termin und einen Platz. Kein Ein-/Auschecken und somit keine Kontaktverfolgung.<br />
+    (Dieser Modus eignet sich insbesondere dann, wenn man Räume der sogenannten Positivliste nutzt, in der bereits die Kontaktverfolgung durch darfichrein.de erfolgt.)<br />
+    <b>Nur Einchecken und Auschecken am Platz:</b> Keine Vorabreservierung von Plätzen.<br />
+    (Dieser Modus eignet sich nur für die reine Kontaktverfolgung und Platzbuchung am Platze. An der FAU sollte dieser Modus nur für Räume oder Ressourcen verwendet werden, die nicht bereits durch die Anwendung darfichrein.de verwaltet werden.)',
         ));
 
         $cmb_general->add_field(array(
@@ -266,8 +315,16 @@ class Metaboxes
             'id'   => 'rrze-rsvp-room-sso-required',
             'type' => 'checkbox',
             'default' => '',
-            'after_row' => '<div id="rrze-rsvp-additionals">'            
         ));
+
+        // $cmb_general->add_field(array(
+        //     'name' => __('LDAP is required', 'rrze-rsvp'),
+        //     'desc' => __('If LDAP is enabled, the customer must log in via LDAP in order to use the booking system.', 'rrze-rsvp'),
+        //     'id'   => 'rrze-rsvp-room-ldap-required',
+        //     'type' => 'checkbox',
+        //     'default' => '',
+        //     'after_row' => '<div id="rrze-rsvp-additionals">'            
+        // ));
 
         $cmb_general->add_field(array(
             'name' => __('Available days in advance', 'rrze-rsvp'),
@@ -293,6 +350,14 @@ class Metaboxes
             'name' => __('Email confirmation is required', 'rrze-rsvp'),
             'desc' => __('The customer must confirm his reservation within one hour. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-force-to-confirm',
+            'type' => 'checkbox',
+            'default' => ''
+        ));
+
+        $cmb_general->add_field(array(
+            'name' => __('Checkout notification', 'rrze-rsvp'),
+            'desc' => __('Send an email to the booking manager when customer has checked out.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-checkout-notification',
             'type' => 'checkbox',
             'default' => ''
         ));

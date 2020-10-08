@@ -231,7 +231,6 @@ class Schedule
     protected function cancelNotCheckedInBookings()
     {
         $timeStampBefore = current_time('timestamp') - (15 * MINUTE_IN_SECONDS);
-        $timeStampAfter = current_time('timestamp') + (15 * MINUTE_IN_SECONDS);        
 
         $args = [
             'fields'            => 'ids',
@@ -253,7 +252,7 @@ class Schedule
                 ],
                 'booking_start_clause' => [
                     'key'       => 'rrze-rsvp-booking-start',
-                    'value'     => $timeStampAfter,
+                    'value'     => $timeStampBefore,
                     'compare'   => '<'
                 ]
             ]
