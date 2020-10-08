@@ -48,12 +48,15 @@ class LDAP {
         Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldapForm');
 
         if(isset($_POST['username']) && isset($_POST['password'])){
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+
             $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
             $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
 
             $this->link_identifier = ldap_connect($this->server, $this->port);
         
             if (!$this->link_identifier){
+                Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                 $content = $this->logError('ldap_connect()');
             }else{
                 Helper::debugLog(__FILE__, __LINE__, __METHOD__);
@@ -64,6 +67,7 @@ class LDAP {
 
 
                 if (!$bind) {
+                    Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                     $content = $this->logError('ldap_bind()');
                 }else{
 
@@ -97,6 +101,7 @@ class LDAP {
                     }
                 }
             }
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__);
         }else{
             Helper::debugLog(__FILE__, __LINE__, __METHOD__);
             $content = '<form action="#" method="POST">'
