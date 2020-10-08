@@ -48,6 +48,10 @@ class Bookings extends Shortcodes {
 
     public function onLoaded()
     {
+
+        // BK DEBUG filter
+        add_filter( 'template_include', [$this, 'var_template_include'], 1000 );
+
         add_action('template_redirect', [$this, 'maybeAuthenticate']);
         add_action('template_redirect', [$this, 'bookingSubmitted']);
 
@@ -59,13 +63,27 @@ class Bookings extends Shortcodes {
         add_action( 'wp_ajax_nopriv_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );     
     }
 
+
+    // BK DEBUG filter method
+    public function var_template_include( $t ){
+        $GLOBALS['current_theme_template'] = basename($t);
+        return $t;
+    }
+
+
     public function maybeAuthenticate(){
         Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'GET parameter = ' . json_encode($_GET) );
         Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'REQUEST parameter = ' . json_encode($_REQUEST) );
 
         global $post;
-        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
+        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth']) || isset($_GET['require-sso-auth']) || isset($_REQUEST['require-ldap-auth'])) {
             Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'RETURNED! DAS IST EIN BUG');
+            
+            if( isset( $GLOBALS['current_theme_template'] ) ){
+                Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'TEMPLATE = ' . $GLOBALS['current_theme_template']);
+            }
+
+
             return;
         }
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
