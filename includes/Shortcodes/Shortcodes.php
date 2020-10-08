@@ -120,7 +120,7 @@ class Shortcodes
 
     public function maybeAuthenticate()
     {
-        // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         global $post;
         if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
