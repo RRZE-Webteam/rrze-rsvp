@@ -60,7 +60,8 @@ class Bookings extends Shortcodes {
     }
 
     public function maybeAuthenticate(){
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'hier stimmt etwas nicht: $this->ldapRequired müsste true sein');
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'GET parameter = ' . json_encode($_GET) );
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'REQUEST parameter = ' . json_encode($_REQUEST) );
 
         global $post;
         if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
@@ -69,7 +70,7 @@ class Bookings extends Shortcodes {
         }
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->nonce = ' . $this->nonce . ' rsvp-availability');
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->nonce = ' . $this->nonce . ' rsvp-availability isset($_REQUEST[nonce]=' . (isset($_REQUEST['nonce'])?$_REQUEST['nonce']:' is not set'));
 
         if (isset($_GET['room_id'])) {            
             Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben eine room_id');
