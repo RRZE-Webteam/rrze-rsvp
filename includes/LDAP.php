@@ -53,7 +53,7 @@ class LDAP {
         }
 
         if(isset($_POST['username']) && isset($_POST['password'])){
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$_POST = ' . json_encode($_POST));
 
             $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
             $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);

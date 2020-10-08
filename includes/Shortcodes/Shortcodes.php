@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Helper;
 use RRZE\RSVP\IdM;
-use RRZE\RSVP\LDAP;
+// use RRZE\RSVP\LDAP;
 use RRZE\RSVP\Shortcodes\Bookings;
 use RRZE\RSVP\Shortcodes\Availability;
 use RRZE\RSVP\Shortcodes\QR;
@@ -26,7 +26,7 @@ class Shortcodes
 
     protected $idm;
 
-    protected $ldap;
+    // protected $ldap;
 
     public function __construct($pluginFile, $settings)
     {
@@ -34,7 +34,7 @@ class Shortcodes
         $this->settings = $settings;
         $this->shortcodesettings = getShortcodeSettings();
         $this->idm = new IdM;
-        $this->ldap = new LDAP;
+        // $this->ldap = new LDAP;
     }
 
     public function onLoaded()
@@ -106,8 +106,8 @@ class Shortcodes
         global $post;
         if (isset($_GET['require-sso-auth']) && wp_verify_nonce($_GET['require-sso-auth'], 'require-sso-auth')) {
             return sprintf('%sincludes/templates/single-auth.php', plugin()->getDirectory());
-        } elseif (isset($_GET['require-ldap-auth']) && wp_verify_nonce($_GET['require-ldap-auth'], 'require-ldap-auth')) {
-            return sprintf('%sincludes/templates/single-ldap-auth.php', plugin()->getDirectory());
+        // } elseif (isset($_GET['require-ldap-auth']) && wp_verify_nonce($_GET['require-ldap-auth'], 'require-ldap-auth')) {
+        //     return sprintf('%sincludes/templates/single-ldap-auth.php', plugin()->getDirectory());
         } elseif (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) {
             return sprintf('%sincludes/templates/single-form.php', plugin()->getDirectory());
         } elseif ($post->post_type == 'room') {
@@ -129,7 +129,7 @@ class Shortcodes
 
         if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
             $this->idm->tryLogIn();
-            $this->ldap->tryLogIn();
+            // $this->ldap->tryLogIn();
         }     
     }
 }
