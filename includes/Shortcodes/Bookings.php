@@ -651,6 +651,17 @@ class Bookings extends Shortcodes {
         } else {
             $booking_seat = absint($posted_data['rsvp_seat']);
         }
+        $room_id = $booking_room;
+        $room_meta = get_post_meta($room_id);
+        $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : '';
+        foreach ($room_timeslots as $week) {
+            foreach ($week['rrze-rsvp-room-weekday'] as $day) {
+                $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+            }
+        }
+        $weekday = date('N', $booking_timestamp_start);
+        $booking_end = array_key_exists($booking_start, $schedule[$weekday]) ? $schedule[$weekday][$booking_start] : $booking_start;
+        $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
         // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         if ($this->sso) {
@@ -799,13 +810,22 @@ class Bookings extends Shortcodes {
                     'value' => $booking_email
                 ],
                 [
-                    'key' => 'rrze-rsvp-booking-start',
-                    'value' => $booking_timestamp_start
-                ],
-                [
                     'key' => 'rrze-rsvp-booking-status',
                     'value' => ['booked', 'confirmed', 'checked-in'],
                     'compare' => 'IN',
+                ],
+                [
+                    'relation' => 'OR',
+                    [
+                        'key' => 'rrze-rsvp-booking-start',
+                        'value' => [$booking_timestamp_start + 1, $booking_timestamp_end - 1],
+                        'compare' => 'BETWEEN',
+                    ],
+                    [
+                        'key' => 'rrze-rsvp-booking-end',
+                        'value' => [$booking_timestamp_start + 1, $booking_timestamp_end - 1],
+                        'compare' => 'BETWEEN',
+                    ],
                 ]
             ],
             'nopaging' => true,
@@ -824,18 +844,6 @@ class Bookings extends Shortcodes {
         }
 
         // Überprüfen ob Timeslot in der Vergangenheit liegt
-        $room_id = $booking_room;
-        $room_meta = get_post_meta($room_id);
-        $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : '';
-        foreach ($room_timeslots as $week) {
-            foreach ($week['rrze-rsvp-room-weekday'] as $day) {
-                $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
-            }
-        }
-        $weekday = date('N', $booking_timestamp_start);
-        $booking_end = array_key_exists($booking_start, $schedule[$weekday]) ? $schedule[$weekday][$booking_start] : $booking_start;
-        $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
-
         if ($booking_timestamp_end < current_time('timestamp')) {
             $redirectUrl = add_query_arg(
                 [
