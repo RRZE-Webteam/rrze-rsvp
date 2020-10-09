@@ -68,7 +68,6 @@ echo $divOpen;
 
 if (!$ldapInstance->isAuthenticated()){
     echo $template->getContent('auth/require-ldap-auth', $data);
-    echo $ldapInstance->ldapForm();
 }
 
 echo $divClose;

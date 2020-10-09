@@ -35,8 +35,6 @@ if ($idm->simplesamlAuth() && !$ldapInstance->isAuthenticated()) {
     $data['title'] = __('Authentication Required', 'rrze-rsvp');
     $data['please_login'] = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
 }elseif (!$ldapInstance->isAuthenticated()) {
-    $loginUrl = 'LDAP LOGIN URL HERE';
-    Helper::debugLog(__FILE__, __LINE__, __METHOD__, "BK 2DO: $loginUrl");
     $data['title'] = __('Authentication Required', 'rrze-rsvp');
     $data['please_login'] = sprintf(__('<a href="%s">Please login with your LDAP username</a>.', 'rrze-rsvp'), $loginUrl);
 }else {
@@ -85,10 +83,9 @@ if (Helper::isFauTheme()) {
  */
 echo $divOpen;
 
-if ($idm->simplesamlAuth()) {
+if ($idm->simplesamlAuth() && !$ldapInstance->isAuthenticated()) {
     echo $template->getContent('auth/require-sso-auth', $data);
 }elseif (!$ldapInstance->isAuthenticated()){
-    Helper::debugLog(__FILE__, __LINE__, __METHOD__, "getContent('auth/require-ldap-auth' ... ");
     echo $template->getContent('auth/require-ldap-auth', $data);
 }
 

@@ -31,7 +31,6 @@ class LDAP {
     }
 
     public function onLoaded() {
-        add_shortcode('rsvp-ldap-login', [$this, 'ldapForm'], 10, 0);
         add_action('wp', [$this, 'requireAuth']);
     }
     
@@ -43,84 +42,65 @@ class LDAP {
     }
     
 
-    public function ldapForm(){
-
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldapForm');
+    // returns true/false if logged in via LDAP and sets $this->mail fetched from LDAP
+    public function isAuthenticated(){
+        $error = false;
 
         if ($this->isLoggedIn){
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldapForm - isLoggedIn');
-            return;
+            return true;
         }
 
         if(isset($_POST['username']) && isset($_POST['password'])){
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$_POST = ' . json_encode($_POST));
-
             $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
             $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
 
             $this->link_identifier = @ldap_connect($this->server, $this->port);
         
             if (!$this->link_identifier){
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__);
-                $content = $this->logError('ldap_connect()');
+                $error = $this->logError('ldap_connect()');
             }else{
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                 ldap_set_option($this->link_identifier, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($this->link_identifier, LDAP_OPT_REFERRALS, 0);
             
                 $bind = @ldap_bind($this->link_identifier, $username . '@' . $this->bind_base_dn, $password);
 
-
                 if (!$bind) {
-                    Helper::debugLog(__FILE__, __LINE__, __METHOD__);
-                    $content = $this->logError('ldap_bind()');
+                    $error = $this->logError('ldap_bind()');
                 }else{
-
                     $this->search_filter = '(sAMAccountName=' . $username . ')';
-                    $result_identifier = @ldap_search($this->link_identifier, $this->search_base_dn, $this->search_filter);
-                    
-                    Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+                    $result_identifier = @ldap_search($this->link_identifier, $this->search_base_dn, $this->search_filter);                    
+
                     if ($result_identifier === false){
-                        $content = $this->logError('ldap_search()');
+                        $error = $this->logError('ldap_search()');
                     }else{
                         $aEntry = @ldap_get_entries($this->link_identifier, $result_identifier);
 
-                        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                         if (isset($aEntry['count']) && $aEntry['count'] > 0){
-                            Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])){
-                                $content = $aEntry[0]['mail'][0] . 'TEST'; 
                                 $this->mail = $aEntry[0]['mail'][0]; 
-                                $this->isLoggedIn = true;
-                                wp_nonce_url() 
-                        
-                                Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->mail=' . $this->mail);
+                                return true;
                             }else{
-                                Helper::debugLog(__FILE__, __LINE__, __METHOD__);
-                                $content = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0] and $aEntry[0][\'mail\'][0]');
+                                $error = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0] and $aEntry[0][\'mail\'][0]');
                             }
                         }else{
-                            Helper::debugLog(__FILE__, __LINE__, __METHOD__);
-                            $content = 'User not found';
+                            return false; // User not found
                         }
-                        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                         @ldap_close($this->connection);
                     }
                 }
             }
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__);
-        }else{
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__);
-            $content = '<form action="#" method="POST">'
-                . '<label for="username">Username: </label><input id="username" type="text" name="username" />'
-                . '<label for="password">Password: </label><input id="password" type="password" name="password" />'
-                . '<input type="submit" name="submit" value="Submit" />'
-                . '</form>';
-        }
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, ($this->isLoggedIn?'$this->isLoggedIn is true':'$this->isLoggedIn is false'));
-
-        return $content;   
+        } 
     } 
+
+
+    // public function ldapForm(){
+    //     return '<form action="#" method="POST">'
+    //             . '<label for="username">Username: </label><input id="username" type="text" name="username" />'
+    //             . '<label for="password">Password: </label><input id="password" type="password" name="password" />'
+    //             . '<input type="submit" name="submit" value="Submit" />'
+    //             . '</form>';
+    // } 
 
 
 
@@ -169,9 +149,8 @@ class LDAP {
         );
 
         $data = [];
-        $loginUrl = 'URL-UEBER-requireAuth';
         $data['title'] = __('Authentication Required', 'rrze-rsvp');
-        $data['please_login'] = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
+        $data['please_login'] = sprintf(__('<a href="%s">Please login with your LDAP username</a>.', 'rrze-rsvp'), $loginUrl);
 
         add_filter('the_content', function ($content) use ($data) {
             return $this->template->getContent('auth/require-ldap-auth', $data);
@@ -203,9 +182,6 @@ class LDAP {
     }
 
 
-    public function isAuthenticated(){
-        return $this->isLoggedIn;
-    }
 
 
     public function getLoginURL(){
