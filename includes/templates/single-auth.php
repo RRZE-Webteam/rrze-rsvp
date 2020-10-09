@@ -30,7 +30,7 @@ if ($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated()) {
 
 
 $data = [];
-if ($idm->simplesamlAuth()) {
+if ($idm->simplesamlAuth() && !$ldapInstance->isAuthenticated()) {
     $loginUrl = $idm->simplesamlAuth->getLoginURL();
     $data['title'] = __('Authentication Required', 'rrze-rsvp');
     $data['please_login'] = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);

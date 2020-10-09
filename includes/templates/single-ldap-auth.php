@@ -66,8 +66,10 @@ if (Helper::isFauTheme()) {
  */
 echo $divOpen;
 
-echo $template->getContent('auth/require-ldap-auth', $data);
-echo $ldap->ldapForm();
+if (!$ldapInstance->isAuthenticated()){
+    echo $template->getContent('auth/require-ldap-auth', $data);
+    echo $ldapInstance->ldapForm();
+}
 
 echo $divClose;
 

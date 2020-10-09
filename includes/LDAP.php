@@ -89,9 +89,11 @@ class LDAP {
                         if (isset($aEntry['count']) && $aEntry['count'] > 0){
                             Helper::debugLog(__FILE__, __LINE__, __METHOD__);
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])){
-                                $content = $aEntry[0]['mail'][0]; 
+                                $content = $aEntry[0]['mail'][0] . 'TEST'; 
                                 $this->mail = $aEntry[0]['mail'][0]; 
                                 $this->isLoggedIn = true;
+                                wp_nonce_url() 
+                        
                                 Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->mail=' . $this->mail);
                             }else{
                                 Helper::debugLog(__FILE__, __LINE__, __METHOD__);
@@ -116,6 +118,7 @@ class LDAP {
                 . '</form>';
         }
         Helper::debugLog(__FILE__, __LINE__, __METHOD__, ($this->isLoggedIn?'$this->isLoggedIn is true':'$this->isLoggedIn is false'));
+
         return $content;   
     } 
 
@@ -199,10 +202,9 @@ class LDAP {
         return true;
     }
 
-    
+
     public function isAuthenticated(){
         return $this->isLoggedIn;
-
     }
 
 
