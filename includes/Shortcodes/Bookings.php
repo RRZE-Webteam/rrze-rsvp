@@ -71,60 +71,42 @@ class Bookings extends Shortcodes {
 
 
     public function maybeAuthenticate(){
-        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'GET parameter = ' . json_encode($_GET) );
-        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'REQUEST parameter = ' . json_encode($_REQUEST) );
-
-
-        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'trace: ' . json_encode(debug_backtrace()) );
-
         global $post;
         if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
             if( isset( $GLOBALS['current_theme_template'] ) ){
                 // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'TEMPLATE = ' . $GLOBALS['current_theme_template']);
             }
-
             return;
         }
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
         $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
         // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->nonce = ' . $this->nonce . ' rsvp-availability isset($_REQUEST[nonce]=' . (isset($_REQUEST['nonce'])?$_REQUEST['nonce']:' is not set'));
-
+        // Check if either the shortcode or the room's settings require LDAP:
+    
         if (isset($_GET['room_id'])) {            
-            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben eine room_id');
             $roomId = absint($_GET['room_id']);
             if ($this->nonce){
-                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben KEINEN nonce! BUG!');
                 $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ssoRequired = ' . json_encode($this->ssoRequired));
                 $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
-                Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired));
             }
         } else {
-            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben keine room_id ! WARUM?');
             $roomId = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'room');
-            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$roomId = ' . $roomId);
 
             $shortcodeSSO = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
             $this->ssoRequired = ( $shortcodeSSO ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true)) );
-            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ssoRequired = ' . json_encode($this->ssoRequired));
-
-            // Check if either the shortcode or the room's settings require LDAP:
-            $shortcodeLDAP = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
-            $this->ldapRequired = ( $shortcodeLDAP ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true)) );
-            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired));
         }
+
+        $shortcodeLDAP = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
+        $this->ldapRequired = ( $shortcodeLDAP || $this->nonce ? true : get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
 
         if ($this->ssoRequired) {
             $this->sso = $this->idm->tryLogIn();
-            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->sso is set');
         } elseif ($this->ldapRequired) {
             $this->ldap = $this->ldapInstance->tryLogIn();
-            Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldap is set');
         }
 
 // BK EDIT 2020-10-07
 // hier stimmt etwas nicht: $this->ldapRequired müsste true sein:
-        Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired) . ' $shortcodeLDAP = ' . json_encode($shortcodeLDAP) . ' rrze-rsvp-room-ldap-required = '  . get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
