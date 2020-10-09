@@ -315,6 +315,7 @@ class Metaboxes
             'id'   => 'rrze-rsvp-room-sso-required',
             'type' => 'checkbox',
             'default' => '',
+<<<<<<< Updated upstream
         ));
 
         // $cmb_general->add_field(array(
@@ -325,6 +326,20 @@ class Metaboxes
         //     'default' => '',
         //     'after_row' => '<div id="rrze-rsvp-additionals">'            
         // ));
+=======
+            // 'after_row' => '<div id="rrze-rsvp-additionals">'
+        ));
+
+        $cmb_general->add_field(array(
+            'name' => __('LDAP is required', 'rrze-rsvp'),
+            'desc' => __('If LDAP is enabled, the customer must log in via LDAP in order to use the booking system.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-ldap-required',
+            'type' => 'checkbox',
+            'default' => '',
+            'after_row' => '<div id="rrze-rsvp-additionals">'            
+        ));
+        // Beim Wieder-Aktivieren der LDAP-Metabox muss das after_row-Attribut wieder aus der SSO-Metabox entfernt werden (Z. 318)
+>>>>>>> Stashed changes
 
         $cmb_general->add_field(array(
             'name' => __('Available days in advance', 'rrze-rsvp'),

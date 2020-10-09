@@ -5,6 +5,13 @@
 </div>
 {{/sso_authentication_error}}
 
+{{ldap_authentication_error}}
+<h2>{{=ldap_authentication}}</h2>
+<div class="alert alert-danger" role="alert">
+    {{=message}}
+</div>
+{{/ldap_authentication_error}}
+
 {{booking_data_error}}
 <h2>{{=booking_data}}</h2>
 <div class="alert alert-danger" role="alert">

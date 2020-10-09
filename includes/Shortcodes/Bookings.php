@@ -5,7 +5,7 @@ namespace RRZE\RSVP\Shortcodes;
 use RRZE\RSVP\Email;
 use RRZE\RSVP\Helper;
 use RRZE\RSVP\IdM;
-// use RRZE\RSVP\LDAP;
+use RRZE\RSVP\LDAP;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Template;
 use RRZE\RSVP\TransientData;
@@ -27,13 +27,12 @@ class Bookings extends Shortcodes {
 
     protected $email;
     protected $idm;
-    // protected $ldapInstance;
+    protected $ldapInstance;
     protected $sso = false;
     protected $ssoRequired;
-    // protected $ldap = false;
-    // protected $ldapRequired;
+    protected $ldap = false;
+    protected $ldapRequired;
     protected $nonce;
-    // protected $ldap_nonce;
 
     public function __construct($pluginFile, $settings)
     {
@@ -42,7 +41,7 @@ class Bookings extends Shortcodes {
         $this->options = (object) $settings->getOptions();
         $this->email = new Email;
         $this->idm = new IdM;
-        // $this->ldapInstance = new LDAP;
+        $this->ldapInstance = new LDAP;
         $this->template = new Template;
     }
 
@@ -96,9 +95,9 @@ class Bookings extends Shortcodes {
             if ($this->nonce){
                 // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben KEINEN nonce! BUG!');
                 $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
-                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ssoRequired = ' . json_encode($this->ssoRequired));
-                // $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
-                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired));
+                Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ssoRequired = ' . json_encode($this->ssoRequired));
+                $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
+                Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired));
             }
         } else {
             // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'wir haben keine room_id ! WARUM?');
@@ -109,22 +108,23 @@ class Bookings extends Shortcodes {
             $this->ssoRequired = ( $shortcodeSSO ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true)) );
             // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ssoRequired = ' . json_encode($this->ssoRequired));
 
-            // $shortcodeLDAP = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
-            // $this->ldapRequired = ( $shortcodeLDAP ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true)) );
+            // Check if either the shortcode or the room's settings require LDAP:
+            $shortcodeLDAP = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
+            $this->ldapRequired = ( $shortcodeLDAP ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true)) );
             // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired));
         }
 
         if ($this->ssoRequired) {
             $this->sso = $this->idm->tryLogIn();
             // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->sso is set');
-        // } elseif ($this->ldapRequired) {
-        //     $this->ldap = $this->ldapInstance->tryLogIn();
-            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldap is set');
+        } elseif ($this->ldapRequired) {
+            $this->ldap = $this->ldapInstance->tryLogIn();
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldap is set');
         }
 
 // BK EDIT 2020-10-07
 // hier stimmt etwas nicht: $this->ldapRequired müsste true sein:
-        // Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired) . ' $shortcodeLDAP = ' . json_encode($shortcodeLDAP) . ' rrze-rsvp-room-ldap-required = '  . get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__, '$this->ldapRequired = ' . json_encode($this->ldapRequired) . ' $shortcodeLDAP = ' . json_encode($shortcodeLDAP) . ' rrze-rsvp-room-ldap-required = '  . get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
@@ -152,6 +152,9 @@ class Bookings extends Shortcodes {
         wp_enqueue_style('rrze-rsvp-shortcode');
 
         if ($output = $this->ssoAuthenticationError()) {
+            return $output;
+        }
+        if ($output = $this->ldapAuthenticationError()) {
             return $output;
         }
         if ($output = $this->postDataError()) {
@@ -203,6 +206,14 @@ class Bookings extends Shortcodes {
             $alert = '<div class="alert alert-warning" role="alert">';
             $alert .= '<p><strong>'.__('SSO not available.','rrze-rsvp').'</strong><br>';
             $alert .= __('Please activate SSO authentication or remove the SSO attribute from your shortcode.','rrze-rsvp').'</p>';
+            $alert .= '</div>';
+            return $alert;
+        }
+    
+        if ($this->ldapRequired && !$this->ldap) {
+            $alert = '<div class="alert alert-warning" role="alert">';
+            $alert .= '<p><strong>'.__('LDAP not available.','rrze-rsvp').'</strong><br>';
+            $alert .= __('Please activate LDAP authentication or remove the LDAP attribute from your shortcode.','rrze-rsvp').'</p>';
             $alert .= '</div>';
             return $alert;
         }
@@ -369,13 +380,13 @@ class Bookings extends Shortcodes {
                 . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
                 . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
                 . '</div>';
-        // }else if ($this->ldapRequired) {
-        //     $data = $this->ldapInstance->getCustomerData();
-        //     $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
+        }else if ($this->ldapRequired) {
+            $data = $this->ldapInstance->getCustomerData();
+            $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
 
-        //     $output .= '<div class="form-group">'
-        //         . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
-        //         . '</div>';
+            $output .= '<div class="form-group">'
+                . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
+                . '</div>';
         } else {
             $error = isset($fieldErrors['rsvp_lastname']) ? ' error' : '';
             $value = isset($fieldErrors['rsvp_lastname']['value']) ? $fieldErrors['rsvp_lastname']['value'] : '';
@@ -446,6 +457,20 @@ class Bookings extends Shortcodes {
         $data['sso_authentication_error'] = true;
         $data['sso_authentication'] = __('SSO error', 'rrze-rsvp');
         $data['message'] = __("Error retrieving your data from SSO. Please try again or contact the website administrator.", 'rrze-rsvp');
+
+        return $this->template->getContent('shortcode/booking-error', $data);
+    }
+
+    protected function ldapAuthenticationError()
+    {
+        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'ldap_authentication')) {
+            return '';
+        }
+
+        $data = [];
+        $data['ldap_authentication_error'] = true;
+        $data['ldap_authentication'] = __('LDAP error', 'rrze-rsvp');
+        $data['message'] = __("Error retrieving your data from LDAP. Please try again or contact the website administrator.", 'rrze-rsvp');
 
         return $this->template->getContent('shortcode/booking-error', $data);
     }
@@ -652,7 +677,7 @@ class Bookings extends Shortcodes {
         } else {
             $booking_seat = absint($posted_data['rsvp_seat']);
         }
-        // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
+        Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         if ($this->sso) {
             if ($this->idm->isAuthenticated()){
@@ -671,28 +696,28 @@ class Bookings extends Shortcodes {
                 wp_redirect($redirectUrl);
                 exit;
             }
-        // }elseif ($this->ldapRequired) {
-        //     // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is required');
+        }elseif ($this->ldapRequired) {
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is required');
 
-        //     if ($this->ldapInstance->isAuthenticated()){
-        //         // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap isAuth');
+            if ($this->ldapInstance->isAuthenticated()){
+                Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap isAuth');
 
-        //         $data = $this->ldapInstance->getCustomerData();
-        //         $booking_email  = $data['customer_email'];
-        //     } else {
-        //         $redirectUrl = add_query_arg(
-        //             [
-        //                 'booking' => wp_create_nonce('ldap_authentication'),
-        //                 'ldap_nonce' => $this->ldap_nonce
-        //             ],
-        //             get_permalink()
-        //         );
-        //         // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is not auth - redirect = ' . $redirectUrl);
-        //         wp_redirect($redirectUrl);
-        //         exit;
-        //     }
+                $data = $this->ldapInstance->getCustomerData();
+                $booking_email  = $data['customer_email'];
+            } else {
+                $redirectUrl = add_query_arg(
+                    [
+                        'booking' => wp_create_nonce('ldap_authentication'),
+                        'nonce' => $this->nonce
+                    ],
+                    get_permalink()
+                );
+                Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is not auth - redirect = ' . json_encode($redirectUrl));
+                wp_redirect($redirectUrl);
+                exit;
+            }
         } else {
-            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'neither sso nor ldap is required');
+            Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'neither sso nor ldap is required');
             $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
             $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
             $booking_email = sanitize_email($posted_data['rsvp_email']);
