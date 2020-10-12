@@ -664,6 +664,7 @@ class Functions
             'post_status' => 'publish',
             'nopaging' => true,
             'meta_query' => [
+                'relation' => 'AND',
                 [
                     'key' => 'rrze-rsvp-booking-seat',
                     'value'   => $seat,
@@ -692,9 +693,8 @@ class Functions
         $loopstart = strtotime($start);
         $loopend = strtotime($end);
         while ($loopstart <= $loopend) {
-            $weekday = date('w', $loopstart);
+            $weekday = date('N', $loopstart);
             $dateday = date('Y-m-d', $loopstart);
-            if ($weekday == '0') $weekday = '7';
             if (isset($slots[$weekday]) && !in_array($dateday, $days_blocked)) {
                 foreach ($slots[$weekday] as $valid  => $slot_infos) {
                     $valid_array = explode('-', $valid);

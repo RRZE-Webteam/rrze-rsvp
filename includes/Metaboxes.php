@@ -238,6 +238,7 @@ class Metaboxes
             'type'    => 'multicheck',
             'options' => Functions::daysOfWeekAry(1),
             'before' => [$this, 'cbTimeslotAttributes'],
+            'default' => ['1', '2', '3', '4', '5'],
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
@@ -246,6 +247,7 @@ class Metaboxes
             'type' => 'text_time',
             'time_format' => 'H:i',
             'before' => [$this, 'cbTimeslotAttributes'],
+            'default' => '00:00',
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
@@ -254,6 +256,7 @@ class Metaboxes
             'type' => 'text_time',
             'time_format' => 'H:i',
             'before' => [$this, 'cbTimeslotAttributes'],
+            'default' => '00:00',
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
@@ -315,6 +318,7 @@ class Metaboxes
             'id'   => 'rrze-rsvp-room-sso-required',
             'type' => 'checkbox',
             'default' => '',
+            'after_row' => '<div id="rrze-rsvp-additionals">'
         ));
 
         // $cmb_general->add_field(array(
@@ -325,6 +329,7 @@ class Metaboxes
         //     'default' => '',
         //     'after_row' => '<div id="rrze-rsvp-additionals">'            
         // ));
+        // Beim Wieder-Aktivieren der LDAP-Metabox muss das after_row-Attribut wieder aus der SSO-Metabox entfernt werden (Z. 318)
 
         $cmb_general->add_field(array(
             'name' => __('Available days in advance', 'rrze-rsvp'),

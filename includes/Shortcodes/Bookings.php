@@ -497,9 +497,8 @@ class Bookings extends Shortcodes {
         if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'seat_unavailable')) {
             return '';
         }
-
         $url = $_GET['url'];
-        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        if (sanitize_text_field($url) != $url) {
             return '';
         }
 
@@ -517,9 +516,9 @@ class Bookings extends Shortcodes {
         if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'timeslot_unavailable')) {
             return '';
         }
-
         $url = $_GET['url'];
-        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+
+        if (sanitize_text_field($url) != $url) {
             return '';
         }
 
@@ -652,6 +651,17 @@ class Bookings extends Shortcodes {
         } else {
             $booking_seat = absint($posted_data['rsvp_seat']);
         }
+        $room_id = $booking_room;
+        $room_meta = get_post_meta($room_id);
+        $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : '';
+        foreach ($room_timeslots as $week) {
+            foreach ($week['rrze-rsvp-room-weekday'] as $day) {
+                $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+            }
+        }
+        $weekday = date('N', $booking_timestamp_start);
+        $booking_end = array_key_exists($booking_start, $schedule[$weekday]) ? $schedule[$weekday][$booking_start] : $booking_start;
+        $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
         // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         if ($this->sso) {
@@ -800,13 +810,22 @@ class Bookings extends Shortcodes {
                     'value' => $booking_email
                 ],
                 [
-                    'key' => 'rrze-rsvp-booking-start',
-                    'value' => $booking_timestamp_start
-                ],
-                [
                     'key' => 'rrze-rsvp-booking-status',
                     'value' => ['booked', 'confirmed', 'checked-in'],
                     'compare' => 'IN',
+                ],
+                [
+                    'relation' => 'OR',
+                    [
+                        'key' => 'rrze-rsvp-booking-start',
+                        'value' => [$booking_timestamp_start + 1, $booking_timestamp_end - 1],
+                        'compare' => 'BETWEEN',
+                    ],
+                    [
+                        'key' => 'rrze-rsvp-booking-end',
+                        'value' => [$booking_timestamp_start + 1, $booking_timestamp_end - 1],
+                        'compare' => 'BETWEEN',
+                    ],
                 ]
             ],
             'nopaging' => true,
@@ -825,23 +844,11 @@ class Bookings extends Shortcodes {
         }
 
         // Überprüfen ob Timeslot in der Vergangenheit liegt
-        $room_id = $booking_room;
-        $room_meta = get_post_meta($room_id);
-        $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : '';
-        foreach ($room_timeslots as $week) {
-            foreach ($week['rrze-rsvp-room-weekday'] as $day) {
-                $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
-            }
-        }
-        $weekday = date('N', $booking_timestamp_start);
-        $booking_end = array_key_exists($booking_start, $schedule[$weekday]) ? $schedule[$weekday][$booking_start] : $booking_start;
-        $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
-
         if ($booking_timestamp_end < current_time('timestamp')) {
             $redirectUrl = add_query_arg(
                 [
                     //'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', get_permalink(), $room_id, $booking_date, $booking_start),
-                    'url' => wp_get_referer(),
+                    'url' => urlencode(wp_get_referer()),
                     'booking' => wp_create_nonce('timeslot_unavailable'),
                     'nonce' => $this->nonce
                 ],
@@ -852,26 +859,41 @@ class Bookings extends Shortcodes {
         }
 
         // Überprüfen ob der Platz in der Zwischenzeit bereits anderweitig gebucht wurde
-        $check_availability = Functions::getSeatAvailability($booking_seat, $booking_date, $booking_date);
-        $seat_available = false;
-        foreach ($check_availability[$booking_date] as $timeslot) {
-            if (strpos($timeslot, $booking_start) == 0) {
-                $seat_available = true;
-                break;
-            }
-        }
-        if (!$seat_available) {
+        $bookings = get_posts([
+            'post_type' => 'booking',
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'meta_query' => [
+                'relation' => 'AND',
+                [
+                    'key' => 'rrze-rsvp-booking-seat',
+                    'value'   => $booking_seat,
+                ],
+                [
+                    'key' => 'rrze-rsvp-booking-status',
+                    'value'   => ['booked', 'confirmed', 'checked-in'],
+                    'compare' => 'IN'
+                ],
+                [
+                    'key'     => 'rrze-rsvp-booking-start',
+                    'value' => strtotime($booking_date . ' ' . $booking_start),
+                    'compare' => '=',
+                ],
+            ],
+        ]);
+
+        if (!empty($bookings)) {
             $redirectUrl = add_query_arg(
                 [
                     //'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', get_permalink(), $room_id, $booking_date, $booking_start),
-                    'url' => wp_get_referer(),
+                    'url' => urlencode(wp_get_referer()),
                     'booking' => wp_create_nonce('seat_unavailable'),
                     'nonce' => $this->nonce
                 ],
                 get_permalink()
             );
             wp_redirect($redirectUrl);
-            exit;                
+            exit;
         }
 
         $autoconfirmation = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true));
