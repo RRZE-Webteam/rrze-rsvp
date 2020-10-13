@@ -826,11 +826,21 @@ class Bookings extends Shortcodes {
                         'value' => [$booking_timestamp_start + 1, $booking_timestamp_end - 1],
                         'compare' => 'BETWEEN',
                     ],
+                   [
+                       'key' => 'rrze-rsvp-booking-start',
+                       'value' => $booking_timestamp_start,
+                       'compare' => '=',
+                   ],
+                   [
+                       'key' => 'rrze-rsvp-booking-end',
+                       'value' => $booking_timestamp_end,
+                       'compare' => '=',
+                   ],
                 ]
             ],
             'nopaging' => true,
         ];
-        $check_bookings = get_posts($check_args);      
+        $check_bookings = get_posts($check_args);
         if (!empty($check_bookings)) {
             $redirectUrl = add_query_arg(
                 [
