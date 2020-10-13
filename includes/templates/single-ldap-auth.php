@@ -3,7 +3,11 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
+<<<<<<< Updated upstream
 $ldapInstance = new LDAP;
+=======
+// $ldap = new LDAP;
+>>>>>>> Stashed changes
 $template = new Template;
 
 $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
@@ -16,11 +20,19 @@ $nonce = isset($_GET['ldap-nonce']) ? sprintf('&ldap-nonce=%s', sanitize_text_fi
 $bookingId = isset($_GET['id']) && !$roomId ? sprintf('?id=%s', absint($_GET['id'])) : '';
 $action = isset($_GET['action']) && !$roomId ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
 
+<<<<<<< Updated upstream
 if ($ldapInstance->isAuthenticated()) {
     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
     wp_redirect($redirectUrl);
     exit;
 }
+=======
+// if ($ldap->getAuth()) {
+//     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
+//     wp_redirect($redirectUrl);
+//     exit; 
+// }
+>>>>>>> Stashed changes
 
 $data = [];
 $data['title'] = __('Authentication Required', 'rrze-rsvp');
@@ -66,9 +78,14 @@ if (Helper::isFauTheme()) {
  */
 echo $divOpen;
 
+<<<<<<< Updated upstream
 if (!$ldapInstance->isAuthenticated()){
     echo $template->getContent('auth/require-ldap-auth', $data);
 }
+=======
+echo $template->getContent('auth/require-ldap-auth', $data);
+// echo $ldap->ldapForm();
+>>>>>>> Stashed changes
 
 echo $divClose;
 

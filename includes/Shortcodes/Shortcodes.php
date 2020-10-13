@@ -26,7 +26,11 @@ class Shortcodes
 
     protected $idm;
 
+<<<<<<< Updated upstream
     protected $ldapInstance;
+=======
+    // protected $ldap; 
+>>>>>>> Stashed changes
 
     public function __construct($pluginFile, $settings)
     {
