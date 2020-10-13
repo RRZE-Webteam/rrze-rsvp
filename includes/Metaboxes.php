@@ -4,11 +4,15 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
+use RRZE\RSVP\Settings;
+
 class Metaboxes
 {
     public function __construct()
     {
         require_once plugin()->getPath('vendor/cmb2') . 'init.php';
+        $this->settings = new Settings(plugin()->getFile());
+        $this->options = $this->settings->getOptions();
     }
 
     public function onLoaded()
@@ -390,10 +394,23 @@ class Metaboxes
 
         $cmb_general->add_field(array(
             'name' => __('Check-in is required', 'rrze-rsvp'),
-            'desc' => __('The customer must check-in their booking within 15 minutes from the start of the event. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
+            'desc' => __('The customer must check-in their booking within a certain time from the start of the event. Otherwise the system will cancel the booking. The time allowed can be set just below in the "Allowed Check-In Time" section.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-force-to-checkin',
             'type' => 'checkbox',
             'default' => '',
+        ));
+
+        $defaultCheckInTime = $this->options['general_check-in-time'];
+        $cmb_general->add_field(array(
+            'name' => __('Allowed Check-In Time (minutes)', 'rrze-rsvp'),
+            'desc' => sprintf(__('You can specify an allowed check-in time for this room. If "Check-In required" is checked, the system will cancel the booking after this time. Default is %s minutes.', 'rrze-rsvp'), $defaultCheckInTime),
+            'id'   => 'rrze-rsvp-room-check-in-time',
+            'type' => 'text',
+            'attributes' => array(
+                'type' => 'number',
+                'min' => '5',
+            ),
+            'default' => $defaultCheckInTime,
         ));
 
         $cmb_general->add_field(array(
