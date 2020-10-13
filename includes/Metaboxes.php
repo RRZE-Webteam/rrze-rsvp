@@ -238,6 +238,7 @@ class Metaboxes
             'type'    => 'multicheck',
             'options' => Functions::daysOfWeekAry(1),
             'before' => [$this, 'cbTimeslotAttributes'],
+            'default' => ['1', '2', '3', '4', '5'],
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
@@ -246,6 +247,7 @@ class Metaboxes
             'type' => 'text_time',
             'time_format' => 'H:i',
             'before' => [$this, 'cbTimeslotAttributes'],
+            'default' => '00:00',
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
@@ -254,6 +256,7 @@ class Metaboxes
             'type' => 'text_time',
             'time_format' => 'H:i',
             'before' => [$this, 'cbTimeslotAttributes'],
+            'default' => '00:00',
         ));
 
         $cmb_timeslots->add_group_field($group_field_id,  array(
@@ -317,7 +320,7 @@ class Metaboxes
             'default' => '',
         ));
 
-        $cmb_general->add_field(array(
+      $cmb_general->add_field(array(
             'name' => __('LDAP is required', 'rrze-rsvp'),
             'desc' => __('If LDAP is enabled, the customer must log in via LDAP in order to use the booking system.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-ldap-required',

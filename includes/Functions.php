@@ -531,6 +531,8 @@ class Functions
         $seats_booked = [];
         if ($start == $end) {
             $end = date('Y-m-d H:i', strtotime($start . ' +23 hours, +59 minutes'));
+        } else {
+            $end = date('Y-m-d H:i', strtotime($end . ' +23 hours, +59 minutes'));
         }
         foreach ($seats as $seat) {
             $seat_ids[] = $seat->ID;
@@ -664,6 +666,7 @@ class Functions
             'post_status' => 'publish',
             'nopaging' => true,
             'meta_query' => [
+                'relation' => 'AND',
                 [
                     'key' => 'rrze-rsvp-booking-seat',
                     'value'   => $seat,
@@ -692,9 +695,8 @@ class Functions
         $loopstart = strtotime($start);
         $loopend = strtotime($end);
         while ($loopstart <= $loopend) {
-            $weekday = date('w', $loopstart);
+            $weekday = date('N', $loopstart);
             $dateday = date('Y-m-d', $loopstart);
-            if ($weekday == '0') $weekday = '7';
             if (isset($slots[$weekday]) && !in_array($dateday, $days_blocked)) {
                 foreach ($slots[$weekday] as $valid  => $slot_infos) {
                     $valid_array = explode('-', $valid);
@@ -778,20 +780,25 @@ class Functions
         $room_timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
         if (is_array($room_timeslots)) {
             foreach ($room_timeslots as $week) {
-                foreach ($week['rrze-rsvp-room-weekday'] as $day) {
-                    if (isset($week['rrze-rsvp-room-starttime']) && isset($week['rrze-rsvp-room-endtime'])) {
-                        $valid_from = ((isset($week['rrze-rsvp-room-timeslot-valid-from']) && $week['rrze-rsvp-room-timeslot-valid-from'] !='') ? $week['rrze-rsvp-room-timeslot-valid-from'] : 'unlimited');
-                        $valid_to = ((isset($week['rrze-rsvp-room-timeslot-valid-to']) && $week['rrze-rsvp-room-timeslot-valid-to'] !='') ? strtotime('+23 hours, +59 minutes', intval($week['rrze-rsvp-room-timeslot-valid-to'])) : 'unlimited');
-                        if ($with_duration == true) {
-                            $schedule[$day][$valid_from.'-'.$valid_to.'-'.$week['rrze-rsvp-room-starttime'].'-'.$week['rrze-rsvp-room-endtime']]['start'] = $week['rrze-rsvp-room-starttime'];
-                            $schedule[$day][$valid_from.'-'.$valid_to.'-'.$week['rrze-rsvp-room-starttime'].'-'.$week['rrze-rsvp-room-endtime']]['end'] = $week['rrze-rsvp-room-endtime'];
-                        } else {
-                            $now =  current_time('timestamp');
-                            if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $now >= $valid_from && $now <= $valid_to)
-                                || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $now >= $valid_from)
-                                || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $now <= $valid_to)
-                                || ($valid_from == 'unlimited' && $valid_to == 'unlimited')) {
-                                $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+                if (isset($week['rrze-rsvp-room-weekday'])) {
+                    foreach ($week[ 'rrze-rsvp-room-weekday' ] as $day) {
+                        if (isset($week[ 'rrze-rsvp-room-starttime' ]) && isset($week[ 'rrze-rsvp-room-endtime' ])) {
+                            $valid_from = ((isset($week[ 'rrze-rsvp-room-timeslot-valid-from' ]) && $week[ 'rrze-rsvp-room-timeslot-valid-from' ] != '') ? $week[ 'rrze-rsvp-room-timeslot-valid-from' ] : 'unlimited');
+                            $valid_to   = ((isset($week[ 'rrze-rsvp-room-timeslot-valid-to' ]) && $week[ 'rrze-rsvp-room-timeslot-valid-to' ] != '') ? strtotime(
+                                '+23 hours, +59 minutes',
+                                intval($week[ 'rrze-rsvp-room-timeslot-valid-to' ])
+                            ) : 'unlimited');
+                            if ($with_duration == true) {
+                                $schedule[ $day ][ $valid_from . '-' . $valid_to . '-' . $week[ 'rrze-rsvp-room-starttime' ] . '-' . $week[ 'rrze-rsvp-room-endtime' ] ][ 'start' ] = $week[ 'rrze-rsvp-room-starttime' ];
+                                $schedule[ $day ][ $valid_from . '-' . $valid_to . '-' . $week[ 'rrze-rsvp-room-starttime' ] . '-' . $week[ 'rrze-rsvp-room-endtime' ] ][ 'end' ]   = $week[ 'rrze-rsvp-room-endtime' ];
+                            } else {
+                                $now = current_time('timestamp');
+                                if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $now >= $valid_from && $now <= $valid_to)
+                                    || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $now >= $valid_from)
+                                    || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $now <= $valid_to)
+                                    || ($valid_from == 'unlimited' && $valid_to == 'unlimited')) {
+                                    $schedule[ $day ][ $week[ 'rrze-rsvp-room-starttime' ] ] = $week[ 'rrze-rsvp-room-endtime' ];
+                                }
                             }
                         }
                     }
