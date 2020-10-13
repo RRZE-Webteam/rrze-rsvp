@@ -33,6 +33,8 @@ class Metaboxes
     /*
      * Set Timeslot weekday, start time and end time to disabled if there are bookings for this timeslot.
      * Valid from/to can still be modified.
+     * @param  object $field_args Current field args
+     * @param  object $field      Current field object
      */
     public function cbTimeslotAttributes($args, $field) {
         $seats = Functions::getAllRoomSeats($field->object_id);
@@ -97,7 +99,7 @@ class Metaboxes
         ));
 
         $cmb->add_field(array(
-            'name'             => __('Start', 'rrze-rsvp'),
+            'name'             => __('Timeslot', 'rrze-rsvp'),
             'id'               => 'rrze-rsvp-booking-start',
             //'type' => 'text_date_timestamp',
             'type' => 'text_datetime_timestamp',
@@ -111,7 +113,9 @@ class Metaboxes
                     )
                 ),
                 'required' => 'required',
-            )
+            ),
+            'after'     => [$this, 'cbDisplayTimeslot'],
+            'description'   => __('Click on the date input to select a date and a time slot.', 'rrze-rsvp'),
         ));
 
         $cmb->add_field(array(
@@ -128,8 +132,10 @@ class Metaboxes
                         'stepMinute' => 10,
                     )
                 ),
-                'readonly' => 'readonly',
-            )
+                'disabled' => 'disabled',
+            ),
+            'required'  => 'required',
+            'classes'   => 'hidden'
         ));
 
         $cmb->add_field(array(
@@ -526,5 +532,20 @@ class Metaboxes
             $result[$post->ID] = $post->post_title;
         }
         return $result;
+    }
+
+    /**
+     * Output a message if the current page has the id of "2" (the about page)
+     * @param  object $field_args Current field args
+     * @param  object $field      Current field object
+     */
+    public function cbDisplayTimeslot($field_args, $field ) {
+        $start = get_post_meta($field->object_id, 'rrze-rsvp-booking-start', true);
+        $end = get_post_meta($field->object_id, 'rrze-rsvp-booking-end', true);
+        if ($start != '' && $end != '') {
+            echo '<span class="display-timeslot">' . __('Time slot booked', 'rrze-rsvp') . ': ' . date_i18n(get_option('date_format'), $start) . ' // '
+                . date('H:i', $start) . ' - ' . date('H:i', $end) . '</span>';
+        }
+
     }
 }
