@@ -48,15 +48,9 @@ class Main
 		$tracking = new Tracking;
 		$tracking->onLoaded();
 
-<<<<<<< Updated upstream
-		// LDAP
-		$ldap = new LDAP;
-		$ldap->onLoaded();
-=======
 		// LDAP 
 		// $ldap = new LDAP;
 		// $ldap->onLoaded();
->>>>>>> Stashed changes
 
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();

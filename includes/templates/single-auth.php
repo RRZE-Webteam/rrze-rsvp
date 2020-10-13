@@ -22,17 +22,10 @@ if ($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated()) {
     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
     wp_redirect($redirectUrl);
     exit;
-<<<<<<< Updated upstream
-}elseif ($ldapInstance->isAuthenticated()) {
-    $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
-    wp_redirect($redirectUrl);
-    exit;
-=======
 // }elseif ($ldap->isAuthenticated()) { 
 //     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
 //     wp_redirect($redirectUrl);
 //     exit;
->>>>>>> Stashed changes
 }
 
 
