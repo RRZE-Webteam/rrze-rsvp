@@ -8,7 +8,7 @@ use RRZE\RSVP\Settings;
 
 class Tracking {
     const DB_TABLE = 'rrze_rsvp_tracking';
-    const DB_VERSION = '1.4.0';
+    const DB_VERSION = '1.4.1';
     const DB_VERSION_OPTION_NAME = 'rrze_rsvp_tracking_db_version';
 
     protected $settings;
@@ -505,9 +505,9 @@ class Tracking {
             end datetime NOT NULL,
             room_post_id bigint(20) NOT NULL,
             room_name text NOT NULL,
-            room_street text NOT NULL, 
-            room_zip varchar(10) NOT NULL,
-            room_city text NOT NULL, 
+            room_street text, 
+            room_zip varchar(10),
+            room_city text, 
             seat_name text NOT NULL, 
             hash_guest_firstname char(64) NOT NULL,
             hash_guest_lastname char(64) NOT NULL,
