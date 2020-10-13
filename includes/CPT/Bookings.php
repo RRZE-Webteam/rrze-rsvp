@@ -386,23 +386,23 @@ class Bookings
         // find timeslot in start or end
         // $meta_sql = get_meta_sql( $meta_query, 'post', $wpdb->posts, 'ID' ); https://developer.wordpress.org/reference/functions/get_meta_sql/
         // https://wordpress.stackexchange.com/questions/78649/using-meta-query-meta-query-with-a-search-query-s
+        // there is no "part_meta_value" -> inject sql
         if ($filterTimeslot) {
             $parts = explode(" - ", $filterTimeslot);
+
             $meta_query[] = array(
                 'key' => 'rrze-rsvp-booking-start',
                 'value' => strtotime($parts[0]),
                 'type' => 'NUMERIC'
+                // 'type' => 'TIME'
             );
             $meta_query[] = array(
                 'key' => 'rrze-rsvp-booking-end',
                 'value' => strtotime($parts[1]),
                 'type' => 'NUMERIC'
+                // 'type' => 'TIME'
             );
         }
-
-        // echo '<pre>';
-        // var_dump($meta_query);
-        // exit;
 
         if ($meta_query) {
             $meta_query['relation'] = 'AND';
