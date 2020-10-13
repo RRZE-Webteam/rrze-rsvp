@@ -1171,7 +1171,7 @@ class Bookings extends Shortcodes {
         if (!$date || !$time) {
             $response['seat'] = '<div class="rsvp-seat-select error">'.__('Please select a date and a time slot.', 'rrze-rsvp').'</div>';
         }
-        $availability = Functions::getRoomAvailability($roomID, $date, date('Y-m-d', strtotime($date. ' +1 days')), false);
+        $availability = Functions::getRoomAvailability($roomID, $date, $date, false);
         $bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
         if ($date) {
             $response['time'] = $this->buildTimeslotSelect($roomID, $date, $time, $availability);
