@@ -259,7 +259,8 @@ if ($checkInBooking) {
     $daysInAdvance = get_post_meta($roomId, 'rrze-rsvp-room-days-in-advance', true);
     $allowInstant = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-instant-check-in', true));
 
-    $nonceQuery = (!$ssoRequired && !$ldapRequired ? '' : '&nonce=' . $nonce );
+    // $nonceQuery = (!$ssoRequired && !$ldapRequired ? '' : '&nonce=' . $nonce );
+    $nonceQuery = (!$ssoRequired ? '' : '&nonce=' . $nonce );
 
     if ($bookingmode == 'reservation' && $status == 'confirmed') {
         $link = sprintf(
