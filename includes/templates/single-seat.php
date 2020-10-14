@@ -38,6 +38,8 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
 
         $bLDAP = true;
         if (!$ldapRequired || (!$ldapInstance->isAuthenticated())) {
+            echo 'single seat';
+            exit;
             $bLDAP = false;
         }
 

@@ -103,6 +103,8 @@ class Shortcodes
         if (isset($_GET['require-sso-auth']) && wp_verify_nonce($_GET['require-sso-auth'], 'require-sso-auth')) {
             return sprintf('%sincludes/templates/single-auth.php', plugin()->getDirectory());
         } elseif (isset($_GET['require-ldap-auth']) && wp_verify_nonce($_GET['require-ldap-auth'], 'require-ldap-auth')) {
+            // echo 'include';
+            // exit;
             return sprintf('%sincludes/templates/single-ldap-auth.php', plugin()->getDirectory());
         } elseif (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) {
             return sprintf('%sincludes/templates/single-form.php', plugin()->getDirectory());
