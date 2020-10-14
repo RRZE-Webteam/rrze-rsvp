@@ -26,7 +26,7 @@ class Shortcodes
 
     protected $idm;
 
-    protected $ldapInstance;
+    // protected $ldap; 
 
     public function __construct($pluginFile, $settings)
     {

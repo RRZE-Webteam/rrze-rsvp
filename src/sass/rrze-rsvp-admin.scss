@@ -76,4 +76,19 @@ div.cmb2-id-rrze-rsvp-room-bookingmode .info-bookingmode {
 	}
 }
 
+div.cmb2-id-rrze-rsvp-booking-start {
+	.display-timeslot,
+	.cmb2-metabox-description {
+		display: block;
+		padding: .5em 0;
+		color: #757575;
+	}
+	.select_timeslot {
+		margin-top: 0;
+	}
+	#rrze-rsvp-booking-start_time {
+		display: none;
+	}
+}
+
 

@@ -3,7 +3,7 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-$ldapInstance = new LDAP;
+// $ldap = new LDAP;
 $template = new Template;
 
 $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
@@ -16,11 +16,11 @@ $nonce = isset($_GET['ldap-nonce']) ? sprintf('&ldap-nonce=%s', sanitize_text_fi
 $bookingId = isset($_GET['id']) && !$roomId ? sprintf('?id=%s', absint($_GET['id'])) : '';
 $action = isset($_GET['action']) && !$roomId ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
 
-if ($ldapInstance->isAuthenticated()) {
-    $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
-    wp_redirect($redirectUrl);
-    exit;
-}
+// if ($ldap->getAuth()) {
+//     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
+//     wp_redirect($redirectUrl);
+//     exit; 
+// }
 
 $data = [];
 $data['title'] = __('Authentication Required', 'rrze-rsvp');
@@ -66,9 +66,8 @@ if (Helper::isFauTheme()) {
  */
 echo $divOpen;
 
-if (!$ldapInstance->isAuthenticated()){
-    echo $template->getContent('auth/require-ldap-auth', $data);
-}
+echo $template->getContent('auth/require-ldap-auth', $data);
+// echo $ldap->ldapForm();
 
 echo $divClose;
 

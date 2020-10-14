@@ -170,6 +170,24 @@ class Settings
     }
 
     /**
+     * Gibt den Wert einer Standardeinstellung zurück.
+     * @param string  $name  settings field name
+     * @param string  $section the section name this field belongs to
+     * @param string  $default default text if it's not found
+     * @return string
+     */
+    public function getDefault($section, $name)
+    {
+        $key = $section . '_' . $name;
+        $defaults = $this->defaultOptions();
+        if (isset($defaults[$key])) {
+            return $defaults[$key];
+        }
+
+        return '';
+    }
+
+    /**
      * Gibt die Einstellungen zurück.
      * @return array
      */
@@ -189,16 +207,22 @@ class Settings
      * @param string  $name  settings field name
      * @param string  $section the section name this field belongs to
      * @param string  $default default text if it's not found
+     * @param boolean  $overwriteEmpty default text if option is empty
      * @return string
      */
-    public function getOption($section, $name, $default = '')
+    public function getOption($section, $name, $default = '', $overwriteEmpty = false)
     {
         $option = $section . '_' . $name;
 
-        if (isset($this->options[$option])) {
-            return $this->options[$option];
+        if ($overwriteEmpty === false) {
+            if (isset($this->options[$option])) {
+                return $this->options[$option];
+            }
+        } else {
+            if (isset($this->options[$option]) && !empty($this->options[$option])) {
+                return $this->options[$option];
+            }
         }
-
         return $default;
     }
 

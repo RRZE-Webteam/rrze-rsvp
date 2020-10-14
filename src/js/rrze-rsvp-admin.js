@@ -77,8 +77,8 @@ jQuery(document).ready(function ($) {
 	});
 
 	// Remove disabled attribute from protected timeslot fields before submit
-	$('body.wp-admin.post-type-room form').submit(function(e) {
-		$('#rrze-rsvp-room-timeslots_repeat :disabled').each(function(e) {
+	$('body.wp-admin.post-type-room form, body.wp-admin.post-type-booking form').submit(function(e) {
+		$('#postbox-container-2 :disabled').each(function(e) {
 			$(this).removeAttr('disabled');
 		})
 	});
@@ -91,7 +91,7 @@ jQuery(document).ready(function ($) {
 		enddate = details.find('input#rrze-rsvp-booking-end_date'),
 		endtime = details.find('input#rrze-rsvp-booking-end_time');
 
-	starttime.attr('readonly', 'readonly');
+	starttime.attr('disabled', 'disabled');
 
 	seat.change(function() {
 		startdate.val('');
@@ -107,6 +107,8 @@ jQuery(document).ready(function ($) {
 		endtime.val('');
 		if (seat.val() == '' || startdate.val() == '') {
 			alert(rrze_rsvp_admin.alert_no_seat_date);
+			startdate.val('');
+			enddate.val('');
 		} else {
 			jQuery('div.select_timeslot_container').remove();
 			jQuery.post(API_AJAXURL, {         //POST request

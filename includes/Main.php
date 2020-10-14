@@ -48,9 +48,9 @@ class Main
 		$tracking = new Tracking;
 		$tracking->onLoaded();
 
-		// LDAP
-		$ldap = new LDAP;
-		$ldap->onLoaded();
+		// LDAP 
+		// $ldap = new LDAP;
+		// $ldap->onLoaded();
 
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();
@@ -118,7 +118,7 @@ class Main
 			'text_confirmed' => _x('Confirmed', 'Booking', 'rrze-rsvp'),
 			'ajaxurl' => admin_url('admin-ajax.php'),
 			// Strings für CPT Booking Backend
-			'alert_no_seat_date' => __('Please select a seat and a date first.', 'rrze-rsvp')
+			'alert_no_seat_date' => __('Please select a seat first.', 'rrze-rsvp')
 		));
 
 		if ($post_type == 'booking') {
