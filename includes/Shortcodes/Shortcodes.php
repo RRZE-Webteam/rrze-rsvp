@@ -18,15 +18,11 @@ use function RRZE\RSVP\plugin;
  */
 class Shortcodes
 {
-    protected $pluginFile;
-    
+    protected $pluginFile;    
     private $settings = '';
-
     private $shortcodesettings = 'X';
-
     protected $idm;
-
-    // protected $ldap; 
+    protected $ldap; 
 
     public function __construct($pluginFile, $settings)
     {
