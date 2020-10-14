@@ -28,14 +28,14 @@ $action = isset($_GET['action']) && !$roomId ? sprintf('&action=%s', sanitize_te
 if ($ldapInstance->isAuthenticated()) {
     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
 
-    // $data = $ldapInstance->getCustomerData();
-    // var_dump($data);
+    $data = $ldapInstance->getCustomerData();
+    var_dump($data);
 
-    // echo '<br><br><br>';
-    // var_dump($redirectUrl);
+    echo '<br><br><br>';
+    echo $redirectUrl . '||||';
 
 
-    // exit;
+    exit;
     wp_redirect($redirectUrl);
     exit; 
 }
