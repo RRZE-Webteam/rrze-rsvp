@@ -932,7 +932,7 @@ class Actions
 			$bookingCancelled = true;
 		} elseif (!$bookingCancelled && !$bookingCkeckedIn && $bookingConfirmed && $action == 'checkin') {
 			$offset = 15 * MINUTE_IN_SECONDS;
-			if (($start - $offset) <= $now && ($end - $offset) >= $now) {
+			if (($start - $offset) <= $now && $end >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
 				$bookingCkeckedIn = true;
 			}
