@@ -12,7 +12,6 @@ class Metaboxes
     {
         require_once plugin()->getPath('vendor/cmb2') . 'init.php';
         $this->settings = new Settings(plugin()->getFile());
-        $this->options = $this->settings->getOptions();
     }
 
     public function onLoaded()
@@ -400,17 +399,18 @@ class Metaboxes
             'default' => '',
         ));
 
-        $defaultCheckInTime = $this->options['general_check-in-time'];
+        $defaultCheckInTime = $this->settings->getDefault('general', 'check-in-time');
+        $settingsCheckInTime = $this->settings->getOption('general', 'check-in-time', $defaultCheckInTime, true);
         $cmb_general->add_field(array(
             'name' => __('Allowed Check-In Time (minutes)', 'rrze-rsvp'),
-            'desc' => sprintf(__('You can specify an allowed check-in time for this room. If "Check-In required" is checked, the system will cancel the booking after this time. Default is %s minutes.', 'rrze-rsvp'), $defaultCheckInTime),
+            'desc' => sprintf(__('You can specify an allowed check-in time for this room. If "Check-In required" is checked, the system will cancel the booking after this time. Default is %s minutes.', 'rrze-rsvp'), $settingsCheckInTime),
             'id'   => 'rrze-rsvp-room-check-in-time',
             'type' => 'text',
             'attributes' => array(
                 'type' => 'number',
                 'min' => '5',
             ),
-            'default' => $defaultCheckInTime,
+            'default' => $settingsCheckInTime,
         ));
 
         $cmb_general->add_field(array(
