@@ -21,6 +21,7 @@ class Bookings
     protected $filterDate;
     protected $filterStart;
     protected $filterEnd;
+    protected $sSearch;
 
 
     public function __construct()
@@ -54,62 +55,6 @@ class Bookings
 
     
 
-    public function me_search_query($query){
-        if ( $query->is_main_query() && $query->query_vars['post_type'] == 'booking' ) {
-            //Get original meta query
-            $meta_query = (array)$query->get('meta_query');
-    
-
-            $encryptedFields = [
-                'rrze-rsvp-booking-guest-firstname',
-                'rrze-rsvp-booking-guest-lastname',
-                'rrze-rsvp-booking-guest-email',
-                'rrze-rsvp-booking-guest-phone',
-            ];
-
-            // $plainFields = [
-            //     'rrze-rsvp-seat-room',
-            //     'rrze-rsvp-booking-seat',
-            // ];
-            // $data['room'] = get_post_meta($data['seat'], 'rrze-rsvp-seat-room', true);
-            // $data['room_name'] = get_the_title($data['room']);
-
-            $encryptedSearch = ($query->query_vars['s'] ? Functions::crypt($query->query_vars['s'], 'encrypt') : '');
-            // $encryptedSearch = $query->query_vars['s']; 
-            $sub_meta_query = [];
-            foreach($encryptedFields as $field){
-                $sub_meta_query[] = [
-                    'key'     => $field,
-                    'value'   => $encryptedSearch,
-                    'compare' => 'LIKE',    
-                ];
-            }
-            $plainSearch = $query->query_vars['s']; 
-            foreach($plainFields as $field){
-                $sub_meta_query[] = [
-                    'key'     => $field,
-                    'value'   => $plainSearch,
-                    'compare' => 'LIKE',    
-                ];
-            }
-
-            $sub_meta_query = [
-                'key'     => 'rrze-rsvp-seat-room',
-                'value'   => $plainSearch,
-                'compare' => 'LIKE',    
-            ];
-
-            $meta_query[] = $sub_meta_query;
-
-            // echo 'me_search_query<pre>';
-            // var_dump($meta_query);
-            // exit;
-    
-            // Set the meta query to the complete, altered query
-            $query->set('meta_query', $meta_query);
-        }
-
-    }
 
     // Register Custom Post Type
     public function booking_post_type()
@@ -427,6 +372,8 @@ class Bookings
     private function setFilterParams( string $sSearch = '' ){
         if ($sSearch){
             $aRoomIDs = $this->getPostIDsByTitleSubstring($sSearch);
+
+            // find matches to phone, email, firstname, lastname
         }
         $aRoomIDs[] = filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
         $this->filterRoomIDs = $aRoomIDs;
@@ -439,7 +386,36 @@ class Bookings
         }
     }
 
+
+    public function getMetaQueryGuest( string $sSearch ){
+        $meta_query = [];
+        $encryptedSearch = Functions::crypt($sSearch, 'encrypt');
+
+        $encryptedFields = [
+            'rrze-rsvp-booking-guest-firstname',
+            'rrze-rsvp-booking-guest-lastname',
+            'rrze-rsvp-booking-guest-email',
+            'rrze-rsvp-booking-guest-phone',
+        ];
+
+        foreach($encryptedFields as $field){
+            $meta_query[] = [
+                'key'     => $field,
+                'value'   => $encryptedSearch,
+                'compare' => 'LIKE',    
+            ];
+        }
+
+        if ( count($meta_query) > 1 ) {
+            $meta_query['relation'] = 'OR';
+        }
+
+        return $meta_query;
+    }
+
+    // meta_query combines search for firstname, lastname, phone, email, room's title, seat's title, booking start, booking end, booking date
     private function getMetaQuery(){
+
         $meta_query = [];
 
         // the rooms that match to entered keyword (found in room's title or seat's title)
@@ -482,6 +458,15 @@ class Bookings
             $meta_query['relation'] = 'AND';
         }
 
+        $meta_query_guest = $this->getMetaQueryGuest();
+        if ($meta_query_guest){
+            $meta_query = array(
+                'relation' => 'AND',
+                $meta_query, 
+                $meta_query_guest,
+            );
+        }
+
         return $meta_query;
     }
 
@@ -491,7 +476,8 @@ class Bookings
             return;
         } 
 
-        $this->setFilterParams($query->query_vars['s']);
+        $this->sSearch = $query->query_vars['s'];
+        $this->setFilterParams();
         $meta_query = $this->getMetaQuery();
         
         if ($meta_query){
