@@ -387,9 +387,9 @@ class Bookings
     }
 
 
-    public function getMetaQueryGuest( string $sSearch ){
+    public function getMetaQueryGuest(){
         $meta_query = [];
-        $encryptedSearch = Functions::crypt($sSearch, 'encrypt');
+        $encryptedSearch = Functions::crypt($this->sSearch, 'encrypt');
 
         $encryptedFields = [
             'rrze-rsvp-booking-guest-firstname',
@@ -484,10 +484,10 @@ class Bookings
             $query->set('meta_query', array($meta_query));
         }
 
-        $query->set('s', ''); 
-        echo '<pre>';
-        var_dump($query);
-        exit;
+        // $query->set('s', ''); 
+        // echo '<pre>';
+        // var_dump($query);
+        // exit;
 
     }
 
