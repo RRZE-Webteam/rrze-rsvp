@@ -473,7 +473,7 @@ class Bookings
     public function searchBookings($query) {
         // if (is_admin() || !$query->is_main_query() || $query->query['post_type'] != 'booking') {
         if (!$query->is_main_query() || $query->query['post_type'] != 'booking') {
-            return;
+            return $query;
         } 
 
         $this->sSearch = $query->query_vars['s'];
@@ -483,6 +483,8 @@ class Bookings
         if ($meta_query){
             $query->set('meta_query', array($meta_query));
         }
+
+        return $query;
 
         // $query->set('s', ''); 
         // echo '<pre>';
