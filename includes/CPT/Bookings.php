@@ -419,13 +419,13 @@ class Bookings
         $meta_query = [];
 
         // the rooms that match to entered keyword (found in room's title or seat's title)
-        // if ($this->filterRoomIDs){
-        //     $meta_query[] = array(
-        //         'key' => 'rrze-rsvp-seat-room',
-        //         'value' => $this->filterRoomIDs,
-        //         'compare' => 'IN',
-        //     );
-        // }
+        if ($this->filterRoomIDs){
+            $meta_query[] = array(
+                'key' => 'rrze-rsvp-seat-room',
+                'value' => $this->filterRoomIDs,
+                'compare' => 'IN',
+            );
+        }
 
         // the dropdowns to filter by:
         if ($this->filterDate) {
