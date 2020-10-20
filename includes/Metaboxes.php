@@ -4,11 +4,14 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
+use RRZE\RSVP\Settings;
+
 class Metaboxes
 {
     public function __construct()
     {
         require_once plugin()->getPath('vendor/cmb2') . 'init.php';
+        $this->settings = new Settings(plugin()->getFile());
     }
 
     public function onLoaded()
@@ -33,6 +36,8 @@ class Metaboxes
     /*
      * Set Timeslot weekday, start time and end time to disabled if there are bookings for this timeslot.
      * Valid from/to can still be modified.
+     * @param  object $field_args Current field args
+     * @param  object $field      Current field object
      */
     public function cbTimeslotAttributes($args, $field) {
         $seats = Functions::getAllRoomSeats($field->object_id);
@@ -97,7 +102,7 @@ class Metaboxes
         ));
 
         $cmb->add_field(array(
-            'name'             => __('Start', 'rrze-rsvp'),
+            'name'             => __('Timeslot', 'rrze-rsvp'),
             'id'               => 'rrze-rsvp-booking-start',
             //'type' => 'text_date_timestamp',
             'type' => 'text_datetime_timestamp',
@@ -111,7 +116,9 @@ class Metaboxes
                     )
                 ),
                 'required' => 'required',
-            )
+            ),
+            'after'     => [$this, 'cbDisplayTimeslot'],
+            'description'   => __('Click on the date input to select a date and a time slot.', 'rrze-rsvp'),
         ));
 
         $cmb->add_field(array(
@@ -128,8 +135,10 @@ class Metaboxes
                         'stepMinute' => 10,
                     )
                 ),
-                'readonly' => 'readonly',
-            )
+                'disabled' => 'disabled',
+            ),
+            'required'  => 'required',
+            'classes'   => 'hidden'
         ));
 
         $cmb->add_field(array(
@@ -318,18 +327,16 @@ class Metaboxes
             'id'   => 'rrze-rsvp-room-sso-required',
             'type' => 'checkbox',
             'default' => '',
-            'after_row' => '<div id="rrze-rsvp-additionals">'
         ));
 
-        // $cmb_general->add_field(array(
-        //     'name' => __('LDAP is required', 'rrze-rsvp'),
-        //     'desc' => __('If LDAP is enabled, the customer must log in via LDAP in order to use the booking system.', 'rrze-rsvp'),
-        //     'id'   => 'rrze-rsvp-room-ldap-required',
-        //     'type' => 'checkbox',
-        //     'default' => '',
-        //     'after_row' => '<div id="rrze-rsvp-additionals">'            
-        // ));
-        // Beim Wieder-Aktivieren der LDAP-Metabox muss das after_row-Attribut wieder aus der SSO-Metabox entfernt werden (Z. 318)
+      $cmb_general->add_field(array(
+            'name' => __('LDAP is required', 'rrze-rsvp'),
+            'desc' => __('If LDAP is enabled, the customer must log in via LDAP in order to use the booking system.', 'rrze-rsvp'),
+            'id'   => 'rrze-rsvp-room-ldap-required',
+            'type' => 'checkbox',
+            'default' => '',
+            'after_row' => '<div id="rrze-rsvp-additionals">'            
+        ));
 
         $cmb_general->add_field(array(
             'name' => __('Available days in advance', 'rrze-rsvp'),
@@ -386,10 +393,24 @@ class Metaboxes
 
         $cmb_general->add_field(array(
             'name' => __('Check-in is required', 'rrze-rsvp'),
-            'desc' => __('The customer must check-in their booking within 15 minutes from the start of the event. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
+            'desc' => __('The customer must check-in their booking within a certain time from the start of the event. Otherwise the system will cancel the booking. The time allowed can be set just below in the "Allowed Check-In Time" section.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-force-to-checkin',
             'type' => 'checkbox',
             'default' => '',
+        ));
+
+        $defaultCheckInTime = $this->settings->getDefault('general', 'check-in-time');
+        $settingsCheckInTime = $this->settings->getOption('general', 'check-in-time', $defaultCheckInTime, true);
+        $cmb_general->add_field(array(
+            'name' => __('Allowed Check-In Time (minutes)', 'rrze-rsvp'),
+            'desc' => sprintf(__('You can specify an allowed check-in time for this room. If "Check-In required" is checked, the system will cancel the booking after this time. Default is %s minutes.', 'rrze-rsvp'), $settingsCheckInTime),
+            'id'   => 'rrze-rsvp-room-check-in-time',
+            'type' => 'text',
+            'attributes' => array(
+                'type' => 'number',
+                'min' => '5',
+            ),
+            'default' => $settingsCheckInTime,
         ));
 
         $cmb_general->add_field(array(
@@ -528,5 +549,20 @@ class Metaboxes
             $result[$post->ID] = $post->post_title;
         }
         return $result;
+    }
+
+    /**
+     * Output a message if the current page has the id of "2" (the about page)
+     * @param  object $field_args Current field args
+     * @param  object $field      Current field object
+     */
+    public function cbDisplayTimeslot($field_args, $field ) {
+        $start = get_post_meta($field->object_id, 'rrze-rsvp-booking-start', true);
+        $end = get_post_meta($field->object_id, 'rrze-rsvp-booking-end', true);
+        if ($start != '' && $end != '') {
+            echo '<span class="display-timeslot">' . __('Time slot booked', 'rrze-rsvp') . ': ' . date_i18n(get_option('date_format'), $start) . ' // '
+                . date('H:i', $start) . ' - ' . date('H:i', $end) . '</span>';
+        }
+
     }
 }

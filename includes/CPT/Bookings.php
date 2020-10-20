@@ -15,12 +15,14 @@ use RRZE\RSVP\Carbon;
 class Bookings
 {
     protected $sDate;
+    protected $sTimeslot;
     protected $sRoom;
 
 
     public function __construct()
     {
         $this->sDate = 'rsvp_booking_date';
+        $this->sTimeslot = 'rsvp_booking_timeslot';
         $this->sRoom = 'rsvp_booking_room';
     }
 
@@ -288,8 +290,10 @@ class Bookings
         }
 
         $sAllDates = __('Show all dates', 'rrze-rsvp');
+        $sAllTimeslots = __('Show all time slots', 'rrze-rsvp');
         $sAllRoomes = __('Show all rooms', 'rrze-rsvp');
         $sSelectedDate = (string) filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
+        $sSelectedTimeslot = (string) filter_input(INPUT_GET, $this->sTimeslot, FILTER_SANITIZE_STRING);
         $sSelectedRoom = (string) filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
 
         // 1. get all booking IDs
@@ -300,12 +304,17 @@ class Bookings
         ]);
 
         $aBookingDates = [];
+        $aBookingTimeslots = [];
         $aBookingRooms = [];
 
         foreach ($aBookingIds as $bookingId) {
             // 2. get unique dates
-            $bookingDate = get_post_meta($bookingId, 'rrze-rsvp-booking-start', true);
-            $aBookingDates[$bookingDate] = Functions::dateFormat($bookingDate);
+            $bookingStart = get_post_meta($bookingId, 'rrze-rsvp-booking-start', true);
+            $aBookingDates[$bookingStart] = Functions::dateFormat($bookingStart);
+
+            $bookingEnd = get_post_meta($bookingId, 'rrze-rsvp-booking-end', true);
+            $bookingTimeslot = sprintf('%05s', Functions::timeFormat($bookingStart)) . ' - ' . sprintf('%05s', Functions::timeFormat($bookingEnd));
+            $aBookingTimeslots[$bookingTimeslot] = $bookingTimeslot;
             // 3. get unique rooms via seat
             $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
             $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
@@ -315,6 +324,11 @@ class Bookings
         if ($aBookingDates) {
             Functions::sortArrayKeepKeys($aBookingDates);
             echo Functions::getSelectHTML($this->sDate, $sAllDates, $aBookingDates, $sSelectedDate);
+        }
+
+        if ($aBookingTimeslots) {
+            Functions::sortArrayKeepKeys($aBookingTimeslots);
+            echo Functions::getSelectHTML($this->sTimeslot, $sAllTimeslots, $aBookingTimeslots, $sSelectedTimeslot);
         }
 
         if ($aBookingRooms) {
@@ -335,10 +349,11 @@ class Bookings
         }
 
         $filterDate = filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
+        $filterTimeslot = filter_input(INPUT_GET, $this->sTimeslot, FILTER_SANITIZE_STRING);
         $roomId = filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
 
         // don't modify query_vars because only default values are given (= "show all ...")
-        if (!($filterDate || $roomId)) {
+        if (!($filterDate || $roomId || $filterTimeslot)) {
             return $query;
         }
 
@@ -365,6 +380,27 @@ class Bookings
             $meta_query[] = array(
                 'key' => 'rrze-rsvp-booking-start',
                 'value' => $filterDate
+            );
+        }
+
+        // find timeslot in start or end
+        // $meta_sql = get_meta_sql( $meta_query, 'post', $wpdb->posts, 'ID' ); https://developer.wordpress.org/reference/functions/get_meta_sql/
+        // https://wordpress.stackexchange.com/questions/78649/using-meta-query-meta-query-with-a-search-query-s
+        // there is no "part_meta_value" -> inject sql
+        if ($filterTimeslot) {
+            $parts = explode(" - ", $filterTimeslot);
+
+            $meta_query[] = array(
+                'key' => 'rrze-rsvp-booking-start',
+                'value' => strtotime($parts[0]),
+                'type' => 'NUMERIC'
+                // 'type' => 'TIME'
+            );
+            $meta_query[] = array(
+                'key' => 'rrze-rsvp-booking-end',
+                'value' => strtotime($parts[1]),
+                'type' => 'NUMERIC'
+                // 'type' => 'TIME'
             );
         }
 

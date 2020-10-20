@@ -2,3 +2,10 @@
 	<div class="container">
 		<h2>{{=title}}</h2>
 		<p>{{=please_login}}</p>
+
+		<form action="#" method="POST">
+			<label for="username">Username: </label><input id="username" type="text" name="username" value="{{=username}}" />
+			<label for="password">Password: </label><input id="password" type="password" name="password"  value="{{=password}}" />
+			<input type="submit" name="submit" value="Submit" />
+		</form>
+

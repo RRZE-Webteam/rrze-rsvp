@@ -3,7 +3,7 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-$ldap = new LDAP;
+// $ldap = new LDAP;
 $template = new Template;
 
 $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
@@ -19,11 +19,10 @@ $action = isset($_GET['action']) && !$roomId ? sprintf('&action=%s', sanitize_te
 // if ($ldap->getAuth()) {
 //     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
 //     wp_redirect($redirectUrl);
-//     exit;
+//     exit; 
 // }
 
 $data = [];
-// $loginUrl = $ldap->getLoginURL();
 $data['title'] = __('Authentication Required', 'rrze-rsvp');
 $data['please_login'] = __('Please login with your UB-AD username', 'rrze-rsvp');
 
@@ -68,7 +67,7 @@ if (Helper::isFauTheme()) {
 echo $divOpen;
 
 echo $template->getContent('auth/require-ldap-auth', $data);
-echo $ldap->ldapForm();
+// echo $ldap->ldapForm();
 
 echo $divClose;
 

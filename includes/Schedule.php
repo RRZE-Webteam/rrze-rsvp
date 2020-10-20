@@ -24,6 +24,8 @@ class Schedule
     public function __construct()
     {
         $this->email = new Email;
+        $this->settings = new Settings(plugin()->getFile());
+        $this->options = $this->settings->getOptions();
     }
 
     /**
@@ -223,7 +225,7 @@ class Schedule
 
     /**
      * cancelNotCheckedInBookings
-     * Cancel booking that were not checked-in after 15 minutes 
+     * Cancel booking that were not checked-in in time
      * of starting the event. It depends on whether the check-in requirement 
      * is activated in the room settings.
      * @return void
@@ -250,11 +252,11 @@ class Schedule
                     'value'     => ['confirmed'],
                     'compare'   => 'IN'
                 ],
-                'booking_start_clause' => [
-                    'key'       => 'rrze-rsvp-booking-start',
-                    'value'     => $timeStampBefore,
-                    'compare'   => '<'
-                ]
+//                'booking_start_clause' => [
+//                    'key'       => 'rrze-rsvp-booking-start',
+//                    'value'     => $timeStampBefore,
+//                    'compare'   => '<'
+//                ]
             ]
         ];
 
@@ -263,15 +265,27 @@ class Schedule
         if ($query->have_posts()) {
             while ($query->have_posts()) {
                 $query->the_post();
-                $seatId = get_post_meta(get_the_ID(), 'rrze-rsvp-booking-seat', true);
+                $bookingId = get_the_ID();
+                $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
                 $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
+                $bookingStart = get_post_meta($bookingId,'rrze-rsvp-booking-start', true);
+                $checkInTime = get_post_meta($roomId, 'rrze-rsvp-room-check-in-time', true);
+                if ($checkInTime == '') {
+                    $defaultCheckInTime = $this->settings->getDefault('general', 'check-in-time');
+                    $settingsCheckInTime = $this->settings->getOption('general', 'check-in-time', $defaultCheckInTime, true);
+                    $checkInTime = $settingsCheckInTime;
+                }
+                $timeStampCheckIn = current_time('timestamp') - ($checkInTime * MINUTE_IN_SECONDS);
+                if ($bookingStart >= $timeStampCheckIn) {
+                    continue;
+                }
                 if (get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true) == 'consultation') {
-                    update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'checked-in');
-                    do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
+                    update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
+                    do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
                 } elseif (get_post_meta($roomId, 'rrze-rsvp-room-force-to-checkin', true)) {
-                    update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'cancelled');
-                    $this->email->bookingCancelledCustomer(get_the_ID(), 'reservation', 'notcheckedin');
-                    do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
+                    update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
+                    $this->email->bookingCancelledCustomer($bookingId, 'reservation', 'notcheckedin');
+                    do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
                 }
             }
             wp_reset_postdata();

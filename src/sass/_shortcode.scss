@@ -78,16 +78,17 @@
         }
 	caption {
 	    text-align: left;
+        padding-bottom: 3px;
 	}
         .cal-next {
             display: inline-block;
             float: right;
-            margin-left: 5px;
+            margin-left: 10px;
         }
         .cal-prev {
             display: inline-block;
             float: left;
-            margin-right: 5px;
+            margin-right: 10px;
         }
         th {
             padding: 5px 10px;

@@ -69,10 +69,10 @@ class Availability extends Shortcodes
                             $seat_names_raw[$seat_id] = get_the_title($seat_id);
                         }
                         asort($seat_names_raw);
+                        $glue = ', ';
                         foreach ($seat_names_raw as $seat_id => $seat_name) {
                             $booking_link_open = '';
                             $booking_link_close = '';
-                            $glue = ', ';
                             if ($booking_link) {
                                 $permalink = get_permalink($room);
                                 $timeslot = explode('-', $time)[0];
