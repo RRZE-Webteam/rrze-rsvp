@@ -10,6 +10,11 @@
 {{=time}}
 
 {{=room_name}}
+{{is_no_check}}
+{{seat_name}}
+{{=seat_name}}
+{{/seat_name}}
+{{/is_no_check}}
 
 {{=alt_cancel_text}}
 {{=cancel_url}}
@@ -27,6 +32,11 @@
 {{=time_en}}
 
 {{=room_name}}
+{{is_no_check}}
+{{seat_name}}
+{{=seat_name}}
+{{/seat_name}}
+{{/is_no_check}}
 
 {{=alt_cancel_text_en}}
 {{=cancel_url}}

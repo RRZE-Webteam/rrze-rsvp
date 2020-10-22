@@ -135,41 +135,39 @@ jQuery(document).ready(function ($) {
 
 
     /* trigger reservations' details - see https://github.com/RRZE-Webteam/rrze-rsvp/issues/92 */
-    function triggerAdditionals(t){
-		if (($('select#rrze-rsvp-room-bookingmode option:checked').val() == 'reservation') 
-		|| ($('select#rrze-rsvp-room-bookingmode option:checked').val() == 'consultation')) {
-            $('div#rrze-rsvp-additionals').slideDown(t);
-        }else{
-            $('div#rrze-rsvp-additionals').slideUp(t);
-		}
-		if ($('select#rrze-rsvp-room-bookingmode option:checked').val() == 'reservation') {
-			$('div#rrze-rsvp-consultation').slideDown(t);
-		}
-		if ($('select#rrze-rsvp-room-bookingmode option:checked').val() == 'consultation') {
-			$('div#rrze-rsvp-consultation').slideUp(t);
-		}		
-    }
+    var bookingModeSelect = $('select#rrze-rsvp-room-bookingmode');
+    var bookingMode = bookingModeSelect.val();
+    var instantCheckInRow = $('div.cmb2-id-rrze-rsvp-room-instant-check-in');
+    var autoConfirmationInput = $('input#rrze-rsvp-room-auto-confirmation');
+    var autoConfirmationChecked = autoConfirmationInput.is(':checked');
+	triggerModeVisibility(bookingMode);
+	triggerInstant(autoConfirmationChecked);
 
-    function triggerInstant(t){
-        if ($('#rrze-rsvp-room-auto-confirmation').is(':checked')) {
-            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideDown(t);
+	bookingModeSelect.on('change', function() {
+		var bookingMode = $('option:selected',this).val();
+		triggerModeVisibility(bookingMode);
+	});
+	autoConfirmationInput.click(function() {
+		var autoConfirmation = $(this).is(':checked');
+		triggerInstant(autoConfirmation);
+	});
+
+    function triggerModeVisibility(bookingMode){
+		$('div#cmb2-metabox-rrze_rsvp_general-meta div.cmb-row.hide-'+bookingMode).slideUp();
+		$('div#cmb2-metabox-rrze_rsvp_general-meta div.cmb-row').not('.hide-'+bookingMode).slideDown();
+		$('div#cmb2-metabox-rrze_rsvp_general-meta div.cmb-row.hide-'+bookingMode+' input').prop('checked', false);
+		if (bookingMode === 'check-only') {
+			$('input#rrze-rsvp-room-instant-check-in').prop('checked', true);
+		}
+	}
+
+    function triggerInstant(autoConfirmationChecked){
+        if (autoConfirmationChecked === true) {
+			instantCheckInRow.slideDown();
         } else {
-            $('div.cmb2-id-rrze-rsvp-room-instant-check-in').slideUp(t);
-            if( $('#rrze-rsvp-room-instant-check-in').is(':checked')) {
-                $('#rrze-rsvp-room-instant-check-in').prop('checked', false)
-            }
+			instantCheckInRow.slideUp();
+            $('#rrze-rsvp-room-instant-check-in').prop('checked', false)
         }
     }
 
-    triggerAdditionals(0);
-    triggerInstant(0);
-
-    $('select#rrze-rsvp-room-bookingmode').on('change', function() {        
-        triggerAdditionals(100);
-    });
-
-    $('#rrze-rsvp-room-auto-confirmation').click(function() {
-        triggerInstant(100);
-    }); 
-    
 });

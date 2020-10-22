@@ -108,7 +108,7 @@ class Email
      * @param string $to Customer email address
      * @param string $subject Email subject
      * @param integer $bookingId Booking Id
-     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation', 'consultation' or 'no-check'
      * @return void
      */
     public function bookingRequestedAdmin(string $to, string $subject, int $bookingId, string $bookingMode = 'reservation')
@@ -156,7 +156,7 @@ class Email
      * bookingCancelledAdmin
      * Send an email to the admin when the customer cancels the booking.
      * @param integer $bookingId Booking Id
-     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation', 'consultation' or 'no-check'
      * @return void
      */
     public function bookingCancelledAdmin(int $bookingId, string $bookingMode = 'reservation')
@@ -199,7 +199,7 @@ class Email
      * bookingCheckedoutAdmin
      * Send an email to the admin when the customer has checked out from the seat.
      * @param integer $bookingId Booking Id
-     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation', 'consultation' or 'no-check'
      * @return void
      */
     public function bookingCheckedoutAdmin(int $bookingId, string $bookingMode = 'reservation')
@@ -245,7 +245,7 @@ class Email
      * cancellation of the booking. Optionally, the customer can cancel the 
      * reservation using the link included in the email message.
      * @param integer $bookingId
-     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation', 'consultation' or 'no-check'
      * @return void
      */
     public function bookingRequestedCustomer(int $bookingId, string $bookingMode = 'reservation')
@@ -327,7 +327,7 @@ class Email
      * the customer can check in, check out or cancel the booking through 
      * the respective links included in the email message.
      * @param integer $bookingId Booking Id
-     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation', 'consultation' or 'no-check'
      * @param boolean $status Status of the booking
      * @return void
      */
@@ -352,6 +352,9 @@ class Email
         $data = [];
         // Is locale not english?
         $data['is_locale_not_english'] = !$this->isLocaleEnglish ? true : false;
+
+        // Adapt consultation template for no-check booking mode
+        $data['is_no_check'] = $bookingMode == 'no-check' ? true : false;
 
         $data['header_image'] = has_header_image() ? get_header_image() : false;
 
@@ -395,7 +398,7 @@ class Email
         $data['site_url'] = site_url();
         $data['site_name'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
 
-        if ($bookingMode == 'consultation') {
+        if (in_array($bookingMode, ['consultation', 'no-check'])) {
             $message = $this->template->getContent('email/booking-consultation-confirmed-customer', $data);
             $altMessage = $this->template->getContent('email/booking-consultation-confirmed-customer.txt', $data);
         } else {
@@ -440,7 +443,7 @@ class Email
      * Send a booking cancellation email to the customer. No further action 
      * is necessary.
      * @param integer $bookingId Booking Id
-     * @param string $bookingMode Booking mode: 'check-only', 'reservation' or 'consultation'
+     * @param string $bookingMode Booking mode: 'check-only', 'reservation', 'consultation' or 'no-check'
      * @return void
      */
     public function bookingCancelledCustomer(int $bookingId, string $bookingMode = 'reservation', string $cancelreason = '')
