@@ -41,16 +41,9 @@ class Bookings
         add_action('wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots']);
         add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
 
-
-        // add_filter( 'query_vars', [$this, 'registerQueryVarsBookingSearch'] );
-
-
+        add_filter( 'query_vars', [$this, 'registerQueryVarsBookingSearch'] );
         add_filter('parse_query', [$this, 'filterBookings'], 10);
         add_action('pre_get_posts', [$this, 'searchBookings']);
-
-        //add_filter('views_edit-booking', [$this, 'bookingViews']);
-        // BK TEST
-        // add_filter('pre_get_posts', [$this, 'me_search_query']);
     }
 
     
@@ -298,6 +291,10 @@ class Bookings
         wp_die();
     }
 
+    private function getTimeDifference(){
+        global $wpdb;
+        return $wpdb->get_results("SELECT TIMESTAMPDIFF(HOUR, NOW(), convert_tz(NOW(), @@session.time_zone, '+00:00'))", ARRAY_N );
+    }
 
     public function addFilters($post_type)
     {
@@ -465,9 +462,14 @@ class Bookings
 
     private function getBookingIDsByTime($mode, $myTime){
         global $wpdb;
-        // date_i18n(get_option('time_format'), $booking['start'])
+        $ret = [];
+        $timeDiff = $this->getTimeDifference();
+        $myTime = date('h:i', strtotime($myTime) - $timeDiff[0][0] * 60 * 60);
         $sql = "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'rrze-rsvp-booking-$mode' AND DATE_FORMAT(FROM_UNIXTIME(meta_value), '%H:%i') = '$myTime'";
-        $ret = $wpdb->get_results( $sql, OBJECT_K );
+        $aPostIDs = $wpdb->get_results( $sql, ARRAY_N );
+        foreach($aPostIDs as $postID){
+            $ret[] = $postID[0];
+        }
         return $ret;
     }
 
@@ -516,6 +518,10 @@ class Bookings
 
         if ($this->filterEnd){
             $aBookingIDs = array_merge($aBookingIDs, $this->getBookingIDsByTime('end', $this->filterEnd));
+        }
+
+        if ($aBookingIDs){
+            $query->set('post__in', $aBookingIDs);
         }
 
         if ($meta_query) {
