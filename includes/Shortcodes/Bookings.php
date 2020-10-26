@@ -329,7 +329,7 @@ class Bookings extends Shortcodes {
             $get_timestamp = strtotime($get_date);
             $month          = date_i18n('n', $get_timestamp);
             $year           = date_i18n('Y', $get_timestamp);
-            $start          = date_i18n('Y-m-d', $get_timestamp);
+            $start          = date_i18n('Y-m-d', current_time('timestamp'));
             $end            = date_i18n('Y-m-d', strtotime($start . ' +' . $days . ' days'));
             $output .= $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date);
             $output .= '</div>'; //.rsvp-date-container
