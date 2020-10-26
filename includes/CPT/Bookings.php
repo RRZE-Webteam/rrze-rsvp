@@ -42,10 +42,10 @@ class Bookings
         add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
 
 
-        add_filter( 'query_vars', [$this, 'registerQueryVarsBookingSearch'] );
+        // add_filter( 'query_vars', [$this, 'registerQueryVarsBookingSearch'] );
 
 
-        // add_filter('parse_query', [$this, 'filterQuery'], 10);
+        add_filter('parse_query', [$this, 'filterBookings'], 10);
         add_action('pre_get_posts', [$this, 'searchBookings']);
 
         //add_filter('views_edit-booking', [$this, 'bookingViews']);
@@ -362,34 +362,76 @@ class Bookings
         return $vars;
     }
  
-    private function getPostIDsByTitleSubstring( $sSearch ){
+    private function getSeatIDsFromRoomIDs($aRoomIDs){
+        $args = [
+            'fields'            => 'ids',
+            'post_type'         => 'seat',
+            'post_status'       => 'publish',
+            'nopaging'          => true,
+            'meta_query'        => [
+                [
+                    'key'       => 'rrze-rsvp-seat-room',
+                    'value'     => $aRoomIDs,
+                    'compare'   => 'IN'
+                ]
+            ]
+        ];
+        return get_posts($args);
+    }
+
+    private function getBookingIDsBySeatRoomTitle( $sSearch ){
+        // 1. fetch rooms that contain $sSearch in the title
         global $wpdb;
-        $aPostIDs = $wpdb->get_results( "SELECT ID FROM $wpdb->posts WHERE post_type IN ('room', 'seat') AND post_title LIKE '%" . $sSearch . "%'", OBJECT_K );
-        return array_keys($aPostIDs);
+        $aBookingIDs = [];
+        $aSeatIDs = [];
+        $aRoomIDs = $wpdb->get_results( "SELECT ID FROM $wpdb->posts WHERE post_type = 'room' AND post_title LIKE '%" . $sSearch . "%'", OBJECT_K );
+
+        // 2. get seat ids for found rooms
+        if ($aRoomIDs){
+            $aSeatIDs = $this->getSeatIDsFromRoomIDs(array_keys($aRoomIDs));
+        }
+
+        // 3. get seats that contain $sSearch in the title
+        $aNewSeatIDs = $wpdb->get_results( "SELECT ID FROM $wpdb->posts WHERE post_type = 'seat' AND post_title LIKE '%" . $sSearch . "%'", OBJECT_K );
+
+        // 4. get bookingIDs that match to seatIDs
+        $aSeatIDs = array_merge($aSeatIDs, array_keys($aNewSeatIDs));
+
+        if ($aSeatIDs){
+            $args = array(
+                'fields' => 'ids',
+                'post_type'         => 'booking',
+                'post_status'       => 'publish',
+                'nopaging'          => true,                
+                'meta_query' => array(
+                    array(
+                        'key'   => 'rrze-rsvp-booking-seat',
+                        'value' => $aSeatIDs,
+                        'compare' => 'IN'
+                    )),
+            );
+            $aBookingIDs = get_posts($args);
+        }
+
+        return $aBookingIDs;
     }
 
 
-    private function setFilterParams( string $sSearch = '' ){
-        if ($sSearch){
-            $aRoomIDs = $this->getPostIDsByTitleSubstring($sSearch);
-
-            // find matches to phone, email, firstname, lastname
-        }
-        $aRoomIDs[] = filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
-        $this->filterRoomIDs = $aRoomIDs;
+    private function setFilterParams(){
+        $this->filterRoomIDs = (array)filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
         $this->filterDate = filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
         $filterTime = filter_input(INPUT_GET, $this->sTimeslot, FILTER_SANITIZE_STRING);
         if ($filterTime){
             $parts = explode(" - ", $filterTime);
-            $this->filterStart = strtotime($parts[0]);
-            $this->filterEnd = strtotime($parts[0]);
+            $this->filterStart = $parts[0];
+            $this->filterEnd = $parts[0];
         }
     }
 
 
-    public function getMetaQueryGuest(){
+    public function getBookingByGuest( $sSearch ){
         $meta_query = [];
-        $encryptedSearch = Functions::crypt($this->sSearch, 'encrypt');
+        $encryptedSearch = Functions::crypt($sSearch, 'encrypt');
 
         $encryptedFields = [
             'rrze-rsvp-booking-guest-firstname',
@@ -410,88 +452,102 @@ class Bookings
             $meta_query['relation'] = 'OR';
         }
 
-        return $meta_query;
+        $args = array(
+            'fields' => 'ids',
+            'post_type'         => 'booking',
+            'post_status'       => 'publish',
+            'nopaging'          => true,                
+            'meta_query' => array($meta_query),
+        );
+
+        return get_posts($args);
     }
 
-    // meta_query combines search for firstname, lastname, phone, email, room's title, seat's title, booking start, booking end, booking date
-    private function getMetaQuery(){
+    private function getBookingIDsByTime($mode, $myTime){
+        global $wpdb;
+        // date_i18n(get_option('time_format'), $booking['start'])
+        $sql = "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'rrze-rsvp-booking-$mode' AND DATE_FORMAT(FROM_UNIXTIME(meta_value), '%H:%i') = '$myTime'";
+        $ret = $wpdb->get_results( $sql, OBJECT_K );
+        return $ret;
+    }
+
+    public function filterBookings($query)
+    {
+        if (!(is_admin() and $query->is_main_query())) {
+            return $query;
+        }
+
+        // don't modify query_vars because it's not our post_type
+        if (!($query->query['post_type'] === 'booking')) {
+            return $query;
+        }
+        $this->setFilterParams();
+
+        // don't modify query_vars because only default values are given (= "show all ...")
+        if (!$this->filterDate && !$this->filterRoomIDs && !$this->filterStart && !$this->filterEnd) {
+            return $query;
+        }
 
         $meta_query = [];
 
-        // the rooms that match to entered keyword (found in room's title or seat's title)
-        if ($this->filterRoomIDs){
-            $meta_query[] = array(
-                'key' => 'rrze-rsvp-seat-room',
-                'value' => $this->filterRoomIDs,
-                'compare' => 'IN',
-            );
+        if ($this->filterRoomIDs) {
+            // get seatIDs 
+            $aSeatIDs = $this->getSeatIDsFromRoomIDs($this->filterRoomIDs);
+
+            if ($aSeatIDs) {
+                $meta_query[] = array(
+                    'key' => 'rrze-rsvp-booking-seat',
+                    'value' => $aSeatIDs,
+                    'compare' => 'IN'
+                );
+            }
         }
 
-        // the dropdowns to filter by:
         if ($this->filterDate) {
             $meta_query[] = array(
                 'key' => 'rrze-rsvp-booking-start',
-                'value' => $this->filterDate,
+                'value' => $this->filterDate
             );
         }
+        $aBookingIDs = [];
+        if ($this->filterStart){
+            $aBookingIDs = $this->getBookingIDsByTime('start', $this->filterStart);
+        }
 
-        // we've got to look for time !
-        // if ($this->filterStart) {
-        //     $meta_query[] = array(
-        //         'key' => 'rrze-rsvp-booking-start',
-        //         'value' => $this->filterStart,
-        //         'type' => 'NUMERIC'
-        //         // 'type' => 'TIME'
-        //     );
-        // }
+        if ($this->filterEnd){
+            $aBookingIDs = array_merge($aBookingIDs, $this->getBookingIDsByTime('end', $this->filterEnd));
+        }
 
-        // if ($this->filterEnd) {
-        //     $meta_query[] = array(
-        //         'key' => 'rrze-rsvp-booking-end',
-        //         'value' => $this->filterEnd,
-        //         'type' => 'NUMERIC'
-        //         // 'type' => 'TIME'
-        //     );
-        // }
-
-        if ( count($meta_query) > 1 ){
+        if ($meta_query) {
             $meta_query['relation'] = 'AND';
+            $query->query_vars['meta_query'] = $meta_query;
         }
 
-        $meta_query_guest = $this->getMetaQueryGuest();
-        if ($meta_query_guest){
-            $meta_query = array(
-                'relation' => 'AND',
-                $meta_query, 
-                $meta_query_guest,
-            );
-        }
-
-        return $meta_query;
+        return $query;
     }
 
+
+
     public function searchBookings($query) {
-        // if (is_admin() || !$query->is_main_query() || $query->query['post_type'] != 'booking') {
         if (!$query->is_main_query() || $query->query['post_type'] != 'booking') {
             return $query;
         } 
 
+        $aBookingIDs = [];
+
         $this->sSearch = $query->query_vars['s'];
-        $this->setFilterParams();
-        $meta_query = $this->getMetaQuery();
-        
-        if ($meta_query){
-            $query->set('meta_query', array($meta_query));
+        if ($this->sSearch){
+            $aBookingIDs = array_merge($this->getBookingIDsBySeatRoomTitle($this->sSearch), $this->getBookingByGuest($this->sSearch));
+            if ($aBookingIDs){
+                $query->set('post__in', $aBookingIDs);
+                $query->set('s', '');
+            }
         }
 
         return $query;
-
-        // $query->set('s', ''); 
-        // echo '<pre>';
-        // var_dump($query);
-        // exit;
-
     }
+
+
 
     public function bookingViews($views)
     {
