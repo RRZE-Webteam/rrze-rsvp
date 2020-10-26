@@ -961,6 +961,9 @@ class Bookings extends Shortcodes {
                     $status = 'checked-in';
                 }
             break;
+            case 'no-check':
+                $status = $autoconfirmation ? 'confirmed' : 'booked';
+                break;
             default:
                 //
         }

@@ -163,7 +163,10 @@ jQuery(document).ready(function ($) {
 
     function triggerInstant(autoConfirmationChecked){
         if (autoConfirmationChecked === true) {
-			instantCheckInRow.slideDown();
+			var bookingMode = $('option:selected', bookingModeSelect).val();
+			if (bookingMode === 'reservation' || bookingMode === 'check-only') {
+				instantCheckInRow.slideDown();
+			}
         } else {
 			instantCheckInRow.slideUp();
             $('#rrze-rsvp-room-instant-check-in').prop('checked', false)

@@ -416,7 +416,7 @@ class Email
         $this->send($booking['guest_email'], $subject, $message, $altMessage, $attachment);
 
         $sendToEmail = get_post_meta($booking['room'], 'rrze-rsvp-room-send-to-email', true);
-        if (is_email($sendToEmail) && ($status == 'confirmed') && in_array($bookingMode, ['reservation', 'consultation'])) {
+        if (is_email($sendToEmail) && ($status == 'confirmed') && in_array($bookingMode, ['reservation', 'consultation', 'no-check'])) {
             $subject = __('A booking has been confirmed', 'rrze-rsvp');
             $text = __('The booking has been confirmed by the customer.', 'rrze-rsvp');
             $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
