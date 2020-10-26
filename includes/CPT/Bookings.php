@@ -41,7 +41,7 @@ class Bookings
         add_action('wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots']);
         add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
 
-        add_filter( 'query_vars', [$this, 'registerQueryVarsBookingSearch'] );
+        add_filter('query_vars', [$this, 'registerQueryVarsBookingSearch'] );
         add_filter('parse_query', [$this, 'filterBookings'], 10);
         add_action('pre_get_posts', [$this, 'searchBookings']);
     }
@@ -291,6 +291,8 @@ class Bookings
         wp_die();
     }
 
+
+    
     private function getTimeDifference(){
         global $wpdb;
         return $wpdb->get_results("SELECT TIMESTAMPDIFF(HOUR, NOW(), convert_tz(NOW(), @@session.time_zone, '+00:00'))", ARRAY_N );
@@ -549,7 +551,6 @@ class Bookings
                 $query->set('s', '');
             }
         }
-
         return $query;
     }
 
