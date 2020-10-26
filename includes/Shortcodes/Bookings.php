@@ -345,13 +345,15 @@ class Bookings extends Shortcodes {
 
             $output .= '</div>'; //.rsvp-datetime-container
 
-            $output .= '<div class="rsvp-seat-container">';
-            if ($get_date && $get_time) {
-                $output .= $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability);
-            } else {
-                $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
+            if ($bookingMode != 'consultation') {
+                $output .= '<div class="rsvp-seat-container">';
+                if ($get_date && $get_time) {
+                    $output .= $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability);
+                } else {
+                    $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
+                }
+                $output .= '</div>'; //.rsvp-seat-container
             }
-            $output .= '</div>'; //.rsvp-seat-container
             //	$output .= '</fieldset>';
         }
 
