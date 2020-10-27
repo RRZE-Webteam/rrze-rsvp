@@ -3,7 +3,9 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-// $ldap = new LDAP;
+
+
+$ldapInstance = new LDAP;
 $template = new Template;
 
 $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
@@ -11,16 +13,35 @@ $room = $roomId ? sprintf('?room_id=%d', $roomId) : '';
 $seat = isset($_GET['seat_id']) ? sprintf('&seat_id=%d', absint($_GET['seat_id'])) : '';
 $bookingDate = isset($_GET['bookingdate']) ? sprintf('&bookingdate=%s', sanitize_text_field($_GET['bookingdate'])) : '';
 $timeslot = isset($_GET['timeslot']) ? sprintf('&timeslot=%s', sanitize_text_field($_GET['timeslot'])) : '';
-$nonce = isset($_GET['ldap-nonce']) ? sprintf('&ldap-nonce=%s', sanitize_text_field($_GET['ldap-nonce'])) : '';        
+$nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET['nonce'])) : '';        
+
 
 $bookingId = isset($_GET['id']) && !$roomId ? sprintf('?id=%s', absint($_GET['id'])) : '';
 $action = isset($_GET['action']) && !$roomId ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
 
-// if ($ldap->getAuth()) {
-//     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
-//     wp_redirect($redirectUrl);
-//     exit; 
-// }
+// echo '<pre>';
+// var_dump($_REQUEST);
+// exit;
+// $username = filter_var($_POST, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+
+if ($ldapInstance->isAuthenticated()) {
+    $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
+
+    $data = $ldapInstance->getCustomerData();
+    var_dump($data);
+
+    echo '<br><br><br>';
+    echo $redirectUrl . '||||';
+
+
+    exit;
+    wp_redirect($redirectUrl);
+    exit; 
+}
+
+// echo 'sollte authenticated sein';
+// exit;
 
 $data = [];
 $data['title'] = __('Authentication Required', 'rrze-rsvp');

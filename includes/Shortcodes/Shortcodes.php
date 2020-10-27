@@ -18,15 +18,11 @@ use function RRZE\RSVP\plugin;
  */
 class Shortcodes
 {
-    protected $pluginFile;
-    
+    protected $pluginFile;    
     private $settings = '';
-
     private $shortcodesettings = 'X';
-
     protected $idm;
-
-    // protected $ldap; 
+    protected $ldap; 
 
     public function __construct($pluginFile, $settings)
     {
@@ -107,6 +103,8 @@ class Shortcodes
         if (isset($_GET['require-sso-auth']) && wp_verify_nonce($_GET['require-sso-auth'], 'require-sso-auth')) {
             return sprintf('%sincludes/templates/single-auth.php', plugin()->getDirectory());
         } elseif (isset($_GET['require-ldap-auth']) && wp_verify_nonce($_GET['require-ldap-auth'], 'require-ldap-auth')) {
+            // echo 'include';
+            // exit;
             return sprintf('%sincludes/templates/single-ldap-auth.php', plugin()->getDirectory());
         } elseif (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) {
             return sprintf('%sincludes/templates/single-form.php', plugin()->getDirectory());
