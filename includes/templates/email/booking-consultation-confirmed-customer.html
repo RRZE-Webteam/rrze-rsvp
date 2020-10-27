@@ -226,7 +226,12 @@
                   <tr>
                     <td align="center" style="font-size:0px;padding:10px 25px;padding-top:20px;word-break:break-word;">
                       <div style="font-family:Helvetica, Arial, sans-serif;font-size:24px;line-height:35px;text-align:center;color:#000000;">{{=date}}<br>{{=time}}<br>
-                        <span style="font-size:18px">{{=room_name}}</span></div>
+                        <span style="font-size:18px">{{=room_name}}</span><br>
+                        {{is_no_check}}
+                        {{seat_name}}
+                        <span style="font-size:18px">{{=seat_name}}</span>
+                        {{/seat_name}}
+                        {{/is_no_check}}</div>
                     </td>
                   </tr>
                 </table>
@@ -593,7 +598,12 @@
                   <tr>
                     <td align="center" style="font-size:0px;padding:10px 25px;padding-top:20px;word-break:break-word;">
                       <div style="font-family:Helvetica, Arial, sans-serif;font-size:24px;line-height:35px;text-align:center;color:#000000;">{{=date_en}}<br>{{=time_en}}<br>
-                        <span style="font-size:18px">{{=room_name}}</span></div>
+                        <span style="font-size:18px">{{=room_name}}</span><br>
+                        {{is_no_check}}
+                        {{seat_name}}
+                        <span style="font-size:18px">{{=seat_name}}</span>
+                        {{/seat_name}}
+                        {{/is_no_check}}</div>
                     </td>
                   </tr>
                 </table>

@@ -334,12 +334,11 @@ class Bookings extends Shortcodes {
             $output .= '<div class="rsvp-datetime-container form-group clearfix">';
             $output .= '<legend>' . __( 'Select date and time','rrze-rsvp') . '</legend>';
             $output .=  '<div class="rsvp-date-container">';
-            $dateComponents = getdate(strtotime($get_date));
-            $month          = $dateComponents[ 'mon' ];
-            $year           = $dateComponents[ 'year' ];
-            $start          = date_create();
-            $end            = date_create();
-            date_modify($end, '+' . $days . ' days');
+            $get_timestamp = strtotime($get_date);
+            $month          = date_i18n('n', $get_timestamp);
+            $year           = date_i18n('Y', $get_timestamp);
+            $start          = date_i18n('Y-m-d', current_time('timestamp'));
+            $end            = date_i18n('Y-m-d', strtotime($start . ' +' . $days . ' days'));
             $output .= $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date);
             $output .= '</div>'; //.rsvp-date-container
 
@@ -354,13 +353,15 @@ class Bookings extends Shortcodes {
 
             $output .= '</div>'; //.rsvp-datetime-container
 
-            $output .= '<div class="rsvp-seat-container">';
-            if ($get_date && $get_time) {
-                $output .= $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability);
-            } else {
-                $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
+            if ($bookingMode != 'consultation') {
+                $output .= '<div class="rsvp-seat-container">';
+                if ($get_date && $get_time) {
+                    $output .= $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability);
+                } else {
+                    $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
+                }
+                $output .= '</div>'; //.rsvp-seat-container
             }
-            $output .= '</div>'; //.rsvp-seat-container
             //	$output .= '</fieldset>';
         }
 
@@ -982,6 +983,9 @@ class Bookings extends Shortcodes {
                     $status = 'checked-in';
                 }
             break;
+            case 'no-check':
+                $status = $autoconfirmation ? 'confirmed' : 'booked';
+                break;
             default:
                 //
         }
@@ -1056,79 +1060,72 @@ class Bookings extends Shortcodes {
      * https://css-tricks.com/snippets/php/build-a-calendar-table/
      */
     public function buildCalendar($month, $year, $start = '', $end = '', $roomID = '', $bookingdate_selected = '') {
-        if ($start == '')
-            $start = date_create();
-        if (!is_object($end))
-            $end = date_create($end);
-        if ($roomID == 'select')
-            $roomID = '';
+//        $month = 6;
+        if ($start == '') {
+            $start = date('Y-m-d', current_time('timestamp'));
+        }
+        if ($end == '') {
+            $end = date('Y-m-d', strtotime($start . ' +7 days'));
+        }
         // Create array containing abbreviations of days of week.
-        $daysOfWeek = Functions::daysOfWeekAry(0, 1, 2);      
+        $daysOfWeek = Functions::daysOfWeekAry(0, 1, 2);
         // What is the first day of the month in question?
         $firstDayOfMonth = mktime(0,0,0,$month,1,$year);
-        $firstDayOfMonthObject = date_create($firstDayOfMonth);
+        $firstDayOfMonthDate = date('Y-m-d', $firstDayOfMonth);
         // How many days does this month contain?
         $numberDays = date('t', $firstDayOfMonth);
-        // Retrieve some information about the first day of the
-        // month in question.
-        $dateComponents = getdate($firstDayOfMonth);
+        $lastDayOfMonth = mktime(0,0,0, $month, $numberDays, $year);
+        $lastDayOfMonthDate = date('Y-m-d', $lastDayOfMonth);
         // What is the name of the month in question?
-        $monthName = $dateComponents['month'];
-        // What is the index value (0-6) of the first day of the month in question.
-        // (BB: adapted to European index (Mo = 0)
-        $dayOfWeek = $dateComponents['wday'] - 1;
-        if ($dayOfWeek == -1)
-            $dayOfWeek = 6;
-        $today_day = date("d");
-        $today_day = ltrim($today_day, '0');
+        $monthName = date_i18n('w', $firstDayOfMonth);
+        // What is the index value (1-7) of the first day of the month in question.
+        $dayOfWeek = date('N', $firstDayOfMonth);
         $bookingDaysStart = $start;
         $bookingDaysEnd = $end;
-        $endDate = date_format($bookingDaysEnd, 'Y-m-d');
-        $startDate = date_format($bookingDaysStart, 'Y-m-d');
         $link_next = '<a href="#" class="cal-skip cal-next" data-direction="next">&gt;&gt;</a>';
         $link_prev = '<a href="#" class="cal-skip cal-prev" data-direction="prev">&lt;&lt;</a>';
-        $availability = Functions::getRoomAvailability($roomID, $startDate, $endDate, false);
+        $availability = Functions::getRoomAvailability($roomID, $bookingDaysStart, $bookingDaysEnd, false);
         // Create the table tag opener and day headers
-        $calendar = '<table class="rsvp_calendar" data-period="'.date_i18n('Y-m', $firstDayOfMonth).'" data-end="'.$endDate.'">';
+        $calendar = '<table class="rsvp_calendar" data-period="'.date_i18n('Y-m', $firstDayOfMonth).'" data-end="'.$bookingDaysEnd.'">';
         $calendar .= "<caption>";
-        if ($bookingDaysStart <= date_create($year.'-'.$month)) {
+        if ($bookingDaysStart <= $firstDayOfMonthDate) {
             $calendar .= $link_prev;
         }
         $calendar .= date_i18n('F Y', $firstDayOfMonth);
-        if ($bookingDaysEnd >= date_create($year.'-'.$month.'-'.$numberDays)) {
+        if ($bookingDaysEnd >= $lastDayOfMonthDate) {
             $calendar .= $link_next;
         }
         //print $remainingBookingDays;
         $calendar .= "</caption>";
-        $calendar .= "<tr>";
         // Create the calendar headers
+        $calendar .= "<tr>";
         foreach($daysOfWeek as $day) {
             $calendar .= "<th class='header'>$day</th>";
         }
+        $calendar .= "</tr>";
         // Create the rest of the calendar
         // Initiate the day counter, starting with the 1st.
         $currentDay = 1;
-        $calendar .= "</tr><tr>";
-        // The variable $dayOfWeek is used to
-        // ensure that the calendar
-        // display consists of exactly 7 columns.
-        if ($dayOfWeek > 0) {
-            $calendar .= "<td colspan='$dayOfWeek'>&nbsp;</td>";
+        $calendar .= "<tr>";
+        // The variable $dayOfWeek is used to ensure that the calendar display consists of exactly 7 columns.
+        if ($dayOfWeek > 1) {
+            $colspan = $dayOfWeek - 1;
+            $calendar .= "<td colspan='$colspan'>&nbsp;</td>";
         }
         $month = str_pad($month, 2, "0", STR_PAD_LEFT);
         while ($currentDay <= $numberDays) {
             // Seventh column (Saturday) reached. Start a new row.
-            if ($dayOfWeek == 7) {
-                $dayOfWeek = 0;
+
+            if ($dayOfWeek > 7) {
+                $dayOfWeek = 1;
                 $calendar .= "</tr><tr>";
             }
             $currentDayRel = str_pad($currentDay, 2, "0", STR_PAD_LEFT);
             $date = "$year-$month-$currentDayRel";
-            $currentDate = date_create($date);
             $class = '';
             $title = '';
             $active = true;
-            if ($date < date_format($bookingDaysStart, 'Y-m-d') || $date > date_format($bookingDaysEnd, 'Y-m-d')) {
+            if ($date < $bookingDaysStart || $date >$bookingDaysEnd) {
                 $active = false;
                 $title = __('Not bookable (outside booking period)','rrze-rsvp');
             } else {
@@ -1153,13 +1150,12 @@ class Bookings extends Shortcodes {
             $input_open = '<span class="inactive">';
             $input_close = '</span>';
             if ($active) {
-                if ($bookingdate_selected == $date || ($bookingdate_selected == false && $date == $startDate)) {
-                    $selected = 'checked="checked"';
+                if ($bookingdate_selected == $date || ($bookingdate_selected == false && $date == $bookingDaysStart)) {
+                    $checked = 'checked="checked"';
                 } else {
-                    $selected = '';
+                    $checked = '';
                 }
-                //$selected = $bookingdate_selected == $date ? 'checked="checked"' : '';
-                $input_open = "<input type=\"radio\" id=\"rsvp_date_$date\" value=\"$date\" name=\"rsvp_date\" $selected required aria-required='true'><label for=\"rsvp_date_$date\">";
+                $input_open = "<input type=\"radio\" id=\"rsvp_date_$date\" value=\"$date\" name=\"rsvp_date\" $checked required aria-required='true'><label for=\"rsvp_date_$date\">";
                 $input_close = '</label>';
             }
             $calendar .= "<td class='day $class' rel='$date' title='$title'>" . $input_open.$currentDay.$input_close . "</td>";
@@ -1168,8 +1164,8 @@ class Bookings extends Shortcodes {
             $dayOfWeek++;
         }
         // Complete the row of the last week in month, if necessary
-        if ($dayOfWeek != 7) {
-            $remainingDays = 7 - $dayOfWeek;
+        if ($dayOfWeek != 8) {
+            $remainingDays = 8 - $dayOfWeek;
             $calendar .= "<td colspan='$remainingDays'>&nbsp;</td>";
         }
         $calendar .= "</tr>";
@@ -1181,7 +1177,7 @@ class Bookings extends Shortcodes {
         check_ajax_referer( 'rsvp-ajax-nonce', 'nonce' );
         $period = explode('-', $_POST['month']);
         $mod = ($_POST['direction'] == 'next' ? 1 : -1);
-        $start = date_create();
+        $start = date_i18n('Y-m-d', current_time('timestamp'));
         $end = sanitize_text_field($_POST['end']);
         $roomID = (int)$_POST['room'];
         $output = '';

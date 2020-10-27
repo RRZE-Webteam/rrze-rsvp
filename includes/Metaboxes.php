@@ -309,13 +309,15 @@ class Metaboxes
             'type'             => 'select',
             'default'          => 'reservation',
             'options' => array(
-                'reservation' => __('Reservation', 'rrze-rsvp'),
+                'reservation' => __('Reservation with check-in', 'rrze-rsvp'),
+                'no-check' => __('Reservation without check-in', 'rrze-rsvp'),
                 'consultation' => __('Consultation', 'rrze-rsvp'),
                 'check-only' => __('Check-in and check-out only on site', 'rrze-rsvp'), // Nur Ein- und Auschecken vor Ort
             ),
             'description' => 'Der Buchungsmodus legt den grundlegenden Workflow für eine Buchung fest:<br />
-    <b>Platzreservierung:</b> Registrierung und Anmeldung für einen Termin und einen Platz + Einchecken und Auschecken am Platz beim Erreichen des Termins + Speicherung der Daten der Teilnehmer zur Kontaktverfolgung.</br />
-    <b>Sprechstunde:</b> Nur Registrierung und Anmeldung für einen Termin und einen Platz. Kein Ein-/Auschecken und somit keine Kontaktverfolgung.<br />
+    <b>Platzreservierung mit Check-In:</b> Registrierung und Anmeldung für einen Termin und einen Platz + Einchecken und Auschecken am Platz beim Erreichen des Termins + Speicherung der Daten der Teilnehmer zur Kontaktverfolgung.</br />
+    <b>Platzreservierung ohne Check-In:</b> Nur Registrierung und Anmeldung für einen Termin und einen Platz. Kein Ein-/Auschecken und somit keine Kontaktverfolgung.<br />
+    <b>Sprechstunde:</b> Wie Platzreservierung ohne Check-In, jedoch nur ein Platz pro Raum; daher nur eine Buchung pro Termin möglich. Plätze werden im Buchungsvorgang nicht angezeigt.<br />
     (Dieser Modus eignet sich insbesondere dann, wenn man Räume der sogenannten Positivliste nutzt, in der bereits die Kontaktverfolgung durch darfichrein.de erfolgt.)<br />
     <b>Nur Einchecken und Auschecken am Platz:</b> Keine Vorabreservierung von Plätzen.<br />
     (Dieser Modus eignet sich nur für die reine Kontaktverfolgung und Platzbuchung am Platze. An der FAU sollte dieser Modus nur für Räume oder Ressourcen verwendet werden, die nicht bereits durch die Anwendung darfichrein.de verwaltet werden.)',
@@ -329,13 +331,12 @@ class Metaboxes
             'default' => '',
         ));
 
-      $cmb_general->add_field(array(
+        $cmb_general->add_field(array(
             'name' => __('LDAP is required', 'rrze-rsvp'),
             'desc' => __('If LDAP is enabled, the customer must log in via LDAP in order to use the booking system.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-ldap-required',
             'type' => 'checkbox',
             'default' => '',
-            'after_row' => '<div id="rrze-rsvp-additionals">'            
         ));
 
         $cmb_general->add_field(array(
@@ -347,7 +348,8 @@ class Metaboxes
                 'type' => 'number',
                 'min' => '0',
             ),
-            'default' => 7
+            'default' => 7,
+            'classes' => ['hide-check-only']
         ));
 
         $cmb_general->add_field(array(
@@ -356,6 +358,7 @@ class Metaboxes
             'id'   => 'rrze-rsvp-room-auto-confirmation',
             'type' => 'checkbox',
             'default' => '',
+            'classes' => ['hide-check-only']
         ));
 
         $cmb_general->add_field(array(
@@ -363,7 +366,8 @@ class Metaboxes
             'desc' => __('The customer must confirm his reservation within one hour. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-force-to-confirm',
             'type' => 'checkbox',
-            'default' => ''
+            'default' => '',
+            'classes' => ['hide-check-only']
         ));
 
         $cmb_general->add_field(array(
@@ -371,7 +375,8 @@ class Metaboxes
             'desc' => __('Send an email to the booking manager when customer has checked out.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-checkout-notification',
             'type' => 'checkbox',
-            'default' => ''
+            'default' => '',
+            'classes' => ['hide-no-check', 'hide-consultation']
         ));
 
         $cmb_general->add_field(array(
@@ -380,8 +385,7 @@ class Metaboxes
             'id'   => 'rrze-rsvp-room-send-to-email',
             'type' => 'text_email',
             'default' => '',
-            'after_row' => '<div id="rrze-rsvp-consultation">'
-        ));        
+        ));
 
         $cmb_general->add_field(array(
             'name' => __('Allow Instant Check-In', 'rrze-rsvp'),
@@ -389,6 +393,7 @@ class Metaboxes
             'id'   => 'rrze-rsvp-room-instant-check-in',
             'type' => 'checkbox',
             'default' => '',
+            'classes' => ['hide-no-check', 'hide-consultation', 'hide-check-only']
         ));
 
         $cmb_general->add_field(array(
@@ -397,6 +402,7 @@ class Metaboxes
             'id'   => 'rrze-rsvp-room-force-to-checkin',
             'type' => 'checkbox',
             'default' => '',
+            'classes' => ['hide-no-check', 'hide-consultation', 'hide-check-only']
         ));
 
         $defaultCheckInTime = $this->settings->getDefault('general', 'check-in-time');
@@ -411,6 +417,7 @@ class Metaboxes
                 'min' => '5',
             ),
             'default' => $settingsCheckInTime,
+            'classes' => ['hide-no-check', 'hide-consultation', 'hide-check-only']
         ));
 
         $cmb_general->add_field(array(
@@ -427,34 +434,24 @@ class Metaboxes
             'type' => 'text',
             'id'   => 'rrze-rsvp-room-notes-label',
             'default' => __('Additional information', 'rrze-rsvp'),
-            'after_row' => '</div></div>' // .rrze-rsvp-consultation .additional-reservation-functions
         ));
 
         $cmb_general->add_field(array(
             'name'    => __('Street', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-room-street',
             'type'    => 'text',
-//            'attributes'  =>  [
-//                'required' => 'required',
-//            ],
         ));
 
         $cmb_general->add_field(array(
             'name'    => __('ZIP', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-room-zip',
             'type'    => 'text',
-//            'attributes'  =>  [
-//                'required' => 'required',
-//            ],
         ));
 
         $cmb_general->add_field(array(
             'name'    => __('City', 'rrze-rsvp'),
             'id'      => 'rrze-rsvp-room-city',
             'type'    => 'text',
-//            'attributes'  =>  [
-//                'required' => 'required',
-//            ],
         ));
 
         $cmb_general->add_field(array(

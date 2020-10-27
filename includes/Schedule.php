@@ -269,7 +269,7 @@ class Schedule
                 $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
                 $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
                 $bookingStart = get_post_meta($bookingId,'rrze-rsvp-booking-start', true);
-                $checkInTime = get_post_meta($roomId, 'rrze-rsvp-check-in-time', true);
+                $checkInTime = get_post_meta($roomId, 'rrze-rsvp-room-check-in-time', true);
                 if ($checkInTime == '') {
                     $defaultCheckInTime = $this->settings->getDefault('general', 'check-in-time');
                     $settingsCheckInTime = $this->settings->getOption('general', 'check-in-time', $defaultCheckInTime, true);
