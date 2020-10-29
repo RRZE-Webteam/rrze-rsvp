@@ -36,12 +36,13 @@ class Bookings
         add_action('init', [$this, 'booking_post_type']);
         //add_filter( 'manage_edit-booking_columns', [$this, 'booking_filter_posts_columns'] );
         add_filter('manage_booking_posts_columns', [$this, 'booking_columns']);
-        add_action('manage_booking_posts_custom_column', [$this, 'booking_column'], 10, 2);
+        add_action('manage_booking_posts_custom_column', [$this, 'getBookingValue'], 10, 2);
         add_filter('manage_edit-booking_sortable_columns', [$this, 'booking_sortable_columns']);
         add_action('wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots']);
         add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
+        add_filter('months_dropdown_results', '__return_empty_array');
 
-        add_filter('query_vars', [$this, 'registerQueryVarsBookingSearch'] );
+        // add_filter('query_vars', [$this, 'registerQueryVarsBookingSearch'] );
         add_filter('parse_query', [$this, 'filterBookings'], 10);
         add_action('pre_get_posts', [$this, 'searchBookings']);
     }
@@ -98,9 +99,6 @@ class Bookings
         register_post_type('booking', $args);
     }
 
-    public function booking_taxonomies()
-    {
-    }
 
     /*
 	 * Custom Admin Columns
@@ -138,7 +136,7 @@ class Bookings
         return $columns;
     }
 
-    function booking_column($column, $post_id)
+    function getBookingValue($column, $post_id)
     {
         $post = get_post($post_id);
         $booking = Functions::getBooking($post_id);
@@ -295,7 +293,7 @@ class Bookings
     
     private function getTimeDifference(){
         global $wpdb;
-        return $wpdb->get_results("SELECT TIMESTAMPDIFF(HOUR, NOW(), convert_tz(NOW(), @@session.time_zone, '+00:00'))", ARRAY_N );
+        return $wpdb->get_results("SELECT CONVERT_TZ(NOW(), @@session.time_zone, '+00:00')", ARRAY_N );
     }
 
     public function addFilters($post_type)
@@ -307,7 +305,7 @@ class Bookings
         $sAllDates = __('Show all dates', 'rrze-rsvp');
         $sAllTimeslots = __('Show all time slots', 'rrze-rsvp');
         $sAllRoomes = __('Show all rooms', 'rrze-rsvp');
-        $sSelectedDate = (string) filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
+        $sSelectedDate = (string) filter_input(INPUT_GET, $this->sDate, FILTER_SANITIZE_STRING);
         $sSelectedTimeslot = (string) filter_input(INPUT_GET, $this->sTimeslot, FILTER_SANITIZE_STRING);
         $sSelectedRoom = (string) filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
 
@@ -325,7 +323,7 @@ class Bookings
         foreach ($aBookingIds as $bookingId) {
             // 2. get unique dates
             $bookingStart = get_post_meta($bookingId, 'rrze-rsvp-booking-start', true);
-            $aBookingDates[$bookingStart] = Functions::dateFormat($bookingStart);
+            $aBookingDates[date("Y-m-d", $bookingStart)] = Functions::dateFormat($bookingStart);
 
             $bookingEnd = get_post_meta($bookingId, 'rrze-rsvp-booking-end', true);
             $bookingTimeslot = sprintf('%05s', Functions::timeFormat($bookingStart)) . ' - ' . sprintf('%05s', Functions::timeFormat($bookingEnd));
@@ -337,7 +335,7 @@ class Bookings
         }
 
         if ($aBookingDates) {
-            Functions::sortArrayKeepKeys($aBookingDates);
+            ksort($aBookingDates);
             echo Functions::getSelectHTML($this->sDate, $sAllDates, $aBookingDates, $sSelectedDate);
         }
 
@@ -418,12 +416,12 @@ class Bookings
 
     private function setFilterParams(){
         $this->filterRoomIDs = (array)filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
-        $this->filterDate = filter_input(INPUT_GET, $this->sDate, FILTER_VALIDATE_INT);
+        $this->filterDate = filter_input(INPUT_GET, $this->sDate, FILTER_SANITIZE_STRING);
         $filterTime = filter_input(INPUT_GET, $this->sTimeslot, FILTER_SANITIZE_STRING);
         if ($filterTime){
             $parts = explode(" - ", $filterTime);
             $this->filterStart = $parts[0];
-            $this->filterEnd = $parts[0];
+            $this->filterEnd = $parts[1];
         }
     }
 
@@ -462,11 +460,22 @@ class Bookings
         return get_posts($args);
     }
 
+    private function getBookingIDsByDate($myDate){
+        global $wpdb;
+        $ret = [];
+        $sql = "SELECT post_id FROM $wpdb->postmeta WHERE (meta_key = 'rrze-rsvp-booking-start' OR meta_key = 'rrze-rsvp-booking-end') AND DATE_FORMAT(FROM_UNIXTIME(meta_value), '%Y-%m-%d') = '$myDate'";
+        $aPostIDs = $wpdb->get_results( $sql, ARRAY_N );
+        foreach($aPostIDs as $postID){
+            $ret[] = $postID[0];
+        }
+        return $ret;
+    }
+
+
     private function getBookingIDsByTime($mode, $myTime){
         global $wpdb;
         $ret = [];
-        $timeDiff = $this->getTimeDifference();
-        $myTime = date('h:i', strtotime($myTime) - $timeDiff[0][0] * 60 * 60);
+        $wpdb->query("SET time_zone = '+00:00'");
         $sql = "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'rrze-rsvp-booking-$mode' AND DATE_FORMAT(FROM_UNIXTIME(meta_value), '%H:%i') = '$myTime'";
         $aPostIDs = $wpdb->get_results( $sql, ARRAY_N );
         foreach($aPostIDs as $postID){
@@ -492,7 +501,7 @@ class Bookings
             return $query;
         }
 
-        $meta_query = [];
+        $meta_query = $query->get('meta_query',array());;
 
         if ($this->filterRoomIDs) {
             // get seatIDs 
@@ -507,30 +516,32 @@ class Bookings
             }
         }
 
-        if ($this->filterDate) {
-            $meta_query[] = array(
-                'key' => 'rrze-rsvp-booking-start',
-                'value' => $this->filterDate
-            );
-        }
         $aBookingIDs = [];
+        $bFiltered = false;
+        if ($this->filterDate) {
+            $aBookingIDs = $this->getBookingIDsByDate($this->filterDate);
+            $bFiltered = true;
+        }
         if ($this->filterStart){
-            $aBookingIDs = $this->getBookingIDsByTime('start', $this->filterStart);
+            $aBookingIDs = ($aBookingIDs ? array_intersect($aBookingIDs, $this->getBookingIDsByTime('start', $this->filterStart)) : $this->getBookingIDsByTime('start', $this->filterStart));
+            $bFiltered = true;
         }
 
         if ($this->filterEnd){
-            $aBookingIDs = array_merge($aBookingIDs, $this->getBookingIDsByTime('end', $this->filterEnd));
+            $aBookingIDs = ($aBookingIDs ? array_intersect($aBookingIDs, $this->getBookingIDsByTime('end', $this->filterEnd)) : $this->getBookingIDsByTime('end', $this->filterEnd));
+            $bFiltered = true;
         }
 
-        if ($aBookingIDs){
-            $query->set('post__in', $aBookingIDs);
+        if ($bFiltered && !$aBookingIDs){
+            $aBookingIDs[] = -1;
         }
+
+        $query->set('post__in', $aBookingIDs);
 
         if ($meta_query) {
             $meta_query['relation'] = 'AND';
             $query->query_vars['meta_query'] = $meta_query;
         }
-
         return $query;
     }
 
