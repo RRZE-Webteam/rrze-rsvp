@@ -12,8 +12,7 @@ use RRZE\RSVP\Capabilities;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Carbon;
 
-class Bookings
-{
+class Bookings {
     protected $sDate;
     protected $sTimeslot;
     protected $sRoom;
@@ -24,25 +23,24 @@ class Bookings
     protected $sSearch;
 
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->sDate = 'rsvp_booking_date';
         $this->sTimeslot = 'rsvp_booking_timeslot';
         $this->sRoom = 'rsvp_booking_room';
     }
 
-    public function onLoaded()
-    {
+    public function onLoaded() {
         add_action('init', [$this, 'booking_post_type']);
-        //add_filter( 'manage_edit-booking_columns', [$this, 'booking_filter_posts_columns'] );
-        add_filter('manage_booking_posts_columns', [$this, 'booking_columns']);
-        add_action('manage_booking_posts_custom_column', [$this, 'getBookingValue'], 10, 2);
-        add_filter('manage_edit-booking_sortable_columns', [$this, 'booking_sortable_columns']);
-        add_action('wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots']);
-        add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
-        add_filter('months_dropdown_results', '__return_empty_array');
+        add_post_type_support( 'booking', 'page-attributes' );
 
-        // add_filter('query_vars', [$this, 'registerQueryVarsBookingSearch'] );
+        add_filter('months_dropdown_results', '__return_empty_array');
+        add_filter('manage_booking_posts_columns', [$this, 'addBookingColumns']);
+        add_action('manage_booking_posts_custom_column', [$this, 'getBookingValue'], 10, 2);
+        add_filter('manage_edit-booking_sortable_columns', [$this, 'addBookingSortableColumns']);
+        add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
+        add_action('wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots']);
+
+        add_filter('query_vars', [$this, 'registerQueryVarsBookingSearch'] );
         add_filter('parse_query', [$this, 'filterBookings'], 10);
         add_action('pre_get_posts', [$this, 'searchBookings']);
     }
@@ -51,8 +49,7 @@ class Bookings
 
 
     // Register Custom Post Type
-    public function booking_post_type()
-    {
+    public function booking_post_type() {
         $labels = [
             'name'                      => _x('Bookings', 'Post type general name', 'rrze-rsvp'),
             'singular_name'             => _x('Booking', 'Post type singular name', 'rrze-rsvp'),
@@ -100,35 +97,15 @@ class Bookings
     }
 
 
-    /*
-	 * Custom Admin Columns
-	 * Source: https://www.smashingmagazine.com/2017/12/customizing-admin-columns-wordpress/
-	 */
-
-    function booking_filter_posts_columns($columns)
-    {
+    public function addBookingColumns($columns) {
+        $columns = array();
+        $columns['cb'] = true;
         $columns['bookingdate'] = __('Date', 'rrze-rsvp');
         $columns['bookingstart'] = __('Time', 'rrze-rsvp');
-        $columns['room'] = __('Room', 'rrze-rsvp');
+        $columns['room'] = 'Room';
         $columns['seat'] = __('Seat', 'rrze-rsvp');
         $columns['name'] = __('Name', 'rrze-rsvp');
         $columns['email'] = __('Email', 'rrze-rsvp');
-        $columns['status'] = __('Status', 'rrze-rsvp');
-        return $columns;
-    }
-
-    function booking_columns($columns)
-    {
-        $columns = array(
-            'cb' => $columns['cb'],
-            'bookingdate' => __('Date', 'rrze-rsvp'),
-            'bookingstart' => __('Time', 'rrze-rsvp'),
-            'room' => __('Room', 'rrze-rsvp'),
-            'seat' => __('Seat', 'rrze-rsvp'),
-            'name' => __('Name', 'rrze-rsvp'),
-            'email' => __('Email', 'rrze-rsvp')
-        );
-
         if (current_user_can('read_customer_phone')) {
             $columns['phone'] = __('Phone', 'rrze-rsvp');
         }
@@ -136,8 +113,22 @@ class Bookings
         return $columns;
     }
 
-    function getBookingValue($column, $post_id)
-    {
+    public function addBookingSortableColumns($columns) {
+        $columns['bookingdate'] = 'bookingdate';
+        $columns['bookingstart'] = 'bookingstart';
+        $columns['room'] ='room';
+        $columns['seat'] = 'seat';
+        $columns['name'] = 'name';
+        $columns['email'] = 'email';
+        if (current_user_can('read_customer_phone')) {
+            $columns['phone'] = 'phone';
+        }
+        $columns['status'] = 'status';
+
+        return $columns;
+    }
+
+    function getBookingValue($column, $post_id) {
         $post = get_post($post_id);
         $booking = Functions::getBooking($post_id);
         $bookingDate = date_i18n(get_option('date_format'), $booking['start']);
@@ -247,18 +238,6 @@ class Bookings
         }
     }
 
-    function booking_sortable_columns($columns)
-    {
-        $columns = array(
-            'bookingdate' => __('Date', 'rrze-rsvp'),
-            'bookingstart' => __('Time', 'rrze-rsvp'),
-            'room' => __('Room', 'rrze-rsvp'),
-            'seat' => __('Seat', 'rrze-rsvp'),
-            'name' => __('Name', 'rrze-rsvp'),
-        );
-
-        return $columns;
-    }
 
     public function ajaxShowTimeslots()
     {
@@ -562,6 +541,37 @@ class Bookings
                 $query->set('s', '');
             }
         }
+
+        // $orderby = $query->get( 'orderby' );
+        // $columns['bookingdate'] = 'bookingdate';
+        // $columns['bookingstart'] = 'bookingstart';
+        // $columns['room'] ='room';
+        // $columns['seat'] = 'seat';
+        // $columns['name'] = 'name';
+        // $columns['email'] = 'email';
+        // if (current_user_can('read_customer_phone')) {
+        //     $columns['phone'] = 'phone';
+        // }
+        // $columns['status'] = 'status';
+
+        // if ( $orderby ) {
+    
+        //     $meta_query = array(
+        //         'relation' => 'OR',
+        //         array(
+        //             'key' => 'rrze-rsvp-seat-room',
+        //             'compare' => 'NOT EXISTS', 
+        //         ),
+        //         array(
+        //             'key' => 'rrze-rsvp-seat-room',
+        //         ),
+        //     );
+    
+            // $query->set( 'meta_query', $meta_query );
+            $query->set( 'orderby', 'rrze-rsvp-booking-start' );
+        // }
+
+
         return $query;
     }
 
