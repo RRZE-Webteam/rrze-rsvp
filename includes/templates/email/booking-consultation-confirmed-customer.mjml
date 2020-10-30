@@ -33,7 +33,12 @@
         <mj-text align="center" padding="10px 25px" font-size="20px"><strong>{{=subject}}</strong></mj-text>
         <mj-text align="center" font-size="14px">{{=text}}</mj-text>
         <mj-text align="center" color="#000000" font-size="24px" line-height="35px" padding-top="20px">{{=date}}<br>{{=time}}<br>
-          <span style="font-size:18px">{{=room_name}}</span>
+          <span style="font-size:18px">{{=room_name}}</span><br>
+          {{is_no_check}}
+          {{seat_name}}
+          <span style="font-size:18px">{{=seat_name}}</span>
+          {{/seat_name}}
+          {{/is_no_check}}
         </mj-text>
       </mj-column>
     </mj-section>
@@ -85,7 +90,12 @@
         <mj-text align="center" padding="10px 25px" font-size="20px"><strong>{{=subject_en}}</strong></mj-text>
         <mj-text align="center" font-size="14px">{{=text_en}}</mj-text>
         <mj-text align="center" color="#000000" font-size="24px" line-height="35px" padding-top="20px">{{=date_en}}<br>{{=time_en}}<br>
-          <span style="font-size:18px">{{=room_name}}</span>
+          <span style="font-size:18px">{{=room_name}}</span><br>
+          {{is_no_check}}
+          {{seat_name}}
+          <span style="font-size:18px">{{=seat_name}}</span>
+          {{/seat_name}}
+          {{/is_no_check}}
         </mj-text>
       </mj-column>
     </mj-section>

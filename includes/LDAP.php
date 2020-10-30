@@ -50,10 +50,17 @@ class LDAP {
             return true;
         }
 
-        if(isset($_POST['username']) && isset($_POST['password'])){
-            $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-            $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
 
+        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+        $username = ( $username ? $username : filter_input(INPUT_GET, 'username', FILTER_SANITIZE_STRING));
+        $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
+        $password = ( $password ? $password : filter_input(INPUT_GET, 'password', FILTER_SANITIZE_STRING));
+
+        // BK 2DO !!!
+        $username = ( isset($_REQUEST['username']) ? $_REQUEST['username'] : '');
+        $password = ( isset($_REQUEST['password']) ? $_REQUEST['password'] : '');
+
+        if ($username && $password){
             $this->link_identifier = @ldap_connect($this->server, $this->port);
         
             if (!$this->link_identifier){
@@ -79,7 +86,20 @@ class LDAP {
 
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])){
                                 $this->mail = $aEntry[0]['mail'][0]; 
+                                $this->isLoggedIn = true;
+
+                                // var_dump($_REQUEST);
+                                // echo '$username = ' . $username;
+                                // echo '<br>$password = ' . $password;
+                                // exit;
+                        
+                        
+                                // $redirectUrl = esc_url(wp_nonce_url(trailingslashit(get_permalink()), 'do_something', 'my_nonce'));
+                                // wp_redirect($redirectUrl);
+                                // exit; 
+
                                 return true;
+                        
                             }else{
                                 $error = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0] and $aEntry[0][\'mail\'][0]');
                             }
@@ -90,18 +110,13 @@ class LDAP {
                     }
                 }
             }
-        } 
+        // }else{
+        //     echo 'here';
+        //     exit;
+        }
+        
+
     } 
-
-
-    // public function ldapForm(){
-    //     return '<form action="#" method="POST">'
-    //             . '<label for="username">Username: </label><input id="username" type="text" name="username" />'
-    //             . '<label for="password">Password: </label><input id="password" type="password" name="password" />'
-    //             . '<input type="submit" name="submit" value="Submit" />'
-    //             . '</form>';
-    // } 
-
 
 
     public function requireAuth(){
@@ -135,6 +150,7 @@ class LDAP {
         $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';        
 
         if ($this->isLoggedIn) {
+            
             $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
             // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'isLoggedIn $redirectUrl=' . $redirectUrl);
             wp_redirect($redirectUrl);
@@ -159,39 +175,36 @@ class LDAP {
     }
 
 
-    public function tryLogIn(){
+    public function tryLogIn($test = ''){
         $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : null;
         $room = $roomId ? sprintf('&room_id=%d', $roomId) : '';
         $seat = isset($_GET['seat_id']) ? sprintf('&seat_id=%d', absint($_GET['seat_id'])) : '';
         $bookingDate = isset($_GET['bookingdate']) ? sprintf('&bookingdate=%s', sanitize_text_field($_GET['bookingdate'])) : '';
         $timeslot = isset($_GET['timeslot']) ? sprintf('&timeslot=%s', sanitize_text_field($_GET['timeslot'])) : '';
-        $nonce = isset($_GET['ldap-nonce']) ? sprintf('&ldap-nonce=%s', sanitize_text_field($_GET['ldap-nonce'])) : '';
+        $nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET['nonce'])) : '';
 
         $bookingId = isset($_GET['id']) && !$roomId ? sprintf('&id=%s', absint($_GET['id'])) : '';
         $action = isset($_GET['action']) ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
 
-        // if (!$this->isLoggedIn) {
-        //     $authNonce = sprintf('?require-ldap-auth=%s', wp_create_nonce('require-ldap-auth'));
-        //     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $authNonce, $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
-        //     header('HTTP/1.0 403 Forbidden');
-        //     wp_redirect($redirectUrl);
-        //     exit;
-        // }
+    
+        if (!$this->isLoggedIn) {
+            $authNonce = sprintf('?require-ldap-auth=%s', wp_create_nonce('require-ldap-auth'));
+            $redirectUrl = sprintf('%s%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $authNonce, $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
+            // var_dump($redirectUrl);
+            // echo '<br><br>try url';
+            // exit;
+            header('HTTP/1.0 403 Forbidden');
+            wp_redirect($redirectUrl);
+            exit;
+        }
 
         return true;
     }
 
 
-
-
-    public function getLoginURL(){
-        return 'URL-GETLOGINURL';
-    }
-
-
     public function getCustomerData(){
         return [
-            'customer_email' => $this->mail ? $this->mail : __('no@email', 'rrze-rsvp')
+            'customer_email' => $this->mail ? $this->mail : __('no@email LDAP', 'rrze-rsvp')
         ];
     }
 

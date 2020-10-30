@@ -575,7 +575,7 @@ class Actions
 				|| ($requestSeat != $seat)
 			) {
 				$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
-			}			
+            }
 		}
 
 		if ($errorMessage) {
@@ -699,6 +699,25 @@ class Actions
 				$errorMessage = __('This item is used in a booking and cannot be password protected.', 'rrze-rsvp');
 			}
         }
+
+        if ($post_data['post_type'] == 'room') {
+            $oldTimeslots = get_post_meta($post_id, 'rrze-rsvp-room-timeslots', true);
+            $newTimeslots = isset($_POST['rrze-rsvp-room-timeslots']) ? $_POST['rrze-rsvp-room-timeslots'] : [];
+
+            if (!empty($newTimeslots)) {
+                foreach ($newTimeslots as $k => $newTimeslot) {
+                    if ($newTimeslot['rrze-rsvp-room-starttime'] > $newTimeslot['rrze-rsvp-room-endtime']) {
+                        $errorTimeslots['invalid'][] = $k + 1;
+                    }
+                }
+                if (isset($errorTimeslots['invalid'])) {
+                    $_POST['rrze-rsvp-room-timeslots'] = $oldTimeslots;
+                    $sTimeslots = implode(' and ', $errorTimeslots['invalid']);
+                    $errorMessage = sprintf(_n('Unable to save post: End time must be greater than start time in timeslot no. %s.', 'Unable to save post: End time must be greater than start time in timeslots no. %s.', count($errorTimeslots['invalid']), 'rrze-rsvp'), $sTimeslots);
+                }
+            }
+        }
+
 
 		if ($errorMessage) {
 			wp_die(
