@@ -1009,6 +1009,7 @@ class Bookings extends Shortcodes {
                 }
             break;
             case 'reservation':
+            case 'no-check':
             case 'consultation':
                 if ($status == 'confirmed') {
                     $this->email->bookingConfirmedCustomer($booking_id, $bookingMode);
