@@ -19,11 +19,6 @@ $nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET[
 $bookingId = isset($_GET['id']) && !$roomId ? sprintf('?id=%s', absint($_GET['id'])) : '';
 $action = isset($_GET['action']) && !$roomId ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
 
-// echo '<pre>';
-// var_dump($_REQUEST);
-// exit;
-// $username = filter_var($_POST, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-
 
 if ($ldapInstance->isAuthenticated()) {
     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
@@ -39,9 +34,6 @@ if ($ldapInstance->isAuthenticated()) {
     wp_redirect($redirectUrl);
     exit; 
 }
-
-// echo 'sollte authenticated sein';
-// exit;
 
 $data = [];
 $data['title'] = __('Authentication Required', 'rrze-rsvp');
@@ -88,7 +80,6 @@ if (Helper::isFauTheme()) {
 echo $divOpen;
 
 echo $template->getContent('auth/require-ldap-auth', $data);
-// echo $ldap->ldapForm();
 
 echo $divClose;
 

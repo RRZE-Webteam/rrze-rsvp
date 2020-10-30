@@ -5,7 +5,7 @@ namespace RRZE\RSVP\Shortcodes;
 use RRZE\RSVP\Email;
 use RRZE\RSVP\Helper;
 use RRZE\RSVP\IdM;
-// use RRZE\RSVP\LDAP;
+use RRZE\RSVP\LDAP;
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Template;
 use RRZE\RSVP\TransientData;
@@ -27,30 +27,24 @@ class Bookings extends Shortcodes {
 
     protected $email;
     protected $idm;
-    // protected $ldapInstance; 
+    protected $ldapInstance; 
     protected $sso = false;
     protected $ssoRequired;
-    // protected $ldap = false;
-    // protected $ldapRequired;
+    protected $ldap = false;
+    protected $ldapRequired;
     protected $nonce;
 
-    public function __construct($pluginFile, $settings)
-    {
+    public function __construct($pluginFile, $settings) {
         parent::__construct($pluginFile, $settings);
         $this->shortcodesettings = getShortcodeSettings();
         $this->options = (object) $settings->getOptions();
         $this->email = new Email;
         $this->idm = new IdM;
-        // $this->ldapInstance = new LDAP;
+        $this->ldapInstance = new LDAP;
         $this->template = new Template;
     }
 
-    public function onLoaded()
-    {
-
-        // BK DEBUG filter
-        add_filter( 'template_include', [$this, 'var_template_include'], 1000 );
-
+    public function onLoaded() {
         add_action('template_redirect', [$this, 'maybeAuthenticate']);
         add_action('template_redirect', [$this, 'bookingSubmitted']);
 
@@ -63,17 +57,10 @@ class Bookings extends Shortcodes {
     }
 
 
-    // BK DEBUG filter method
-    public function var_template_include( $t ){
-        $GLOBALS['current_theme_template'] = basename($t);
-        return $t;
-    }
-
-
     public function maybeAuthenticate(){
         global $post;
-        // if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
-        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
+        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
+        // if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
                 return;
         }
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
@@ -83,7 +70,7 @@ class Bookings extends Shortcodes {
             $roomId = absint($_GET['room_id']);
             if ($this->nonce){
                 $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
-                // $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
+                $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
                 }
     
         } else {
@@ -92,16 +79,17 @@ class Bookings extends Shortcodes {
             $shortcodeSSO = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'sso');
             $this->ssoRequired = ( $shortcodeSSO ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true)) );
 
-            // $shortcodeLDAP = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
-            // $this->ldapRequired = ( $shortcodeLDAP ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true)) );
+            $shortcodeLDAP = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
+            $this->ldapRequired = ( $shortcodeLDAP ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true)) );
         }
 
         if ($this->ssoRequired) {
             $this->sso = $this->idm->tryLogIn();
-        // } elseif ($this->ldapRequired) {
-        //     $this->ldap = $this->ldapInstance->tryLogIn($this->nonce);
         }
-
+        
+        if ($this->ldapRequired) {
+            $this->ldap = $this->ldapInstance->tryLogIn($this->nonce);
+        }
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
@@ -129,9 +117,9 @@ class Bookings extends Shortcodes {
         if ($output = $this->ssoAuthenticationError()) {
             return $output;
         }
-        // if ($output = $this->ldapAuthenticationError()) {
-        //     return $output;
-        // }
+        if ($output = $this->ldapAuthenticationError()) {
+            return $output;
+        }
         if ($output = $this->postDataError()) {
             return $output;
         }        
@@ -348,14 +336,17 @@ class Bookings extends Shortcodes {
                 . '<p>' . __('First name', 'rrze-rsvp') . ': <strong>' . $data['customer_firstname'] . '</strong></p>'
                 . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
                 . '</div>';
-        // }else if ($this->ldapRequired) {
-        //     $data = $this->ldapInstance->getCustomerData();
-        //     $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
+        }
+        if ($this->ldapRequired) {
+            $data = $this->ldapInstance->getCustomerData();
+            $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
 
-        //     $output .= '<div class="form-group">'
-        //         . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
-        //         . '</div>';
-        } else {
+            $output .= '<div class="form-group">'
+                . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
+                . '</div>';
+        }
+        
+        if (!$this->ssoRequired && !$this->ldapRequired) {
             $error = isset($fieldErrors['rsvp_lastname']) ? ' error' : '';
             $value = isset($fieldErrors['rsvp_lastname']['value']) ? $fieldErrors['rsvp_lastname']['value'] : '';
             $message = isset($fieldErrors['rsvp_lastname']['message']) ? $fieldErrors['rsvp_lastname']['message'] : '';    
@@ -415,8 +406,7 @@ class Bookings extends Shortcodes {
         return $output;
     }
 
-    protected function ssoAuthenticationError()
-    {
+    protected function ssoAuthenticationError(){
         if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'sso_authentication')) {
             return '';
         }
@@ -429,22 +419,20 @@ class Bookings extends Shortcodes {
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
-    // protected function ldapAuthenticationError()
-    // {
-    //     if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'ldap_authentication')) {
-    //         return '';
-    //     }
+    protected function ldapAuthenticationError(){
+        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'ldap_authentication')) {
+            return '';
+        }
 
-    //     $data = [];
-    //     $data['ldap_authentication_error'] = true;
-    //     $data['ldap_authentication'] = __('LDAP error', 'rrze-rsvp');
-    //     $data['message'] = __("Error retrieving your data from LDAP. Please try again or contact the website administrator.", 'rrze-rsvp');
+        $data = [];
+        $data['ldap_authentication_error'] = true;
+        $data['ldap_authentication'] = __('LDAP error', 'rrze-rsvp');
+        $data['message'] = __("Error retrieving your data from LDAP. Please try again or contact the website administrator.", 'rrze-rsvp');
 
-    //     return $this->template->getContent('shortcode/booking-error', $data);
-    // }
+        return $this->template->getContent('shortcode/booking-error', $data);
+    }
 
-    protected function postDataError()
-    {
+    protected function postDataError(){
         if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'post_data')) {
             return '';
         }
@@ -457,8 +445,7 @@ class Bookings extends Shortcodes {
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
-    protected function saveError()
-    {
+    protected function saveError(){
         if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'save_error')) {
             return '';
         }
@@ -471,8 +458,7 @@ class Bookings extends Shortcodes {
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
-    protected function multipleBookingError()
-    {
+    protected function multipleBookingError(){
         if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'multiple_booking')) {
             return '';
         }
@@ -485,8 +471,7 @@ class Bookings extends Shortcodes {
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
-    protected function seatUnavailableError()
-    {
+    protected function seatUnavailableError(){
         if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'seat_unavailable')) {
             return '';
         }
@@ -504,8 +489,7 @@ class Bookings extends Shortcodes {
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
-    protected function timeslotUnavailableError()
-    {
+    protected function timeslotUnavailableError(){
         if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'timeslot_unavailable')) {
             return '';
         }
@@ -524,8 +508,7 @@ class Bookings extends Shortcodes {
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
-    protected function selectRoom($input_room = '')
-    {
+    protected function selectRoom($input_room = ''){
         $get_room = isset($_GET[ 'room_id' ]) ? absint($_GET[ 'room_id' ]) : '';
         if ($input_room != '' || $get_room != '') {
             return '';
@@ -551,8 +534,7 @@ class Bookings extends Shortcodes {
         return $selectRoom;
     }
 
-    protected function bookedNotice()
-    {
+    protected function bookedNotice(){
         if (!isset($_GET['id']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'booked')) {
             return '';
         }
@@ -655,7 +637,6 @@ class Bookings extends Shortcodes {
         $weekday = date('N', $booking_timestamp_start);
         $booking_end = array_key_exists($booking_start, $schedule[$weekday]) ? $schedule[$weekday][$booking_start] : $booking_start;
         $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
-        // Helper::debugLog(__FILE__, __LINE__, __METHOD__);
 
         if ($this->sso) {
             if ($this->idm->isAuthenticated()){
@@ -675,11 +656,7 @@ class Bookings extends Shortcodes {
                 exit;
             }
         }elseif ($this->ldapRequired) {
-            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is required');
-
             if ($this->ldapInstance->isAuthenticated()){
-                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap isAuth');
-
                 $data = $this->ldapInstance->getCustomerData();
                 $booking_email  = $data['customer_email'];
             } else {
@@ -690,12 +667,10 @@ class Bookings extends Shortcodes {
                     ],
                     get_permalink()
                 );
-                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'ldap is not auth - redirect = ' . $redirectUrl);
                 wp_redirect($redirectUrl);
                 exit;
             }
         } else {
-            // Helper::debugLog(__FILE__, __LINE__, __METHOD__, 'neither sso nor ldap is required');
             $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
             $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
             $booking_email = sanitize_email($posted_data['rsvp_email']);
