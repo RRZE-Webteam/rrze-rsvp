@@ -10,15 +10,13 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Capabilities;
 
-class Rooms
-{
-    public function __construct()
-    {
+class Rooms{
+
+    public function __construct(){
         //
     }
 
-    public function onLoaded()
-    {
+    public function onLoaded(){
         add_action('init', [$this, 'room_post_type']);
 
         add_filter('manage_room_posts_columns', [$this, 'columns']);
@@ -28,9 +26,9 @@ class Rooms
         add_filter('months_dropdown_results', [$this, 'removeMonthsDropdown'], 10, 2);
     }
 
+
     // Register Custom Post Type
-    public function room_post_type()
-    {
+    public function room_post_type(){
         $labels = [
             'name'                  => _x('Rooms', 'Post type general name', 'rrze-rsvp'),
             'singular_name'         => _x('Room', 'Post type singular name', 'rrze-rsvp'),
@@ -82,8 +80,7 @@ class Rooms
         register_post_type('room', $args);
     }
 
-    public function columns($columns)
-    {
+    public function columns($columns){
         $columns = array(
             'cb' => $columns['cb'],
             'title' => __('Room', 'rrze-rsvp')
@@ -91,23 +88,20 @@ class Rooms
         return $columns;
     }
 
-    public function customColumn($column, $postId)
-    {
+    public function customColumn($column, $postId){
         if ('title' === $column) {
             echo get_the_title($postId);
         }
     }
 
-    public function sortableColumns($columns)
-    {
+    public function sortableColumns($columns){
         $columns = array(
-            'title' => __('Room', 'rrze-rsvp')
+            'title' => 'title'
         );
         return $columns;
     }
 
-    public function removeMonthsDropdown($months, $postType)
-    {
+    public function removeMonthsDropdown($months, $postType){
         if ($postType == 'room') {
             $months = [];
         }
