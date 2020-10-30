@@ -40,9 +40,11 @@ class Bookings {
         add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
         add_action('wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots']);
 
-        add_filter('query_vars', [$this, 'registerQueryVarsBookingSearch'] );
+        // add_filter('query_vars', [$this, 'registerQueryVars'] );
+        // add_filter('posts_orderby' , [$this, 'getOrderbyStatement'], 10, 2);
         add_filter('parse_query', [$this, 'filterBookings'], 10);
         add_action('pre_get_posts', [$this, 'searchBookings']);
+        // add_filter('posts_join', [$this, 'sortBookingsJoin']);
     }
 
     
@@ -102,7 +104,7 @@ class Bookings {
         $columns['cb'] = true;
         $columns['bookingdate'] = __('Date', 'rrze-rsvp');
         $columns['bookingstart'] = __('Time', 'rrze-rsvp');
-        $columns['room'] = 'Room';
+        $columns['room'] = __('Room', 'rrze-rsvp');
         $columns['seat'] = __('Seat', 'rrze-rsvp');
         $columns['name'] = __('Name', 'rrze-rsvp');
         $columns['email'] = __('Email', 'rrze-rsvp');
@@ -115,16 +117,15 @@ class Bookings {
 
     public function addBookingSortableColumns($columns) {
         $columns['bookingdate'] = 'bookingdate';
-        $columns['bookingstart'] = 'bookingstart';
-        $columns['room'] ='room';
-        $columns['seat'] = 'seat';
-        $columns['name'] = 'name';
-        $columns['email'] = 'email';
-        if (current_user_can('read_customer_phone')) {
-            $columns['phone'] = 'phone';
-        }
+        // $columns['bookingstart'] = 'bookingstart';
+        // $columns['room'] = 'room';
+        // $columns['seat'] = 'seat';
+        // $columns['name'] = 'name';
+        // $columns['email'] = 'email';
+        // if (current_user_can('read_customer_phone')) {
+        //     $columns['phone'] = 'phone';
+        // }
         $columns['status'] = 'status';
-
         return $columns;
     }
 
@@ -234,7 +235,6 @@ class Bookings {
                 }
                 break;
             default:
-                //
         }
     }
 
@@ -331,7 +331,7 @@ class Bookings {
 
 
 
-    public function registerQueryVarsBookingSearch( $vars ) {
+    public function registerQueryVars( $vars ) {
         $vars[] = 'room';
         $vars[] = 'date';
         $vars[] = 'time';
@@ -542,40 +542,62 @@ class Bookings {
             }
         }
 
-        // $orderby = $query->get( 'orderby' );
-        // $columns['bookingdate'] = 'bookingdate';
-        // $columns['bookingstart'] = 'bookingstart';
-        // $columns['room'] ='room';
-        // $columns['seat'] = 'seat';
-        // $columns['name'] = 'name';
-        // $columns['email'] = 'email';
-        // if (current_user_can('read_customer_phone')) {
-        //     $columns['phone'] = 'phone';
-        // }
-        // $columns['status'] = 'status';
+        $orderby = $query->get('orderby');
 
-        // if ( $orderby ) {
-    
-        //     $meta_query = array(
-        //         'relation' => 'OR',
-        //         array(
-        //             'key' => 'rrze-rsvp-seat-room',
-        //             'compare' => 'NOT EXISTS', 
-        //         ),
-        //         array(
-        //             'key' => 'rrze-rsvp-seat-room',
-        //         ),
-        //     );
-    
-            // $query->set( 'meta_query', $meta_query );
-            $query->set( 'orderby', 'rrze-rsvp-booking-start' );
-        // }
+        switch ($orderby){
+            case 'bookingdate':
+                $query->set('meta_key', 'rrze-rsvp-booking-start');
+                $query->set('orderby', 'meta_value_num');
+            break;
+            // case 'email':
+            //     $query->set('meta_key', 'rrze-rsvp-booking-guest-email');
+            //     $query->set('orderby', 'meta_value');
+            // break;
+            // case 'room':
+                // $query->set('meta_key', 'rrze-rsvp-booking-seat');
+                // $query->set('orderby', get_the_title(get_post_meta('meta_value', 'rrze-rsvp-seat-seat', true)));
+                // $query->set('orderby', 'room');
+            // break;
+            // case 'seat':
+            //     $query->set('meta_key', 'rrze-rsvp-booking-seat');
+            //     $query->set('orderby', 'meta_value_num');
+            // break;
+            // case 'status':
+            //     $query->set('meta_key', 'rrze-rsvp-booking-status');
+            //     $query->set('orderby', get_the_title('meta_value'));
+            // break;
+             
+        }
+        $query->set('posts_per_page', -1);
 
-
-        return $query;
+        // echo '<pre>';
+        // var_dump($query);
+        // exit;
     }
 
 
+    public function sortBookingsJoin($join) {
+        global $wpdb, $wp_query;
+        if ( !$wp_query->is_main_query() || !is_admin() || !$wp_query->get('post_type') == 'booking'){
+            return $join;
+        }
+        if ($wp_query->get('orderby') == 'seat'){
+            $join .= "LEFT JOIN $wpdb->postmeta ON $wpdb->posts.ID = $wpdb->postmeta.post_id ";
+        }
+    
+        return $join;
+    }
+
+    // public function sortBookingsWhere($where, &$wp_query)
+    // {
+    //     global $wpdb;
+    //     $where .= ' AND ' . $wpdb->posts . '.post_title LIKE \''.$searchAlphabet.'%\' ';
+    
+    //         // use only if the post meta db table has been joined to the search tables using posts_join filter
+    //         $where .= " AND ($wpdb->postmeta.meta_key = 'JDReview_CustomFields_ReivewOrNewsPostType' AND $wpdb->postmeta.meta_value = 'JDReview_PostType_ReviewPost') ";
+    //         return $where;
+    //     }
+    // }
 
     public function bookingViews($views)
     {

@@ -126,11 +126,11 @@ function defaultOptions()  {
             'room-notes-label' => __('Additional informations', 'rrze-rsvp'),
             'check-in-time' => '15',
             'dsgvo-declaration' => __('Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden erfasst.', 'rrze-rsvp'),
-            'server' => 'ubaddc1.bib.uni-erlangen.de',
-            'port' => '389',
-            'distinguished_name' => 'CN=UB Bib User,OU=Groups,OU=UB,DC=ubad,DC=fau,DC=de',
-            'bind_base_dn' => 'ubad.fau.de',
-            'search_base_dn' => 'DC=ubad,DC=fau,DC=de',
+            // 'server' => 'ubaddc1.bib.uni-erlangen.de',
+            // 'port' => '389',
+            // 'distinguished_name' => 'CN=UB Bib User,OU=Groups,OU=UB,DC=ubad,DC=fau,DC=de',
+            // 'bind_base_dn' => 'ubad.fau.de',
+            // 'search_base_dn' => 'DC=ubad,DC=fau,DC=de',
         ];
     }
     
@@ -172,10 +172,10 @@ function getSections()
             'id'    => 'pdf',
             'title' => __('QR PDF Settings', 'rrze-rsvp')
         ],
-        [
-            'id'    => 'ldap',
-            'title' => __('LDAP Settings', 'rrze-rsvp')
-        ],
+        // [
+        //     'id'    => 'ldap',
+        //     'title' => __('LDAP Settings', 'rrze-rsvp')
+        // ],
     ];
 }
 
@@ -187,80 +187,6 @@ function getFields(){
     $defaults = defaultOptions();
     
     return [
-/*	'basic' => [
-            [
-                'name'              => 'text_input',
-                'label'             => __('Text Input', 'rrze-rsvp'),
-                'desc'              => __('Text input description.', 'rrze-rsvp'),
-                'placeholder'       => __('Text Input placeholder', 'rrze-rsvp'),
-                'type'              => 'text',
-                'default'           => 'Title',
-                'sanitize_callback' => 'sanitize_text_field'
-            ],
-            [
-                'name'              => 'number_input',
-                'label'             => __('Number Input', 'rrze-rsvp'),
-                'desc'              => __('Number input description.', 'rrze-rsvp'),
-                'placeholder'       => '5',
-                'min'               => 0,
-                'max'               => 100,
-                'step'              => '1',
-                'type'              => 'number',
-                'default'           => 'Title',
-                'sanitize_callback' => 'floatval'
-            ],
-            [
-                'name'        => 'textarea',
-                'label'       => __('Textarea Input', 'rrze-rsvp'),
-                'desc'        => __('Textarea description', 'rrze-rsvp'),
-                'placeholder' => __('Textarea placeholder', 'rrze-rsvp'),
-                'type'        => 'textarea'
-            ],
-            [
-                'name'  => 'checkbox',
-                'label' => __('Checkbox', 'rrze-rsvp'),
-                'desc'  => __('Checkbox description', 'rrze-rsvp'),
-                'type'  => 'checkbox'
-            ],
-            [
-                'name'    => 'multicheck',
-                'label'   => __('Multiple checkbox', 'rrze-rsvp'),
-                'desc'    => __('Multiple checkbox description.', 'rrze-rsvp'),
-                'type'    => 'multicheck',
-                'default' => [
-                    'one' => 'one',
-                    'two' => 'two'
-                ],
-                'options'   => [
-                    'one'   => __('One', 'rrze-rsvp'),
-                    'two'   => __('Two', 'rrze-rsvp'),
-                    'three' => __('Three', 'rrze-rsvp'),
-                    'four'  => __('Four', 'rrze-rsvp')
-                ]
-            ],
-            [
-                'name'    => 'radio',
-                'label'   => __('Radio Button', 'rrze-rsvp'),
-                'desc'    => __('Radio button description.', 'rrze-rsvp'),
-                'type'    => 'radio',
-                'options' => [
-                    'yes' => __('Yes', 'rrze-rsvp'),
-                    'no'  => __('No', 'rrze-rsvp')
-                ]
-            ],
-            [
-                'name'    => 'selectbox',
-                'label'   => __('Dropdown', 'rrze-rsvp'),
-                'desc'    => __('Dropdown description.', 'rrze-rsvp'),
-                'type'    => 'select',
-                'default' => 'no',
-                'options' => [
-                    'yes' => __('Yes', 'rrze-rsvp'),
-                    'no'  => __('No', 'rrze-rsvp')
-                ]
-            ]
-        ],
- */
         'general' => [
             [
                 'name'    => 'check-in-time',
@@ -296,7 +222,7 @@ function getFields(){
                 'desc'    => __('Email address for notifications.', 'rrze-rsvp'),
                 'type'    => 'email',
                 'default' => $defaults['notification_email'],
-		'sanitize_callback' => 'sanitize_email'
+		        'sanitize_callback' => 'sanitize_email'
             ],
             [
                 'name'    => 'notification_if_new',
@@ -307,9 +233,9 @@ function getFields(){
                     'yes' => __('Yes', 'rrze-rsvp'),
                     'no'  => __('No', 'rrze-rsvp')
                 ],
-		'default'   => $defaults['notification_if_new'],
+		        'default'   => $defaults['notification_if_new'],
             ],
-	    [
+	        [
                 'name'    => 'notification_if_cancel',
                 'label'   => __('Cancel Notification', 'rrze-rsvp'),
                 'desc'    => __('Notification of booking cancellation.', 'rrze-rsvp'),
@@ -318,9 +244,9 @@ function getFields(){
                     'yes' => __('Yes', 'rrze-rsvp'),
                     'no'  => __('No', 'rrze-rsvp')
                 ],
-		'default'   => $defaults['notification_if_cancel'],
+		        'default'   => $defaults['notification_if_cancel'],
             ],
-	    [
+	        [
                 'name'              => 'sender_name',
                 'label'             => __('Sender name', 'rrze-rsvp'),
                 'desc'              => __('Name for Sender for the booking system.', 'rrze-rsvp'),
@@ -329,15 +255,15 @@ function getFields(){
                 'default'           =>  $defaults['sender_name'],
                 'sanitize_callback' => 'sanitize_text_field'
             ],
-	    [
+	        [
                 'name'    => 'sender_email',
                 'label'   => __('Sender email', 'rrze-rsvp'),
                 'desc'    => __('Email address of sender.', 'rrze-rsvp'),
                 'type'    => 'email',
                 'default' =>  $defaults['sender_email'],
-		'sanitize_callback' => 'sanitize_email'
+		        'sanitize_callback' => 'sanitize_email'
             ],
-	     [
+	        [
                 'name'              => 'received_subject',
                 'label'             => __('Subject of the received booking', 'rrze-rsvp'),
                 'desc'              => __('Subject of the email replying to a booking received.', 'rrze-rsvp'),
@@ -354,7 +280,7 @@ function getFields(){
                 'sanitize_callback' => 'sanitize_text_field',
                 'exception'         => ['locale' => 'en']
             ],            
-	     [
+	        [
                 'name'              => 'received_text',
                 'label'             => __('Text of the received booking', 'rrze-rsvp'),
                 'type'              => 'textarea',
@@ -397,7 +323,7 @@ function getFields(){
                 'default'           => $defaults['force_to_confirm_text_en'],
                 'exception'         => ['locale' => 'en']
             ],                                                    
-	      [
+	        [
                 'name'              => 'confirm_subject',
                 'label'             => __('Subject Confirmation', 'rrze-rsvp'),
                 'desc'              => __('Subject for confirmation mails', 'rrze-rsvp'),
@@ -414,7 +340,7 @@ function getFields(){
                 'sanitize_callback' => 'sanitize_text_field',
                 'exception'         => ['locale' => 'en']
             ],            
-	     [
+	        [
                 'name'              => 'confirm_text',
                 'label'             => __('Confirmation Text', 'rrze-rsvp'),
                 'type'              => 'textarea',
@@ -478,20 +404,19 @@ function getFields(){
                 'sanitize_callback' => 'sanitize_text_field',
                 'exception'         => ['locale' => 'en']
             ],
-	     [
+	        [
                 'name'              => 'cancel_text',
                 'label'             => __('Cancel Text', 'rrze-rsvp'),
                 'type'              => 'textarea',
                 'default'           => $defaults['cancel_text']
-         ],
-	     [
+            ],
+	        [
             'name'              => 'cancel_text_en',
             'label'             => __('Cancel Text (english)', 'rrze-rsvp'),
             'type'              => 'textarea',
             'default'           => $defaults['cancel_text_en'],
             'exception'         => ['locale' => 'en']
-        ]         
-           
+            ]         
         ],
         'pdf' => [
             [
@@ -561,56 +486,48 @@ function getFields(){
                 'type'  => 'checkbox'
             ],
         ],
-        'ldap' => [
-            [
-                'name'    => 'server',
-                'label'   => __('Server', 'rrze-rsvp'),
-                'desc'   => __('LDAP server URL', 'rrze-rsvp'),
-                'type'    => 'text',
-                'default' => $defaults['server'],
-		        'sanitize_callback' => 'sanitize_text_field'
-            ],
-            [
-                'name'    => 'port',
-                'label'   => __('Port', 'rrze-rsvp'),
-                'desc'   => __('Port', 'rrze-rsvp'),
-                'type'    => 'number',
-                'default' => $defaults['port'],
-		        'sanitize_callback' => 'sanitize_natint_field'
-            ],
-            [
-                'name'    => 'distinguished_name',
-                'label'   => __('Distinguished Name', 'rrze-rsvp'),
-                'desc'   => __('Distinguished Name', 'rrze-rsvp'),
-                'type'    => 'text',
-                'default' => $defaults['distinguished_name'],
-		        'sanitize_callback' => 'sanitize_text_field'
-            ],
-            [
-                'name'    => 'bind_base_dn',
-                'label'   => __('Bind Base DN', 'rrze-rsvp'),
-                'desc'   => __('DN to bind on', 'rrze-rsvp'),
-                'type'    => 'text',
-                'default' => $defaults['bind_base_dn'],
-		        'sanitize_callback' => 'sanitize_text_field'
-            ],
-            [
-                'name'    => 'search_base_dn',
-                'label'   => __('Search Base DN', 'rrze-rsvp'),
-                'desc'   => __('DN to search in', 'rrze-rsvp'),
-                'type'    => 'text',
-                'default' => $defaults['search_base_dn'],
-		        'sanitize_callback' => 'sanitize_text_field'
-            ],
-            // [
-            //     'name'    => 'port',
-            //     'label'   => __('Port', 'rrze-rsvp'),
-            //     'desc'   => __('Port', 'rrze-rsvp'),
-            //     'type'    => 'number',
-            //     'default' => $defaults['port'],
-		    //     'sanitize_callback' => 'sanitize_int'
-            // ],
-        ]
+        // 'ldap' => [
+        //     [
+        //         'name'    => 'server',
+        //         'label'   => __('Server', 'rrze-rsvp'),
+        //         'desc'   => __('LDAP server URL', 'rrze-rsvp'),
+        //         'type'    => 'text',
+        //         'default' => $defaults['server'],
+		//         'sanitize_callback' => 'sanitize_text_field'
+        //     ],
+        //     [
+        //         'name'    => 'port',
+        //         'label'   => __('Port', 'rrze-rsvp'),
+        //         'desc'   => __('Port', 'rrze-rsvp'),
+        //         'type'    => 'number',
+        //         'default' => $defaults['port'],
+		//         'sanitize_callback' => 'sanitize_natint_field'
+        //     ],
+        //     [
+        //         'name'    => 'distinguished_name',
+        //         'label'   => __('Distinguished Name', 'rrze-rsvp'),
+        //         'desc'   => __('Distinguished Name', 'rrze-rsvp'),
+        //         'type'    => 'text',
+        //         'default' => $defaults['distinguished_name'],
+		//         'sanitize_callback' => 'sanitize_text_field'
+        //     ],
+        //     [
+        //         'name'    => 'bind_base_dn',
+        //         'label'   => __('Bind Base DN', 'rrze-rsvp'),
+        //         'desc'   => __('DN to bind on', 'rrze-rsvp'),
+        //         'type'    => 'text',
+        //         'default' => $defaults['bind_base_dn'],
+		//         'sanitize_callback' => 'sanitize_text_field'
+        //     ],
+        //     [
+        //         'name'    => 'search_base_dn',
+        //         'label'   => __('Search Base DN', 'rrze-rsvp'),
+        //         'desc'   => __('DN to search in', 'rrze-rsvp'),
+        //         'type'    => 'text',
+        //         'default' => $defaults['search_base_dn'],
+		//         'sanitize_callback' => 'sanitize_text_field'
+        //     ],
+        // ]
     ];
 }
 
