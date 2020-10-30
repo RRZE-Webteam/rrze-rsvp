@@ -142,7 +142,6 @@ jQuery(document).ready(function ($) {
 
 
     /* trigger reservations' details - see https://github.com/RRZE-Webteam/rrze-rsvp/issues/92 */
-	/* trigger reservations' details - see https://github.com/RRZE-Webteam/rrze-rsvp/issues/92 */
 	var bookingModeSelect = $('select#rrze-rsvp-room-bookingmode');
 	var bookingMode = bookingModeSelect.val();
 	var instantCheckInRow = $('div.cmb2-id-rrze-rsvp-room-instant-check-in');
@@ -156,8 +155,8 @@ jQuery(document).ready(function ($) {
 		triggerModeVisibility(bookingMode);
 	});
 	autoConfirmationInput.click(function() {
-		var autoConfirmation = $(this).is(':checked');
-		triggerInstant(autoConfirmation);
+		var autoConfirmationChecked = $(this).is(':checked');
+		triggerInstant(autoConfirmationChecked);
 	});
 
 	function triggerModeVisibility(bookingMode){
