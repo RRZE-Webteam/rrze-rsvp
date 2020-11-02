@@ -47,6 +47,14 @@ if (Helper::isFauTheme()) {
  */
 echo $divOpen;
 
+// if ( shortcode_exists( 'rsvp-booking' ) ) {
+//     echo 'yes, it exists';
+//     echo '<pre>';
+//     var_dump($_REQUEST);
+// }else{
+//     echo 'no man, not existing.';
+// }
+ 
 echo do_shortcode(sprintf('[rsvp-booking%s]', $room));
 
 echo $divClose;

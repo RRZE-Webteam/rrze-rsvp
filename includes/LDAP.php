@@ -43,13 +43,15 @@ class LDAP {
     
 
     // returns true/false if logged in via LDAP and sets $this->mail fetched from LDAP
-    public function isAuthenticated(){
+    public function getEmail(){
+    // public function isAuthenticated(){
+            // return true;
+
         $error = false;
 
-        if ($this->isLoggedIn){
-            return true;
-        }
-
+        // if ($this->isLoggedIn){
+        //     return true;
+        // }
 
         $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
         $username = ( $username ? $username : filter_input(INPUT_GET, 'username', FILTER_SANITIZE_STRING));
@@ -57,29 +59,53 @@ class LDAP {
         $password = ( $password ? $password : filter_input(INPUT_GET, 'password', FILTER_SANITIZE_STRING));
 
         // BK 2DO !!!
-        $username = ( isset($_REQUEST['username']) ? $_REQUEST['username'] : '');
-        $password = ( isset($_REQUEST['password']) ? $_REQUEST['password'] : '');
+        // $username = ( isset($_REQUEST['username']) ? $_REQUEST['username'] : '');
+        // $password = ( isset($_REQUEST['password']) ? $_REQUEST['password'] : '');
 
         if ($username && $password){
+
+            // echo 'user pass given';
+            // exit;
+
             $this->link_identifier = @ldap_connect($this->server, $this->port);
-        
+
+            // echo '1';
+            // exit;
+
             if (!$this->link_identifier){
                 $error = $this->logError('ldap_connect()');
+                // echo '2';
+                // exit;
             }else{
                 ldap_set_option($this->link_identifier, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($this->link_identifier, LDAP_OPT_REFERRALS, 0);
             
                 $bind = @ldap_bind($this->link_identifier, $username . '@' . $this->bind_base_dn, $password);
 
+                // echo '3';
+                // exit;
+    
                 if (!$bind) {
                     $error = $this->logError('ldap_bind()');
+                    // echo '4';
+                    // exit;
+        
                 }else{
+                    // echo '5';
+                    // exit;
+        
                     $this->search_filter = '(sAMAccountName=' . $username . ')';
                     $result_identifier = @ldap_search($this->link_identifier, $this->search_base_dn, $this->search_filter);                    
 
                     if ($result_identifier === false){
                         $error = $this->logError('ldap_search()');
+                        // echo '6';
+                        // exit;
+            
                     }else{
+                        // echo '7';
+                        // exit;
+            
                         $aEntry = @ldap_get_entries($this->link_identifier, $result_identifier);
 
                         if (isset($aEntry['count']) && $aEntry['count'] > 0){
@@ -98,13 +124,16 @@ class LDAP {
                                 // wp_redirect($redirectUrl);
                                 // exit; 
 
-                                return true;
+                                return $aEntry[0]['mail'][0];
                         
                             }else{
                                 $error = $this->logError('ldap_get_entries() : Attributes have changed. Expected $aEntry[0][\'cn\'][0] and $aEntry[0][\'mail\'][0]');
                             }
                         }else{
-                            return false; // User not found
+                            return 'not found';
+                            // exit;
+                    
+                            // return false; // User not found
                         }
                         @ldap_close($this->connection);
                     }
@@ -114,6 +143,9 @@ class LDAP {
         //     echo 'here';
         //     exit;
         }
+
+        // echo 'done' . $this->mail;
+        // exit;
         
 
     } 

@@ -17,15 +17,32 @@ $nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET[
 
 $bookingId = isset($_GET['id']) && !$roomId ? sprintf('?id=%s', absint($_GET['id'])) : '';
 $action = isset($_GET['action']) && !$roomId ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
+// echo '<pre>';
+// var_dump($_REQUEST);
+// // exit;
+// echo 'hereasdf';
+// // // submit
+// exit;
+    // echo '<pre>';
+    // var_dump($_REQUEST);
+    // exit;
 
-if ($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated()) {
+if (isset($_POST['submit_ldap'])){
+    $mail = '&mail=' . $ldapInstance->getEmail();
+    $redirectUrl = sprintf('%s%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce, $mail);
+    // echo '<br>';
+    // echo $redirectUrl;
+    // exit;
+    wp_redirect($redirectUrl);
+    exit;
+}
+
+if (!isset($_POST['submit_ldap']) && $idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated()) {
     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
     wp_redirect($redirectUrl);
     exit;
-}elseif ($ldapInstance->isAuthenticated()) {
-    $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
-    wp_redirect($redirectUrl);
-    exit; 
+// }elseif ($ldapInstance->isAuthenticated()) {
+//     exit; 
 }
 
 
@@ -105,7 +122,7 @@ if ($roomID){
             <form action="#" method="POST">
     			<label for="username">Username: </label><input id="username" type="text" name="username" value="{{=username}}" />
     			<label for="password">Password: </label><input id="password" type="password" name="password"  value="{{=password}}" />
-    			<input type="submit" name="submit" value="Submit" />
+    			<input type="submit" name="submit_ldap" value="Submit" />
             </form>
 FORMEND;
     }
