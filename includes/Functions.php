@@ -146,8 +146,7 @@ class Functions
      * @param int $timestamp (optional, the timestampt to check occupancies at, default: current_time('timestamp') )
      * @return array
      */
-    public static function getOccupancyByRoomId(int $room_id, bool $from_now = NULL, int $timestamp = 0): array
-    {
+    public static function getOccupancyByRoomId(int $room_id, bool $from_now = NULL, int $timestamp = 0): array {
         $data = [];
         $timestamp = ( !$timestamp ? current_time('timestamp') : $timestamp );
         $thisDay = date('Y-m-d', $timestamp);
@@ -178,12 +177,19 @@ class Functions
             'nopaging' => true,
             'meta_key' => 'rrze-rsvp-seat-room',
             'meta_value' => $room_id,
-            'fields' => 'ids',
+            // 'fields' => 'ids',
             'orderby'=> 'title', 
             'order' => 'ASC'
         ]);
 
-        foreach ($seatIds as $seat_id) {
+        // sort by title naturally
+        $seatSortedByTitle = [];
+        foreach($seatIds as $seat){
+            $seatSortedByTitle[$seat->ID] = $seat->post_title;
+        }
+        natsort($seatSortedByTitle);
+
+        foreach ($seatSortedByTitle as $seat_id => $title){
             $slots_free = self::getSeatAvailability($seat_id, $thisDay, $thisDay);
             $slots_free_thisDay_tmp = ( isset($slots_free[$thisDay]) ? $slots_free[$thisDay] : [] );
             $slots_free_thisDay = array_combine($slots_free_thisDay_tmp, $slots_free_thisDay_tmp); // set values to keys
