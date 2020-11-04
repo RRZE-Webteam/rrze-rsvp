@@ -675,6 +675,7 @@ class Actions
 	* 		c) to be password protected 
     */ 
 	public function prePostUpdate($post_id, $post_data) {
+        global $wpdb;
 		$errorMessage = '';
 		
 		if (!in_array($post_data['post_type'], ['room', 'seat'])) {
@@ -720,6 +721,8 @@ class Actions
 
 
 		if ($errorMessage) {
+            $wpdb->update( $wpdb->posts, array( 'post_name' => $post_data['post_title'] ), array( 'ID' => $post_id ) );
+
 			wp_die(
 				$errorMessage,
 				__('Update Error', 'rrze-rsvp'),
