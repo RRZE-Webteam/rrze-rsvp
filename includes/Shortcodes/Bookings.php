@@ -59,19 +59,10 @@ class Bookings extends Shortcodes {
 
 
     public function maybeAuthenticate(){
-        // echo 'maybebooking';
-        // echo '<pre>';
-        // var_dump($_GET);
-        // exit;
         global $post;
-        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
-        // if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
-            // echo 'about to return';
-            // exit;
+        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth']) || isset($_GET['mail'])) {
             return;
         }
-        // echo 'here';
-        // exit;
         $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
 
         if (isset($_GET['room_id'])) {            
@@ -91,25 +82,16 @@ class Bookings extends Shortcodes {
             $this->ldapRequired = ( $shortcodeLDAP ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true)) );
         }
 
-
-        // echo '<pre>';
-        // var_dump($_REQUEST);
-
         if ($this->ssoRequired) {
             $this->sso = $this->idm->tryLogIn();
         }
-        
+
         if ($this->ldapRequired) {
-            $this->ldap = $this->ldapInstance->tryLogIn($this->nonce);
+            $this->ldap = $this->ldapInstance->tryLogIn();
         }
     }
 
     public function shortcodeBooking($atts, $content = '', $tag) {
-
-        // echo '<pre>';
-        // var_dump($_REQUEST);
-        // exit;
-
         global $post;
         $postID = $post->ID;
 
@@ -123,7 +105,6 @@ class Bookings extends Shortcodes {
                     ],
                     get_permalink()
                 );
-                // Helper::debugLog(__FILE__, __LINE__, __METHOD__, json_encode($redirectUrl));
                 wp_redirect($redirectUrl);
                 exit;
             }           
@@ -354,16 +335,15 @@ class Bookings extends Shortcodes {
                 . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
                 . '</div>';
         }
-        if (isset($_GET['mail'])) {
-            // $data = $this->ldapInstance->getCustomerData();
+        $mail = filter_input(INPUT_GET, 'mail', FILTER_SANITIZE_STRING);
 
-            $output .= '<input type="hidden" value="' . $_GET['mail'] . '" id="rsvp_email" name="rsvp_email">';
+        if ($mail) {
+            $output .= '<input type="hidden" value="' . $mail . '" id="rsvp_email" name="rsvp_email">';
 
             $output .= '<div class="form-group">'
-                . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $_GET['mail'] . '</strong></p>'
+                . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $mail . '</strong></p>'
                 . '</div>';
         }
-        
         if (!$this->ssoRequired && !$this->ldapRequired) {
             $error = isset($fieldErrors['rsvp_lastname']) ? ' error' : '';
             $value = isset($fieldErrors['rsvp_lastname']['value']) ? $fieldErrors['rsvp_lastname']['value'] : '';
@@ -383,16 +363,18 @@ class Bookings extends Shortcodes {
                 . '<div class="error-message">' . $message . '</div>'
                 . '</div>';
 
-            $error = isset($fieldErrors['rsvp_email']) ? ' error' : '';
-            $value = isset($fieldErrors['rsvp_email']['value']) ? $fieldErrors['rsvp_email']['value'] : '';
-            $message = isset($fieldErrors['rsvp_email']['message']) ? $fieldErrors['rsvp_email']['message'] : '';    
-            $output .= '<div class="form-group' . $error . '"><label for="rsvp_email">'
-                . __('Email', 'rrze-rsvp') . '</label>'
-                . '<input type="email" name="rsvp_email" value="' . $value . '" '
-		. 'pattern="^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*(\.\w{2,})+$" '
-		. 'id="rsvp_email" required aria-required="true">'
-                . '<div class="error-message">' . $message . '</div>'
-                . '</div>';
+            if (!$mail){
+                $error = isset($fieldErrors['rsvp_email']) ? ' error' : '';
+                $value = isset($fieldErrors['rsvp_email']['value']) ? $fieldErrors['rsvp_email']['value'] : '';
+                $message = isset($fieldErrors['rsvp_email']['message']) ? $fieldErrors['rsvp_email']['message'] : '';    
+                $output .= '<div class="form-group' . $error . '"><label for="rsvp_email">'
+                    . __('Email', 'rrze-rsvp') . '</label>'
+                    . '<input type="email" name="rsvp_email" value="' . $value . '" '
+    		        . 'pattern="^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*(\.\w{2,})+$" '
+    		        . 'id="rsvp_email" required aria-required="true">'
+                    . '<div class="error-message">' . $message . '</div>'
+                    . '</div>';
+            }
         }
         $error = isset($fieldErrors['rsvp_phone']) ? ' error' : '';
         $value = isset($fieldErrors['rsvp_phone']['value']) ? $fieldErrors['rsvp_phone']['value'] : '';
@@ -608,13 +590,6 @@ class Bookings extends Shortcodes {
     }
 
     public function bookingSubmitted() {
-
-        // echo 'bookingSubmitted';
-        // echo '<pre>';
-        // var_dump($_POST);
-        // exit;
-
-
         if (!isset($_POST['rrze_rsvp_post_nonce_field']) || !wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
             return;
         }
@@ -628,7 +603,6 @@ class Bookings extends Shortcodes {
         );
 
         $posted_data = $_POST;
-        // echo Helper::get_html_var_dump($posted_data);
         $booking_date = sanitize_text_field($posted_data['rsvp_date']);
         $booking_start = sanitize_text_field($posted_data['rsvp_time']);
         $booking_timestamp_start = strtotime($booking_date . ' ' . $booking_start);
@@ -1230,10 +1204,17 @@ class Bookings extends Shortcodes {
             }
         }
         $seats = (isset($availability[$date][$time])) ? $availability[$date][$time] : [];
-        //var_dump($seats);
+
+        // sort by title naturally
+        $seatSortedByTitle = [];
+        foreach ($seats as $seatID) {
+            $seatSortedByTitle[$seatID] = get_the_title($seatID);
+        }
+        natsort($seatSortedByTitle);
+
         $seatSelects = '';
-        foreach ($seats as $seat) {
-            $seatname = get_the_title($seat);
+        foreach ($seatSortedByTitle as $seat => $title) {
+            $seatname = $title;
             $id = 'rsvp_seat_' . sanitize_title($seat);
             $checked = checked($seat_id !== false && $seat == $seat_id, true, false);
             $seatSelects .= "<div class='form-group'>"

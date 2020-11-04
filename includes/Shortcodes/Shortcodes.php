@@ -106,14 +106,11 @@ class Shortcodes{
     }
 
     public function maybeAuthenticate() {
-
-
         global $post;
-        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
-        // if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
-                return;
+        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth']) || isset($_GET['mail'])) {
+            return;
         }
-
+        
         if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
             $this->idm->tryLogIn();
             $this->ldapInstance->tryLogIn();

@@ -17,32 +17,24 @@ $nonce = isset($_GET['nonce']) ? sprintf('&nonce=%s', sanitize_text_field($_GET[
 
 $bookingId = isset($_GET['id']) && !$roomId ? sprintf('?id=%s', absint($_GET['id'])) : '';
 $action = isset($_GET['action']) && !$roomId ? sprintf('&action=%s', sanitize_text_field($_GET['action'])) : '';
-// echo '<pre>';
-// var_dump($_REQUEST);
-// // exit;
-// echo 'hereasdf';
-// // // submit
-// exit;
-    // echo '<pre>';
-    // var_dump($_REQUEST);
-    // exit;
 
+$loginDenied = '';
 if (isset($_POST['submit_ldap'])){
-    $mail = '&mail=' . $ldapInstance->getEmail();
-    $redirectUrl = sprintf('%s%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce, $mail);
-    // echo '<br>';
-    // echo $redirectUrl;
-    // exit;
-    wp_redirect($redirectUrl);
-    exit;
+    $mail = $ldapInstance->getEmail();
+    if ($mail){
+        $mail = '&mail=' . $mail;
+        $redirectUrl = sprintf('%s%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce, $mail);
+        wp_redirect($redirectUrl);
+        exit;
+    }else{
+        $loginDenied = '<div class="error-message">' . __('Login denied', 'rrze-rsvp') . '</div>';
+    }
 }
 
-if (!isset($_POST['submit_ldap']) && $idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated()) {
+if ($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated()) {
     $redirectUrl = sprintf('%s%s%s%s%s%s%s%s', trailingslashit(get_permalink()), $bookingId, $action, $room, $seat, $bookingDate, $timeslot, $nonce);
     wp_redirect($redirectUrl);
     exit;
-// }elseif ($ldapInstance->isAuthenticated()) {
-//     exit; 
 }
 
 
@@ -106,22 +98,25 @@ echo <<<DIVEND
 		<h2>$title</h2>
 DIVEND;
 
-$orMsg = '';
+$sOr = '';
 if (isset($_GET['require-sso-auth'])){
     echo "<p>$idmLogin</p>";
-    $orMsg = '<br><strong>' . __('Oder', 'rrze-rsvp') . '</strong><br>&nbsp;<br>';
+    $sOr = '<br><strong>' . __('Oder', 'rrze-rsvp') . '</strong><br>&nbsp;<br>';
 }
 
 $roomID = filter_input(INPUT_GET, 'room_id', FILTER_VALIDATE_INT, ['min_range' => 1]);
+
 if ($roomID){
     $ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomID, 'rrze-rsvp-room-ldap-required', true));
     if ($ldapRequired){
-        $headline = $orMsg . __('Please login with your UB-AD username', 'rrze-rsvp') . ':';
+        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+        $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
+        $headline = $sOr . __('Please login with your UB-AD username', 'rrze-rsvp') . ':' . $loginDenied;
         echo <<<FORMEND
         $headline
             <form action="#" method="POST">
-    			<label for="username">Username: </label><input id="username" type="text" name="username" value="{{=username}}" />
-    			<label for="password">Password: </label><input id="password" type="password" name="password"  value="{{=password}}" />
+    			<label for="username">Username: </label><input id="username" type="text" name="username" value="$username" />
+    			<label for="password">Password: </label><input id="password" type="password" name="password"  value="$password" />
     			<input type="submit" name="submit_ldap" value="Submit" />
             </form>
 FORMEND;
