@@ -310,12 +310,21 @@ class Settings
         foreach ($this->settingsSections as $section) {
             if ($this->settingsPrefix . $section['id'] != $this->currentTab) {
                 continue;
-            } ?>
+            } 
+            switch ( $this->currentTab ) {
+                case 'rrze-rsvp-reset': 
+                    $btn_label = __('Reset', 'rrze-rsvp' );
+                    break;
+                default: 
+                    $btn_label = '';
+            }
+            
+            ?>
             <div id="<?php echo $this->settingsPrefix . $section['id']; ?>">
                 <form method="post" action="options.php">
                     <?php settings_fields($this->settingsPrefix . $section['id']); ?>
                     <?php do_settings_sections($this->settingsPrefix . $section['id']); ?>
-                    <?php submit_button(); ?>
+                    <?php submit_button($btn_label); ?>
                 </form>
             </div>
         <?php

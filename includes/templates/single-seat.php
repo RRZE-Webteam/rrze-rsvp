@@ -199,6 +199,8 @@ if ($checkInBooking) {
     $bookingId = null;
     $status = null;
     $ssoRequired = false;
+    $ldapRequired = false;
+   
     $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
     $now = current_time('timestamp');
 
