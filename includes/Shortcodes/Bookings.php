@@ -1230,10 +1230,16 @@ class Bookings extends Shortcodes {
             }
         }
         $seats = (isset($availability[$date][$time])) ? $availability[$date][$time] : [];
-        //var_dump($seats);
+
+        // sort by title naturally
+        $seatSortedByTitle = [];
+        foreach ($seats as $seatID) {
+            $seatSortedByTitle[$seatID] = get_the_title($seatID);
+        }
+        natsort($seatSortedByTitle);
         $seatSelects = '';
-        foreach ($seats as $seat) {
-            $seatname = get_the_title($seat);
+        foreach ($seatSortedByTitle as $seat => $title) {
+            $seatname = $title;
             $id = 'rsvp_seat_' . sanitize_title($seat);
             $checked = checked($seat_id !== false && $seat == $seat_id, true, false);
             $seatSelects .= "<div class='form-group'>"
