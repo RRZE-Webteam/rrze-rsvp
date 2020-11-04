@@ -27,7 +27,7 @@ if (isset($_POST['submit_ldap'])){
         wp_redirect($redirectUrl);
         exit;
     }else{
-        $loginDenied = '<div class="error-message">' . __('Login denied', 'rrze-rsvp') . '</div>';
+        $loginDenied = '<br><p class="error-message">' . __('Login denied', 'rrze-rsvp') . '</p>';
     }
 }
 
@@ -93,7 +93,7 @@ echo $divOpen;
 
 
 echo <<<DIVEND
-<div class="rrze-rsvp-booking-reply">
+<div class="rrze-rsvp-booking-reply rrze-rsvp">
     <div class="container">    
 		<h2>$title</h2>
 DIVEND;
