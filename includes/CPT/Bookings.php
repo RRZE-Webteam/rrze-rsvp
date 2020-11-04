@@ -40,11 +40,8 @@ class Bookings {
         add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
         add_action('wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots']);
 
-        // add_filter('query_vars', [$this, 'registerQueryVars'] );
-        // add_filter('posts_orderby' , [$this, 'getOrderbyStatement'], 10, 2);
         add_filter('parse_query', [$this, 'filterBookings'], 10);
         add_action('pre_get_posts', [$this, 'searchBookings']);
-        // add_filter('posts_join', [$this, 'sortBookingsJoin']);
     }
 
     
@@ -407,21 +404,26 @@ class Bookings {
 
     public function getBookingByGuest( $sSearch ){
         $meta_query = [];
-        $encryptedSearch = Functions::crypt($sSearch, 'encrypt');
 
-        $encryptedFields = [
-            'rrze-rsvp-booking-guest-firstname',
-            'rrze-rsvp-booking-guest-lastname',
-            'rrze-rsvp-booking-guest-email',
-            'rrze-rsvp-booking-guest-phone',
-        ];
+        $sSearchWords = explode(' ', $sSearch);
 
-        foreach($encryptedFields as $field){
-            $meta_query[] = [
-                'key'     => $field,
-                'value'   => $encryptedSearch,
-                'compare' => 'LIKE',    
+        foreach($sSearchWords as $sSearch){
+            $encryptedSearch = Functions::crypt($sSearch, 'encrypt');
+
+            $encryptedFields = [
+                'rrze-rsvp-booking-guest-firstname',
+                'rrze-rsvp-booking-guest-lastname',
+                'rrze-rsvp-booking-guest-email',
+                'rrze-rsvp-booking-guest-phone',
             ];
+
+            foreach($encryptedFields as $field){
+                $meta_query[] = [
+                    'key'     => $field,
+                    'value'   => $encryptedSearch,
+                    'compare' => 'LIKE',    
+                ];
+            }
         }
 
         if ( count($meta_query) > 1 ) {
@@ -569,38 +571,10 @@ class Bookings {
              
         }
         $query->set('posts_per_page', -1);
-
-        // echo '<pre>';
-        // var_dump($query);
-        // exit;
     }
 
 
-    public function sortBookingsJoin($join) {
-        global $wpdb, $wp_query;
-        if ( !$wp_query->is_main_query() || !is_admin() || !$wp_query->get('post_type') == 'booking'){
-            return $join;
-        }
-        if ($wp_query->get('orderby') == 'seat'){
-            $join .= "LEFT JOIN $wpdb->postmeta ON $wpdb->posts.ID = $wpdb->postmeta.post_id ";
-        }
-    
-        return $join;
-    }
-
-    // public function sortBookingsWhere($where, &$wp_query)
-    // {
-    //     global $wpdb;
-    //     $where .= ' AND ' . $wpdb->posts . '.post_title LIKE \''.$searchAlphabet.'%\' ';
-    
-    //         // use only if the post meta db table has been joined to the search tables using posts_join filter
-    //         $where .= " AND ($wpdb->postmeta.meta_key = 'JDReview_CustomFields_ReivewOrNewsPostType' AND $wpdb->postmeta.meta_value = 'JDReview_PostType_ReviewPost') ";
-    //         return $where;
-    //     }
-    // }
-
-    public function bookingViews($views)
-    {
+    public function bookingViews($views){
         if (isset($views['all'])) unset($views['all']);
         if (isset($views['mine'])) unset($views['mine']);
         if (isset($views['publish'])) unset($views['publish']);
