@@ -126,11 +126,6 @@ function defaultOptions()  {
             'room-notes-label' => __('Additional informations', 'rrze-rsvp'),
             'check-in-time' => '15',
             'dsgvo-declaration' => __('Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden erfasst.', 'rrze-rsvp'),
-            // 'server' => 'ubaddc1.bib.uni-erlangen.de',
-            // 'port' => '389',
-            // 'distinguished_name' => 'CN=UB Bib User,OU=Groups,OU=UB,DC=ubad,DC=fau,DC=de',
-            // 'bind_base_dn' => 'ubad.fau.de',
-            // 'search_base_dn' => 'DC=ubad,DC=fau,DC=de',
         ];
     }
     
@@ -172,10 +167,10 @@ function getSections()
             'id'    => 'pdf',
             'title' => __('QR PDF Settings', 'rrze-rsvp')
         ],
-        // [
-        //     'id'    => 'ldap',
-        //     'title' => __('LDAP Settings', 'rrze-rsvp')
-        // ],
+        [
+            'id'    => 'ldap',
+            'title' => __('LDAP Settings', 'rrze-rsvp')
+        ],
     ];
 }
 
@@ -486,48 +481,43 @@ function getFields(){
                 'type'  => 'checkbox'
             ],
         ],
-        // 'ldap' => [
-        //     [
-        //         'name'    => 'server',
-        //         'label'   => __('Server', 'rrze-rsvp'),
-        //         'desc'   => __('LDAP server URL', 'rrze-rsvp'),
-        //         'type'    => 'text',
-        //         'default' => $defaults['server'],
-		//         'sanitize_callback' => 'sanitize_text_field'
-        //     ],
-        //     [
-        //         'name'    => 'port',
-        //         'label'   => __('Port', 'rrze-rsvp'),
-        //         'desc'   => __('Port', 'rrze-rsvp'),
-        //         'type'    => 'number',
-        //         'default' => $defaults['port'],
-		//         'sanitize_callback' => 'sanitize_natint_field'
-        //     ],
-        //     [
-        //         'name'    => 'distinguished_name',
-        //         'label'   => __('Distinguished Name', 'rrze-rsvp'),
-        //         'desc'   => __('Distinguished Name', 'rrze-rsvp'),
-        //         'type'    => 'text',
-        //         'default' => $defaults['distinguished_name'],
-		//         'sanitize_callback' => 'sanitize_text_field'
-        //     ],
-        //     [
-        //         'name'    => 'bind_base_dn',
-        //         'label'   => __('Bind Base DN', 'rrze-rsvp'),
-        //         'desc'   => __('DN to bind on', 'rrze-rsvp'),
-        //         'type'    => 'text',
-        //         'default' => $defaults['bind_base_dn'],
-		//         'sanitize_callback' => 'sanitize_text_field'
-        //     ],
-        //     [
-        //         'name'    => 'search_base_dn',
-        //         'label'   => __('Search Base DN', 'rrze-rsvp'),
-        //         'desc'   => __('DN to search in', 'rrze-rsvp'),
-        //         'type'    => 'text',
-        //         'default' => $defaults['search_base_dn'],
-		//         'sanitize_callback' => 'sanitize_text_field'
-        //     ],
-        // ]
+        'ldap' => [
+            [
+                'name'    => 'server',
+                'label'   => __('Server', 'rrze-rsvp'),
+                'desc'   => __('LDAP server URL', 'rrze-rsvp'),
+                'type'    => 'text',
+		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+            [
+                'name'    => 'port',
+                'label'   => __('Port', 'rrze-rsvp'),
+                'desc'   => __('Port', 'rrze-rsvp'),
+                'type'    => 'number',
+		        'sanitize_callback' => 'sanitize_natint_field'
+            ],
+            [
+                'name'    => 'distinguished_name',
+                'label'   => __('Distinguished Name', 'rrze-rsvp'),
+                'desc'   => __('Distinguished Name', 'rrze-rsvp'),
+                'type'    => 'text',
+		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+            [
+                'name'    => 'bind_base_dn',
+                'label'   => __('Bind Base DN', 'rrze-rsvp'),
+                'desc'   => __('DN to bind on', 'rrze-rsvp'),
+                'type'    => 'text',
+		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+            [
+                'name'    => 'search_base_dn',
+                'label'   => __('Search Base DN', 'rrze-rsvp'),
+                'desc'   => __('DN to search in', 'rrze-rsvp'),
+                'type'    => 'text',
+		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+        ]
     ];
 }
 

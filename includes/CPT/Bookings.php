@@ -117,14 +117,14 @@ class Bookings {
 
     public function addBookingSortableColumns($columns) {
         $columns['bookingdate'] = 'bookingdate';
-        // $columns['bookingstart'] = 'bookingstart';
-        // $columns['room'] = 'room';
-        // $columns['seat'] = 'seat';
-        // $columns['name'] = 'name';
-        // $columns['email'] = 'email';
-        // if (current_user_can('read_customer_phone')) {
-        //     $columns['phone'] = 'phone';
-        // }
+        $columns['bookingstart'] = 'bookingstart';
+        $columns['room'] = 'room';
+        $columns['seat'] = 'seat';
+        $columns['name'] = 'name';
+        $columns['email'] = 'email';
+        if (current_user_can('read_customer_phone')) {
+            $columns['phone'] = 'phone';
+        }
         $columns['status'] = 'status';
         return $columns;
     }

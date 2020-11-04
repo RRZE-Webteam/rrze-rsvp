@@ -133,8 +133,8 @@ class Seats
 	public function sortableColumns($columns)
 	{
 		$columns = array(
-			'title' => __('Seat', 'rrze-rsvp'),
-			'room' => __('Room', 'rrze-rsvp')
+			'title' => 'title',
+			'room' => 'room'
 		);
 		return $columns;
 	}
