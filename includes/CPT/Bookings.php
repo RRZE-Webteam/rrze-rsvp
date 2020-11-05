@@ -73,7 +73,7 @@ class Bookings {
             'label'                     => __('Booking', 'rrze-rsvp'),
             'description'               => __('Add and edit Booking informations', 'rrze-rsvp'),
             'labels'                    => $labels,
-            'supports'                  => ['author', 'revisions'],
+            'supports'                  => ['author'], // , 'revisions'
             'hierarchical'              => false,
             'public'                    => false,
             'show_ui'                   => true,
