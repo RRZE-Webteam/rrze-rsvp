@@ -289,7 +289,7 @@ class Email
         $message = $this->template->getContent('email/email', $data);
         $altMessage = $this->template->getContent('email/email.txt', $data);
 
-        var_dump($message); exit;
+        //var_dump($message); exit;
 
         $this->send($to, $subject, $message, $altMessage, $attachment);
     }
