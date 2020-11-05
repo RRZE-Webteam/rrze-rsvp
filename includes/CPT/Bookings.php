@@ -10,7 +10,7 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Capabilities;
 use RRZE\RSVP\Functions;
-use RRZE\RSVP\Carbon;
+// use RRZE\RSVP\Carbon;
 
 class Bookings {
     protected $sDate;
@@ -525,7 +525,6 @@ class Bookings {
         if (!$query->is_main_query() || $query->query['post_type'] != 'booking') {
             return $query;
         } 
-
         $aBookingIDs = [];
 
         $this->sSearch = $query->query_vars['s'];
@@ -565,7 +564,6 @@ class Bookings {
             // break;
              
         }
-        $query->set('posts_per_page', -1);
     }
 
     public function removeMonthsDropdown($months, $postType){
