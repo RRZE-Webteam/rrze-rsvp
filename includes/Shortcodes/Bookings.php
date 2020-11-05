@@ -655,10 +655,9 @@ class Bookings extends Shortcodes {
                 exit;
             }
         }elseif ($this->ldapRequired) {
-            if ($this->ldapInstance->isAuthenticated()){
-                $data = $this->ldapInstance->getCustomerData();
-                $booking_email  = $data['customer_email'];
-            } else {
+            $booking_email = $this->ldapInstance->getEmail();
+
+            if (!$booking_email){
                 $redirectUrl = add_query_arg(
                     [
                         'booking' => wp_create_nonce('ldap_authentication'),
