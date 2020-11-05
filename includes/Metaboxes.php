@@ -159,6 +159,7 @@ class Metaboxes
             'default'          => 'custom',
             'options'          => array(
                 'booked' => __('Booked', 'rrze-rsvp'),
+                'customer-confirmed'   => __('Confirmed by customer', 'rrze-rsvp'),
                 'confirmed'   => __('Confirmed', 'rrze-rsvp'),
                 'cancelled'     => _x('Cancelled', 'Booking', 'rrze-rsvp'),
                 'checked-in'     => __('Checked In', 'rrze-rsvp'),

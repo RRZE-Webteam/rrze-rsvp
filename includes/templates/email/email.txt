@@ -1,8 +1,11 @@
+{{=site_name}}
+
 {{is_locale_not_english}}
 (English version below)
 {{/is_locale_not_english}}
 ----------------------------------------------------------------------------
 {{=subject}}
+{{reason}}{{=reason}}{{/reason}}
 
 {{=text}}
 
@@ -13,19 +16,31 @@
 {{seat_name}}
 {{=seat_name}}
 {{/seat_name}}
+{{to_admin}}
 
-{{!instant_checkin}}
+{{=customer.name}}
+{{=customer.email}}
+{{/to_admin}}
+
+{{show_confirm_button}}
+{{=alt_confirm_text}}
+{{=confirm_url}}
+{{/show_confirm_button}}
+
+{{show_checkin_btn}}
 {{=alt_checkin_text}}
 {{=checkin_url}}
-{{/!instant_checkin}}
+{{/show_checkin_btn}}
 
+{{show_checkout_btn}}
 {{=alt_checkout_text}}
 {{=checkout_url}}
+{{/show_checkout_btn}}
 
-{{!instant_checkin}}
+{{show_cancel_btn}}
 {{=alt_cancel_text}}
 {{=cancel_url}}
-{{/!instant_checkin}}
+{{/show_cancel_btn}}
 
 {{=site_name}}
 {{=site_url}}
@@ -33,6 +48,7 @@
 {{is_locale_not_english}}
 ----------------------------------------------------------------------------
 {{=subject_en}}
+{{reason}}{{=reason_en}}{{/reason}}
 
 {{=text_en}}
 
@@ -43,19 +59,31 @@
 {{seat_name}}
 {{=seat_name}}
 {{/seat_name}}
+{{to_admin}}
 
-{{!instant_checkin}}
+{{=customer.name}}
+{{=customer.email}}
+{{/to_admin}}
+
+{{show_confirm_button}}
+{{=alt_confirm_text_en}}
+{{=confirm_url}}
+{{/show_confirm_button}}
+
+{{show_checkin_btn}}
 {{=alt_checkin_text_en}}
 {{=checkin_url}}
-{{/!instant_checkin}}
+{{/show_checkin_btn}}
 
+{{show_checkout_btn}}
 {{=alt_checkout_text_en}}
 {{=checkout_url}}
+{{/show_checkout_btn}}
 
-{{!instant_checkin}}
+{{show_cancel_btn}}
 {{=alt_cancel_text_en}}
 {{=cancel_url}}
-{{/!instant_checkin}}
+{{/show_cancel_btn}}
 
 {{=site_name}}
 {{=site_url}}
