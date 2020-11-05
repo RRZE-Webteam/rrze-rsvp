@@ -31,9 +31,9 @@ class Bookings {
 
     public function onLoaded() {
         add_action('init', [$this, 'booking_post_type']);
-        add_post_type_support( 'booking', 'page-attributes' );
+        // add_post_type_support( 'booking', 'page-attributes' );
 
-        add_filter('months_dropdown_results', '__return_empty_array');
+        add_filter('months_dropdown_results', [$this, 'removeMonthsDropdown'], 10, 2);
         add_filter('manage_booking_posts_columns', [$this, 'addBookingColumns']);
         add_action('manage_booking_posts_custom_column', [$this, 'getBookingValue'], 10, 2);
         add_filter('manage_edit-booking_sortable_columns', [$this, 'addBookingSortableColumns']);
@@ -129,14 +129,14 @@ class Bookings {
     function getBookingValue($column, $post_id) {
         // $post = get_post($post_id);
         $booking = Functions::getBooking($post_id);
-        $bookingDate = date_i18n(get_option('date_format'), $booking['start']);
-        $bookingStart = date_i18n(get_option('time_format'), $booking['start']) . ' - ' . date_i18n(get_option('time_format'), $booking['end']);
 
         switch ($column) {
             case 'bookingdate':
+                $bookingDate = date_i18n(get_option('date_format'), $booking['start']);
                 echo $bookingDate;
                 break;
             case 'bookingstart':
+                $bookingStart = date_i18n(get_option('time_format'), $booking['start']) . ' - ' . date_i18n(get_option('time_format'), $booking['end']);
                 echo $bookingStart;
                 break;
             case 'room':
@@ -567,4 +567,12 @@ class Bookings {
         }
         $query->set('posts_per_page', -1);
     }
+
+    public function removeMonthsDropdown($months, $postType){
+        if ($postType == 'booking') {
+            $months = [];
+        }
+        return $months;
+    }
+
 }
