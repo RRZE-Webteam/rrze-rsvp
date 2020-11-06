@@ -522,7 +522,7 @@ class Bookings {
 
 
     public function searchBookings($query) {
-        if (!$query->is_main_query() || $query->query['post_type'] != 'booking') {
+        if (!$query->is_main_query() || $query->post_type != 'booking') {
             return $query;
         } 
         $aBookingIDs = [];

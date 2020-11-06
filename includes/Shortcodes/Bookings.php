@@ -80,14 +80,20 @@ class Bookings extends Shortcodes {
 
             $shortcodeLDAP = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
             $this->ldapRequired = ( $shortcodeLDAP ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true)) );
+            echo $roomId . ' $this->ldapRequired = ' . $this->ldapRequired;
+            exit;
         }
 
         if ($this->ssoRequired) {
-            $this->sso = $this->idm->tryLogIn();
+        echo 'sso';
+        exit;
+        $this->sso = $this->idm->tryLogIn();
         }
 
         if ($this->ldapRequired) {
-            $this->ldap = $this->ldapInstance->tryLogIn();
+            echo 'ldap';
+            exit;
+                $this->ldap = $this->ldapInstance->tryLogIn();
         }
     }
 
@@ -654,7 +660,7 @@ class Bookings extends Shortcodes {
                 wp_redirect($redirectUrl);
                 exit;
             }
-        }elseif ($this->ldapRequired) {
+        }elseif ($this->ldap) {
             $booking_email = $this->ldapInstance->getEmail();
 
             if (!$booking_email){
