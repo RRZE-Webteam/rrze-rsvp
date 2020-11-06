@@ -171,6 +171,10 @@ function getSections()
             'id'    => 'ldap',
             'title' => __('LDAP Settings', 'rrze-rsvp')
         ],
+        [
+            'id'    => 'reset',
+            'title' => __('Reset Settings', 'rrze-rsvp')
+        ],
     ];
 }
 
@@ -516,6 +520,14 @@ function getFields(){
                 'desc'   => __('DN to search in', 'rrze-rsvp'),
                 'type'    => 'text',
 		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+        ],
+        'reset' => [
+            [
+                'name'  => 'reset_settings',
+                'label'   => '',
+                'desc'   => __('Yes, I want to reset <strong>all</strong> settings.', 'rrze-rsvp'),
+                'type'  => 'checkbox'
             ],
         ]
     ];

@@ -37,7 +37,8 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
         }
 
         $bLDAP = true;
-        if (!$ldapRequired || (!$ldapInstance->isAuthenticated())) {
+        $booking_email = $ldapInstance->getEmail();
+        if (!$ldapRequired || (!$booking_email)) {
             $bLDAP = false;
         }
 
@@ -53,8 +54,7 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
                     $action = 'no-auth';
                 }
             } elseif ($bLDAP) {
-                $customerData = $ldapInstance->getCustomerData();
-                if ($customerEmail  != $customerData['customer_email']) {
+                if ($customerEmail  != $booking_email) {
                     $action = 'no-auth';
                 }
             }                
@@ -199,6 +199,8 @@ if ($checkInBooking) {
     $bookingId = null;
     $status = null;
     $ssoRequired = false;
+    $ldapRequired = false;
+   
     $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
     $now = current_time('timestamp');
 
@@ -263,6 +265,7 @@ if ($checkInBooking) {
     // $nonceQuery = (!$ssoRequired ? '' : '&nonce=' . $nonce );
     $nonceQuery = ( !$ssoRequired && !$ldapRequired ? '' : '&nonce=' . $nonce );
 
+    // BK DEBUG
     if ($bookingmode == 'reservation' && $status == 'confirmed') {
         $link = sprintf(
             '<a href="%1$s?id=%2$d&action=checkin%3$s" class="button button-checkin" data-id="%2$d">%4$s</a>',

@@ -331,8 +331,7 @@ class Functions
     }
     
 
-    public static function getBooking(int $bookingId): array
-    {
+    public static function getBooking(int $bookingId): array {
         $data = [];
 
         $post = get_post($bookingId);
@@ -368,6 +367,8 @@ class Functions
         $data['guest_lastname'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-lastname', true), 'decrypt');
         $data['guest_email'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-email', true), 'decrypt');
         $data['guest_phone'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-phone', true), 'decrypt');
+
+        $data['post_status'] = $post->post_status;
 
         return $data;
     }
