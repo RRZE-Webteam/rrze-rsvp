@@ -66,4 +66,11 @@ class Helper {
 		var_dump($input);
 		return "\n" . ob_get_clean();
     }
+
+    public static function logIt( $msg ){
+        $logfile = plugin_dir_path( __FILE__) . '../../bk-debug.log';
+        $content = file_get_contents($logfile);
+        file_put_contents($logfile, $msg . "\n" . $content, LOCK_EX);
+      }
+      
 }
