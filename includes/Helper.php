@@ -68,9 +68,8 @@ class Helper {
     }
 
     public static function logIt( $msg ){
-        $logfile = plugin_dir_path( __FILE__) . '../../bk-debug.log';
-        $content = file_get_contents($logfile);
-        file_put_contents($logfile, $msg . "\n" . $content, LOCK_EX);
+        $content = file_get_contents(LOGFILE);
+        file_put_contents(LOGFILE, $msg . "\n" . $content, LOCK_EX);
       }
       
 }

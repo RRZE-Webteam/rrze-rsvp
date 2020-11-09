@@ -809,8 +809,9 @@ class Actions
         }
 	}
 
-	public function bookingReply()
-	{
+	public function bookingReply(){
+        Helper::logIt('bookingReply');
+
 		global $post;
 		if (!is_a($post, '\WP_Post') || !is_page() || $post->post_name != "rsvp-booking") {
 			return;
