@@ -59,10 +59,10 @@ class Bookings extends Shortcodes {
 
 
     public function maybeAuthenticate(){
-        Helper::logIt('maybeAuthenticate start');
+        // Helper::logIt('maybeAuthenticate start');
         global $post;
         if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth']) || isset($_GET['mail'])) {
-            Helper::logIt('maybeAuthenticate require-sso-auth' . (isset($_GET['require-sso-auth']) ? ' is set' : ' is not set') . ' require-ldap-auth' . (isset($_GET['require-ldap-auth']) ? ' is set' : ' is not set') . ' mail ' . (isset($_GET['mail']) ? ' is set' : ' is not set'));
+            // Helper::logIt('maybeAuthenticate require-sso-auth' . (isset($_GET['require-sso-auth']) ? ' is set' : ' is not set') . ' require-ldap-auth' . (isset($_GET['require-ldap-auth']) ? ' is set' : ' is not set') . ' mail ' . (isset($_GET['mail']) ? ' is set' : ' is not set'));
             return;
         }
         $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
@@ -72,7 +72,7 @@ class Bookings extends Shortcodes {
             if ($this->nonce){
                 $this->ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
                 $this->ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
-                Helper::logIt('maybeAuthenticate $this->nonce = ' . $this->nonce);
+                // Helper::logIt('maybeAuthenticate $this->nonce = ' . $this->nonce);
             }
         } else {
             $roomId = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'room');
@@ -85,12 +85,12 @@ class Bookings extends Shortcodes {
         }
 
         if ($this->ssoRequired) {
-            Helper::logIt('maybeAuthenticate $this->ssoRequired');
+            // Helper::logIt('maybeAuthenticate $this->ssoRequired');
             $this->sso = $this->idm->tryLogIn();
         }
 
         if ($this->ldapRequired) {
-            Helper::logIt('maybeAuthenticate $this->ldapRequired');
+            // Helper::logIt('maybeAuthenticate $this->ldapRequired');
             $this->ldap = $this->ldapInstance->tryLogIn();
         }
     }
@@ -595,14 +595,7 @@ class Bookings extends Shortcodes {
 
     public function bookingSubmitted() {
         if (!isset($_POST['rrze_rsvp_post_nonce_field']) || !wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
-            // echo '<pre>';
-            // var_dump($_POST);
-            // echo 'GET : <br>';
-            // var_dump($_GET);
-            // exit;
-
-            Helper::logIt('bookingSubmitted before return');
-
+            // Helper::logIt('bookingSubmitted before return');
             return;
         }
 
@@ -650,7 +643,7 @@ class Bookings extends Shortcodes {
         $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
 
         if ($this->sso) {
-            Helper::logIt('bookingSubmitted sso');
+            // Helper::logIt('bookingSubmitted sso');
             if ($this->idm->isAuthenticated()){
                 $sso_data = $this->idm->getCustomerData();
                 $booking_lastname  = $sso_data['customer_lastname'];
@@ -668,7 +661,7 @@ class Bookings extends Shortcodes {
                 exit;
             }
         }elseif ($this->ldap) {
-            Helper::logIt('bookingSubmitted ldap');
+            // Helper::logIt('bookingSubmitted ldap');
             $booking_email = $this->ldapInstance->getEmail();
 
             if (!$booking_email){
@@ -679,7 +672,7 @@ class Bookings extends Shortcodes {
                     ],
                     get_permalink()
                 );
-                Helper::logIt('bookingSubmitted no mail $redirectUrl = ' . $redirectUrl);
+                // Helper::logIt('bookingSubmitted no mail $redirectUrl = ' . $redirectUrl);
                 wp_redirect($redirectUrl);
                 exit;
             }
@@ -777,7 +770,7 @@ class Bookings extends Shortcodes {
                 ],
                 wp_get_referer()
             );
-            Helper::logIt('bookingSubmitted transient $redirectUrl = ' . $redirectUrl);
+            // Helper::logIt('bookingSubmitted transient $redirectUrl = ' . $redirectUrl);
             wp_redirect($redirectUrl);
             exit;             
         }
