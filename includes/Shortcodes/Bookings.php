@@ -54,7 +54,7 @@ class Bookings extends Shortcodes {
         add_action( 'wp_ajax_nopriv_UpdateForm', [$this, 'ajaxUpdateForm'] );
         add_action( 'wp_ajax_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );
         add_action( 'wp_ajax_nopriv_ShowItemInfo', [$this, 'ajaxShowItemInfo'] );     
-        add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
+        add_shortcode('rsvp-booking', [$this, 'shortcodeBooking']);
     }
 
 
@@ -876,6 +876,7 @@ class Bookings extends Shortcodes {
         $autoconfirmation = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true));
         $instantCheckIn = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-instant-check-in', true));
         $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-force-to-confirm', true));
+        $sendIcsToAdmin = get_post_meta($room_id, 'rrze-rsvp-room-send-to-email', true);
 
         //Buchung speichern
         $new_draft = [
