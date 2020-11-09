@@ -80,20 +80,14 @@ class Bookings extends Shortcodes {
 
             $shortcodeLDAP = $this->getShortcodeAtt($post->post_content, 'rsvp-booking', 'ldap');
             $this->ldapRequired = ( $shortcodeLDAP ? true : Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true)) );
-            echo $roomId . ' $this->ldapRequired = ' . $this->ldapRequired;
-            exit;
         }
 
         if ($this->ssoRequired) {
-        echo 'sso';
-        exit;
-        $this->sso = $this->idm->tryLogIn();
+            $this->sso = $this->idm->tryLogIn();
         }
 
         if ($this->ldapRequired) {
-            echo 'ldap';
-            exit;
-                $this->ldap = $this->ldapInstance->tryLogIn();
+            $this->ldap = $this->ldapInstance->tryLogIn();
         }
     }
 
