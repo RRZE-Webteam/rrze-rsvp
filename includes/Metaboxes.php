@@ -75,6 +75,16 @@ class Metaboxes
         }
     }
 
+    public function cbBookingStatusAttributes($args, $field) {
+        $field->args['attributes']['required'] = 'required';
+        // Allow status selection only for new posts
+        // Disable on edit-post screen -> Controlled status changes via list table only
+        $screen = get_current_screen();
+        if( $screen->action != 'add') {
+            $field->args['attributes']['disabled'] = 'disabled';
+        }
+    }
+
 
     public function booking()
     {
@@ -154,9 +164,7 @@ class Metaboxes
                 'checked-in'     => __('Checked In', 'rrze-rsvp'),
                 'checked-out'     => __('Checked Out', 'rrze-rsvp'),
             ),
-            'attributes'  =>  [
-                'required' => 'required',
-            ],            
+            'before' => [$this, 'cbBookingStatusAttributes'],
         ));
 
 

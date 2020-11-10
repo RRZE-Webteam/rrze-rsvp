@@ -10,7 +10,7 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Capabilities;
 use RRZE\RSVP\Functions;
-use RRZE\RSVP\Carbon;
+// use RRZE\RSVP\Carbon;
 
 class Bookings {
     protected $sDate;
@@ -31,20 +31,17 @@ class Bookings {
 
     public function onLoaded() {
         add_action('init', [$this, 'booking_post_type']);
-        add_post_type_support( 'booking', 'page-attributes' );
+        // add_post_type_support( 'booking', 'page-attributes' );
 
-        add_filter('months_dropdown_results', '__return_empty_array');
+        add_filter('months_dropdown_results', [$this, 'removeMonthsDropdown'], 10, 2);
         add_filter('manage_booking_posts_columns', [$this, 'addBookingColumns']);
         add_action('manage_booking_posts_custom_column', [$this, 'getBookingValue'], 10, 2);
         add_filter('manage_edit-booking_sortable_columns', [$this, 'addBookingSortableColumns']);
         add_action('restrict_manage_posts', [$this, 'addFilters'], 10, 1);
         add_action('wp_ajax_ShowTimeslots', [$this, 'ajaxShowTimeslots']);
 
-        // add_filter('query_vars', [$this, 'registerQueryVars'] );
-        // add_filter('posts_orderby' , [$this, 'getOrderbyStatement'], 10, 2);
         add_filter('parse_query', [$this, 'filterBookings'], 10);
         add_action('pre_get_posts', [$this, 'searchBookings']);
-        // add_filter('posts_join', [$this, 'sortBookingsJoin']);
     }
 
     
@@ -76,7 +73,7 @@ class Bookings {
             'label'                     => __('Booking', 'rrze-rsvp'),
             'description'               => __('Add and edit Booking informations', 'rrze-rsvp'),
             'labels'                    => $labels,
-            'supports'                  => ['author', 'revisions'],
+            'supports'                  => ['author'], // , 'revisions'
             'hierarchical'              => false,
             'public'                    => false,
             'show_ui'                   => true,
@@ -117,29 +114,29 @@ class Bookings {
 
     public function addBookingSortableColumns($columns) {
         $columns['bookingdate'] = 'bookingdate';
-        // $columns['bookingstart'] = 'bookingstart';
-        // $columns['room'] = 'room';
-        // $columns['seat'] = 'seat';
-        // $columns['name'] = 'name';
-        // $columns['email'] = 'email';
-        // if (current_user_can('read_customer_phone')) {
-        //     $columns['phone'] = 'phone';
-        // }
+        $columns['bookingstart'] = 'bookingstart';
+        $columns['room'] = 'room';
+        $columns['seat'] = 'seat';
+        $columns['name'] = 'name';
+        $columns['email'] = 'email';
+        if (current_user_can('read_customer_phone')) {
+            $columns['phone'] = 'phone';
+        }
         $columns['status'] = 'status';
         return $columns;
     }
 
     function getBookingValue($column, $post_id) {
-        $post = get_post($post_id);
+        // $post = get_post($post_id);
         $booking = Functions::getBooking($post_id);
-        $bookingDate = date_i18n(get_option('date_format'), $booking['start']);
-        $bookingStart = date_i18n(get_option('time_format'), $booking['start']) . ' - ' . date_i18n(get_option('time_format'), $booking['end']);
 
         switch ($column) {
             case 'bookingdate':
+                $bookingDate = date_i18n(get_option('date_format'), $booking['start']);
                 echo $bookingDate;
                 break;
             case 'bookingstart':
+                $bookingStart = date_i18n(get_option('time_format'), $booking['start']) . ' - ' . date_i18n(get_option('time_format'), $booking['end']);
                 echo $bookingStart;
                 break;
             case 'room':
@@ -163,8 +160,7 @@ class Bookings {
                 $now = current_time('timestamp');
                 $bookingDate = '<span class="booking_date">' . __('Booked on', 'rrze-rsvp') . ' ' . $booking['booking_date'] . '</span>';
                 $archive = ($end < $now);
-                $_wpnonce = wp_create_nonce('status');
-                $publish = ($post->post_status == 'publish');
+                $publish = ($booking['post_status'] == 'publish');
 
                 if ($publish && $archive) {
                     switch ($status) {
@@ -188,6 +184,8 @@ class Bookings {
                     }
                     echo $button, $bookingDate;
                 } elseif ($publish) {
+                    $_wpnonce = wp_create_nonce('status');
+
                     if ($status == 'cancelled') {
                         $cancelledButton = '<button class="button button-secondary" disabled>' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</button>';
                         $restoreButton = sprintf(
@@ -329,15 +327,7 @@ class Bookings {
         }
     }
 
-
-
-    public function registerQueryVars( $vars ) {
-        $vars[] = 'room';
-        $vars[] = 'date';
-        $vars[] = 'time';
-        return $vars;
-    }
- 
+   
     private function getSeatIDsFromRoomIDs($aRoomIDs){
         $args = [
             'fields'            => 'ids',
@@ -407,21 +397,26 @@ class Bookings {
 
     public function getBookingByGuest( $sSearch ){
         $meta_query = [];
-        $encryptedSearch = Functions::crypt($sSearch, 'encrypt');
 
-        $encryptedFields = [
-            'rrze-rsvp-booking-guest-firstname',
-            'rrze-rsvp-booking-guest-lastname',
-            'rrze-rsvp-booking-guest-email',
-            'rrze-rsvp-booking-guest-phone',
-        ];
+        $sSearchWords = explode(' ', $sSearch);
 
-        foreach($encryptedFields as $field){
-            $meta_query[] = [
-                'key'     => $field,
-                'value'   => $encryptedSearch,
-                'compare' => 'LIKE',    
+        foreach($sSearchWords as $sSearch){
+            $encryptedSearch = Functions::crypt($sSearch, 'encrypt');
+
+            $encryptedFields = [
+                'rrze-rsvp-booking-guest-firstname',
+                'rrze-rsvp-booking-guest-lastname',
+                'rrze-rsvp-booking-guest-email',
+                'rrze-rsvp-booking-guest-phone',
             ];
+
+            foreach($encryptedFields as $field){
+                $meta_query[] = [
+                    'key'     => $field,
+                    'value'   => $encryptedSearch,
+                    'compare' => 'LIKE',    
+                ];
+            }
         }
 
         if ( count($meta_query) > 1 ) {
@@ -527,15 +522,16 @@ class Bookings {
 
 
     public function searchBookings($query) {
-        if (!$query->is_main_query() || $query->query['post_type'] != 'booking') {
+        if (!$query->is_main_query() || $query->post_type != 'booking') {
             return $query;
         } 
-
         $aBookingIDs = [];
 
         $this->sSearch = $query->query_vars['s'];
         if ($this->sSearch){
-            $aBookingIDs = array_merge($this->getBookingIDsBySeatRoomTitle($this->sSearch), $this->getBookingByGuest($this->sSearch));
+            // $this->getBookingByGuest() deactivated because it is not allowed to search for persons (Personalrat)
+            // $aBookingIDs = array_merge($this->getBookingIDsBySeatRoomTitle($this->sSearch), $this->getBookingByGuest($this->sSearch));
+            $aBookingIDs = $this->getBookingIDsBySeatRoomTitle($this->sSearch);
             if ($aBookingIDs){
                 $query->set('post__in', $aBookingIDs);
                 $query->set('s', '');
@@ -568,42 +564,13 @@ class Bookings {
             // break;
              
         }
-        $query->set('posts_per_page', -1);
-
-        // echo '<pre>';
-        // var_dump($query);
-        // exit;
     }
 
-
-    public function sortBookingsJoin($join) {
-        global $wpdb, $wp_query;
-        if ( !$wp_query->is_main_query() || !is_admin() || !$wp_query->get('post_type') == 'booking'){
-            return $join;
+    public function removeMonthsDropdown($months, $postType){
+        if ($postType == 'booking') {
+            $months = [];
         }
-        if ($wp_query->get('orderby') == 'seat'){
-            $join .= "LEFT JOIN $wpdb->postmeta ON $wpdb->posts.ID = $wpdb->postmeta.post_id ";
-        }
-    
-        return $join;
+        return $months;
     }
 
-    // public function sortBookingsWhere($where, &$wp_query)
-    // {
-    //     global $wpdb;
-    //     $where .= ' AND ' . $wpdb->posts . '.post_title LIKE \''.$searchAlphabet.'%\' ';
-    
-    //         // use only if the post meta db table has been joined to the search tables using posts_join filter
-    //         $where .= " AND ($wpdb->postmeta.meta_key = 'JDReview_CustomFields_ReivewOrNewsPostType' AND $wpdb->postmeta.meta_value = 'JDReview_PostType_ReviewPost') ";
-    //         return $where;
-    //     }
-    // }
-
-    public function bookingViews($views)
-    {
-        if (isset($views['all'])) unset($views['all']);
-        if (isset($views['mine'])) unset($views['mine']);
-        if (isset($views['publish'])) unset($views['publish']);
-        return $views;
-    }
 }

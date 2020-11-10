@@ -7,6 +7,8 @@ defined('ABSPATH') || exit;
 use RRZE\RSVP\CPT\CPT;
 use RRZE\RSVP\Shortcodes\Shortcodes;
 use RRZE\RSVP\Printing\Printing;
+use function RRZE\RSVP\Config\getOptionName;
+
 
 /**
  * [Main description]
@@ -23,7 +25,7 @@ class Main
 	 */
 	public function __construct($pluginFile)
 	{
-		$this->pluginFile = $pluginFile;
+        $this->pluginFile = $pluginFile;
 	}
 
 	public function onLoaded()
@@ -79,8 +81,34 @@ class Main
 		add_action('rest_api_init', function () {
 			//$api = new API;
 			//$api->register_routes();
-		});
+        });
+        
+		add_action('update_option_rrze_rsvp', [$this, 'resetSettings']);
+		
+		// RRZE Cache Plugin: Skip Cache
+		add_filter('rrzecache_skip_cache', [$this, 'skipCache']);		
+    }
+	
+	/**
+	 * skipCache
+	 * Check if cache is bypassed.
+	 * @return boolean
+	 */
+	public function skipCache(): bool
+	{
+		global $post_type;
+		if (in_array($post_type, array_keys(Capabilities::getCurrentCptArgs()))) {
+			return true;
+		}
+		return false;		
 	}
+
+    public function resetSettings(){
+        if (isset($_POST['rrze_rsvp']) && isset($_POST['rrze_rsvp']['reset_reset_settings']) && $_POST['rrze_rsvp']['reset_reset_settings'] == 'on'){
+            $optionName = getOptionName();
+            delete_option($optionName);
+        }
+    }
 
 	public function adminEnqueueScripts()
 	{

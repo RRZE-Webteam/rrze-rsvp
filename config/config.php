@@ -6,6 +6,8 @@ use RRZE\RSVP\Functions;
 
 defined('ABSPATH') || exit;
 
+define( 'LOGFILE', plugin_dir_path( __FILE__) . '../bk-debug.log' );
+
 /**
  * Gibt der Name der Option zurück.
  * @return array [description]
@@ -126,11 +128,6 @@ function defaultOptions()  {
             'room-notes-label' => __('Additional informations', 'rrze-rsvp'),
             'check-in-time' => '15',
             'dsgvo-declaration' => __('Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden erfasst.', 'rrze-rsvp'),
-            // 'server' => 'ubaddc1.bib.uni-erlangen.de',
-            // 'port' => '389',
-            // 'distinguished_name' => 'CN=UB Bib User,OU=Groups,OU=UB,DC=ubad,DC=fau,DC=de',
-            // 'bind_base_dn' => 'ubad.fau.de',
-            // 'search_base_dn' => 'DC=ubad,DC=fau,DC=de',
         ];
     }
     
@@ -176,6 +173,10 @@ function getSections()
         //     'id'    => 'ldap',
         //     'title' => __('LDAP Settings', 'rrze-rsvp')
         // ],
+        [
+            'id'    => 'reset',
+            'title' => __('Reset Settings', 'rrze-rsvp')
+        ],
     ];
 }
 
@@ -492,7 +493,6 @@ function getFields(){
         //         'label'   => __('Server', 'rrze-rsvp'),
         //         'desc'   => __('LDAP server URL', 'rrze-rsvp'),
         //         'type'    => 'text',
-        //         'default' => $defaults['server'],
 		//         'sanitize_callback' => 'sanitize_text_field'
         //     ],
         //     [
@@ -500,7 +500,6 @@ function getFields(){
         //         'label'   => __('Port', 'rrze-rsvp'),
         //         'desc'   => __('Port', 'rrze-rsvp'),
         //         'type'    => 'number',
-        //         'default' => $defaults['port'],
 		//         'sanitize_callback' => 'sanitize_natint_field'
         //     ],
         //     [
@@ -508,7 +507,6 @@ function getFields(){
         //         'label'   => __('Distinguished Name', 'rrze-rsvp'),
         //         'desc'   => __('Distinguished Name', 'rrze-rsvp'),
         //         'type'    => 'text',
-        //         'default' => $defaults['distinguished_name'],
 		//         'sanitize_callback' => 'sanitize_text_field'
         //     ],
         //     [
@@ -516,7 +514,6 @@ function getFields(){
         //         'label'   => __('Bind Base DN', 'rrze-rsvp'),
         //         'desc'   => __('DN to bind on', 'rrze-rsvp'),
         //         'type'    => 'text',
-        //         'default' => $defaults['bind_base_dn'],
 		//         'sanitize_callback' => 'sanitize_text_field'
         //     ],
         //     [
@@ -524,10 +521,17 @@ function getFields(){
         //         'label'   => __('Search Base DN', 'rrze-rsvp'),
         //         'desc'   => __('DN to search in', 'rrze-rsvp'),
         //         'type'    => 'text',
-        //         'default' => $defaults['search_base_dn'],
 		//         'sanitize_callback' => 'sanitize_text_field'
         //     ],
-        // ]
+        // ],
+        'reset' => [
+            [
+                'name'  => 'reset_settings',
+                'label'   => '',
+                'desc'   => __('Yes, I want to reset <strong>all</strong> settings.', 'rrze-rsvp'),
+                'type'  => 'checkbox'
+            ],
+        ]
     ];
 }
 
@@ -567,12 +571,12 @@ function getShortcodeSettings(){
                 'type' => 'boolean',
                 'default'   => false
             ],
-            'ldap' => [
-                'field_type' => 'toggle',
-                'label' => __( 'Require LDAP Authentication', 'rrze-rsvp' ),
-                'type' => 'boolean',
-                'default'   => false
-            ],
+            // 'ldap' => [
+            //     'field_type' => 'toggle',
+            //     'label' => __( 'Require LDAP Authentication', 'rrze-rsvp' ),
+            //     'type' => 'boolean',
+            //     'default'   => false
+            // ],
         ],
         'rsvp-availability' => [
             'block' => [

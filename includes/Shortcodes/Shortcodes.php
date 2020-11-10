@@ -16,16 +16,14 @@ use function RRZE\RSVP\plugin;
 /**
  * Laden und definieren der Shortcodes
  */
-class Shortcodes
-{
+class Shortcodes{
     protected $pluginFile;    
     private $settings = '';
     private $shortcodesettings = 'X';
     protected $idm;
     // protected $ldap; 
 
-    public function __construct($pluginFile, $settings)
-    {
+    public function __construct($pluginFile, $settings){
         $this->pluginFile = $pluginFile;
         $this->settings = $settings;
         $this->shortcodesettings = getShortcodeSettings();
@@ -33,8 +31,7 @@ class Shortcodes
         // $this->ldapInstance = new LDAP;
     }
 
-    public function onLoaded()
-    {
+    public function onLoaded(){
         add_action('template_redirect', [$this, 'maybeAuthenticate']);
         add_filter('single_template', [$this, 'includeSingleTemplate']);
 
@@ -48,8 +45,7 @@ class Shortcodes
         $qr_shortcode->onLoaded();
     }
 
-    public function gutenberg_init()
-    {
+    public function gutenberg_init(){
         // Skip block registration if Gutenberg is not enabled/merged.
         if (!function_exists('register_block_type')) {
             return;
@@ -82,11 +78,9 @@ class Shortcodes
         wp_localize_script($editor_script, $this->settings['block']['blockname'] . 'Config', $this->settings);
     }
 
-    public function shortcodeAtts($atts, $tag, $shortcodesettings)
-    {
+    public function shortcodeAtts($atts, $tag, $shortcodesettings){
         // merge given attributes with default ones
         $atts_default = array();
-        //var_dump($this->shortcodesettings);
         foreach ($shortcodesettings as $tagname => $settings) {
             foreach ($settings as $k => $v) {
                 if ($k != 'block') {
@@ -97,13 +91,11 @@ class Shortcodes
         return shortcode_atts($atts_default[$tag], $atts);
     }
 
-    public function includeSingleTemplate($singleTemplate)
-    {
+    public function includeSingleTemplate($singleTemplate){
         global $post;
-        if (isset($_GET['require-sso-auth']) && wp_verify_nonce($_GET['require-sso-auth'], 'require-sso-auth')) {
-            return sprintf('%sincludes/templates/single-auth.php', plugin()->getDirectory());
-        // } elseif (isset($_GET['require-ldap-auth']) && wp_verify_nonce($_GET['require-ldap-auth'], 'require-ldap-auth')) {
-        //     return sprintf('%sincludes/templates/single-ldap-auth.php', plugin()->getDirectory());
+        // if ((isset($_GET['require-sso-auth']) && wp_verify_nonce($_GET['require-sso-auth'], 'require-sso-auth')) || (isset($_GET['require-ldap-auth']) && wp_verify_nonce($_GET['require-ldap-auth'], 'require-ldap-auth'))) {
+        if ((isset($_GET['require-sso-auth']) && wp_verify_nonce($_GET['require-sso-auth'], 'require-sso-auth'))) {
+            return sprintf('%sincludes/templates/auth/single-auth.php', plugin()->getDirectory());
         } elseif (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) {
             return sprintf('%sincludes/templates/single-form.php', plugin()->getDirectory());
         } elseif ($post->post_type == 'room') {
@@ -116,11 +108,11 @@ class Shortcodes
 
     public function maybeAuthenticate() {
         global $post;
-        // if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth'])) {
+        // if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth']) || isset($_GET['mail'])) {
         if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
-                return;
+            return;
         }
-
+        
         if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
             $this->idm->tryLogIn();
             // $this->ldapInstance->tryLogIn();

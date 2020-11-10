@@ -33,6 +33,7 @@ jQuery(document).ready(function($){
         });
     });
 
+    updateForm();
 });
 
 function updateForm() {
