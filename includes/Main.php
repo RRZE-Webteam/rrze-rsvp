@@ -25,7 +25,7 @@ class Main
 	 */
 	public function __construct($pluginFile)
 	{
-		$this->pluginFile = $pluginFile;
+        $this->pluginFile = $pluginFile;
 	}
 
 	public function onLoaded()
@@ -51,8 +51,8 @@ class Main
 		$tracking->onLoaded();
 
 		// LDAP 
-		$ldap = new LDAP;
-		$ldap->onLoaded();
+		// $ldap = new LDAP;
+		// $ldap->onLoaded();
 
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();
@@ -83,9 +83,26 @@ class Main
 			//$api->register_routes();
         });
         
-        add_action('update_option_rrze_rsvp', [$this, 'resetSettings']); 
+		add_action('update_option_rrze_rsvp', [$this, 'resetSettings']);
+		
+		// RRZE Cache Plugin: Skip Cache
+		add_filter('rrzecache_skip_cache', [$this, 'skipCache']);		
     }
-    
+	
+	/**
+	 * skipCache
+	 * Check if cache is bypassed.
+	 * @return boolean
+	 */
+	public function skipCache(): bool
+	{
+		global $post_type;
+		if (in_array($post_type, array_keys(Capabilities::getCurrentCptArgs()))) {
+			return true;
+		}
+		return false;		
+	}
+
     public function resetSettings(){
         if (isset($_POST['rrze_rsvp']) && isset($_POST['rrze_rsvp']['reset_reset_settings']) && $_POST['rrze_rsvp']['reset_reset_settings'] == 'on'){
             $optionName = getOptionName();
