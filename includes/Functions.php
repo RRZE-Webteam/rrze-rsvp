@@ -350,6 +350,7 @@ class Functions
         $data['date_en'] = date('F j, Y', $data['start']);
         $data['time_en'] = date('g:i a', $data['start']) . ' - ' . date('g:i a', $data['end']);
 
+        $data['booking_date_timestamp'] = strtotime($post->post_date);
         $data['booking_date'] = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($post->post_date));
 
         $data['seat'] = get_post_meta($post->ID, 'rrze-rsvp-booking-seat', true);
