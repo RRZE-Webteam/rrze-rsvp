@@ -89,7 +89,7 @@ class Bookings extends Shortcodes {
         // }
 
         if ($this->ssoRequired) {
-            Helper::logIt('maybeAuthenticate $this->ssoRequired');
+            // Helper::logIt('maybeAuthenticate $this->ssoRequired');
             $this->sso = $this->idm->tryLogIn();
         }
 
