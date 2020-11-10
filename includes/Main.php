@@ -26,7 +26,6 @@ class Main
 	public function __construct($pluginFile)
 	{
         $this->pluginFile = $pluginFile;
-        add_filter('rrzecache_skip_cache', '__return_true');
 	}
 
 	public function onLoaded()

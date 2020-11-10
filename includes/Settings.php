@@ -101,6 +101,7 @@ class Settings
         add_action('admin_init', [$this, 'adminInit']);
         add_action('admin_menu', [$this, 'adminMenu']);
         add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
+        add_filter('rrzecache_skip_cache', '__return_true');
     }
 
     protected function setMenu()
