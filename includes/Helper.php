@@ -66,4 +66,10 @@ class Helper {
 		var_dump($input);
 		return "\n" . ob_get_clean();
     }
+
+    public static function logIt( $msg ){
+        $content = file_get_contents(LOGFILE);
+        file_put_contents(LOGFILE, $msg . "\n" . $content, LOCK_EX);
+      }
+      
 }

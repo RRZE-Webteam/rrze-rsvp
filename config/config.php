@@ -6,6 +6,8 @@ use RRZE\RSVP\Functions;
 
 defined('ABSPATH') || exit;
 
+define( 'LOGFILE', plugin_dir_path( __FILE__) . '../bk-debug.log' );
+
 /**
  * Gibt der Name der Option zurück.
  * @return array [description]
