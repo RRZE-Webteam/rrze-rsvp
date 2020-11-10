@@ -84,11 +84,12 @@ class Bookings extends Shortcodes {
         }
 
         if ($this->ssoRequired) {
-            // Helper::logIt('maybeAuthenticate $this->ssoRequired');
+            Helper::logIt('maybeAuthenticate $this->ssoRequired');
             $this->sso = $this->idm->tryLogIn();
         }
 
         if ($this->ldapRequired) {
+            Helper::logIt('maybeAuthenticate $this->ldapRequired');
             $this->ldap = $this->ldapInstance->tryLogIn();
         }
     }
