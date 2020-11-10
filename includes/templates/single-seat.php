@@ -7,7 +7,7 @@ defined('ABSPATH') || exit;
 use WP_Query;
 
 $idm = new Idm;
-$ldapInstance = new LDAP;
+// $ldapInstance = new LDAP;
 
 $settings = new Settings(plugin()->getFile());
 $options = (object) $settings->getOptions();
@@ -29,22 +29,22 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
         $room = $seatCheckInOut['room'];
         $customerEmail = $seatCheckInOut['guest_email'];
         $ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-sso-required', true));
-        $ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-ldap-required', true));
+        // $ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-ldap-required', true));
 
         $bSSO = true;
         if (!$ssoRequired || !($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated())) {
             $bSSO = false;
         }
 
-        $bLDAP = true;
-        $booking_email = $ldapInstance->getEmail();
-        if (!$ldapRequired || (!$booking_email)) {
-            $bLDAP = false;
-        }
+        // $bLDAP = true;
+        // $booking_email = $ldapInstance->getEmail();
+        // if (!$ldapRequired || (!$booking_email)) {
+        //     $bLDAP = false;
+        // }
 
         // if (!$ssoRequired || !($idm->simplesamlAuth() && $idm->simplesamlAuth->isAuthenticated())) {
-        // if (!$bSSO) {
-        if (!$bSSO && !$bLDAP) {
+        if (!$bSSO) {
+        // if (!$bSSO && !$bLDAP) {
             $action = 'no-auth';
         } else {
             if ($bSSO) {
@@ -53,10 +53,10 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
                 if ($customerEmail  != $customerData['customer_email']) {
                     $action = 'no-auth';
                 }
-            } elseif ($bLDAP) {
-                if ($customerEmail  != $booking_email) {
-                    $action = 'no-auth';
-                }
+            // } elseif ($bLDAP) {
+            //     if ($customerEmail  != $booking_email) {
+            //         $action = 'no-auth';
+            //     }
             }                
         }                
     }
@@ -199,7 +199,7 @@ if ($checkInBooking) {
     $bookingId = null;
     $status = null;
     $ssoRequired = false;
-    $ldapRequired = false;
+    // $ldapRequired = false;
    
     $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
     $now = current_time('timestamp');
@@ -255,17 +255,16 @@ if ($checkInBooking) {
         $date = $data['date'];
         $time = $data['time'];
         $ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-sso-required', true));
-        $ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-ldap-required', true));
+        // $ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-ldap-required', true));
     }
 
     $bookingmode = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true);
     $daysInAdvance = get_post_meta($roomId, 'rrze-rsvp-room-days-in-advance', true);
     $allowInstant = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-instant-check-in', true));
 
-    // $nonceQuery = (!$ssoRequired ? '' : '&nonce=' . $nonce );
-    $nonceQuery = ( !$ssoRequired && !$ldapRequired ? '' : '&nonce=' . $nonce );
+    $nonceQuery = (!$ssoRequired ? '' : '&nonce=' . $nonce );
+    // $nonceQuery = ( !$ssoRequired && !$ldapRequired ? '' : '&nonce=' . $nonce );
 
-    // BK DEBUG
     if ($bookingmode == 'reservation' && $status == 'confirmed') {
         $link = sprintf(
             '<a href="%1$s?id=%2$d&action=checkin%3$s" class="button button-checkin" data-id="%2$d">%4$s</a>',
