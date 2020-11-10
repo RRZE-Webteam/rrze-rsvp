@@ -813,11 +813,11 @@ class Actions
 	public function bookingReply(){
         // Helper::logIt('bookingReply new');
 
-        // global $post;
-		// if (!is_a($post, '\WP_Post') || !is_page() || $post->post_name != "rsvp-booking") {
-        //     Helper::logIt('bookingReply about to return');
-		// 	return;
-		// }
+        global $post;
+		if (!is_a($post, '\WP_Post') || !is_page() || $post->post_name != "rsvp-booking") {
+            // Helper::logIt('bookingReply about to return');
+			return;
+		}
 
 		$bookingId = isset($_GET['id']) ? absint($_GET['id']) : false;
 		$action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : false;
