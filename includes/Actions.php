@@ -114,8 +114,20 @@ class Actions
 				$this->email->bookingCancelledCustomer($bookingId, $bookingMode);
 			} elseif ($status == 'cancelled' && $action == 'restore') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
+			} elseif ($status == 'confirmed' && $action == 'checkin') {
+			    $now = current_time('timestamp');
+                $offset = 15 * MINUTE_IN_SECONDS;
+                if ($now < ($booking['start'] - $offset) || $now > $booking['end']) {
+                    wp_die(
+                        __('Booking can only be checked in between 15 minutes before the start of the timeslot and the end of the timeslot.', 'rrze-rsvp'),
+                        __('Update Error', 'rrze-rsvp'),
+                        ['back_link' => true]
+                    );
+                } else {
+                    update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
+                }
 			} elseif ($status == 'checked-in' && $action == 'checkout') {
-				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-out');
+			    update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-out');
 			}
 
 			do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
