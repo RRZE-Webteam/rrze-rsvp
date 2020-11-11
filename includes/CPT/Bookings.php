@@ -204,15 +204,22 @@ class Bookings {
                             $_wpnonce,
                             _x('Cancel', 'Booking', 'rrze-rsvp')
                         );
+                        $checkInButton = sprintf(
+                            '<a href="edit.php?post_type=%1$s&action=checkin&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>',
+                            'booking',
+                            $booking['id'],
+                            $_wpnonce,
+                            _x('Check-In', 'Booking', 'rrze-rsvp')
+                        );
                         $checkoutButton = sprintf(
                             '<a href="edit.php?post_type=%1$s&action=checkout&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>',
                             'booking',
                             $booking['id'],
                             $_wpnonce,
                             _x('Check-Out', 'Booking', 'rrze-rsvp')
-                        );                    
+                        );
                         if ($status == 'confirmed') {
-                            $button = $cancelButton . '<button class="button button-primary" disabled>' . _x('Confirmed', 'Booking', 'rrze-rsvp') . '</button>';
+                            $button = $cancelButton . $checkInButton;
                         } elseif ($status == 'checked-in') {
                             $button = '<button class="button button-primary" disabled>' . _x('Checked-In', 'Booking', 'rrze-rsvp') . '</button>' . $checkoutButton;
                         } elseif ($status == 'checked-out') {
