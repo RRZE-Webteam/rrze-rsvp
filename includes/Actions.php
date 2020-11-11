@@ -116,9 +116,10 @@ class Actions
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
 			} elseif ($status == 'confirmed' && $action == 'checkin') {
 			    $now = current_time('timestamp');
-			    if ($now < $booking['start'] || $now > $booking['end']) {
+                $offset = 15 * MINUTE_IN_SECONDS;
+                if ($now < ($booking['start'] - $offset) || $now > $booking['end']) {
                     wp_die(
-                        __('Booking can only be checked in during booked timeslot.', 'rrze-rsvp'),
+                        __('Booking can only be checked in between 15 minutes before the start of the timeslot and the end of the timeslot.', 'rrze-rsvp'),
                         __('Update Error', 'rrze-rsvp'),
                         ['back_link' => true]
                     );
