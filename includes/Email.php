@@ -29,8 +29,8 @@ class Email
      */
     public function __construct()
     {
-        $settings = new Settings(plugin()->getFile());
-        $this->options = (object) $settings->getOptions();
+        $this->settings = new Settings(plugin()->getFile());
+        $this->options = (object) $this->settings->getOptions();
         $this->template = new Template;
         $this->isLocaleEnglish = Functions::isLocaleEnglish();
     }
@@ -51,10 +51,11 @@ class Email
             return;
         }
 
-        $sendToEmail = get_post_meta($booking['room'], 'rrze-rsvp-room-send-to-email', true);
+        $roomMeta = get_post_meta($booking['room']);
+        $sendToEmail = isset($roomMeta['rrze-rsvp-room-send-to-email']) ? $roomMeta['rrze-rsvp-room-send-to-email'][0] : '';
         $to = $recipient == 'admin' ? $this->options->email_notification_email : $booking['guest_email'];
-        $bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
-        $autoConfirmation = Functions::getBoolValueFromAtt(get_post_meta($booking['room'], 'rrze-rsvp-room-auto-confirmation', true));
+        $bookingMode = isset($roomMeta['rrze-rsvp-room-bookingmode']) ? $roomMeta['rrze-rsvp-room-bookingmode'][0] : '';
+        $autoConfirmation = isset($roomMeta['rrze-rsvp-room-auto-confirmation']) ? Functions::getBoolValueFromAtt($roomMeta['rrze-rsvp-room-auto-confirmation'][0]) : false;
         $adminConfirmationRequired = $autoConfirmation ? false : true; // Verwirrende Post-Meta-Bezeichnung vereinfacht
         $showConfirmationButton = false;
         $showCheckinButton = false;
@@ -64,8 +65,6 @@ class Email
             $cancelReason = false;
             $cancelReason_en = false;
         }
-
-        // TODO: Instant CheckIn -> kein Cancel-Button, kein CheckIn-Button
 
         switch ($mailContext) {
             case 'customerConfirmationRequired':
@@ -250,10 +249,35 @@ class Email
             $data['checkin_url'] = Functions::bookingReplyUrl('checkin', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
             $data['checkin_btn'] = __('Check In', 'rrze-rsvp');
             $data['checkin_btn_en'] = 'Check In';
-            $data['checkin_text'] = __('Please check-in your booking on site.', 'rrze-rsvp');
-            $data['checkin_text_en'] = 'Please check-in your booking on site.';
-            $data['alt_checkin_text'] = __('Please check-in your booking on site.', 'rrze-rsvp');
-            $data['alt_checkin_text_en'] = 'Please check-in your booking on site.';
+            $forceCheckin = isset($roomMeta['rrze-rsvp-room-force-to-checkin']) ? $roomMeta['rrze-rsvp-room-force-to-checkin'][0] : '';
+
+            if ($forceCheckin) {
+                $checkInTime = isset($roomMeta['rrze-rsvp-room-check-in-time']) ? $roomMeta['rrze-rsvp-room-check-in-time'][0] : '';
+                if ($checkInTime == '') {
+                    $defaultCheckInTime = $this->settings->getDefault('general', 'check-in-time');
+                    $settingsCheckInTime = $this->settings->getOption('general', 'check-in-time', $defaultCheckInTime, true);
+                    $checkInTime = $settingsCheckInTime;
+                }
+                $bookingTimeStamp = $booking['booking_date_timestamp'];
+                $bookingStart = $booking['start'];
+                if ($bookingStart < $bookingTimeStamp) {
+                    //Seat booked after beginning of timeslot
+                    $timeStampCheckIn = $bookingTimeStamp + ($checkInTime * MINUTE_IN_SECONDS);
+                } else {
+                    $timeStampCheckIn = $bookingStart + ($checkInTime * MINUTE_IN_SECONDS);
+                }
+                $checkInLimit = Functions::timeFormat($timeStampCheckIn);
+                $checkInLimit_en = date('g:i a', $timeStampCheckIn);
+                $data['checkin_text'] = sprintf(__('Please check-in your booking on site until %s.', 'rrze-rsvp'), $checkInLimit);
+                $data['checkin_text_en'] = sprintf('Please check-in your booking on site until %s.', $checkInLimit_en);
+                $data['alt_checkin_text'] = sprintf(__('Please check-in your booking on site until %s.', 'rrze-rsvp'), $checkInLimit);
+                $data['alt_checkin_text_en'] = sprintf('Please check-in your booking on site until %s.', $checkInLimit_en);
+            } else {
+                $data['checkin_text'] = __('Please check-in your booking on site.', 'rrze-rsvp');
+                $data['checkin_text_en'] = 'Please check-in your booking on site.';
+                $data['alt_checkin_text'] = __('Please check-in your booking on site.', 'rrze-rsvp');
+                $data['alt_checkin_text_en'] = 'Please check-in your booking on site.';
+            }
         } else {
             $data['show_checkin_btn'] = false;
         }
