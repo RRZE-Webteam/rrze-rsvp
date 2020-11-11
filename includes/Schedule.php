@@ -227,19 +227,11 @@ class Schedule
      */
     protected function cancelNotCheckedInBookings()
     {
-        $timeStampBefore = current_time('timestamp') - (15 * MINUTE_IN_SECONDS);
-
         $args = [
             'fields'            => 'ids',
             'post_type'         => ['booking'],
             'post_status'       => 'publish',
             'nopaging'          => true,
-            'date_query'        => [
-                [
-                    'before'    => date('Y-m-d H:i:s', $timeStampBefore),
-                    'inclusive' => false,
-                ],
-            ],            
             'meta_query'        => [
                 'relation'      => 'AND',
                 'booking_status_clause' => [
@@ -247,11 +239,6 @@ class Schedule
                     'value'     => ['confirmed'],
                     'compare'   => 'IN'
                 ],
-//                'booking_start_clause' => [
-//                    'key'       => 'rrze-rsvp-booking-start',
-//                    'value'     => $timeStampBefore,
-//                    'compare'   => '<'
-//                ]
             ]
         ];
 
@@ -261,23 +248,35 @@ class Schedule
             while ($query->have_posts()) {
                 $query->the_post();
                 $bookingId = get_the_ID();
-                $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
-                $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
-                $bookingStart = get_post_meta($bookingId,'rrze-rsvp-booking-start', true);
-                $checkInTime = get_post_meta($roomId, 'rrze-rsvp-room-check-in-time', true);
+                $booking = Functions::getBooking($bookingId);
+                $roomId = $booking['room'];
+                $roomMeta = get_post_meta($roomId);
+                $bookingMode = isset($roomMeta['rrze-rsvp-room-bookingmode']) ? $roomMeta['rrze-rsvp-room-bookingmode'][0] : '';
+                $checkInRequired = isset($roomMeta['rrze-rsvp-room-force-to-checkin']) ? Functions::getBoolValueFromAtt($roomMeta['rrze-rsvp-room-force-to-checkin'][0]) : false;
+                if (!$checkInRequired && !in_array($bookingMode, ['consultation', 'no-check'])) {
+                    continue;
+                }
+                $bookingTimeStamp = $booking['booking_date_timestamp'];
+                $bookingStart = $booking['start'];
+                $checkInTime = isset($roomMeta['rrze-rsvp-room-check-in-time']) ? $roomMeta['rrze-rsvp-room-check-in-time'][0] : '';
                 if ($checkInTime == '') {
                     $defaultCheckInTime = $this->settings->getDefault('general', 'check-in-time');
                     $settingsCheckInTime = $this->settings->getOption('general', 'check-in-time', $defaultCheckInTime, true);
                     $checkInTime = $settingsCheckInTime;
                 }
-                $timeStampCheckIn = current_time('timestamp') - ($checkInTime * MINUTE_IN_SECONDS);
-                if ($bookingStart >= $timeStampCheckIn) {
+                if ($bookingStart < $bookingTimeStamp) {
+                    //Seat booked after beginning of timeslot
+                    $timeStampCheckIn = $bookingTimeStamp + ($checkInTime * MINUTE_IN_SECONDS);
+                } else {
+                    $timeStampCheckIn = $bookingStart + ($checkInTime * MINUTE_IN_SECONDS);
+                }
+                if (current_time('timestamp') < $timeStampCheckIn) {
                     continue;
                 }
-                if (get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true) == 'consultation') {
+                if (in_array($bookingMode, ['consultation', 'no-check'])) {
                     update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
                     do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
-                } elseif (get_post_meta($roomId, 'rrze-rsvp-room-force-to-checkin', true)) {
+                } elseif ($checkInRequired) {
                     update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
                     $this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled', 'notcheckedin');
                     do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
