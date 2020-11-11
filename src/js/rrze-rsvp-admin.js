@@ -181,10 +181,10 @@ jQuery(document).ready(function ($) {
 	}
     
     // prevent copy & paste and disable mouse right click and cut for booking overview
-    $('body.post-type-booking').bind('cut copy paste', function (e) {
+    $('body.post-type-booking table.wp-list-table').bind('cut copy paste', function (e) {
         e.preventDefault();
     });
-    $('body.post-type-booking').on("contextmenu",function(e){
+    $('body.post-type-booking table.wp-list-table').on("contextmenu",function(e){
         return false;
     });
 });
