@@ -63,7 +63,7 @@ class Actions
             $bookingConfirmed = true;
             $this->email->doEmail('adminConfirmed', 'customer', $bookingId);
         } elseif ($status == 'booked' && $action == 'custom-confirm') {
-            update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'custom-confirmed');
+            update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'customer-confirmed');
             $bookingConfirmed = true;
             $this->email->doEmail('customerConfirmed', 'customer', $bookingId,'customer-confirmed');
             if ($adminConfirmationRequired) {
@@ -118,7 +118,7 @@ class Actions
 				$this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled');
 			} elseif ($status == 'cancelled' && $action == 'restore') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
-			} elseif ($status == 'confirmed' && $action == 'checkin') {
+			} elseif (in_array($status, ['checked-out', 'confirmed']) && $action == 'checkin') {
 			    $now = current_time('timestamp');
                 $offset = 15 * MINUTE_IN_SECONDS;
                 if ($now < ($booking['start'] - $offset) || $now > $booking['end']) {
@@ -894,7 +894,7 @@ class Actions
 			$bookingConfirmed = true;
 			$this->email->doEmail('adminConfirmed', 'customer', $bookingId);
         } elseif ($bookingBooked && $action == 'custom-confirm') {
-            update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'custom-confirmed');
+            update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'customer-confirmed');
             $bookingConfirmed = true;
             $this->email->doEmail('customerConfirmed', 'customer', $bookingId,'customer-confirmed');
             if ($adminConfirmationRequired) {
