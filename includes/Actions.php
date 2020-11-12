@@ -987,7 +987,7 @@ class Actions
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 			$this->email->doEmail('bookingCancelled', 'admin', $bookingId);
 			$bookingCancelled = true;
-		} elseif (!$bookingCancelled && !$bookingCheckedIn && $bookingConfirmed && $action == 'checkin') {
+		} elseif (!$bookingCancelled && !$bookingCheckedIn && ($bookingConfirmed || $bookingCheckedOut) && $action == 'checkin') {
 			$offset = 15 * MINUTE_IN_SECONDS;
 			if (($start - $offset) <= $now && $end >= $now) {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
