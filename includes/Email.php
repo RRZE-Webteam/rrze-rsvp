@@ -304,7 +304,7 @@ class Email
 
         // ICS attachment
         $attachment = '';
-        if ($status == 'confirmed') {
+        if ($status == 'confirmed' || $mailContext == 'newBooking') {
             $icsFilename = sprintf('%s-%s.ics', sanitize_title($booking['room_name']), date('YmdHi', $booking['start']));
             $icsContent = ICS::generate($bookingId, $icsFilename);
             $attachment = $this->tempFile($icsFilename, $icsContent);
@@ -313,9 +313,32 @@ class Email
         $message = $this->template->getContent('email/email', $data);
         $altMessage = $this->template->getContent('email/email.txt', $data);
 
-        //var_dump($message); exit;
+        //$this->send($to, $subject, $message, $altMessage, $attachment);
 
-        $this->send($to, $subject, $message, $altMessage, $attachment);
+        // Send ICS to separate address if requested
+        if (is_email($sendToEmail) && ($status == 'confirmed') && in_array($bookingMode, ['reservation', 'consultation', 'no-check'])) {
+            $subject = __('New confirmed booking', 'rrze-rsvp');
+            $text = __('There is a new confirmed booking for your room. Calendar file (.ics) attached.', 'rrze-rsvp');
+            $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
+            $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
+
+            $data['subject'] = $subject;
+            $data['text'] = $text;
+            $data['customer']['name'] = $customerName;
+            $data['customer']['email'] = $customerEmail;
+            $data['show_check_btns'] = false;
+            $data['show_cancel_btn'] = false;
+            $data['show_confirm_button'] = false;
+
+            $message = $this->template->getContent('email/email', $data);
+            $altMessage = $this->template->getContent('email/email.txt', $data);
+
+            $icsFilename = sprintf('%s-%s-copy.ics', sanitize_title($booking['room_name']), date('YmdHi', $booking['start']));
+            $icsContent = ICS::generate($bookingId, $icsFilename, 'send-to-email');
+            $attachment = $this->tempFile($icsFilename, $icsContent);
+
+            $this->send($sendToEmail, $subject, $message, $altMessage, $attachment);
+        }
     }
 
     /**

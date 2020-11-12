@@ -83,7 +83,7 @@ class Actions
 
 	public function handleActions()
 	{
-		if (isset($_GET['action']) && isset($_GET['id']) && wp_verify_nonce($_REQUEST['_wpnonce'], 'status')) {
+		if (isset($_GET['action']) && isset($_GET['id']) && isset($_REQUEST['_wpnonce']) && wp_verify_nonce($_REQUEST['_wpnonce'], 'status')) {
 			$bookingId = absint($_GET['id']);
 			$action = sanitize_text_field($_GET['action']);
 
@@ -99,7 +99,8 @@ class Actions
 				return;
 			}
 
-			$autoConfirmation = Functions::getBoolValueFromAtt(get_post_meta($booking['room'], 'rrze-rsvp-room-auto-confirmation', true));
+            $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true));
+            $autoConfirmation = Functions::getBoolValueFromAtt(get_post_meta($booking['room'], 'rrze-rsvp-room-auto-confirmation', true));
             $adminConfirmationRequired = $autoConfirmation ? false : true; // Verwirrende Post-Meta-Bezeichnung vereinfacht
 
             if (in_array($status, ['booked', 'customer-confirmed']) && $action == 'confirm') {
@@ -117,7 +118,11 @@ class Actions
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 				$this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled');
 			} elseif ($status == 'cancelled' && $action == 'restore') {
-				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
+                if ($forceToConfirm) {
+                    update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'customer-confirmed');
+                } else {
+                    update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
+                }
 			} elseif (in_array($status, ['checked-out', 'confirmed']) && $action == 'checkin') {
 			    $now = current_time('timestamp');
                 $offset = 15 * MINUTE_IN_SECONDS;

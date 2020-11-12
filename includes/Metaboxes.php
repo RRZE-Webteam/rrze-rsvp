@@ -363,7 +363,7 @@ class Metaboxes
 
         $cmb_general->add_field(array(
             'name' => __('Automatic confirmation', 'rrze-rsvp'),
-            'desc' => __('Incoming bookings do not need to be confirmed by the booking managers', 'rrze-rsvp'),
+            'desc' => __('Incoming bookings do <u>not</u> need to be confirmed by the booking managers.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-auto-confirmation',
             'type' => 'checkbox',
             'default' => '',
@@ -371,7 +371,7 @@ class Metaboxes
         ));
 
         $cmb_general->add_field(array(
-            'name' => __('Email confirmation is required', 'rrze-rsvp'),
+            'name' => __('Customer confirmation required', 'rrze-rsvp'),
             'desc' => __('The customer must confirm his reservation within one hour. Otherwise the system will cancel the booking.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-force-to-confirm',
             'type' => 'checkbox',
@@ -389,7 +389,7 @@ class Metaboxes
         ));
 
         $cmb_general->add_field(array(
-            'name' => __('Send to an email address', 'rrze-rsvp'),
+            'name' => __('Additional ICS email', 'rrze-rsvp'),
             'desc' => __('A copy of the confirmed booking will be sent to the specified email address with a calendar file (.ics) as an attachment.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-send-to-email',
             'type' => 'text_email',

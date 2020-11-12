@@ -218,7 +218,10 @@ class Bookings {
                             $_wpnonce,
                             _x('Check-Out', 'Booking', 'rrze-rsvp')
                         );
-                        if ($status == 'confirmed') {
+                        $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true));
+                        if ($status == 'booked' && $forceToConfirm) {
+                            $button = _x('Waiting for customer confirmation', 'Booking', 'rrze-rsvp') . $cancelButton;
+                        } elseif ($status == 'confirmed') {
                             $button = $cancelButton . $checkInButton;
                         } elseif ($status == 'checked-in') {
                             $button = '<button class="button button-primary" disabled>' . _x('Checked-In', 'Booking', 'rrze-rsvp') . '</button>' . $checkoutButton;
