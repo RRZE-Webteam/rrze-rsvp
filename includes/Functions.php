@@ -612,6 +612,7 @@ class Functions
                 }
             }
         }
+        ksort($room_availability);
 
         // Für Kalender aus Array-Ebene Timestamp zwei Ebenen (Tag / Zeit) machen
         foreach ($room_availability as $timestamp => $v) {
@@ -727,6 +728,7 @@ class Functions
             }
             $loopstart = strtotime("+1 day", $loopstart);
         }
+        ksort($seat_availability);
 
         // Für Ausgabe Timestamp zwei Ebenen (Tag / Zeit) machen
         foreach ($seat_availability as $timestamp => $timestamp_end) {
