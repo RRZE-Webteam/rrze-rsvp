@@ -60,10 +60,10 @@ jQuery(document).ready(function ($) {
      */
 
     // Set search string in result
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('s')){
-        $('.subtitle').html( $('.subtitle').text().substring(0, $('.subtitle').text().length - 1) + urlParams.get('s') + '&rdquo;');
-    }
+    // const urlParams = new URLSearchParams(window.location.search);
+    // if (urlParams.get('s')){
+    //     $('.subtitle').html( $('.subtitle').text().substring(0, $('.subtitle').text().length - 1) + urlParams.get('s') + '&rdquo;');
+    // }
 
 	// Hide booking mode info text on loading, insert booking mode info icon
 	$('select#rrze-rsvp-room-bookingmode').after('<a><span class="dashicons dashicons-editor-help info-bookingmode" title="Informationen zum Buchungsmodus anzeigen" aria-hidden="true"></span><span class="screen-reader-text">Informationen zum Buchungsmodus anzeigen</span></a>');

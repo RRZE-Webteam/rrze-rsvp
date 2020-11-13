@@ -529,7 +529,7 @@ class Bookings {
 
 
     public function searchBookings($query) {
-        if (!$query->is_main_query() || $query->post_type != 'booking') {
+        if (!$query->is_main_query() || $query->query_vars['post_type'] != 'booking') {
             return $query;
         } 
         $aBookingIDs = [];
@@ -539,6 +539,7 @@ class Bookings {
             // $this->getBookingByGuest() deactivated because it is not allowed to search for persons (Personalrat)
             // $aBookingIDs = array_merge($this->getBookingIDsBySeatRoomTitle($this->sSearch), $this->getBookingByGuest($this->sSearch));
             $aBookingIDs = $this->getBookingIDsBySeatRoomTitle($this->sSearch);
+
             if ($aBookingIDs){
                 $query->set('post__in', $aBookingIDs);
                 $query->set('s', '');
