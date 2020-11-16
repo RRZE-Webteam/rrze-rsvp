@@ -307,10 +307,10 @@ class Bookings {
         foreach ($aBookingIds as $bookingId) {
             // 2. get unique dates
             $bookingStart = get_post_meta($bookingId, 'rrze-rsvp-booking-start', true);
-            $aBookingDates[date("Y-m-d", $bookingStart)] = Functions::dateFormat($bookingStart);
+            $aBookingDates[date("Y-m-d", $bookingStart)] = Functions::dateFormat((int)$bookingStart);
 
             $bookingEnd = get_post_meta($bookingId, 'rrze-rsvp-booking-end', true);
-            $bookingTimeslot = sprintf('%05s', Functions::timeFormat($bookingStart)) . ' - ' . sprintf('%05s', Functions::timeFormat($bookingEnd));
+            $bookingTimeslot = sprintf('%05s', Functions::timeFormat((int)$bookingStart)) . ' - ' . sprintf('%05s', Functions::timeFormat((int)$bookingEnd));
             $aBookingTimeslots[$bookingTimeslot] = $bookingTimeslot;
             // 3. get unique rooms via seat
             $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
