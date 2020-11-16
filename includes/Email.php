@@ -313,7 +313,7 @@ class Email
         $message = $this->template->getContent('email/email', $data);
         $altMessage = $this->template->getContent('email/email.txt', $data);
 
-        //$this->send($to, $subject, $message, $altMessage, $attachment);
+        $this->send($to, $subject, $message, $altMessage, $attachment);
 
         // Send ICS to separate address if requested
         if (is_email($sendToEmail) && ($status == 'confirmed') && in_array($bookingMode, ['reservation', 'consultation', 'no-check'])) {
