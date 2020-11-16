@@ -345,8 +345,8 @@ class Functions
         $start = new Carbon(date('Y-m-d H:i:s', $data['start']), wp_timezone());
         $end = absint(get_post_meta($post->ID, 'rrze-rsvp-booking-end', true));
         $data['end'] = $end ? $end : $start->endOfDay()->getTimestamp();
-        $data['date'] = self::dateFormat($data['start']);
-        $data['time'] = self::timeFormat($data['start']) . ' - ' . self::timeFormat($data['end']);
+        $data['date'] = self::dateFormat((int)$data['start']);
+        $data['time'] = self::timeFormat((int)$data['start']) . ' - ' . self::timeFormat((int)$data['end']);
         $data['date_en'] = date('F j, Y', $data['start']);
         $data['time_en'] = date('g:i a', $data['start']) . ' - ' . date('g:i a', $data['end']);
 
@@ -612,6 +612,7 @@ class Functions
                 }
             }
         }
+        ksort($room_availability);
 
         // Für Kalender aus Array-Ebene Timestamp zwei Ebenen (Tag / Zeit) machen
         foreach ($room_availability as $timestamp => $v) {
@@ -727,6 +728,7 @@ class Functions
             }
             $loopstart = strtotime("+1 day", $loopstart);
         }
+        ksort($seat_availability);
 
         // Für Ausgabe Timestamp zwei Ebenen (Tag / Zeit) machen
         foreach ($seat_availability as $timestamp => $timestamp_end) {

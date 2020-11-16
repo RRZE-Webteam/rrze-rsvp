@@ -310,10 +310,10 @@ class Bookings {
         foreach ($aBookingIds as $bookingId) {
             // 2. get unique dates
             $bookingStart = get_post_meta($bookingId, 'rrze-rsvp-booking-start', true);
-            $aBookingDates[date("Y-m-d", $bookingStart)] = Functions::dateFormat($bookingStart);
+            $aBookingDates[date("Y-m-d", $bookingStart)] = Functions::dateFormat((int)$bookingStart);
 
             $bookingEnd = get_post_meta($bookingId, 'rrze-rsvp-booking-end', true);
-            $bookingTimeslot = sprintf('%05s', Functions::timeFormat($bookingStart)) . ' - ' . sprintf('%05s', Functions::timeFormat($bookingEnd));
+            $bookingTimeslot = sprintf('%05s', Functions::timeFormat((int)$bookingStart)) . ' - ' . sprintf('%05s', Functions::timeFormat((int)$bookingEnd));
             $aBookingTimeslots[$bookingTimeslot] = $bookingTimeslot;
             // 3. get unique rooms via seat
             $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
@@ -532,7 +532,7 @@ class Bookings {
 
 
     public function searchBookings($query) {
-        if (!$query->is_main_query() || $query->post_type != 'booking') {
+        if (!$query->is_main_query() || $query->query_vars['post_type'] != 'booking') {
             return $query;
         } 
         $aBookingIDs = [];
@@ -542,6 +542,7 @@ class Bookings {
             // $this->getBookingByGuest() deactivated because it is not allowed to search for persons (Personalrat)
             // $aBookingIDs = array_merge($this->getBookingIDsBySeatRoomTitle($this->sSearch), $this->getBookingByGuest($this->sSearch));
             $aBookingIDs = $this->getBookingIDsBySeatRoomTitle($this->sSearch);
+
             if ($aBookingIDs){
                 $query->set('post__in', $aBookingIDs);
                 $query->set('s', '');
