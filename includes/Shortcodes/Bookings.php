@@ -651,8 +651,8 @@ class Bookings extends Shortcodes {
                 exit;
             }
         }elseif ($this->ldap) {
-            if ($this->ldap->isAuthenticated()){
-                $ldap_data = $this->ldap->getCustomerData();
+            if ($this->ldapInstance->isAuthenticated()){
+                $ldap_data = $this->ldapInstance->getCustomerData();
                 $booking_email  = $ldap_data['customer_email'];
             } else {
                 $redirectUrl = add_query_arg(
@@ -670,6 +670,9 @@ class Bookings extends Shortcodes {
             $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
             $booking_email = sanitize_email($posted_data['rsvp_email']);
         }
+
+        $this->idm->logout();
+        $this->ldapInstance->logout();
 
         // Postdaten überprüfen
         $transientData = new TransientData(bin2hex(random_bytes(8)));

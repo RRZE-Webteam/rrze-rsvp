@@ -89,14 +89,12 @@ if ($ssoRequired) {
 }
 
 if ($ldapRequired) {
-    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
     $headline = $sOr . __('Please login with your UB-AD username', 'rrze-rsvp') . ':' . $loginDenied;
     echo <<<FORMEND
     $headline
         <form action="#" method="POST">
-            <label for="username">Username: </label><input id="username" type="text" name="username" value="$username" />
-            <label for="password">Password: </label><input id="password" type="password" name="password"  value="$password" />
+            <label for="username">Username: </label><input id="username" type="text" name="username" value="" />
+            <label for="password">Password: </label><input id="password" type="password" name="password"  value="" />
             <input type="submit" name="submit_ldap" value="Submit" />
         </form>
 FORMEND;

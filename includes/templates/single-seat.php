@@ -48,9 +48,11 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
             if ($bSSO) {
                 $idm->setAttributes();
                 $customerData = $idm->getCustomerData();
+                $idm->logout();
             } elseif ($bLDAP) {
                 $ldapInstance->setAttributes();
                 $customerData = $ldapInstance->getCustomerData();
+                $ldapInstance->logout();
             }                
         }                
     }
