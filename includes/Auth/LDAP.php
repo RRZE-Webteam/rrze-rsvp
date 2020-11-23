@@ -30,7 +30,7 @@ final class LDAP extends Auth
     protected $sessionTimeout = 10 * MINUTE_IN_SECONDS;
 
     public function __construct()
-    {        
+    {
         if (!isset($_SESSION)) {
             session_name('rrze_rsvp');
             session_start();
@@ -119,6 +119,23 @@ final class LDAP extends Auth
                 @ldap_close($this->connection);
             }
         }
+    }
+
+    public function logout()
+    {
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['ldap_logged_in'],
+                $params['ldap_uid'],
+                $params['ldap_mail']
+            );
+        }
+        session_destroy();
     }
 
     private function logError(string $method)

@@ -7,6 +7,7 @@ defined('ABSPATH') || exit;
 use RRZE\RSVP\Functions;
 
 use SimpleSAML\Auth\Simple as SimpleSAMLAuthSimple;
+use SimpleSAML\Session as Session;
 
 final class IdM extends Auth
 {
@@ -30,7 +31,12 @@ final class IdM extends Auth
 
     public function isAuthenticated(): bool
     {
-        return $this->simplesamlAuth && $this->simplesamlAuth->isAuthenticated();
+        if ($this->simplesamlAuth && $this->simplesamlAuth->isAuthenticated()) {
+            return true;
+        } else {
+            Session::getSessionFromRequest()->cleanup();
+            return false;
+        }
     }
 
     public function setAttributes()
@@ -60,6 +66,14 @@ final class IdM extends Auth
             'customer_lastname' => $customerLastname,
             'customer_email' => $this->mail ? $this->mail : __('no@email', 'rrze-rsvp')
         ];
+    }
+
+    public function logout(string $returnTo = '')
+    {
+        if (filter_var($returnTo, FILTER_VALIDATE_URL)) {
+            $this->simplesamlAuth->logout($returnTo);
+            Session::getSessionFromRequest()->cleanup();
+        }
     }
 
     public function getLoginURL()

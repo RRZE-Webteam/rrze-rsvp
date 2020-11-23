@@ -20,6 +20,8 @@ abstract class Auth
 
     abstract public function getCustomerData(): array;
 
+    abstract public function logout();
+
     public static function tryLogIn()
     {
         $authNonce = sprintf('require-auth=%s', wp_create_nonce('require-auth'));
