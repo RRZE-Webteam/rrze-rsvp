@@ -70,12 +70,12 @@ final class IdM extends Auth
 
     public function logout(string $returnTo = '')
     {
-        $this->simplesamlAuth->logout();
+        if (filter_var($returnTo, FILTER_VALIDATE_URL)) {
+            $this->simplesamlAuth->logout($returnTo);
+        } else {
+            $this->simplesamlAuth->logout();
+        }
         Session::getSessionFromRequest()->cleanup();
-        // if (filter_var($returnTo, FILTER_VALIDATE_URL)) {
-        //     $this->simplesamlAuth->logout($returnTo);
-        //     Session::getSessionFromRequest()->cleanup();
-        // }
     }
 
     public function getLoginURL()

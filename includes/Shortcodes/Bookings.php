@@ -534,6 +534,14 @@ class Bookings extends Shortcodes {
             return '';
         }
 
+        if ($this->idm->isAuthenticated()) {
+            $this->idm->logout();
+        }
+
+        if ($this->ldapInstance->isAuthenticated()) {
+            $this->ldapInstance->logout();
+        }
+
         $bookingId = absint($_GET['id']);
         $booking = Functions::getBooking($bookingId);
         if (!$booking) {
@@ -670,9 +678,6 @@ class Bookings extends Shortcodes {
             $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
             $booking_email = sanitize_email($posted_data['rsvp_email']);
         }
-
-        $this->idm->logout();
-        $this->ldapInstance->logout();
 
         // Postdaten überprüfen
         $transientData = new TransientData(bin2hex(random_bytes(8)));
