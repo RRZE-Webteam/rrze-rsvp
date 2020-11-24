@@ -11,9 +11,16 @@ $ldapInstance = new LDAP;
 $template = new Template;
 $settings = new Settings(plugin()->getFile());
 
-$room = isset($_GET['room_id']) ? absint($_GET['room_id']) : 0;
-$ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-sso-required', true));
-$ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-ldap-required', true));
+$roomID = isset($_GET['room_id']) ? absint($_GET['room_id']) : 0;
+if (!$roomID && isset($_GET['id'])){
+    // get room ID from booking via seat
+    $bookingID = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+    $seatID = get_post_meta($bookingID, 'rrze-rsvp-booking-seat', true);
+    $roomID = get_post_meta($seatID, 'rrze-rsvp-seat-room', true);
+}
+
+$ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomID, 'rrze-rsvp-room-sso-required', true));
+$ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomID, 'rrze-rsvp-room-ldap-required', true));
 $ldapRequired = $ldapRequired && $settings->getOption('ldap', 'server') ? true : false;
 
 $loginDenied = '';
