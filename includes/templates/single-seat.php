@@ -48,7 +48,7 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
             if ($bSSO) {
                 $idm->setAttributes();
                 $customerData = $idm->getCustomerData();
-                $idm->logout();
+                // $idm->logout();
             } elseif ($bLDAP) {
                 $ldapInstance->setAttributes();
                 $customerData = $ldapInstance->getCustomerData();
@@ -373,6 +373,12 @@ if ($checkInBooking) {
 
 echo $div_close;
 
-wp_enqueue_style('rrze-rsvp-shortcode');
+if ($idm->isAuthenticated()) {
+    $idm->logout();
+}
 
+wp_enqueue_style('rrze-rsvp-shortcode');
 get_footer();
+
+
+
