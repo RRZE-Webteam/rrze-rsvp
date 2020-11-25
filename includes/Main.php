@@ -59,9 +59,9 @@ class Main
 		$tools = new Tools;
 		$tools->onLoaded();
 
-		$virtualPage = new VirtualPage(__('Booking', 'rrze-rsvp'), 'rsvp-booking');
-		$virtualPage->onLoaded();
-
+        $virtualPage = new VirtualPage(__('Booking', 'rrze-rsvp'), 'rsvp-booking');
+        $virtualPage->onLoaded();
+        
 		$actions = new Actions;
 		$actions->onLoaded();
 

@@ -594,7 +594,6 @@ class Bookings extends Shortcodes {
 
     public function bookingSubmitted() {
         if (!isset($_POST['rrze_rsvp_post_nonce_field']) || !wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
-            // Helper::logIt('bookingSubmitted before return');
             return;
         }
 
@@ -767,7 +766,6 @@ class Bookings extends Shortcodes {
                 ],
                 wp_get_referer()
             );
-            // Helper::logIt('bookingSubmitted transient $redirectUrl = ' . $redirectUrl);
             wp_redirect($redirectUrl);
             exit;             
         }
