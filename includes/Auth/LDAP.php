@@ -67,6 +67,7 @@ final class LDAP extends Auth
 
     public function getCustomerData(): array
     {
+        $this->logout();
         return [
             'customer_email' => $this->mail ? $this->mail : __('no@email', 'rrze-rsvp')
         ];
@@ -126,14 +127,20 @@ final class LDAP extends Auth
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
             $params = session_get_cookie_params();
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                $params['ldap_logged_in'],
-                $params['ldap_uid'],
-                $params['ldap_mail']
-            );
+
+            // setcookie(
+            //     session_name(),
+            //     '',
+            //     time() - 42000,
+            //     $params['ldap_logged_in'],
+            //     $params['ldap_uid'],
+            //     $params['ldap_mail']
+            // );
+
+            $_SESSION['ldap_logged_in'] = '';
+            $_SESSION['ldap_uid'] = '';
+            $_SESSION['ldap_mail'] = '';
+
         }
         session_destroy();
     }
