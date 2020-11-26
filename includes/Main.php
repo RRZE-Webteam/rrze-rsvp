@@ -7,6 +7,7 @@ defined('ABSPATH') || exit;
 use RRZE\RSVP\CPT\CPT;
 use RRZE\RSVP\Shortcodes\Shortcodes;
 use RRZE\RSVP\Printing\Printing;
+
 use function RRZE\RSVP\Config\getOptionName;
 
 
@@ -15,10 +16,7 @@ use function RRZE\RSVP\Config\getOptionName;
  */
 class Main
 {
-
 	protected $pluginFile;
-	private $settings = '';
-
 
 	/**
 	 * [__construct description]
@@ -32,11 +30,7 @@ class Main
 	{
 		// Settings
 		$settings = new Settings($this->pluginFile);
-		$settings->onLoaded();
-
-		// IdM
-        $idm = new IdM;
-        $idm->onLoaded();		
+		$settings->onLoaded();		
 
 		// Posttypes 
 		$cpt = new CPT;
@@ -49,10 +43,6 @@ class Main
 		// Tracking
 		$tracking = new Tracking;
 		$tracking->onLoaded();
-
-		// LDAP 
-		// $ldap = new LDAP;
-		// $ldap->onLoaded();
 
 		$shortcodes = new Shortcodes($this->pluginFile, $settings);
 		$shortcodes->onLoaded();
@@ -69,9 +59,9 @@ class Main
 		$tools = new Tools;
 		$tools->onLoaded();
 
-		$virtualPage = new VirtualPage(__('Booking', 'rrze-rsvp'), 'rsvp-booking');
-		$virtualPage->onLoaded();
-
+        $virtualPage = new VirtualPage(__('Booking', 'rrze-rsvp'), 'rsvp-booking');
+        $virtualPage->onLoaded();
+        
 		$actions = new Actions;
 		$actions->onLoaded();
 

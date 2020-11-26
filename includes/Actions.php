@@ -823,21 +823,14 @@ class Actions
 
 
 	public function bookingReply(){
-        // Helper::logIt('bookingReply new');
-
         global $post;
 		if (!is_a($post, '\WP_Post') || !is_page() || $post->post_name != "rsvp-booking") {
-            // Helper::logIt('bookingReply about to return');
 			return;
 		}
 
 		$bookingId = isset($_GET['id']) ? absint($_GET['id']) : false;
 		$action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : false;
 		$hash = isset($_GET['booking-reply']) ? sanitize_text_field($_GET['booking-reply']) : false;
-
-        // Helper::logIt('bookingReply $bookingId = ' . $bookingId);
-        // Helper::logIt('bookingReply $action = ' . $action);
-        // Helper::logIt('bookingReply $hash = ' . $hash);
 
 		if (!$hash || !$bookingId || !$action) {
 			return;
@@ -859,13 +852,11 @@ class Actions
 		$bookingCancelled = ($booking['status'] == 'cancelled');
 
 		if (($action == 'confirm' || $action == 'cancel') && $isAdmin) {
-            // Helper::logIt('bookingReply pre bookingReplyAdmin');
 			$this->bookingReplyAdmin($bookingId, $booking, $action);
 		} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel' || $action == 'maybe-cancel') && $isCustomer) {
 			if ($bookingCancelled) {
 				$action = 'cancel';
 			}
-            // Helper::logIt('bookingReply pre bookingReplyCustomer');
 			$this->bookingReplyCustomer($bookingId, $booking, $action);
 		} else {
 			header('HTTP/1.0 403 Forbidden');
