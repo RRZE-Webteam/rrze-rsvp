@@ -21,6 +21,7 @@ $checkInBooking = null;
 $seatCheckInOut = null;
 $action = null;
 
+
 if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rrze-rsvp-checkin-booked')) {
     $bookingId = absint($_GET['id']);
     $checkInBooking = Functions::getBooking($bookingId);
@@ -374,7 +375,7 @@ if ($checkInBooking) {
 echo $div_close;
 
 if ($idm->isAuthenticated()) {
-    $idm->logout();
+    $idm->logout(home_url( add_query_arg( null, null ) . '&sso_loggedout=1'));
 }
 
 wp_enqueue_style('rrze-rsvp-shortcode');

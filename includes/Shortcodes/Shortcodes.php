@@ -107,7 +107,9 @@ class Shortcodes{
 
     public function maybeAuthenticate() {
         global $post;
-        if (!is_a($post, '\WP_Post') || isset($_GET['require-auth'])) {
+        $sso_loggedout = filter_input(INPUT_GET, 'sso_loggedout', FILTER_VALIDATE_INT);
+
+        if (!is_a($post, '\WP_Post') || isset($_GET['require-auth']) || $sso_loggedout) {
             return;
         }
         
