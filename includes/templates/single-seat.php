@@ -49,12 +49,23 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
             if ($bSSO) {
                 $idm->setAttributes();
                 $customerData = $idm->getCustomerData();
-                // $idm->logout();
+                // check if booking email is logged in email
+                if ($customerEmail != $customerData['customer_email']){
+                    $idm->logout(home_url( add_query_arg( null, null ) . '&email_error=1'));
+                    exit;
+                }else{
+                    $idm->logout(home_url( add_query_arg( null, null ) . '&sso_loggedout=1'));
+                }
             } elseif ($bLDAP) {
                 $ldapInstance->setAttributes();
                 $customerData = $ldapInstance->getCustomerData();
                 $ldapInstance->logout();
-            }                
+                // check if booking email is logged in email
+                if ($customerEmail != $customerData['customer_email']){
+                    wp_redirect(home_url( add_query_arg( null, null ) . '&email_error=1'));
+                    exit;
+                }
+            }   
         }                
     }
 }
@@ -373,10 +384,6 @@ if ($checkInBooking) {
 }
 
 echo $div_close;
-
-if ($idm->isAuthenticated()) {
-    $idm->logout(home_url( add_query_arg( null, null ) . '&sso_loggedout=1'));
-}
 
 wp_enqueue_style('rrze-rsvp-shortcode');
 get_footer();

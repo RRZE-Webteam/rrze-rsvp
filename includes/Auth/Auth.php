@@ -31,9 +31,4 @@ abstract class Auth
         wp_redirect($redirectUrl);
         exit;
     }
-
-    public function getPersonAttributes()
-    {
-        return $this->personAttributes;
-    }
 }
