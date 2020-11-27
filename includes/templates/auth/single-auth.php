@@ -11,6 +11,10 @@ $ldapInstance = new LDAP;
 $template = new Template;
 $settings = new Settings(plugin()->getFile());
 
+$email_error = filter_input(INPUT_GET, 'email_error', FILTER_VALIDATE_INT);
+$email_error = ($email_error ? '<p class="error-message">' . __('Please login to the account you have used to book this seat.', 'rrze-rsvp') . '</p><br><br>' : '');
+
+
 $roomID = isset($_GET['room_id']) ? absint($_GET['room_id']) : 0;
 if (!$roomID && isset($_GET['id'])){
     // get room ID from booking via seat
@@ -82,11 +86,11 @@ if (Helper::isFauTheme()) {
 $title = __('Authentication Required', 'rrze-rsvp');
 echo $divOpen;
 
-
 echo <<<DIVEND
 <div class="rrze-rsvp-booking-reply rrze-rsvp">
     <div class="container">    
-		<h2>$title</h2>
+        <h2>$title</h2>
+        $email_error
 DIVEND;
 
 $sOr = '';
