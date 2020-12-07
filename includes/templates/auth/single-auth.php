@@ -33,8 +33,8 @@ if ($ldapRequired && isset($_POST['submit_ldap'])) {
     if ($ldapInstance->isAuthenticated()) {
         $queryStr = Functions::getQueryStr([], ['require-auth']);
         $redirectUrl = trailingslashit(get_permalink()) . ($queryStr ? '?' . $queryStr : '');
-    wp_redirect($redirectUrl);
-    exit;
+        wp_redirect($redirectUrl);
+        exit;
     } else {
         $loginDenied = '<br><p class="error-message">' . __('Login denied', 'rrze-rsvp') . '</p>';
     }
@@ -89,7 +89,7 @@ echo $divOpen;
 echo <<<DIVEND
 <div class="rrze-rsvp-booking-reply rrze-rsvp">
     <div class="container">    
-		<h2>$title</h2>
+        <h2>$title</h2>
         $email_error
 DIVEND;
 

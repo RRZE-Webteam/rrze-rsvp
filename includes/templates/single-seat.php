@@ -34,7 +34,7 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
         $ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-sso-required', true));
         $ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-ldap-required', true));
         $ldapRequired = $ldapRequired && $settings->getOption('ldap', 'server') ? true : false;
-
+  
         $bSSO = true;
         if (!$ssoRequired || !$idm->isAuthenticated()) {
             $bSSO = false;
@@ -61,11 +61,11 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
                 $customerData = $ldapInstance->getCustomerData();
                 $ldapInstance->logout();
                 // check if booking email is logged in email
-                if ($customerEmail  != $customerData['customer_email']) {
+                if ($customerEmail != $customerData['customer_email']){
                     wp_redirect(home_url( add_query_arg( null, null ) . '&email_error=1'));
                     exit;
                 }
-            }                
+            }   
         }                
     }
 }

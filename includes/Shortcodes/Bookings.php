@@ -165,7 +165,7 @@ class Bookings extends Shortcodes {
         $roomMeta = get_post_meta($roomID);
         $days = $shortcode_atts[ 'days' ] != '' ? (int)$shortcode_atts[ 'days' ] : $roomMeta['rrze-rsvp-room-days-in-advance'][0];
         $comment = (isset($roomMeta['rrze-rsvp-room-notes-check']) && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on');
-
+    
         $bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
         if ($bookingMode == 'check-only' && !$this->nonce) {
             
@@ -357,21 +357,21 @@ class Bookings extends Shortcodes {
                 . __('First name', 'rrze-rsvp') . '</label>'
                 . '<input type="text" name="rsvp_firstname" value="' . $value . '" id="rsvp_firstname" required aria-required="true">'
                 . '<div class="error-message">' . $message . '</div>'
-                . '</div>';
+                . '</div>';               
         }
 
         if (!$this->sso && !$this->ldap) {
-                $error = isset($fieldErrors['rsvp_email']) ? ' error' : '';
-                $value = isset($fieldErrors['rsvp_email']['value']) ? $fieldErrors['rsvp_email']['value'] : '';
-                $message = isset($fieldErrors['rsvp_email']['message']) ? $fieldErrors['rsvp_email']['message'] : '';    
-                $output .= '<div class="form-group' . $error . '"><label for="rsvp_email">'
-                    . __('Email', 'rrze-rsvp') . '</label>'
-                    . '<input type="email" name="rsvp_email" value="' . $value . '" '
-    		        . 'pattern="^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*(\.\w{2,})+$" '
-    		        . 'id="rsvp_email" required aria-required="true">'
-                    . '<div class="error-message">' . $message . '</div>'
-                    . '</div>';
-            }
+            $error = isset($fieldErrors['rsvp_email']) ? ' error' : '';
+            $value = isset($fieldErrors['rsvp_email']['value']) ? $fieldErrors['rsvp_email']['value'] : '';
+            $message = isset($fieldErrors['rsvp_email']['message']) ? $fieldErrors['rsvp_email']['message'] : '';    
+            $output .= '<div class="form-group' . $error . '"><label for="rsvp_email">'
+                . __('Email', 'rrze-rsvp') . '</label>'
+                . '<input type="email" name="rsvp_email" value="' . $value . '" '
+                . 'pattern="^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*(\.\w{2,})+$" '
+                . 'id="rsvp_email" required aria-required="true">'
+                . '<div class="error-message">' . $message . '</div>'
+                . '</div>';            
+        }
 
         $error = isset($fieldErrors['rsvp_phone']) ? ' error' : '';
         $value = isset($fieldErrors['rsvp_phone']['value']) ? $fieldErrors['rsvp_phone']['value'] : '';
