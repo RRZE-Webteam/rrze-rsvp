@@ -27,6 +27,7 @@ In Bezug auf die notwendigen Maßnahmen zur Eindämmung der Corona-Pandemie eign
 
 Das System eignet sich auch für die Verwaltung von Sprechstundenterminen.
 
+
 ## Dokumentation
 
 Eine vollständige Dokumentation mit vielen Anwendungsbeispielen findet sich auf der Seite: 
@@ -46,7 +47,13 @@ https://github.com/RRZE-Webteam/fau-websso/blob/master/README.md
 Nachdem Sie den korrekten Betrieb des FAU-WebSSO-Plugins überprüft haben, können Sie die SSO-Option des RSVP-Plugins verwenden.
 
 
+## Verwendung der LDAP-Option (Raum Einstellungen)
+
+Das Plugin unterstützt auch die Anmeldung über LDAP. Mit dieser Option ist es möglich, den Zugriff auf die Reservierungsseite nur für Personen zu autorisieren, die einen Zugang zu Ihrem Active Directory haben.
+
+
 ## Kontaktverfolgung
+
 Das Plugin bietet auch die Möglichkeit, alle Personen zu ermitteln, die sich mit einer gesuchten Person zeitgleich in denselben Räumen befanden.
 Das Suchformular hierfür wird über "Werkzeuge" -> "RSVP Kontaktverfolgung" aufgerufen.
 Falls der Zugriff nur für SuperAdmins möglich sein soll, muss das Plugin rrze-rsvp-network ( https://github.com/RRZE-Webteam/rrze-rsvp-network ) installiert und aktiviert werden.

@@ -37,7 +37,8 @@ class VirtualPage
     public function init()
     {
         if (get_option('permalink_structure')) {
-            $param = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+            // $param = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+            $param = trim(basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'));
         } else {
             parse_str(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY), $params);
             $param = (isset($params['page_id']) ? $params['page_id'] : false);

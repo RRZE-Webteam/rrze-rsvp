@@ -6,8 +6,6 @@ use RRZE\RSVP\Functions;
 
 defined('ABSPATH') || exit;
 
-define( 'LOGFILE', plugin_dir_path( __FILE__) . '../bk-debug.log' );
-
 /**
  * Gibt der Name der Option zurück.
  * @return array [description]
@@ -153,10 +151,6 @@ function getMenuSettings()
 function getSections()
 {
     return [
-/*       [
-            'id'    => 'basic',
-            'title' => __('Basic Settings', 'rrze-rsvp')
-        ], */
         [
             'id'    => 'general',
             'title' => __('General Settings', 'rrze-rsvp')
@@ -169,10 +163,10 @@ function getSections()
             'id'    => 'pdf',
             'title' => __('QR PDF Settings', 'rrze-rsvp')
         ],
-        // [
-        //     'id'    => 'ldap',
-        //     'title' => __('LDAP Settings', 'rrze-rsvp')
-        // ],
+        [
+             'id'    => 'ldap',
+             'title' => __('LDAP Settings', 'rrze-rsvp')
+        ],
         [
             'id'    => 'reset',
             'title' => __('Reset Settings', 'rrze-rsvp')
@@ -487,43 +481,43 @@ function getFields(){
                 'type'  => 'checkbox'
             ],
         ],
-        // 'ldap' => [
-        //     [
-        //         'name'    => 'server',
-        //         'label'   => __('Server', 'rrze-rsvp'),
-        //         'desc'   => __('LDAP server URL', 'rrze-rsvp'),
-        //         'type'    => 'text',
-		//         'sanitize_callback' => 'sanitize_text_field'
-        //     ],
-        //     [
-        //         'name'    => 'port',
-        //         'label'   => __('Port', 'rrze-rsvp'),
-        //         'desc'   => __('Port', 'rrze-rsvp'),
-        //         'type'    => 'number',
-		//         'sanitize_callback' => 'sanitize_natint_field'
-        //     ],
-        //     [
-        //         'name'    => 'distinguished_name',
-        //         'label'   => __('Distinguished Name', 'rrze-rsvp'),
-        //         'desc'   => __('Distinguished Name', 'rrze-rsvp'),
-        //         'type'    => 'text',
-		//         'sanitize_callback' => 'sanitize_text_field'
-        //     ],
-        //     [
-        //         'name'    => 'bind_base_dn',
-        //         'label'   => __('Bind Base DN', 'rrze-rsvp'),
-        //         'desc'   => __('DN to bind on', 'rrze-rsvp'),
-        //         'type'    => 'text',
-		//         'sanitize_callback' => 'sanitize_text_field'
-        //     ],
-        //     [
-        //         'name'    => 'search_base_dn',
-        //         'label'   => __('Search Base DN', 'rrze-rsvp'),
-        //         'desc'   => __('DN to search in', 'rrze-rsvp'),
-        //         'type'    => 'text',
-		//         'sanitize_callback' => 'sanitize_text_field'
-        //     ],
-        // ],
+        'ldap' => [
+            [
+                'name'    => 'server',
+                'label'   => __('Server', 'rrze-rsvp'),
+                'desc'   => __('LDAP server URL. Leave blank if you are not using LDAP as an authentication system.', 'rrze-rsvp'),
+                'type'    => 'text',
+		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+            [
+                'name'    => 'port',
+                'label'   => __('Port', 'rrze-rsvp'),
+                'desc'   => __('LDAP server port.', 'rrze-rsvp'),
+                'type'    => 'number',
+		        'sanitize_callback' => 'sanitize_natint_field'
+            ],
+            [
+                'name'    => 'distinguished_name',
+                'label'   => __('DN', 'rrze-rsvp'),
+                'desc'   => __('LDAP Distinguished Name.', 'rrze-rsvp'),
+                'type'    => 'text',
+		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+            [
+                'name'    => 'bind_base_dn',
+                'label'   => __('Bind Base DN', 'rrze-rsvp'),
+                'desc'   => __('DN to bind on.', 'rrze-rsvp'),
+                'type'    => 'text',
+		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+            [
+                'name'    => 'search_base_dn',
+                'label'   => __('Search Base DN', 'rrze-rsvp'),
+                'desc'   => __('DN to search in.', 'rrze-rsvp'),
+                'type'    => 'text',
+		        'sanitize_callback' => 'sanitize_text_field'
+            ],
+        ],
         'reset' => [
             [
                 'name'  => 'reset_settings',
@@ -571,12 +565,12 @@ function getShortcodeSettings(){
                 'type' => 'boolean',
                 'default'   => false
             ],
-            // 'ldap' => [
-            //     'field_type' => 'toggle',
-            //     'label' => __( 'Require LDAP Authentication', 'rrze-rsvp' ),
-            //     'type' => 'boolean',
-            //     'default'   => false
-            // ],
+            'ldap' => [
+                'field_type' => 'toggle',
+                'label' => __( 'Require LDAP Authentication', 'rrze-rsvp' ),
+                'type' => 'boolean',
+                'default'   => false
+            ],
         ],
         'rsvp-availability' => [
             'block' => [

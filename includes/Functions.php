@@ -863,4 +863,15 @@ class Functions
         $filter = preg_replace('/[^a-z0-9]/', '', strtolower($att));
         return (in_array($filter, ['1', 'on', 'true', 'wahr', 'aktiv', 'show']));
     }    
+    
+    public static function getQueryStr(array $add = [], array $remove = []): string
+    {
+        if (empty($_SERVER['QUERY_STRING']) && strpos($_SERVER['REQUEST_URI'], '?') === false) {
+            return '';
+        }
+        $queryStr = $_SERVER['QUERY_STRING'];
+        parse_str($queryStr, $queryAry);
+        $queryAry = array_diff_key(array_merge($queryAry, $add), array_fill_keys($remove, ''));
+        return http_build_query($queryAry);
+    }    
 }

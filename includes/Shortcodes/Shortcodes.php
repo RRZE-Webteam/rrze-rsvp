@@ -4,12 +4,12 @@ namespace RRZE\RSVP\Shortcodes;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Helper;
-use RRZE\RSVP\IdM;
-// use RRZE\RSVP\LDAP;
 use RRZE\RSVP\Shortcodes\Bookings;
 use RRZE\RSVP\Shortcodes\Availability;
 use RRZE\RSVP\Shortcodes\QR;
+
+use RRZE\RSVP\Auth\{Auth, IdM, LDAP};
+
 use function RRZE\RSVP\Config\getShortcodeSettings;
 use function RRZE\RSVP\plugin;
 
@@ -28,7 +28,7 @@ class Shortcodes{
         $this->settings = $settings;
         $this->shortcodesettings = getShortcodeSettings();
         $this->idm = new IdM;
-        // $this->ldapInstance = new LDAP;
+        $this->ldapInstance = new LDAP;
     }
 
     public function onLoaded(){
@@ -93,8 +93,7 @@ class Shortcodes{
 
     public function includeSingleTemplate($singleTemplate){
         global $post;
-        // if ((isset($_GET['require-sso-auth']) && wp_verify_nonce($_GET['require-sso-auth'], 'require-sso-auth')) || (isset($_GET['require-ldap-auth']) && wp_verify_nonce($_GET['require-ldap-auth'], 'require-ldap-auth'))) {
-        if ((isset($_GET['require-sso-auth']) && wp_verify_nonce($_GET['require-sso-auth'], 'require-sso-auth'))) {
+        if (isset($_GET['require-auth']) && wp_verify_nonce($_GET['require-auth'], 'require-auth')) {
             return sprintf('%sincludes/templates/auth/single-auth.php', plugin()->getDirectory());
         } elseif (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) {
             return sprintf('%sincludes/templates/single-form.php', plugin()->getDirectory());
@@ -108,14 +107,23 @@ class Shortcodes{
 
     public function maybeAuthenticate() {
         global $post;
-        // if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth']) || isset($_GET['require-ldap-auth']) || isset($_GET['mail'])) {
-        if (!is_a($post, '\WP_Post') || isset($_GET['require-sso-auth'])) {
+        $sso_loggedout = filter_input(INPUT_GET, 'sso_loggedout', FILTER_VALIDATE_INT);
+
+        if (!is_a($post, '\WP_Post') || isset($_GET['require-auth']) || $sso_loggedout) {
             return;
         }
         
         if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
-            $this->idm->tryLogIn();
-            // $this->ldapInstance->tryLogIn();
+            $isAuth = false;
+            if ($this->idm->isAuthenticated()) {
+                $isAuth = true;
+            } elseif ($this->ldapInstance->isAuthenticated()) {
+                $isAuth = true;
+            }
+    
+            if (!$isAuth) {
+                Auth::tryLogIn();
+            }
         }     
     }
 }
