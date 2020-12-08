@@ -1137,12 +1137,28 @@ class Bookings extends Shortcodes {
     public function ajaxUpdateCalendar() {
         check_ajax_referer( 'rsvp-ajax-nonce', 'nonce' );
         $period = explode('-', $_POST['month']);
-        $mod = ($_POST['direction'] == 'next' ? 1 : -1);
+        $month = $period[1];
+        $year = $period[0];
+        switch ($month) {
+            case '1':
+                $modMonth = $_POST['direction'] == 'next' ? 1 : 11;
+                $modYear = $_POST['direction'] == 'next' ? 0 : -1;
+                break;
+            case '12':
+                $modMonth = $_POST['direction'] == 'next' ? -11 : -1;
+                $modYear = $_POST['direction'] == 'next' ? 1 : 0;
+                break;
+            default:
+                $modMonth = $_POST['direction'] == 'next' ? 1 : -1;
+                $modYear = 0;
+                break;
+        }
+
         $start = date_i18n('Y-m-d', current_time('timestamp'));
         $end = sanitize_text_field($_POST['end']);
         $roomID = (int)$_POST['room'];
         $output = '';
-        $output .= $this->buildCalendar($period[1] + $mod, $period[0], $start, $end, $roomID);
+        $output .= $this->buildCalendar($month + $modMonth, $year + $modYear, $start, $end, $roomID);
         echo $output;
         wp_die();
     }
