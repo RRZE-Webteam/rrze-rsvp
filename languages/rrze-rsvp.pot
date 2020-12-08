@@ -16,7 +16,7 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"POT-Creation-Date: 2020-12-08 13:33+0000\n"
+"POT-Creation-Date: 2020-12-08 15:04+0000\n"
 "Language: \n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: Loco https://localise.biz/"
@@ -302,10 +302,6 @@ msgstr ""
 msgid "Book this seat/timeslot now"
 msgstr ""
 
-#: includes/Metaboxes.php:161
-msgid "Booked"
-msgstr ""
-
 #: includes/CPT/Bookings.php:161
 msgid "Booked on"
 msgstr ""
@@ -326,8 +322,8 @@ msgctxt "Booking"
 msgid "Cancel"
 msgstr ""
 
-#: includes/Main.php:135 includes/Metaboxes.php:164
-#: includes/CPT/Bookings.php:168 includes/CPT/Bookings.php:190
+#: includes/Main.php:135 includes/CPT/Bookings.php:168
+#: includes/CPT/Bookings.php:190
 msgctxt "Booking"
 msgid "Cancelled"
 msgstr ""
@@ -439,6 +435,36 @@ msgstr ""
 msgid "Booking Notification"
 msgstr ""
 
+#: includes/Metaboxes.php:161
+msgctxt "Booking status in booking editor"
+msgid "Booked"
+msgstr ""
+
+#: includes/Metaboxes.php:164
+msgctxt "Booking status in booking editor"
+msgid "Cancelled"
+msgstr ""
+
+#: includes/Metaboxes.php:165
+msgctxt "Booking status in booking editor"
+msgid "Checked In"
+msgstr ""
+
+#: includes/Metaboxes.php:166
+msgctxt "Booking status in booking editor"
+msgid "Checked Out"
+msgstr ""
+
+#: includes/Metaboxes.php:163
+msgctxt "Booking status in booking editor"
+msgid "Confirmed"
+msgstr ""
+
+#: includes/Metaboxes.php:162
+msgctxt "Booking status in booking editor"
+msgid "Confirmed by customer"
+msgstr ""
+
 #: includes/Plugin.php:189
 #, php-format
 msgid "Call to undefined method %1$s::%2$s"
@@ -504,14 +530,6 @@ msgstr ""
 msgid "Check-out is not possible at this time."
 msgstr ""
 
-#: includes/Metaboxes.php:165
-msgid "Checked In"
-msgstr ""
-
-#: includes/Metaboxes.php:166
-msgid "Checked Out"
-msgstr ""
-
 #: includes/Shortcodes/Bookings.php:173
 msgid "Checkin in room"
 msgstr ""
@@ -544,14 +562,6 @@ msgstr ""
 
 #: config/config.php:346
 msgid "Confirmation Text (english)"
-msgstr ""
-
-#: includes/Metaboxes.php:163
-msgid "Confirmed"
-msgstr ""
-
-#: includes/Metaboxes.php:162
-msgid "Confirmed by customer"
 msgstr ""
 
 #: includes/templates/single-seat.php:119

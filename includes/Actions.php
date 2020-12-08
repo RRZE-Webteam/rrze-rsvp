@@ -896,7 +896,7 @@ class Actions
             if ($adminConfirmationRequired) {
                 $this->email->doEmail('customerConfirmed', 'admin', $bookingId, 'customer-confirmed');
             }
-		} elseif ($bookingBooked && $action == 'cancel') {
+		} elseif (($bookingBooked || $bookingCustomerConfirmed) && $action == 'cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 			$bookingCancelled = true;
 			$this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled');

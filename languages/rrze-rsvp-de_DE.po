@@ -16,12 +16,12 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "POT-Creation-Date: 2020-11-11 12:06+0000\n"
-"PO-Revision-Date: 2020-12-08 14:02+0000\n"
+"PO-Revision-Date: 2020-12-08 15:06+0000\n"
 "Last-Translator: Barbara\n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
 "X-Generator: Loco https://localise.biz/\n"
-"X-Loco-Version: 2.4.4; wp-5.5.3"
+"X-Loco-Version: 2.4.6; wp-5.5.3"
 
 #: includes/Tools.php:119
 #, php-format
@@ -331,10 +331,6 @@ msgstr "Platz buchen in"
 msgid "Book this seat/timeslot now"
 msgstr "Platz/Termin jetzt buchen"
 
-#: includes/Metaboxes.php:161
-msgid "Booked"
-msgstr "Gebucht"
-
 #: includes/CPT/Bookings.php:161
 msgid "Booked on"
 msgstr "Gebucht am"
@@ -355,8 +351,8 @@ msgctxt "Booking"
 msgid "Cancel"
 msgstr "Stornieren"
 
-#: includes/Main.php:135 includes/Metaboxes.php:164
-#: includes/CPT/Bookings.php:168 includes/CPT/Bookings.php:190
+#: includes/Main.php:135 includes/CPT/Bookings.php:168
+#: includes/CPT/Bookings.php:190
 msgctxt "Booking"
 msgid "Cancelled"
 msgstr "Storniert"
@@ -470,6 +466,36 @@ msgstr "Buchungsmodus"
 msgid "Booking Notification"
 msgstr "Benachrichtigung bei neuer Buchung"
 
+#: includes/Metaboxes.php:161
+msgctxt "Booking status in booking editor"
+msgid "Booked"
+msgstr "Gebucht"
+
+#: includes/Metaboxes.php:164
+msgctxt "Booking status in booking editor"
+msgid "Cancelled"
+msgstr "Storniert"
+
+#: includes/Metaboxes.php:165
+msgctxt "Booking status in booking editor"
+msgid "Checked In"
+msgstr "Eingecheckt"
+
+#: includes/Metaboxes.php:166
+msgctxt "Booking status in booking editor"
+msgid "Checked Out"
+msgstr "Ausgecheckt"
+
+#: includes/Metaboxes.php:163
+msgctxt "Booking status in booking editor"
+msgid "Confirmed"
+msgstr "Vom Raumadmin oder automatisch bestätigt"
+
+#: includes/Metaboxes.php:162
+msgctxt "Booking status in booking editor"
+msgid "Confirmed by customer"
+msgstr "Vom Bucher bestätigt"
+
 #: includes/Plugin.php:189
 #, php-format
 msgid "Call to undefined method %1$s::%2$s"
@@ -535,14 +561,6 @@ msgstr "Sie wurden erfolgreich ausgecheckt."
 msgid "Check-out is not possible at this time."
 msgstr "Auschecken ist derzeit nicht möglich."
 
-#: includes/Metaboxes.php:165
-msgid "Checked In"
-msgstr "Eingecheckt"
-
-#: includes/Metaboxes.php:166
-msgid "Checked Out"
-msgstr "Ausgecheckt"
-
 #: includes/Shortcodes/Bookings.php:173
 msgid "Checkin in room"
 msgstr "Check-In im Raum"
@@ -579,14 +597,6 @@ msgstr "E-Mail-Text für Buchungsbestätigung"
 #: config/config.php:346
 msgid "Confirmation Text (english)"
 msgstr "E-Mail-Text für Buchungsbestätigung (englisch)"
-
-#: includes/Metaboxes.php:163
-msgid "Confirmed"
-msgstr "Bestätigt"
-
-#: includes/Metaboxes.php:162
-msgid "Confirmed by customer"
-msgstr "Vom Bucher bestätigt"
 
 #: includes/templates/single-seat.php:119
 msgid "Consult"
@@ -862,14 +872,12 @@ msgstr ""
 "Ihre E-Mail-Adresse."
 
 #: includes/Metaboxes.php:368
-#, fuzzy
 #| msgid ""
 #| "Incoming bookings do not need to be confirmed by the booking managers"
 msgid ""
 "Incoming bookings do <u>not</u> need to be confirmed by the booking managers."
 msgstr ""
-"Eingehende Buchungen müssen nicht von den Raumverantwortlichen bestätigt "
-"werden"
+"Eingehende Buchungen müssen nicht vom Raumverantwortlichen bestätigt werden."
 
 #: config/config.php:446 config/config.php:448
 msgid "Instructions in English"

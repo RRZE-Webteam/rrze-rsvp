@@ -158,12 +158,12 @@ class Metaboxes
             'show_option_none' => '&mdash; ' . __('Please select', 'rrze-rsvp') . ' &mdash;',
             'default'          => 'custom',
             'options'          => array(
-                'booked' => __('Booked', 'rrze-rsvp'),
-                'customer-confirmed'   => __('Confirmed by customer', 'rrze-rsvp'),
-                'confirmed'   => __('Confirmed', 'rrze-rsvp'),
-                'cancelled'     => _x('Cancelled', 'Booking', 'rrze-rsvp'),
-                'checked-in'     => __('Checked In', 'rrze-rsvp'),
-                'checked-out'     => __('Checked Out', 'rrze-rsvp'),
+                'booked' => _x('Booked', 'Booking status in booking editor', 'rrze-rsvp'),
+                'customer-confirmed'   => _x('Confirmed by customer', 'Booking status in booking editor', 'rrze-rsvp'),
+                'confirmed'   => _x('Confirmed', 'Booking status in booking editor', 'rrze-rsvp'),
+                'cancelled'     => _x('Cancelled', 'Booking status in booking editor', 'rrze-rsvp'),
+                'checked-in'     => _x('Checked In', 'Booking status in booking editor', 'rrze-rsvp'),
+                'checked-out'     => _x('Checked Out', 'Booking status in booking editor', 'rrze-rsvp'),
             ),
             'before' => [$this, 'cbBookingStatusAttributes'],
         ));
