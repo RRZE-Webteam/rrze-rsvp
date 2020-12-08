@@ -34,7 +34,9 @@ final class IdM extends Auth
         if ($this->simplesamlAuth && $this->simplesamlAuth->isAuthenticated()) {
             return true;
         } else {
-            Session::getSessionFromRequest()->cleanup();
+            if (class_exists('Session')){
+                Session::getSessionFromRequest()->cleanup();
+            }
             return false;
         }
     }
