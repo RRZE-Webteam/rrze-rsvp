@@ -546,8 +546,10 @@ class Bookings {
 
             if ($aBookingIDs){
                 $query->set('post__in', $aBookingIDs);
-                $query->set('s', '');
+            }else{
+                $query->set('post__in', [0]);
             }
+            $query->set('s', '');
         }
 
         $orderby = $query->get('orderby');
