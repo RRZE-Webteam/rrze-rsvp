@@ -790,7 +790,7 @@ class Functions
         $room_timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
         if (is_array($room_timeslots)) {
             foreach ($room_timeslots as $week) {
-                if (!empty($week['rrze-rsvp-room-weekday'])) {
+                if (isset($week['rrze-rsvp-room-weekday'])) {
                     foreach ($week[ 'rrze-rsvp-room-weekday' ] as $day) {
                         if (isset($week[ 'rrze-rsvp-room-starttime' ]) && isset($week[ 'rrze-rsvp-room-endtime' ])) {
                             $valid_from = ((isset($week[ 'rrze-rsvp-room-timeslot-valid-from' ]) && $week[ 'rrze-rsvp-room-timeslot-valid-from' ] != '') ? $week[ 'rrze-rsvp-room-timeslot-valid-from' ] : 'unlimited');
@@ -873,5 +873,5 @@ class Functions
         parse_str($queryStr, $queryAry);
         $queryAry = array_diff_key(array_merge($queryAry, $add), array_fill_keys($remove, ''));
         return http_build_query($queryAry);
-    }    
+    }
 }

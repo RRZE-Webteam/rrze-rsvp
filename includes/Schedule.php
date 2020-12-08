@@ -192,12 +192,6 @@ class Schedule
                 ],
             ],
             'meta_query'        => [
-                'relation'      => 'AND',
-                'customer_status_clause' => [
-                    'key'       => 'rrze-rsvp-customer-status',
-                    'value'     => 'booked',
-                    'compare'   => '='
-                ],
                 'booking_status_clause' => [
                     'key'       => 'rrze-rsvp-booking-status',
                     'value'     => 'booked',
@@ -211,12 +205,13 @@ class Schedule
         if ($query->have_posts()) {
             while ($query->have_posts()) {
                 $query->the_post();
-                $seatId = get_post_meta(get_the_ID(), 'rrze-rsvp-booking-seat', true);
+                $bookingId = get_the_ID();
+                $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
                 $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
                 if (get_post_meta($roomId, 'rrze-rsvp-room-force-to-confirm', true)) {
-                    update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'cancelled');
-                    $this->email->bookingCancelledCustomer(get_the_ID(), 'reservation', 'notconfirmed');
-                    do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
+                    update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
+                    $this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled', 'notconfirmed');
+                    do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
                 }
             }
             wp_reset_postdata();
@@ -283,7 +278,7 @@ class Schedule
                     do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
                 } elseif ($checkInRequired) {
                     update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
-                    $this->email->bookingCancelledCustomer($bookingId, 'reservation', 'notcheckedin');
+                    $this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled', 'notcheckedin');
                     do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
                 }
             }

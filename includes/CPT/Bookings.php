@@ -218,12 +218,15 @@ class Bookings {
                             $_wpnonce,
                             _x('Check-Out', 'Booking', 'rrze-rsvp')
                         );
-                        if ($status == 'confirmed') {
+                        $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true));
+                        if ($status == 'booked' && $forceToConfirm) {
+                            $button = _x('Waiting for customer confirmation', 'Booking', 'rrze-rsvp') . $cancelButton;
+                        } elseif ($status == 'confirmed') {
                             $button = $cancelButton . $checkInButton;
                         } elseif ($status == 'checked-in') {
                             $button = '<button class="button button-primary" disabled>' . _x('Checked-In', 'Booking', 'rrze-rsvp') . '</button>' . $checkoutButton;
                         } elseif ($status == 'checked-out') {
-                            $button = _x('Checked-Out', 'Booking', 'rrze-rsvp');
+                            $button = '<button class="button button-primary" disabled>' . _x('Checked-Out', 'Booking', 'rrze-rsvp') . '</button>' . $checkInButton;
                         } else {
                             $button = $cancelButton . sprintf(
                                 '<a href="edit.php?post_type=%1$s&action=confirm&id=%2$d&_wpnonce=%3$s" class="button button-primary" data-id="%2$d">%4$s</a>',
