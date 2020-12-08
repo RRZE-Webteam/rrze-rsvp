@@ -10,6 +10,7 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Capabilities;
 use RRZE\RSVP\Functions;
+use function RRZE\RSVP\Config\isAllowedSearchForGuest;
 // use RRZE\RSVP\Carbon;
 
 class Bookings {
@@ -541,8 +542,11 @@ class Bookings {
         $this->sSearch = $query->query_vars['s'];
         if ($this->sSearch){
             // $this->getBookingByGuest() deactivated because it is not allowed to search for persons (Personalrat)
-            // $aBookingIDs = array_merge($this->getBookingIDsBySeatRoomTitle($this->sSearch), $this->getBookingByGuest($this->sSearch));
-            $aBookingIDs = $this->getBookingIDsBySeatRoomTitle($this->sSearch);
+            // if(isAllowedSearchForGuest()){
+            //     $aBookingIDs = array_merge($this->getBookingIDsBySeatRoomTitle($this->sSearch), $this->getBookingByGuest($this->sSearch));
+            // }else{
+                $aBookingIDs = $this->getBookingIDsBySeatRoomTitle($this->sSearch);
+            // }
 
             if ($aBookingIDs){
                 $query->set('post__in', $aBookingIDs);
