@@ -635,8 +635,18 @@ class Bookings extends Shortcodes {
         $room_meta = get_post_meta($room_id);
         $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : '';
         foreach ($room_timeslots as $week) {
+            $valid_from = ((isset($week[ 'rrze-rsvp-room-timeslot-valid-from' ]) && $week[ 'rrze-rsvp-room-timeslot-valid-from' ] != '') ? $week[ 'rrze-rsvp-room-timeslot-valid-from' ] : 'unlimited');
+            $valid_to   = ((isset($week[ 'rrze-rsvp-room-timeslot-valid-to' ]) && $week[ 'rrze-rsvp-room-timeslot-valid-to' ] != '') ? strtotime(
+                '+23 hours, +59 minutes',
+                intval($week[ 'rrze-rsvp-room-timeslot-valid-to' ])
+            ) : 'unlimited');
             foreach ($week['rrze-rsvp-room-weekday'] as $day) {
-                $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+                if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $booking_timestamp_start >= $valid_from && $booking_timestamp_start <= $valid_to)
+                    || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $booking_timestamp_start >= $valid_from)
+                    || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $booking_timestamp_start <= $valid_to)
+                    || ($valid_from == 'unlimited' && $valid_to == 'unlimited')) {
+                    $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+                }
             }
         }
         $weekday = date('N', $booking_timestamp_start);
