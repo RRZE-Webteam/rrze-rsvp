@@ -501,32 +501,30 @@ class Bookings {
             }
         }
 
+
         $aBookingIDs = [];
-        $bFiltered = false;
         if ($this->filterDate) {
             $aBookingIDs = $this->getBookingIDsByDate($this->filterDate);
-            $bFiltered = true;
         }
+
         if ($this->filterStart){
             $aBookingIDs = ($aBookingIDs ? array_intersect($aBookingIDs, $this->getBookingIDsByTime('start', $this->filterStart)) : $this->getBookingIDsByTime('start', $this->filterStart));
-            $bFiltered = true;
         }
 
-        if ($this->filterEnd){
+        if ($this->filterEnd && $aBookingIDs){
             $aBookingIDs = ($aBookingIDs ? array_intersect($aBookingIDs, $this->getBookingIDsByTime('end', $this->filterEnd)) : $this->getBookingIDsByTime('end', $this->filterEnd));
-            $bFiltered = true;
         }
 
-        if ($bFiltered && !$aBookingIDs){
-            $aBookingIDs[] = -1;
+        if ($this->filterDate || $this->filterStart || $this->filterEnd){
+            $aBookingIDs = ($aBookingIDs ? $aBookingIDs : [-1]);
+            $query->set('post__in', $aBookingIDs);
         }
-
-        $query->set('post__in', $aBookingIDs);
 
         if ($meta_query) {
             $meta_query['relation'] = 'AND';
             $query->query_vars['meta_query'] = $meta_query;
         }
+
         return $query;
     }
 

@@ -16,12 +16,12 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "POT-Creation-Date: 2020-11-11 12:06+0000\n"
-"PO-Revision-Date: 2020-12-08 15:06+0000\n"
-"Last-Translator: Barbara\n"
+"PO-Revision-Date: 2020-12-09 12:31+0000\n"
+"Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
 "X-Generator: Loco https://localise.biz/\n"
-"X-Loco-Version: 2.4.6; wp-5.5.3"
+"X-Loco-Version: 2.4.6; wp-5.6"
 
 #: includes/Tools.php:119
 #, php-format
@@ -1702,7 +1702,7 @@ msgstr "Alle Räume anzeigen"
 
 #: includes/CPT/Bookings.php:293
 msgid "Show all time slots"
-msgstr "Alle Termine anzeigen"
+msgstr "Alle Zeiträume anzeigen"
 
 #: config/config.php:195
 msgid "Show Availability table on Room page."
