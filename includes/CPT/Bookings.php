@@ -448,6 +448,7 @@ class Bookings {
     private function getBookingIDsByDate($myDate){
         global $wpdb;
         $ret = [];
+        $wpdb->query("SET time_zone = '+00:00'");
         $sql = "SELECT post_id FROM $wpdb->postmeta WHERE (meta_key = 'rrze-rsvp-booking-start' OR meta_key = 'rrze-rsvp-booking-end') AND DATE_FORMAT(FROM_UNIXTIME(meta_value), '%Y-%m-%d') = '$myDate'";
         $aPostIDs = $wpdb->get_results( $sql, ARRAY_N );
         foreach($aPostIDs as $postID){
