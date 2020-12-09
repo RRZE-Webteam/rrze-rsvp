@@ -861,7 +861,7 @@ class Functions
     {
         $att = (string) $att;
         $filter = preg_replace('/[^a-z0-9]/', '', strtolower($att));
-        return (in_array($filter, ['1', 'on', 'true', 'wahr', 'aktiv', 'show']));
+        return (in_array($filter, ['1', 'on', 'true', 'wahr', 'aktiv', 'show', 'yes']));
     }
     
     public static function getQueryStr(array $add = [], array $remove = []): string

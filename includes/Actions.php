@@ -14,6 +14,8 @@ class Actions
 	{
 		$this->email = new Email;
 		$this->template = new Template;
+        $this->settings = new Settings(plugin()->getFile());
+        $this->options = (object) $this->settings->getOptions();
 	}
 
 	public function onLoaded()
@@ -981,7 +983,9 @@ class Actions
 			$userConfirmed = true;
 		} elseif (!$bookingCancelled && !$bookingCheckedOut && $action == 'maybe-cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
-			$this->email->doEmail('bookingCancelled', 'admin', $bookingId);
+			if (Functions::getBoolValueFromAtt($this->options->email_notification_if_cancel) == true) {
+                $this->email->doEmail('bookingCancelled', 'admin', $bookingId);
+            }
 			$bookingCancelled = true;
 		} elseif (!$bookingCancelled && !$bookingCheckedIn && ($bookingConfirmed || $bookingCheckedOut) && $action == 'checkin') {
 			$offset = 15 * MINUTE_IN_SECONDS;
