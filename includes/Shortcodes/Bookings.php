@@ -894,6 +894,11 @@ class Bookings extends Shortcodes {
         $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-force-to-confirm', true));
         $forceToCheckin = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-force-to-checkin', true));
         $sendIcsToAdmin = get_post_meta($room_id, 'rrze-rsvp-room-send-to-email', true);
+        if ($booking_mode == 'check-only') {
+            $autoconfirmation = true;
+            $instantCheckIn = true;
+            $forceToCheckin = false;
+        }
 
         //Buchung speichern
         $new_draft = [
