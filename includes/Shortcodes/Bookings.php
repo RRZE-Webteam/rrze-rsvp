@@ -967,7 +967,12 @@ class Bookings extends Shortcodes {
         if ($forceToConfirm) {
             $this->email->doEmail('customerConfirmationRequired', 'customer', $booking_id, $status);
         } else {
-            if ($autoconfirmation) {
+            if ($bookingMode == 'check-only') {
+                $this->email->doEmail('bookingCheckedIn', 'customer', $booking_id, $status);
+                if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
+                    $this->email->doEmail('newBooking', 'admin', $booking_id, $status);
+                }
+            } elseif ($autoconfirmation){
                 $this->email->doEmail('adminConfirmed', 'customer', $booking_id, $status);
                 if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
                     $this->email->doEmail('newBooking', 'admin', $booking_id, $status);

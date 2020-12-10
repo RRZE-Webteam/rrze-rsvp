@@ -38,7 +38,7 @@ class Email
     /**
      * doEmail
      * Prepare email data and send email depending on the email context and recipient.
-     * @param string $mailContext Which Mail should be sent: 'customerConfirmationRequired', 'customerConfirmed', 'adminConfirmationRequired', 'adminConfirmed', 'newBooking', 'bookingCancelled' or 'bookingCheckedOut'
+     * @param string $mailContext Which Mail should be sent: 'customerConfirmationRequired', 'customerConfirmed', 'adminConfirmationRequired', 'adminConfirmed', 'newBooking', 'bookingCancelled', 'bookingCheckedIn' or 'bookingCheckedOut'
      * @param string $recipient Who will get the email: 'admin' or 'customer'
      * @param integer $bookingId Booking Id
      * @param string $status [optional] Booking status: 'booked', 'customer-confirmed', 'confirmed', 'cancelled', 'checked-in' or 'checked-out'
@@ -153,6 +153,16 @@ class Email
                         $cancelReason_en = $this->options->email_cancel_reason_notcheckedin_en;
                     }
                 }
+                break;
+            case 'bookingCheckedIn':
+                $subject = $this->options->email_confirm_subject;
+                $subject_en = $this->options->email_confirm_subject_en;
+                $text = $this->options->email_confirm_text;
+                $text_en = $this->options->email_confirm_text_en;
+                $showCheckinButton = false;
+                $showCheckoutButton = true;
+                $showCancelButton = false;
+                $status = 'checked-in';
                 break;
             case 'bookingCheckedOut':
                 $subject = __('Seat checked out', 'rrze-rsvp');
