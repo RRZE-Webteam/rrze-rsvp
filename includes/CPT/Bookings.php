@@ -222,10 +222,17 @@ class Bookings {
                         );
                         $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true));
                         if ($bookingMode == 'check-only') {
-                            if ($status == 'checked-in') {
-                                $button = '<button class="button button-primary" disabled>' . _x('Checked-In', 'Booking', 'rrze-rsvp') . '</button>' . $checkoutButton;
-                            } else {
-                                $button = '<button class="button button-primary" disabled>' . _x('Checked-Out', 'Booking', 'rrze-rsvp') . '</button>' . $checkInButton;
+                            switch ($status) {
+                                case 'checked-in':
+                                    $button = '<button class="button button-primary" disabled>' . _x('Checked-In', 'Booking', 'rrze-rsvp') . '</button>' . $checkoutButton;
+                                    break;
+                                case 'checked-out':
+                                    $button = '<button class="button button-primary" disabled>' . _x('Checked-Out', 'Booking', 'rrze-rsvp') . '</button>' . $checkInButton;
+                                    break;
+                                case 'booked':
+                                default:
+                                    $button =  $checkInButton;
+                                    break;
                             }
                         } elseif ($status == 'booked' && $forceToConfirm) {
                             $button = _x('Waiting for customer confirmation', 'Booking', 'rrze-rsvp') . $cancelButton;

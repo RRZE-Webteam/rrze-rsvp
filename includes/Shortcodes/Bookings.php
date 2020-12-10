@@ -894,6 +894,11 @@ class Bookings extends Shortcodes {
         $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-force-to-confirm', true));
         $forceToCheckin = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-force-to-checkin', true));
         $sendIcsToAdmin = get_post_meta($room_id, 'rrze-rsvp-room-send-to-email', true);
+        if ($booking_mode == 'check-only') {
+            $autoconfirmation = true;
+            $instantCheckIn = true;
+            $forceToCheckin = false;
+        }
 
         //Buchung speichern
         $new_draft = [
@@ -962,7 +967,12 @@ class Bookings extends Shortcodes {
         if ($forceToConfirm) {
             $this->email->doEmail('customerConfirmationRequired', 'customer', $booking_id, $status);
         } else {
-            if ($autoconfirmation) {
+            if ($bookingMode == 'check-only') {
+                $this->email->doEmail('bookingCheckedIn', 'customer', $booking_id, $status);
+                if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
+                    $this->email->doEmail('newBooking', 'admin', $booking_id, $status);
+                }
+            } elseif ($autoconfirmation){
                 $this->email->doEmail('adminConfirmed', 'customer', $booking_id, $status);
                 if ($this->options->email_notification_if_new == 'yes' && $this->options->email_notification_email != '') {
                     $this->email->doEmail('newBooking', 'admin', $booking_id, $status);
