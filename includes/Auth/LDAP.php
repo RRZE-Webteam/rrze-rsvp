@@ -29,18 +29,14 @@ final class LDAP extends Auth
 
     protected $sessionTimeout = 10 * MINUTE_IN_SECONDS;
 
+    protected $sessionName = 'rrze_rsvp';
+
+    protected $ldapUid = '';
+
+    protected $ldapMail = '';
+
     public function __construct()
     {
-        if (!isset($_SESSION)) {
-            session_name('rrze_rsvp');
-            session_start();
-        }
-        if (!empty($_SESSION['ldap_logged_in']) && $_SESSION['ldap_logged_in'] < time() - $this->sessionTimeout) {
-            unset($_SESSION['ldap_logged_in'], $_SESSION['ldap_mail']);
-        }
-
-        if (!empty($_SESSION['ldap_logged_in'])) $this->setAttributes();
-
         $this->settings = new Settings(plugin()->getFile());
         $this->server = $this->settings->getOption('ldap', 'server');
         $this->port = $this->settings->getOption('ldap', 'port');
@@ -51,14 +47,26 @@ final class LDAP extends Auth
 
     public function isAuthenticated(): bool
     {
-        return empty($_SESSION['ldap_logged_in']) ? false : true;
+        if (!isset($_SESSION)) {
+            session_name($this->sessionName);
+            session_start();
+        }
+
+        $this->ldapUid = !empty($_SESSION['ldap_uid']) ? $_SESSION['ldap_uid'] : '';
+        $this->ldapMail = !empty($_SESSION['ldap_mail']) ? $_SESSION['ldap_mail'] : '';
+
+        session_write_close();
+
+        $this->setAttributes();
+
+        return !empty($this->ldapUid);
     }
 
     public function setAttributes()
     {
         $this->personAttributes = [
-            'uid' => isset($_SESSION['ldap_uid']) ? $_SESSION['ldap_uid'] : null,
-            'mail' => isset($_SESSION['ldap_mail']) ? $_SESSION['ldap_mail'] : null
+            'uid' => $this->ldapUid,
+            'mail' => $this->ldapMail
         ];
 
         $this->uid = $this->personAttributes['uid'];
@@ -106,9 +114,13 @@ final class LDAP extends Auth
 
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])) {
                                 $mail = $aEntry[0]['mail'][0];
-                                $_SESSION['ldap_logged_in'] = time();
+                                if (!isset($_SESSION)) {
+                                    session_name($this->sessionName);
+                                    session_start();
+                                }
                                 $_SESSION['ldap_uid'] = $username;
                                 $_SESSION['ldap_mail'] = $mail;
+                                session_write_close();
                             } else {
                                 $this->logError('ldap_get_entries(): Attributes have changed. Expected $aEntry[0][\'cn\'][0] and $aEntry[0][\'mail\'][0]');
                             }
@@ -124,25 +136,20 @@ final class LDAP extends Auth
 
     public function logout()
     {
-        $_SESSION = [];
-        if (ini_get('session.use_cookies')) {
+        $cookies = [
+            $this->sessionName,
+            substr($this->sessionName, 1),
+            'S' . $this->sessionName,
+        ];
+
+        foreach ($cookies as $cookie_name) {
+            if (!isset($_COOKIE[$cookie_name])) {
+                continue;
+            }
             $params = session_get_cookie_params();
-
-            // setcookie(
-            //     session_name(),
-            //     '',
-            //     time() - 42000,
-            //     $params['ldap_logged_in'],
-            //     $params['ldap_uid'],
-            //     $params['ldap_mail']
-            // );
-
-            $_SESSION['ldap_logged_in'] = '';
-            $_SESSION['ldap_uid'] = '';
-            $_SESSION['ldap_mail'] = '';
-
+            setcookie($cookie_name, '', $_SERVER['REQUEST_TIME'] - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+            unset($_COOKIE[$cookie_name]);
         }
-        session_destroy();
     }
 
     private function logError(string $method)
