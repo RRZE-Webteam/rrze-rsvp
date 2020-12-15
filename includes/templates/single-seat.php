@@ -126,7 +126,7 @@ if ($checkInBooking) {
         echo '<p>' . $roomName . '</p>';    
     } else {
         echo '<h2>' . __('Booking Checked In', 'rrze-rsvp') . '</h2>';
-        echo '<p>', __('This seat has been reserved for you.', 'rrze-rsvp') . '</p>';
+        echo '<p>', __('Check in has been completed.', 'rrze-rsvp') . '</p>';
         echo '<p>' . sprintf(__('Additional information has been sent to your email address <strong>%s</strong>.', 'rrze-rsvp'), $customEmail) . '</p>';
         echo '<p>' . __('Please check out when you leave the site.', 'rrze-rsvp') . '</p>';
         echo '<p class="date">';

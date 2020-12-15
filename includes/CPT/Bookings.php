@@ -162,6 +162,7 @@ class Bookings {
                 $bookingDate = '<span class="booking_date">' . __('Booked on', 'rrze-rsvp') . ' ' . $booking['booking_date'] . '</span>';
                 $archive = ($end < $now);
                 $publish = ($booking['post_status'] == 'publish');
+                $bookingMode = get_post_meta($booking['room'], 'rrze-rsvp-room-bookingmode', true);
 
                 if ($publish && $archive) {
                     switch ($status) {
@@ -220,7 +221,20 @@ class Bookings {
                             _x('Check-Out', 'Booking', 'rrze-rsvp')
                         );
                         $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true));
-                        if ($status == 'booked' && $forceToConfirm) {
+                        if ($bookingMode == 'check-only') {
+                            switch ($status) {
+                                case 'checked-in':
+                                    $button = '<button class="button button-primary" disabled>' . _x('Checked-In', 'Booking', 'rrze-rsvp') . '</button>' . $checkoutButton;
+                                    break;
+                                case 'checked-out':
+                                    $button = '<button class="button button-primary" disabled>' . _x('Checked-Out', 'Booking', 'rrze-rsvp') . '</button>' . $checkInButton;
+                                    break;
+                                case 'booked':
+                                default:
+                                    $button =  $checkInButton;
+                                    break;
+                            }
+                        } elseif ($status == 'booked' && $forceToConfirm) {
                             $button = _x('Waiting for customer confirmation', 'Booking', 'rrze-rsvp') . $cancelButton;
                         } elseif ($status == 'confirmed') {
                             $button = $cancelButton . $checkInButton;

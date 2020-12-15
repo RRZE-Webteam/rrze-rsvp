@@ -172,6 +172,7 @@ jQuery(document).ready(function ($) {
 		$('div#cmb2-metabox-rrze_rsvp_general-meta div.cmb-row.hide-'+bookingMode+' input').prop('checked', false);
 		if (bookingMode === 'check-only') {
 			$('input#rrze-rsvp-room-instant-check-in').prop('checked', true);
+			$('input#rrze-rsvp-room-auto-confirmation').prop('checked', true);
 		}
 	}
 
