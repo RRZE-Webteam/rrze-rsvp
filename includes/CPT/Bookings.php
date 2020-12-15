@@ -533,9 +533,9 @@ class Bookings {
 
     public function searchBookings($query) {
         if (!$query->is_main_query() 
-            || (isset($query->query_vars['post_type']) && $query->query_vars['post_type'] != 'booking')) {
-            return $query;
-        } 
+            || !(isset($query->query_vars['post_type']) && $query->query_vars['post_type'] == 'booking')) {
+            return;
+        }
         $aBookingIDs = [];
 
         $this->sSearch = $query->query_vars['s'];
