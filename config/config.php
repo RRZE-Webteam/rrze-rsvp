@@ -38,13 +38,13 @@ function getConstants() {
         return $options; // Standard-Array für zukünftige Optionen
     }
 
-// function isAllowedSearchForGuest(){
-//     $allowedDomains = [
-//         'www.nickless.test.rrze.fau.de',
-//         'ub.fau.de'
-//     ];
-//     return in_array($_SERVER['SERVER_NAME'], $allowedDomains);
-// }
+function isAllowedSearchForGuest(){
+    $allowedDomains = [
+        'www.nickless.test.rrze.fau.de',
+        'ub.fau.de'
+    ];
+    return in_array($_SERVER['SERVER_NAME'], $allowedDomains);
+}
 
 // used in wp_kses_custom() and for 'desc' of 'contact_tracking_note'  
 function getAllowedHTML(){
