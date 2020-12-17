@@ -555,11 +555,11 @@ class Bookings {
         $this->sSearch = $query->query_vars['s'];
         if ($this->sSearch){
             // $this->getBookingByGuest() deactivated because it is not allowed to search for persons (Personalrat)
-            // if(isAllowedSearchForGuest()){
-            //     $aBookingIDs = array_merge($this->getBookingIDsBySeatRoomTitle($this->sSearch), $this->getBookingByGuest($this->sSearch));
-            // }else{
+            if(isAllowedSearchForGuest()){
+                $aBookingIDs = array_merge($this->getBookingIDsBySeatRoomTitle($this->sSearch), $this->getBookingByGuest($this->sSearch));
+            }else{
                 $aBookingIDs = $this->getBookingIDsBySeatRoomTitle($this->sSearch);
-            // }
+            }
 
             if ($aBookingIDs){
                 $query->set('post__in', $aBookingIDs);
