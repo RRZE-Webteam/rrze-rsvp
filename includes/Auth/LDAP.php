@@ -47,15 +47,19 @@ final class LDAP extends Auth
 
     public function isAuthenticated(): bool
     {
+        $sessionStarted = false;
         if (!isset($_SESSION)) {
             session_name($this->sessionName);
             session_start();
+            $sessionStarted = true;
         }
 
         $this->ldapUid = !empty($_SESSION['ldap_uid']) ? $_SESSION['ldap_uid'] : '';
         $this->ldapMail = !empty($_SESSION['ldap_mail']) ? $_SESSION['ldap_mail'] : '';
 
-        session_write_close();
+        if($sessionStarted){
+            session_write_close();
+        }
 
         $this->setAttributes();
 
@@ -114,13 +118,17 @@ final class LDAP extends Auth
 
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])) {
                                 $mail = $aEntry[0]['mail'][0];
+                                $sessionStarted = false;
                                 if (!isset($_SESSION)) {
                                     session_name($this->sessionName);
                                     session_start();
+                                    $sessionStarted = true;
                                 }
                                 $_SESSION['ldap_uid'] = $username;
                                 $_SESSION['ldap_mail'] = $mail;
-                                session_write_close();
+                                if($sessionStarted){
+                                    session_write_close();
+                                }
                             } else {
                                 $this->logError('ldap_get_entries(): Attributes have changed. Expected $aEntry[0][\'cn\'][0] and $aEntry[0][\'mail\'][0]');
                             }
