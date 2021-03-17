@@ -39,6 +39,17 @@ class Occupancy{
     public function ajaxGetOccupancy() {
         check_ajax_referer( 'rsvp-ajax-nonce', 'nonce'  );
         $roomId = filter_input(INPUT_POST, 'roomId', FILTER_VALIDATE_INT);
+
+        if (get_post_type($roomId) != 'room') { 
+            header('HTTP/1.0 403 Forbidden'); 
+            exit;
+        }
+
+        if (function_available('is_post_publicly_viewable') && !is_post_publicly_viewable($roomId)) {
+            header('HTTP/1.0 403 Forbidden'); 
+            exit;
+        }
+
         $response = Functions::getOccupancyByRoomIdHTMLAdmin($roomId);
         wp_send_json($response);
     }
@@ -46,6 +57,17 @@ class Occupancy{
     public function ajaxGetOccupancyLinks() {
         check_ajax_referer( 'rsvp-ajax-nonce', 'nonce'  );
         $roomId = filter_input(INPUT_POST, 'roomId', FILTER_VALIDATE_INT);
+
+        if (get_post_type($roomId) != 'room') { 
+            header('HTTP/1.0 403 Forbidden'); 
+            exit;
+        }
+
+        if (function_available('is_post_publicly_viewable') && !is_post_publicly_viewable($roomId)) {
+            header('HTTP/1.0 403 Forbidden'); 
+            exit;
+        }
+
         $response = Functions::getOccupancyLinks($roomId);
         wp_send_json($response);
     }
