@@ -473,7 +473,9 @@ class Bookings extends Shortcodes {
         if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'seat_unavailable')) {
             return '';
         }
-        $url = $_GET['url'];
+        // $url = $_GET['url'];
+        $url = filter_input(INPUT_GET, 'url', FILTER_SANITIZE_URL);
+
         if (sanitize_text_field($url) != $url) {
             return '';
         }
@@ -491,7 +493,8 @@ class Bookings extends Shortcodes {
         if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'timeslot_unavailable')) {
             return '';
         }
-        $url = $_GET['url'];
+        // $url = $_GET['url'];
+        $url = filter_input(INPUT_GET, 'url', FILTER_SANITIZE_URL);
 
         if (sanitize_text_field($url) != $url) {
             return '';
