@@ -463,8 +463,10 @@ class Bookings extends Shortcodes {
 
         $data = [];
         $data['multiple_booking_error'] = true;        
-        $data['multiple_booking'] = __('Multiple Booking', 'rrze-rsvp');
-        $data['message'] = __('<strong>You have already booked a seat for the specified time slot.</strong><br>If you want to change your booking, please cancel the existing booking first. You will find the link to do so in your confirmation email.', 'rrze-rsvp');
+        // $data['multiple_booking'] = __('Multiple Booking', 'rrze-rsvp');
+        // $data['message'] = __('<strong>You have already booked a seat for the specified time slot.</strong><br>If you want to change your booking, please cancel the existing booking first. You will find the link to do so in your confirmation email.', 'rrze-rsvp');
+        $data['multiple_booking'] = __('Save booking', 'rrze-rsvp');
+        $data['message'] = __('Error saving the booking.', 'rrze-rsvp');
 
         return $this->template->getContent('shortcode/booking-error', $data);
     }
