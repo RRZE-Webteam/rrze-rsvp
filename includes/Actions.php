@@ -861,15 +861,19 @@ class Actions
 
 		$booking = Functions::getBooking($bookingId);
 		$nonce = $booking ? sprintf('%s-%s', $bookingId, $booking['start']) : '';
-		$decryptedHash = Functions::decrypt($hash);
-		$isAdmin =  $decryptedHash == $nonce ? true : false;
-		$isCustomer =  $decryptedHash == $nonce . '-customer' ? true : false;
+		// $decryptedHash = Functions::decrypt($hash);
+		// $isAdmin =  $decryptedHash === $nonce ? true : false;
+		// $isCustomer =  $decryptedHash === $nonce . '-customer' ? true : false;
+		$encryptedNonceAdmin = Functions::encrypt($nonce);
+		$encryptedNonceCustomer = Functions::encrypt($nonce . '-customer');
+		$isAdmin =  $hash === $encryptedNonceAdmin ? true : false;
+		$isCustomer =  $hash === $encryptedNonceCustomer ? true : false;
 
 		$bookingCancelled = ($booking['status'] == 'cancelled');
 
-		if (($action == 'confirm' || $action == 'cancel') && $isAdmin) {
+		if (($action == 'confirm' || $action == 'cancel') && $isAdmin && $nonce) {
 			$this->bookingReplyAdmin($bookingId, $booking, $action);
-		} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel' || $action == 'maybe-cancel') && $isCustomer) {
+		} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel' || $action == 'maybe-cancel') && $isCustomer && $nonce) {
 			if ($bookingCancelled) {
 				$action = 'cancel';
 			}

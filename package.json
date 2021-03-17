@@ -1,6 +1,6 @@
 {
   "name": "rrze-rsvp",
-  "version": "2.1.13",
+  "version": "2.1.14",
   "description": "Platzbuchungssystem der FAU.",
   "main": "rrze-rsvp.php",
   "textdomain": "rrze-rsvp",
