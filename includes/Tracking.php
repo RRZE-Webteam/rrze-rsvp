@@ -190,12 +190,16 @@ class Tracking {
         if ($aGuests){
             fputcsv($fp, $aHeadings, ';');
             foreach ($aGuests as $aRow){
-                fputcsv($fp, $aRow, ';');
+                $aSanitizedRow = array_map( array($this, $this->csv_sanitize), $aRow);
+                fputcsv($fp, $aSanitizedRow, ';');
              }
         }
         exit;
     }
 
+    public function csv_sanitize($col) { 
+        return ltrim($col, '=@-+');
+    }
 
     private function getTrackingID(int $blogID, int $bookingID, $trackingTable): int {
         global $wpdb;
