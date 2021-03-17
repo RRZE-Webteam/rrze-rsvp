@@ -500,10 +500,11 @@ class Actions
 		if ($messages) {
 			$transientData = new TransientData(bin2hex(random_bytes(8)));
 			$transientData->addData('messages', $messages);
+            $transient = $transientData->getTransient();
 			$redirectUrl = add_query_arg(
 				[
-					'transient-data-nonce' => wp_create_nonce('transient-data'),
-					'transient-data' => $transientData->getTransient()
+					'transient-data-nonce' => wp_create_nonce('transient-data-' . $transient),
+					'transient-data' => $transient
 				],
 				remove_query_arg(['booking_cancelled', 'booking_locked', 'booking_trashed', 'booking_deleted', 'booking_ids'], wp_get_referer())
 			);
@@ -545,10 +546,11 @@ class Actions
 		if ($messages) {
 			$transientData = new TransientData(bin2hex(random_bytes(8)));
 			$transientData->addData('messages', $messages);
+            $transient = $transientData->getTransient();
 			$redirectUrl = add_query_arg(
 				[
-					'transient-data-nonce' => wp_create_nonce('transient-data'),
-					'transient-data' => $transientData->getTransient()
+					'transient-data-nonce' => wp_create_nonce('transient-data-' . $transient),
+					'transient-data' => $transient
 				],
 				remove_query_arg(["{$postType}_locked", "{$postType}_trashed", "{$postType}_deleted", "{$postType}_ids"], wp_get_referer())
 			);
@@ -559,7 +561,7 @@ class Actions
 
 	public function bulkActionsHandlerAdminNotice()
 	{
-		if (!isset($_GET['transient-data']) || !isset($_GET['transient-data-nonce']) || !wp_verify_nonce($_GET['transient-data-nonce'], 'transient-data')) {
+		if (!isset($_GET['transient-data']) || !isset($_GET['transient-data-nonce']) || !wp_verify_nonce($_GET['transient-data-nonce'], 'transient-data-' . $_GET['transient-data'])) {
 			return;
 		}
 		$transient = $_GET['transient-data'];

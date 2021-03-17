@@ -22,7 +22,7 @@ $seatCheckInOut = null;
 $action = null;
 
 
-if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rrze-rsvp-checkin-booked')) {
+if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rrze-rsvp-checkin-booked-' . $_GET['id'])) {
     $bookingId = absint($_GET['id']);
     $checkInBooking = Functions::getBooking($bookingId);
 } elseif (isset($_GET['id']) && isset($_GET['action']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rrze-rsvp-seat-check-inout')) {
