@@ -866,8 +866,8 @@ class Actions
 		// $decryptedHash = Functions::decrypt($hash);
 		// $isAdmin =  $decryptedHash === $nonce ? true : false;
 		// $isCustomer =  $decryptedHash === $nonce . '-customer' ? true : false;
-		$encryptedNonceAdmin = Functions::encrypt($nonce);
-		$encryptedNonceCustomer = Functions::encrypt($nonce . '-customer');
+		$encryptedNonceAdmin = Functions::crypt($nonce);
+		$encryptedNonceCustomer = Functions::crypt($nonce . '-customer');
 		$isAdmin =  $hash === $encryptedNonceAdmin ? true : false;
 		$isCustomer =  $hash === $encryptedNonceCustomer ? true : false;
 
