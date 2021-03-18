@@ -190,7 +190,7 @@ class Tracking {
         if ($aGuests){
             fputcsv($fp, $aHeadings, ';');
             foreach ($aGuests as $aRow){
-                $aSanitizedRow = array_map( array($this, $this->csv_sanitize), $aRow);
+                $aSanitizedRow = array_map( [$this, 'csv_sanitize'], $aRow);
                 fputcsv($fp, $aSanitizedRow, ';');
              }
         }
