@@ -500,10 +500,11 @@ class Actions
 		if ($messages) {
 			$transientData = new TransientData(bin2hex(random_bytes(8)));
 			$transientData->addData('messages', $messages);
+            $transient = $transientData->getTransient();
 			$redirectUrl = add_query_arg(
 				[
-					'transient-data-nonce' => wp_create_nonce('transient-data'),
-					'transient-data' => $transientData->getTransient()
+					'transient-data-nonce' => wp_create_nonce('transient-data-' . $transient),
+					'transient-data' => $transient
 				],
 				remove_query_arg(['booking_cancelled', 'booking_locked', 'booking_trashed', 'booking_deleted', 'booking_ids'], wp_get_referer())
 			);
@@ -545,10 +546,11 @@ class Actions
 		if ($messages) {
 			$transientData = new TransientData(bin2hex(random_bytes(8)));
 			$transientData->addData('messages', $messages);
+            $transient = $transientData->getTransient();
 			$redirectUrl = add_query_arg(
 				[
-					'transient-data-nonce' => wp_create_nonce('transient-data'),
-					'transient-data' => $transientData->getTransient()
+					'transient-data-nonce' => wp_create_nonce('transient-data-' . $transient),
+					'transient-data' => $transient
 				],
 				remove_query_arg(["{$postType}_locked", "{$postType}_trashed", "{$postType}_deleted", "{$postType}_ids"], wp_get_referer())
 			);
@@ -559,7 +561,7 @@ class Actions
 
 	public function bulkActionsHandlerAdminNotice()
 	{
-		if (!isset($_GET['transient-data']) || !isset($_GET['transient-data-nonce']) || !wp_verify_nonce($_GET['transient-data-nonce'], 'transient-data')) {
+		if (!isset($_GET['transient-data']) || !isset($_GET['transient-data-nonce']) || !wp_verify_nonce($_GET['transient-data-nonce'], 'transient-data-' . $_GET['transient-data'])) {
 			return;
 		}
 		$transient = $_GET['transient-data'];
@@ -861,15 +863,19 @@ class Actions
 
 		$booking = Functions::getBooking($bookingId);
 		$nonce = $booking ? sprintf('%s-%s', $bookingId, $booking['start']) : '';
-		$decryptedHash = Functions::decrypt($hash);
-		$isAdmin =  $decryptedHash == $nonce ? true : false;
-		$isCustomer =  $decryptedHash == $nonce . '-customer' ? true : false;
+		// $decryptedHash = Functions::decrypt($hash);
+		// $isAdmin =  $decryptedHash === $nonce ? true : false;
+		// $isCustomer =  $decryptedHash === $nonce . '-customer' ? true : false;
+		$encryptedNonceAdmin = Functions::crypt($nonce);
+		$encryptedNonceCustomer = Functions::crypt($nonce . '-customer');
+		$isAdmin =  $hash === $encryptedNonceAdmin ? true : false;
+		$isCustomer =  $hash === $encryptedNonceCustomer ? true : false;
 
 		$bookingCancelled = ($booking['status'] == 'cancelled');
 
-		if (($action == 'confirm' || $action == 'cancel') && $isAdmin) {
+		if (($action == 'confirm' || $action == 'cancel') && $isAdmin && $nonce) {
 			$this->bookingReplyAdmin($bookingId, $booking, $action);
-		} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel' || $action == 'maybe-cancel') && $isCustomer) {
+		} elseif (($action == 'confirm' || $action == 'checkin' || $action == 'checkout' || $action == 'cancel' || $action == 'maybe-cancel') && $isCustomer && $nonce) {
 			if ($bookingCancelled) {
 				$action = 'cancel';
 			}

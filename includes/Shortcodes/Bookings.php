@@ -98,7 +98,7 @@ class Bookings extends Shortcodes {
         global $post;
         $postID = $post->ID;
 
-        if (isset($_GET['transient-data']) && isset($_GET['transient-data-nonce']) && wp_verify_nonce($_GET['transient-data-nonce'], 'transient-data')) {
+        if (isset($_GET['transient-data']) && isset($_GET['transient-data-nonce']) && wp_verify_nonce($_GET['transient-data-nonce'], 'transient-data-' . $_GET['transient-data'])) {
             $transient = $_GET['transient-data'];
             $transientData = new TransientData($transient);
             if (empty($fieldErrors = $transientData->getData())) {
@@ -444,7 +444,7 @@ class Bookings extends Shortcodes {
     }
 
     protected function saveError(){
-        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'save_error')) {
+        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'save_error-' . $_GET['nonce'])) {
             return '';
         }
 
@@ -457,23 +457,27 @@ class Bookings extends Shortcodes {
     }
 
     protected function multipleBookingError(){
-        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'multiple_booking')) {
+        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'multiple_booking-' . $_GET['nonce'])) {
             return '';
         }
 
         $data = [];
         $data['multiple_booking_error'] = true;        
-        $data['multiple_booking'] = __('Multiple Booking', 'rrze-rsvp');
-        $data['message'] = __('<strong>You have already booked a seat for the specified time slot.</strong><br>If you want to change your booking, please cancel the existing booking first. You will find the link to do so in your confirmation email.', 'rrze-rsvp');
+        // $data['multiple_booking'] = __('Multiple Booking', 'rrze-rsvp');
+        // $data['message'] = __('<strong>You have already booked a seat for the specified time slot.</strong><br>If you want to change your booking, please cancel the existing booking first. You will find the link to do so in your confirmation email.', 'rrze-rsvp');
+        $data['multiple_booking'] = __('Save booking', 'rrze-rsvp');
+        $data['message'] = __('Error saving the booking.', 'rrze-rsvp');
 
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
     protected function seatUnavailableError(){
-        if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'seat_unavailable')) {
+        if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'seat_unavailable-' . $_GET['url'])) {
             return '';
         }
-        $url = $_GET['url'];
+        // $url = $_GET['url'];
+        $url = filter_input(INPUT_GET, 'url', FILTER_SANITIZE_URL);
+
         if (sanitize_text_field($url) != $url) {
             return '';
         }
@@ -488,10 +492,11 @@ class Bookings extends Shortcodes {
     }
 
     protected function timeslotUnavailableError(){
-        if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'timeslot_unavailable')) {
+        if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'timeslot_unavailable-' . $_GET['url'])) {
             return '';
         }
-        $url = $_GET['url'];
+        // $url = $_GET['url'];
+        $url = filter_input(INPUT_GET, 'url', FILTER_SANITIZE_URL);
 
         if (sanitize_text_field($url) != $url) {
             return '';
@@ -533,7 +538,7 @@ class Bookings extends Shortcodes {
     }
 
     protected function bookedNotice(){
-        if (!isset($_GET['id']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'booked')) {
+        if (!isset($_GET['id']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'booked-' . $_GET['nonce'])) {
             return '';
         }
 
@@ -771,10 +776,11 @@ class Bookings extends Shortcodes {
         }
 
         if (!empty($transientData->getData(false))) {           
+            $transient = $transientData->getTransient();
             $redirectUrl = add_query_arg(
                 [
-                    'transient-data-nonce' => wp_create_nonce('transient-data'),
-                    'transient-data' => $transientData->getTransient(),
+                    'transient-data-nonce' => wp_create_nonce('transient-data-' . $transient),
+                    'transient-data' => $transient,
                     'nonce' => $this->nonce
                 ],
                 wp_get_referer()
@@ -827,7 +833,7 @@ class Bookings extends Shortcodes {
         if (!empty($check_bookings)) {
             $redirectUrl = add_query_arg(
                 [
-                    'booking' => wp_create_nonce('multiple_booking'),
+                    'booking' => wp_create_nonce('multiple_booking-' . $this->nonce),
                     'nonce' => $this->nonce
                 ],
                 get_permalink()
@@ -838,11 +844,12 @@ class Bookings extends Shortcodes {
 
         // Überprüfen ob Timeslot in der Vergangenheit liegt
         if ($booking_timestamp_end < current_time('timestamp')) {
+            $url = urlencode(wp_get_referer());
             $redirectUrl = add_query_arg(
                 [
                     //'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', get_permalink(), $room_id, $booking_date, $booking_start),
-                    'url' => urlencode(wp_get_referer()),
-                    'booking' => wp_create_nonce('timeslot_unavailable'),
+                    'url' => $url,
+                    'booking' => wp_create_nonce('timeslot_unavailable-' . $url),
                     'nonce' => $this->nonce
                 ],
                 get_permalink()
@@ -876,11 +883,14 @@ class Bookings extends Shortcodes {
         ]);
 
         if (!empty($bookings)) {
+
+            $url = urlencode(wp_get_referer());
+
             $redirectUrl = add_query_arg(
                 [
                     //'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', get_permalink(), $room_id, $booking_date, $booking_start),
-                    'url' => urlencode(wp_get_referer()),
-                    'booking' => wp_create_nonce('seat_unavailable'),
+                    'url' => $url,
+                    'booking' => wp_create_nonce('seat_unavailable-' . $url),
                     'nonce' => $this->nonce
                 ],
                 get_permalink()
@@ -911,7 +921,7 @@ class Bookings extends Shortcodes {
         if (!$booking_id || is_wp_error($booking_id)) {
             $redirectUrl = add_query_arg(
                 [
-                    'booking' => wp_create_nonce('save_error'),
+                    'booking' => wp_create_nonce('save_error-' . $this->nonce),
                     'nonce' => $this->nonce
                 ],
                 get_permalink()
@@ -1018,7 +1028,7 @@ class Bookings extends Shortcodes {
             $redirectUrl = add_query_arg(
                 [
                     'id' => $booking_id,
-                    'nonce' => wp_create_nonce('rrze-rsvp-checkin-booked')
+                    'nonce' => wp_create_nonce('rrze-rsvp-checkin-booked-' . $booking_id)
                 ],
                 get_permalink($booking_seat)
             );
@@ -1030,7 +1040,7 @@ class Bookings extends Shortcodes {
         $redirectUrl = add_query_arg(
             [
                 'id' => $booking_id,
-                'booking' => wp_create_nonce('booked'),
+                'booking' => wp_create_nonce('booked-' . $this->nonce),
                 'nonce' => $this->nonce
             ],
             get_permalink()
