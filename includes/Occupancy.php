@@ -33,7 +33,6 @@ class Occupancy{
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce( 'rsvp-ajax-nonce' ),
         ]);
-
     }
 
     public function ajaxGetOccupancy() {

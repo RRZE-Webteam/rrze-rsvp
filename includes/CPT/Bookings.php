@@ -484,8 +484,7 @@ class Bookings {
         return $ret;
     }
 
-    public function filterBookings($query)
-    {
+    public function filterBookings($query){
         if (!(is_admin() and $query->is_main_query())) {
             return $query;
         }
@@ -516,8 +515,8 @@ class Bookings {
             }
         }
 
-
         $aBookingIDs = [];
+
         if ($this->filterDate) {
             $aBookingIDs = $this->getBookingIDsByDate($this->filterDate);
         }
@@ -531,6 +530,7 @@ class Bookings {
         }
 
         if ($this->filterDate || $this->filterStart || $this->filterEnd){
+            $aBookingIDs = array_unique($aBookingIDs);
             $aBookingIDs = ($aBookingIDs ? $aBookingIDs : [-1]);
             $query->set('post__in', $aBookingIDs);
         }
@@ -551,6 +551,7 @@ class Bookings {
             return;
         }
         $aBookingIDs = [];
+        $filteredBookingIDs = $query->get('post__in');
 
         $this->sSearch = $query->query_vars['s'];
         if ($this->sSearch){
@@ -562,7 +563,15 @@ class Bookings {
             }
 
             if ($aBookingIDs){
-                $query->set('post__in', $aBookingIDs);
+                if ($filteredBookingIDs){
+                    $aBookingIDs = array_intersect($filteredBookingIDs, $aBookingIDs);
+                }
+
+                if (!$aBookingIDs){
+                    $query->set('post__in', [0]);
+                }else{
+                    $query->set('post__in', $aBookingIDs);
+                }
             }else{
                 $query->set('post__in', [0]);
             }
