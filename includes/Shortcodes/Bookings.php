@@ -318,15 +318,11 @@ class Bookings extends Shortcodes {
 
 	    $output .= '<fieldset>';  
         $output .= '<legend>' . __('Your data', 'rrze-rsvp') . ' <span class="notice-required">('. __('Required','rrze-rsvp'). ')</span></legend>';
-
-        if (($this->sso) || ($this->ldap)){
-            $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
-        }
-
         if ($this->sso) {
             $data = $this->idm->getCustomerData();
             $output .= '<input type="hidden" value="' . $data['customer_lastname'] . '" id="rsvp_lastname" name="rsvp_lastname">';
             $output .= '<input type="hidden" value="' . $data['customer_firstname'] . '" id="rsvp_firstname" name="rsvp_firstname">';
+            $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
 
             $output .= '<div class="form-group">'
                 . '<p>' . __('Last name', 'rrze-rsvp') . ': <strong>' . $data['customer_lastname'] . '</strong></p>'
@@ -337,6 +333,8 @@ class Bookings extends Shortcodes {
 
         if ($this->ldap) {
             $data = $this->ldapInstance->getCustomerData();
+            $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
+
             $output .= '<div class="form-group">'
                 . '<p>' . __('Email', 'rrze-rsvp') . ': <strong>' . $data['customer_email'] . '</strong></p>'
                 . '</div>';
