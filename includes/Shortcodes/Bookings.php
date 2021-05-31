@@ -294,7 +294,7 @@ class Bookings extends Shortcodes {
             $output .= '</div>'; //.rsvp-date-container
 
             $output .= '<div class="rsvp-time-container">'
-                . '<h4>' . __('Available time slots:', 'rrze-rsvp') . '</h4>';
+                . '<p><strong>' . __('Available time slots:', 'rrze-rsvp') . '</strong></p>';
             if ($get_date) {
                 $output .= $this->buildTimeslotSelect($roomID, $get_date, $get_time, $availability);
             } else {
@@ -346,7 +346,7 @@ class Bookings extends Shortcodes {
             $message = isset($fieldErrors['rsvp_lastname']['message']) ? $fieldErrors['rsvp_lastname']['message'] : '';    
             $output .= '<div class="form-group' . $error . '"><label for="rsvp_lastname">'
                 . __('Last name', 'rrze-rsvp') . '</label>'
-                . '<input type="text" name="rsvp_lastname" value="' . $value . '" id="rsvp_lastname" required aria-required="true">'
+                . '<input type="text" name="rsvp_lastname" value="' . $value . '" id="rsvp_lastname" required>'
                 . '<div class="error-message">' . $message . '</div>'
                 . '</div>';
 
@@ -355,7 +355,7 @@ class Bookings extends Shortcodes {
             $message = isset($fieldErrors['rsvp_firstname']['message']) ? $fieldErrors['rsvp_firstname']['message'] : '';    
             $output .= '<div class="form-group' . $error . '"><label for="rsvp_firstname">'
                 . __('First name', 'rrze-rsvp') . '</label>'
-                . '<input type="text" name="rsvp_firstname" value="' . $value . '" id="rsvp_firstname" required aria-required="true">'
+                . '<input type="text" name="rsvp_firstname" value="' . $value . '" id="rsvp_firstname" required>'
                 . '<div class="error-message">' . $message . '</div>'
                 . '</div>';               
         }
@@ -368,7 +368,7 @@ class Bookings extends Shortcodes {
                 . __('Email', 'rrze-rsvp') . '</label>'
                 . '<input type="email" name="rsvp_email" value="' . $value . '" '
                 . 'pattern="^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*(\.\w{2,})+$" '
-                . 'id="rsvp_email" required aria-required="true">'
+                . 'id="rsvp_email" required>'
                 . '<div class="error-message">' . $message . '</div>'
                 . '</div>';            
         }
