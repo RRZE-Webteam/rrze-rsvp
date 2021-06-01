@@ -255,7 +255,7 @@ class Bookings extends Shortcodes {
         if (isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rsvp-availability')) {
             $output .= '<div><input type="hidden" value="' . $_GET['nonce'] . '" id="rsvp_availability" name="nonce"></div>';
         }
-        $output .= '<p><input type="text" value="' . $roomID . '" id="rsvp_room" name="rsvp_room">'
+        $output .= '<p><input type="hidden" value="' . $roomID . '" id="rsvp_room" name="rsvp_room">'
                     . wp_nonce_field('post_nonce', 'rrze_rsvp_post_nonce_field', TRUE, FALSE)
                     . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($roomID) . '</strong>'
                     . '</p>';
