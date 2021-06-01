@@ -1149,7 +1149,7 @@ class Bookings extends Shortcodes {
                 } else {
                     $checked = '';
                 }
-                $input_open = "<input type=\"radio\" id=\"rsvp_date_$date\" value=\"$date\" name=\"rsvp_date\" $checked required aria-required='true'><label for=\"rsvp_date_$date\">";
+                $input_open = "<input type=\"radio\" id=\"rsvp_date_$date\" value=\"$date\" name=\"rsvp_date\" $checked required><label for=\"rsvp_date_$date\">";
                 $input_close = '</label>';
             }
             $calendar .= "<td class='day $class' rel='$date' title='$title'>" . $input_open.$currentDay.$input_close . "</td>";
@@ -1251,7 +1251,7 @@ class Bookings extends Shortcodes {
                 $slot_value = explode('-', $slot)[0];
                 $id = 'rsvp_time_' . sanitize_title($slot_value);
                 $checked = checked($time !== false && $time == $slot_value, true, false);
-                $timeSelects .= "<div class='form-group'><input type='radio' id='$id' value='$slot_value' name='rsvp_time' " . $checked . " required aria-required='true'><label for='$id'>$slot</label></div>";
+                $timeSelects .= "<div class='form-group'><input type='radio' id='$id' value='$slot_value' name='rsvp_time' " . $checked . " required><label for='$id'>$slot</label></div>";
             }
         }
         if ($timeSelects == '') {
@@ -1283,7 +1283,7 @@ class Bookings extends Shortcodes {
             $id = 'rsvp_seat_' . sanitize_title($seat);
             $checked = checked($seat_id !== false && $seat == $seat_id, true, false);
             $seatSelects .= "<div class='form-group'>"
-                . "<input type='radio' id='$id' value='$seat' name='rsvp_seat' $checked required aria-required='true'>"
+                . "<input type='radio' id='$id' value='$seat' name='rsvp_seat' $checked required>"
                 . "<label for='$id'>$seatname</label>"
                 . "</div>";
         }
