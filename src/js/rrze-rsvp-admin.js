@@ -62,7 +62,7 @@ jQuery(document).ready(function ($) {
     // Set search string in result
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('s')){
-        $('.subtitle').html( $('.subtitle').text().substring(0, $('.subtitle').text().length - 1) + urlParams.get('s') + '&rdquo;');
+        $('.subtitle').html($('.subtitle').text().substring(0, $('.subtitle').text().length - 1) + ' "' + urlParams.get('s') + '"');
     }
 
 	// Hide booking mode info text on loading, insert booking mode info icon

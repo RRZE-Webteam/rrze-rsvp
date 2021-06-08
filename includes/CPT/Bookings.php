@@ -291,13 +291,6 @@ class Bookings {
         wp_die();
     }
 
-
-    
-    private function getTimeDifference(){
-        global $wpdb;
-        return $wpdb->get_results("SELECT CONVERT_TZ(NOW(), @@session.time_zone, '+00:00')", ARRAY_N );
-    }
-
     public function addFilters($post_type)
     {
         if ($post_type != 'booking') {
@@ -353,63 +346,22 @@ class Bookings {
     }
 
    
-    private function getSeatIDsFromRoomIDs($aRoomIDs){
-        $args = [
-            'fields'            => 'ids',
-            'post_type'         => 'seat',
-            'post_status'       => 'publish',
-            'nopaging'          => true,
-            'meta_query'        => [
-                [
-                    'key'       => 'rrze-rsvp-seat-room',
-                    'value'     => $aRoomIDs,
-                    'compare'   => 'IN'
-                ]
-            ]
-        ];
-        return get_posts($args);
-    }
-
     private function getBookingIDsBySeatRoomTitle( $sSearch ){
-        // 1. fetch rooms that contain $sSearch in the title
         global $wpdb;
         $aBookingIDs = [];
-        $aSeatIDs = [];
-        $aRoomIDs = $wpdb->get_results( "SELECT ID FROM $wpdb->posts WHERE post_type = 'room' AND post_title LIKE '%" . $sSearch . "%'", OBJECT_K );
+        $aIDs = $wpdb->get_results("SELECT ID FROM $wpdb->posts p, $wpdb->postmeta pm WHERE p.post_type = 'booking' AND p.post_status = 'publish' AND p.id = pm.post_id AND pm.meta_key = 'rrze-rsvp-booking-seat' AND pm.meta_value IN (
+                SELECT ID FROM $wpdb->posts p, $wpdb->postmeta pm WHERE p.post_type = 'seat' AND p.post_status = 'publish' AND p.id = pm.post_id AND (p.post_title LIKE '%" . $sSearch . "%' OR (pm.meta_key = 'rrze-rsvp-seat-room' AND pm.meta_value IN 
+                (SELECT ID FROM $wpdb->posts WHERE post_type = 'room' AND post_status = 'publish' AND post_title LIKE '%" . $sSearch . "%'))))", ARRAY_A );
 
-        // 2. get seat ids for found rooms
-        if ($aRoomIDs){
-            $aSeatIDs = $this->getSeatIDsFromRoomIDs(array_keys($aRoomIDs));
-        }
-
-        // 3. get seats that contain $sSearch in the title
-        $aNewSeatIDs = $wpdb->get_results( "SELECT ID FROM $wpdb->posts WHERE post_type = 'seat' AND post_title LIKE '%" . $sSearch . "%'", OBJECT_K );
-
-        // 4. get bookingIDs that match to seatIDs
-        $aSeatIDs = array_merge($aSeatIDs, array_keys($aNewSeatIDs));
-
-        if ($aSeatIDs){
-            $args = array(
-                'fields' => 'ids',
-                'post_type'         => 'booking',
-                'post_status'       => 'publish',
-                'nopaging'          => true,                
-                'meta_query' => array(
-                    array(
-                        'key'   => 'rrze-rsvp-booking-seat',
-                        'value' => $aSeatIDs,
-                        'compare' => 'IN'
-                    )),
-            );
-            $aBookingIDs = get_posts($args);
+        foreach($aIDs as $aID){
+            $aBookingIDs[] = $aID['ID'];
         }
 
         return $aBookingIDs;
     }
 
-
     private function setFilterParams(){
-        $this->filterRoomIDs = (array)filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
+        $this->filterRoomIDs = filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
         $this->filterDate = filter_input(INPUT_GET, $this->sDate, FILTER_SANITIZE_STRING);
         $filterTime = filter_input(INPUT_GET, $this->sTimeslot, FILTER_SANITIZE_STRING);
         if ($filterTime){
@@ -459,33 +411,40 @@ class Bookings {
         return get_posts($args);
     }
 
-    private function getBookingIDsByDate($myDate){
+    private function getBookingIDsByFilter(){
         global $wpdb;
+        $bSub = FALSE;
         $ret = [];
         $wpdb->query("SET time_zone = '+00:00'");
-        $sql = "SELECT post_id FROM $wpdb->postmeta WHERE (meta_key = 'rrze-rsvp-booking-start' OR meta_key = 'rrze-rsvp-booking-end') AND DATE_FORMAT(FROM_UNIXTIME(meta_value), '%Y-%m-%d') = '$myDate'";
-        $aPostIDs = $wpdb->get_results( $sql, ARRAY_N );
+
+        $sql = "SELECT ID FROM $wpdb->posts WHERE post_type = 'booking' AND post_status = 'publish'";
+
+        if ($this->filterRoomIDs) {
+            $sql .= " AND ID IN (SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'rrze-rsvp-booking-seat' AND meta_value IN (SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'rrze-rsvp-seat-room' AND meta_value = $this->filterRoomIDs))";
+        }
+
+        if ($this->filterDate) {
+            $sql .= " AND ID IN (SELECT post_id FROM $wpdb->postmeta WHERE (meta_key = 'rrze-rsvp-booking-start' OR meta_key = 'rrze-rsvp-booking-end') AND DATE_FORMAT(FROM_UNIXTIME(meta_value), '%Y-%m-%d') = '$this->filterDate')";
+        }
+
+        if ($this->filterStart){
+            $sql .= " AND ID IN (SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'rrze-rsvp-booking-start' AND DATE_FORMAT(FROM_UNIXTIME(meta_value), '%H:%i') = '$this->filterStart')";
+        }
+
+        if ($this->filterEnd){
+            $sql .= " AND ID IN (SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'rrze-rsvp-booking-end' AND DATE_FORMAT(FROM_UNIXTIME(meta_value), '%H:%i') = '$this->filterEnd')";
+        }
+
+        $aPostIDs = $wpdb->get_results($sql, ARRAY_N);
         foreach($aPostIDs as $postID){
             $ret[] = $postID[0];
         }
         return $ret;
     }
 
-
-    private function getBookingIDsByTime($mode, $myTime){
-        global $wpdb;
-        $ret = [];
-        $wpdb->query("SET time_zone = '+00:00'");
-        $sql = "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'rrze-rsvp-booking-$mode' AND DATE_FORMAT(FROM_UNIXTIME(meta_value), '%H:%i') = '$myTime'";
-        $aPostIDs = $wpdb->get_results( $sql, ARRAY_N );
-        foreach($aPostIDs as $postID){
-            $ret[] = $postID[0];
-        }
-        return $ret;
-    }
 
     public function filterBookings($query){
-        if (!(is_admin() and $query->is_main_query())) {
+        if (!(is_admin() && $query->is_main_query())) {
             return $query;
         }
 
@@ -493,6 +452,7 @@ class Bookings {
         if (!($query->query['post_type'] === 'booking')) {
             return $query;
         }
+
         $this->setFilterParams();
 
         // don't modify query_vars because only default values are given (= "show all ...")
@@ -500,40 +460,12 @@ class Bookings {
             return $query;
         }
 
-        $meta_query = $query->get('meta_query',array());;
+        $meta_query = $query->get('meta_query', array());
 
-        if ($this->filterRoomIDs) {
-            // get seatIDs 
-            $aSeatIDs = $this->getSeatIDsFromRoomIDs($this->filterRoomIDs);
-
-            if ($aSeatIDs) {
-                $meta_query[] = array(
-                    'key' => 'rrze-rsvp-booking-seat',
-                    'value' => $aSeatIDs,
-                    'compare' => 'IN'
-                );
-            }
-        }
-
-        $aBookingIDs = [];
-
-        if ($this->filterDate) {
-            $aBookingIDs = $this->getBookingIDsByDate($this->filterDate);
-        }
-
-        if ($this->filterStart){
-            $aBookingIDs = ($aBookingIDs ? array_intersect($aBookingIDs, $this->getBookingIDsByTime('start', $this->filterStart)) : $this->getBookingIDsByTime('start', $this->filterStart));
-        }
-
-        if ($this->filterEnd && $aBookingIDs){
-            $aBookingIDs = ($aBookingIDs ? array_intersect($aBookingIDs, $this->getBookingIDsByTime('end', $this->filterEnd)) : $this->getBookingIDsByTime('end', $this->filterEnd));
-        }
-
-        if ($this->filterDate || $this->filterStart || $this->filterEnd){
-            $aBookingIDs = array_unique($aBookingIDs);
-            $aBookingIDs = ($aBookingIDs ? $aBookingIDs : [-1]);
-            $query->set('post__in', $aBookingIDs);
-        }
+        $aBookingIDs = $this->getBookingIDsByFilter();
+            
+        $aBookingIDs = ($aBookingIDs ? $aBookingIDs : [-1]);
+        $query->set('post__in', $aBookingIDs);
 
         if ($meta_query) {
             $meta_query['relation'] = 'AND';
@@ -550,12 +482,11 @@ class Bookings {
             || !(isset($query->query_vars['post_type']) && $query->query_vars['post_type'] == 'booking')) {
             return;
         }
+
         $aBookingIDs = [];
-        $filteredBookingIDs = $query->get('post__in');
 
         $this->sSearch = $query->query_vars['s'];
         if ($this->sSearch){
-            // $this->getBookingByGuest() deactivated because it is not allowed to search for persons (Personalrat)
             if(isAllowedSearchForGuest()){
                 $aBookingIDs = array_merge($this->getBookingIDsBySeatRoomTitle($this->sSearch), $this->getBookingByGuest($this->sSearch));
             }else{
@@ -563,6 +494,7 @@ class Bookings {
             }
 
             if ($aBookingIDs){
+                $filteredBookingIDs = $query->get('post__in');
                 if ($filteredBookingIDs){
                     $aBookingIDs = array_intersect($filteredBookingIDs, $aBookingIDs);
                 }
