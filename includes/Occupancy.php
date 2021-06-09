@@ -44,7 +44,7 @@ class Occupancy{
             exit;
         }
 
-        if (function_available('is_post_publicly_viewable') && !is_post_publicly_viewable($roomId)) {
+        if (function_exists('is_post_publicly_viewable') && !is_post_publicly_viewable($roomId)) {
             header('HTTP/1.0 403 Forbidden'); 
             exit;
         }
@@ -62,7 +62,7 @@ class Occupancy{
             exit;
         }
 
-        if (function_available('is_post_publicly_viewable') && !is_post_publicly_viewable($roomId)) {
+        if (function_exists('is_post_publicly_viewable') && !is_post_publicly_viewable($roomId)) {
             header('HTTP/1.0 403 Forbidden'); 
             exit;
         }
