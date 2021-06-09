@@ -413,7 +413,6 @@ class Bookings {
 
     private function getBookingIDsByFilter(){
         global $wpdb;
-        $bSub = FALSE;
         $ret = [];
         $wpdb->query("SET time_zone = '+00:00'");
 
