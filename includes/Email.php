@@ -314,9 +314,9 @@ class Email
 
         // ICS attachment
         $attachment = '';
-        if ($status == 'confirmed' || $mailContext == 'newBooking') {
+        if ($status == 'confirmed' || $mailContext == 'newBooking' || $status == 'cancelled' || $mailContext == 'bookingCancelled') {
             $icsFilename = sprintf('%s-%s.ics', sanitize_title($booking['room_name']), date('YmdHi', $booking['start']));
-            $icsContent = ICS::generate($bookingId, $icsFilename);
+            $icsContent = ICS::generate($booking, $icsFilename);
             $attachment = $this->tempFile($icsFilename, $icsContent);
         }
 
@@ -344,7 +344,7 @@ class Email
             $altMessage = $this->template->getContent('email/email.txt', $data);
 
             $icsFilename = sprintf('%s-%s-copy.ics', sanitize_title($booking['room_name']), date('YmdHi', $booking['start']));
-            $icsContent = ICS::generate($bookingId, $icsFilename, 'send-to-email');
+            $icsContent = ICS::generate($booking, $icsFilename, 'send-to-email');
             $attachment = $this->tempFile($icsFilename, $icsContent);
 
             $this->send($sendToEmail, $subject, $message, $altMessage, $attachment);
