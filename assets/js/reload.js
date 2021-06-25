@@ -1,0 +1,1 @@
+"use strict";var url=new URL(window.location.href),t=1e3*url.searchParams.get("reload");setTimeout(function(){window.location.reload(1)},t);

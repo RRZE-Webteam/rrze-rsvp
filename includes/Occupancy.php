@@ -19,6 +19,26 @@ class Occupancy{
         add_action( 'wp_ajax_nopriv_ShowOccupancy', [$this, 'ajaxGetOccupancy'] );
         add_action( 'wp_ajax_ShowOccupancyLinks', [$this, 'ajaxGetOccupancyLinks'] );
         add_action( 'wp_ajax_nopriv_ShowOccupancyLinks', [$this, 'ajaxGetOccupancyLinks'] );
+        add_action( 'wp_enqueue_scripts', [$this, 'wpEnqueueScripts']);
+        add_action( 'wp_print_scripts', [$this, 'wpDenqueueScripts'], 100 );        
+    }
+
+
+    public function wpEnqueueScripts(){
+        if (isset($_GET['reload'])){
+            wp_enqueue_script(
+                'rrze-rsvp-reload',
+                plugins_url('assets/js/reload.js', plugin()->getBasename()),
+                ['jquery'],
+                plugin()->getVersion()
+            );    
+        }
+    }
+
+    public function wpDenqueueScripts(){
+        if (!isset($_GET['reload'])){
+            wp_dequeue_script('rrze-rsvp-reload');    
+        }
     }
 
     public function adminEnqueueScripts(){

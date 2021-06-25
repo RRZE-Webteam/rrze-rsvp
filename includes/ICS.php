@@ -8,9 +8,8 @@ use DateTime;
 
 class ICS
 {
-	public static function generate(int $bookingId, string $filename, string $recipient = 'customer'): string
+	public static function generate(array &$booking, string $filename, string $recipient = 'customer'): string
 	{
-		$booking = Functions::getBooking($bookingId);
 		if (empty($booking)) {
 			return '';
 		}
@@ -24,14 +23,13 @@ class ICS
 		return $output;
 	}
 
-	protected static function vevent(array $booking, string $recipient = 'customer'): string
+	protected static function vevent(array &$booking, string $recipient = 'customer'): string
 	{
 		$timezoneString = get_option('timezone_string');
 		$dtstamp = date('Ymd\THis');
 		$dtstampFormat = Functions::dateFormat(current_time('timestamp')) . ' ' . Functions::timeFormat(current_time('timestamp'));
 
 		$timestamp = date('ymdHi', $booking['start']);
-		$uid = md5($timestamp . date('ymdHi')) . "@rrze-rsvp";
 		$dtstamp = date('Ymd\THis');
 		$dtstart = date('Ymd\THis', $booking['start']);
 		$dtend = date('Ymd\THis', $booking['end']);
@@ -48,6 +46,14 @@ class ICS
 
 		$output = '';
 		$output .= "BEGIN:VEVENT\r\n";
+		if ($booking['status'] == 'cancelled'){
+			$output .= "METHOD:CANCEL\r\n";
+			$output .= "STATUS:CANCELLED\r\n";
+			$uid = get_post_meta($booking['id'], 'rrze-rsvp-booking-ics-uid', TRUE);
+		}else{
+			$uid = md5($timestamp . date('ymdHi')) . "@rrze-rsvp";
+			update_post_meta($booking['id'], 'rrze-rsvp-booking-ics-uid', $uid);
+		}
 		$output .= "UID:" . $uid . "\r\n";
 		$output .= "DTSTAMP:" . $dtstamp . "\r\n";
 		$output .= "DTSTART;TZID=" . $timezoneString . ":" . $dtstart . "\r\n";
