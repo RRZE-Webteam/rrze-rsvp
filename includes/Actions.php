@@ -124,12 +124,13 @@ class Actions
             } elseif (in_array($status, ['booked', 'confirmed']) && $action == 'cancel') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 				$this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled');
-			} elseif ($status == 'cancelled' && $action == 'restore') {
-                if ($forceToConfirm) {
-                    update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'customer-confirmed');
-                } else {
-                    update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
-                }
+			// deactivate restore
+			// } elseif ($status == 'cancelled' && $action == 'restore') {
+            //     if ($forceToConfirm) {
+            //         update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'customer-confirmed');
+            //     } else {
+            //         update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'booked');
+            //     }
 			} elseif ((in_array($status, ['checked-out', 'confirmed']) || $bookingMode == 'check-only') && $action == 'checkin') {
 			    $now = current_time('timestamp');
                 $offset = 15 * MINUTE_IN_SECONDS;

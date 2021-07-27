@@ -190,14 +190,16 @@ class Bookings {
 
                     if ($status == 'cancelled') {
                         $cancelledButton = '<button class="button button-secondary" disabled>' . _x('Cancelled', 'Booking', 'rrze-rsvp') . '</button>';
-                        $restoreButton = sprintf(
-                            '<a href="edit.php?post_type=%1$s&action=restore&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>',
-                            'booking',
-                            $booking['id'],
-                            $_wpnonce,
-                            _x('Restore', 'Booking', 'rrze-rsvp')
-                        );
-                        $button = $cancelledButton . $restoreButton;
+                        // deactivate restore
+                        // $restoreButton = sprintf(
+                        //     '<a href="edit.php?post_type=%1$s&action=restore&id=%2$d&_wpnonce=%3$s" class="button">%4$s</a>',
+                        //     'booking',
+                        //     $booking['id'],
+                        //     $_wpnonce,
+                        //     _x('Restore', 'Booking', 'rrze-rsvp')
+                        // );
+                        // $button = $cancelledButton . $restoreButton;
+                        $button = $cancelledButton;
                     } else {
                         $cancelButton = sprintf(
                             '<a href="edit.php?post_type=%1$s&action=cancel&id=%2$d&_wpnonce=%3$s" class="button button-secondary" data-id="%2$d">%4$s</a>',
