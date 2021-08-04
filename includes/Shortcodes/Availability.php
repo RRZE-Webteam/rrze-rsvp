@@ -68,7 +68,7 @@ class Availability extends Shortcodes
                         foreach ($seat_ids as $seat_id) {
                             $seat_names_raw[$seat_id] = get_the_title($seat_id);
                         }
-                        asort($seat_names_raw);
+                        natsort($seat_names_raw);
                         $glue = ', ';
                         foreach ($seat_names_raw as $seat_id => $seat_name) {
                             $booking_link_open = '';

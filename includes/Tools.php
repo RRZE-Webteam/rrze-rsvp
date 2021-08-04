@@ -73,7 +73,7 @@ class Tools
                 $row = (isset($_GET['schema_rows']) && $_GET['schema_rows'] == 'a-z') ? 'A' : 1;
                 $seat = (isset($_GET['schema_seats']) && $_GET['schema_seats'] == 'num') ? 1 : 'A';
                 $seat_start = $seat;
-                if ($row == $seat) {
+                if ($row == $seat && $num_rows > 1) {
                     $label_row = _x('Row', 'part of the generated seat name', 'rrze-rsvp') . ' ';
                     $label_seat = ' - ' . _x('Seat', 'part of the generated seat name', 'rrze-rsvp') . ' ';
                 } else {
@@ -93,7 +93,7 @@ class Tools
 
                 for ($i = 1; $i <= $num_rows; $i++) {
                     for ($j = 1; $j <= $num_seats; $j++) {
-                        $seat_name = $prefix . $label_row . $row . $label_seat . $seat;
+                        $seat_name = $prefix . $label_row . ($num_rows > 1 ? $row : '') . $label_seat . $seat;
                         $new_seat = [
                             'post_status' => 'publish',
                             'post_type' => 'seat',
