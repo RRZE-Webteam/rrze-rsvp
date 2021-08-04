@@ -21,6 +21,23 @@ $checkInBooking = null;
 $seatCheckInOut = null;
 $action = null;
 
+function buildSeatInfo($seatID = '') {
+    if ($seatID == '') {
+        return '';
+    }
+    $output = '';
+    $equipment = get_the_terms($seatID, 'rrze-rsvp-equipment');
+    if ($equipment !== false) {
+        $output .= '<div class="rsvp-item-info">';
+        foreach  ($equipment as $e) {
+            $e_arr[] = $e->name;
+        }
+        $output .= '<p><strong>' . __('Equipment','rrze-rsvp') . '</strong>: ' . implode(', ', $e_arr) . '</p>';
+        $output .= '</div>';
+    }
+    return $output;
+}
+
 
 if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rrze-rsvp-checkin-booked-' . $_GET['id'])) {
     $bookingId = absint($_GET['id']);
@@ -114,6 +131,7 @@ if ($checkInBooking) {
     $time = $checkInBooking['time'];
     $bookingmode = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true);
     echo '<p><strong>' . __('Room', 'rrze-rsvp') . ':</strong> <a href="' . get_permalink($roomId) . '">' . $roomName . '</a>';
+    echo buildSeatInfo($seatId);
     echo '<div class="rrze-rsvp-seat-check-inout"> <div class="container">';
     if ($bookingmode == 'consultation') {
         echo '<h2>' . __('Consult', 'rrze-rsvp') . '</h2>';
@@ -154,6 +172,7 @@ if ($checkInBooking) {
     $date = $seatCheckInOut['date'];
     $time = $seatCheckInOut['time'];
     echo '<p><strong>' . __('Room:', 'rrze-rsvp') . '</strong> <a href="' . get_permalink($roomId) . '">' . $roomName . '</a>';
+    echo buildSeatInfo($seatId);
     echo '<div class="rrze-rsvp-seat-check-inout"> <div class="container">';
     switch ($action) {
         case 'checkin':
@@ -213,6 +232,7 @@ if ($checkInBooking) {
     $now = current_time('timestamp');
 
     echo '<p><strong>' . __('Room:', 'rrze-rsvp') . '</strong> <a href="' . get_permalink($roomId) . '">' . get_the_title($roomId) . '</a>';
+    echo buildSeatInfo($seatId);
 
     $args = [
         'fields' => 'ids',
