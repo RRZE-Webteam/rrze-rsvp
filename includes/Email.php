@@ -306,6 +306,11 @@ class Email
             $data['show_checkout_btn'] = false;
         }
 
+        if ($bookingMode == 'no-check'){
+            $showCheckinButton = false;
+            $showCheckoutButton = false;
+        }
+
         if ($showCheckinButton || $showCheckoutButton) {
             $data['show_check_btns'] = true;
         } else {

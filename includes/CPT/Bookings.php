@@ -223,6 +223,12 @@ class Bookings {
                             _x('Check-Out', 'Booking', 'rrze-rsvp')
                         );
                         $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true));
+
+                        if ($bookingMode == 'no-check'){ 
+                            $checkInButton = '';
+                            $checkoutButton = '';
+                        }
+
                         if ($bookingMode == 'check-only') {
                             switch ($status) {
                                 case 'checked-in':
