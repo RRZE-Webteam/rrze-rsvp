@@ -148,22 +148,21 @@ jQuery(document).ready(function ($) {
 	var autoConfirmationInput = $('input#rrze-rsvp-room-auto-confirmation');
 	var autoConfirmationChecked = autoConfirmationInput.is(':checked');
 	var forceConfirmationInput = $('input#rrze-rsvp-room-force-to-checkin');
-	var forceConfirmationChecked = forceConfirmationInput.is(':checked');
 	triggerModeVisibility(bookingMode);
 	triggerInstant(autoConfirmationChecked);
-	triggerCheckInTime(forceConfirmationChecked);
+	triggerCheckInTime();
 
 	bookingModeSelect.on('change', function() {
 		var bookingMode = $('option:selected',this).val();
 		triggerModeVisibility(bookingMode);
+		triggerCheckInTime();
 	});
 	autoConfirmationInput.click(function() {
 		var autoConfirmationChecked = $(this).is(':checked');
 		triggerInstant(autoConfirmationChecked);
 	});
 	forceConfirmationInput.click(function() {
-		var forceConfirmationChecked = $(this).is(':checked');
-		triggerCheckInTime(forceConfirmationChecked);
+		triggerCheckInTime();
 	});
 
 	function triggerModeVisibility(bookingMode){
@@ -188,8 +187,8 @@ jQuery(document).ready(function ($) {
 		}
 	}
 
-	function triggerCheckInTime(forceConfirmationChecked) {
-		if (forceConfirmationChecked === true) {
+	function triggerCheckInTime() {
+		if ($('input#rrze-rsvp-room-force-to-checkin').is(':checked')) {
 			$('div.cmb2-id-rrze-rsvp-room-check-in-time').slideDown();
 		} else {
 			$('div.cmb2-id-rrze-rsvp-room-check-in-time').slideUp();
