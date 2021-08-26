@@ -489,6 +489,26 @@ class Metaboxes
             ),
             'preview_size' => 'large', // Image size to use when previewing in the admin.
         ));
+
+
+        $cmb_pd = new_cmb2_box(array(
+            'id'            => 'rrze-rsvp-room-pd-meta',
+            'title'         => __('Public Displays', 'rrze-rsvp'),
+            'object_types'  => array('room',), // Post type
+            'context'       => 'side',
+            'priority'      => 'high',
+            'show_names'    => false, // Show field names on the left
+            // 'cmb_styles' => false, // false to disable the CMB stylesheet
+            'closed'     => true, // Keep the metabox closed by default
+        ));
+
+        $cmb_pd->add_field(array(
+            'name' => __('Text', 'rrze-rsvp'),
+            'id' => 'rrze-rsvp-room-pdtxt',
+            'type' => 'textarea',
+            'desc' => __("This textarea contains the 'Additional Information' to show on top of occupancy grids shown on public displays only.", 'rrze-rsvp'),
+        ));
+
     }
 
     public function seat()
