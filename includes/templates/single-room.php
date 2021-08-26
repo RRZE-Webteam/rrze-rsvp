@@ -82,12 +82,30 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
                 echo do_shortcode('[rsvp-availability room=' . $roomId . ' days=' . $daysInAdvance . ']');
                 break;
             case 'occupancy':
+                if (!empty($options->general_pdtxt)){
+                    echo '<span class="rrze-rsvp-pdtxt">' . $options->general_pdtxt . '</span>';
+                }
+                if (!empty($meta['rrze-rsvp-room-pdtxt'][0])) {
+                    echo '<span class="rrze-rsvp-room-pdtxt">' . $meta['rrze-rsvp-room-pdtxt'][0] . '</span>';
+                }
                 echo Functions::getOccupancyByRoomIdHTML($roomId);
                 break;
             case 'occupancy_now':
+                if (!empty($options->general_pdtxt)){
+                    echo '<span class="rrze-rsvp-pdtxt">' . $options->general_pdtxt . '</span>';
+                }
+                if (!empty($meta['rrze-rsvp-room-pdtxt'][0])) {
+                    echo '<span class="rrze-rsvp-room-pdtxt">' . $meta['rrze-rsvp-room-pdtxt'][0] . '</span>';
+                }
                 echo Functions::getOccupancyByRoomIdHTML($roomId, true);
                 break;
             case 'occupancy_nextavailable':
+                if (!empty($options->general_pdtxt)){
+                    echo '<span class="rrze-rsvp-pdtxt">' . $options->general_pdtxt . '</span>';
+                }
+                if (!empty($meta['rrze-rsvp-room-pdtxt'][0])) {
+                    echo '<span class="rrze-rsvp-room-pdtxt">' . $meta['rrze-rsvp-room-pdtxt'][0] . '</span>';
+                }
                 echo Functions::getOccupancyByRoomIdNextHTML($roomId);
                 break;
             default:

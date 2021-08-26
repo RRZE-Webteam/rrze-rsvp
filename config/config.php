@@ -216,6 +216,14 @@ function getFields(){
                 'default' =>  $defaults['contact_tracking_note'],
                 'sanitize_callback' => 'wp_kses_custom'                
             ],
+            [
+                'name'    => 'pdtxt',
+                'label'   => __('Note for Public Displays', 'rrze-rsvp'),
+                'desc'    => __('Allowed HTML-Tags are:', 'rrze-rsvp') . esc_html(' <' . implode('> <', array_keys(getAllowedHTML())) . '>'),
+                'type'    => 'textarea',
+                'default' =>  '',
+                'sanitize_callback' => 'wp_kses_custom'                
+            ],
         ],
         'email' => [
             [
