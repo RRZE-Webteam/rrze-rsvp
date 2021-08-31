@@ -173,6 +173,12 @@ class Email
             default:
                 break;
         }
+
+        if ($bookingMode == 'no-check' || $bookingMode == 'consultation'){
+            $showCheckinButton = false;
+            $showCheckoutButton = false;
+        }
+
         $subject = $this->placeholderParser($subject, $booking);
         $subject_en = $this->placeholderParser($subject_en, $booking);
         $text = $this->placeholderParser($text, $booking);
@@ -304,11 +310,6 @@ class Email
             $data['alt_checkout_text_en'] = 'Please check out when you leave the site.';
         } else {
             $data['show_checkout_btn'] = false;
-        }
-
-        if ($bookingMode == 'no-check'){
-            $showCheckinButton = false;
-            $showCheckoutButton = false;
         }
 
         if ($showCheckinButton || $showCheckoutButton) {

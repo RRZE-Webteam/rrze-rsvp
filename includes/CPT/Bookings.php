@@ -224,7 +224,7 @@ class Bookings {
                         );
                         $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($booking['room'], 'rrze-rsvp-room-force-to-confirm', true));
 
-                        if ($bookingMode == 'no-check'){ 
+                        if ($bookingMode == 'no-check' || $bookingMode == 'consultation'){ 
                             $checkInButton = '';
                             $checkoutButton = '';
                         }
