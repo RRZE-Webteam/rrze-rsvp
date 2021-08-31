@@ -276,11 +276,11 @@ class Actions
 	{
 		$actions = [];
 		$actions['cancel_booking'] = _x('Cancel', 'Booking', 'rrze-rsvp');
-		if (EMPTY_TRASH_DAYS) {
-			$actions['trash_booking'] = _x('Delete', 'Booking', 'rrze-rsvp');
-		} else {
-			$actions['delete_booking'] = __('Delete Permanently');
-		}
+		// if (EMPTY_TRASH_DAYS) {
+		// 	$actions['trash_booking'] = _x('Delete', 'Booking', 'rrze-rsvp');
+		// } else {
+		// 	$actions['delete_booking'] = __('Delete Permanently');
+		// }
 		return $actions;
 	}
 
