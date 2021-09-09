@@ -395,8 +395,9 @@ class Bookings extends Shortcodes {
         $output .= '<div class="form-group">'
                     . '<input type="checkbox" value="1" id="rsvp_dsgvo" name="rsvp_dsgvo" required> '
                     . '<label for="rsvp_dsgvo">' . $defaults['dsgvo-declaration'] . '</label>'
+                    . $defaults['dsgvo-supplement']
                     . '</div>';
-	$output .= '</fieldset>';  
+	$output .= '</fieldset>';
         $output .= '<button type="submit" class="btn btn-primary">' . __('Submit booking', 'rrze-rsvp') . '</button>
             </form>
         </div>';
