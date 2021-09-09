@@ -3,116 +3,961 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: rrze-rsvp\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Report-Msgid-Bugs-To: https://github.com/RRZE-Webteam/rrze-rsvp/issues\n"
-"X-Poedit-Basepath: ..\n"
-"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:"
-"1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;"
-"esc_html_x:1,2c\n"
-"X-Poedit-SearchPath-0: .\n"
-"X-Poedit-SearchPathExcluded-0: *.js\n"
-"X-Poedit-SourceCharset: UTF-8\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"POT-Creation-Date: 2020-11-11 12:06+0000\n"
-"PO-Revision-Date: 2020-12-09 12:31+0000\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rrze-rsvp\n"
+"POT-Creation-Date: 2021-09-09T09:32:19+00:00\n"
+"PO-Revision-Date: 2021-09-09 11:36+0200\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
-"X-Generator: Loco https://localise.biz/\n"
-"X-Loco-Version: 2.4.6; wp-5.6"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;"
+"_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;"
+"esc_html_e;esc_html_x:1,2c\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Poedit 3.0\n"
+"X-Loco-Version: 2.4.6; wp-5.6\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: includes/Tools.php:119
-#, php-format
-msgid "%s new seat has been created."
-msgid_plural "%s new seats have been created."
-msgstr[0] "%s Platz wurde erstellt."
-msgstr[1] "%s Plätze wurden erstellt."
+#. Plugin Name of the plugin
+#: config/config.php:147 config/config.php:148
+msgid "RRZE RSVP"
+msgstr "RRZE RSVP"
 
-#: includes/Shortcodes/Bookings.php:485 includes/Shortcodes/Bookings.php:504
-#, php-format
-msgid "<a href=\"%s\">Back to booking form &rarr;</a>"
-msgstr "<a href=\"%s\">Zurück zum Buchungsformular &rarr;</a>"
+#. Plugin URI of the plugin
+msgid "https://github.com/RRZE-Webteam/rrze-rsvp"
+msgstr "https://github.com/RRZE-Webteam/rrze-rsvp"
 
-#: includes/templates/auth/single-auth.php:45
-#, php-format
-msgid "<a href=\"%s\">Please login with your IdM username</a>."
-msgstr "<a href=\"%s\">Bitte melden Sie sich mit Ihrer IdM-Kennung an</a>."
+#. Description of the plugin
+msgid "FAU Reservation Tool"
+msgstr "Platzbuchungssystem der FAU"
 
-#: includes/Shortcodes/Bookings.php:590
+#. Author of the plugin
+msgid "RRZE-Webteam"
+msgstr "RRZE-Webteam"
+
+#. Author URI of the plugin
+msgid "https://blogs.fau.de/webworking/"
+msgstr "https://blogs.fau.de/webworking/"
+
+#: config/config.php:103
+msgid "Thank you for booking"
+msgstr "Vielen Dank für Ihre Buchung"
+
+#: config/config.php:105
 msgid ""
-"<strong>Please note that this is only a reservation request.</strong><br>It "
-"only becomes binding as soon as we confirm your booking by email."
+"We received your booking and we will notify you once it has been confirmed."
 msgstr ""
-"<strong>Bitte beachten Sie, dass dies nur eine Reservierungsanfrage ist."
-"</strong><br>Sie wird erst verbindlich, sobald wir Ihre Buchung per E-Mail "
-"bestätigen."
+"Wir haben Ihre Reservierungsanfrage erhalten und werden Sie informieren, "
+"sobald diese bearbeitet wurde."
 
-#: includes/Shortcodes/Bookings.php:484
+#: config/config.php:107
+msgid "Please confirm your booking"
+msgstr "Bitte bestätigen Sie Ihre Buchung"
+
+#: config/config.php:109
 msgid ""
-"<strong>Sorry! The seat you selected is no longer available.</strong><br>"
-"Please try again."
+"You are required to confirm the booking now. Please note that unconfirmed "
+"bookings automatically expire after one hour."
 msgstr ""
-"<strong>Der von Ihnen gewählte Platz ist nicht mehr verfügbar.</strong><br>"
-"Bitte versuchen Sie es erneut."
+"Sie müssen die Buchung jetzt bestätigen. Bitte beachten Sie, dass nicht "
+"bestätigte Buchungen automatisch nach einer Stunde verfallen."
 
-#: includes/Shortcodes/Bookings.php:503
+#: config/config.php:111
+msgid "Your booking has been confirmed"
+msgstr "Ihre Buchung wurde bestätigt."
+
+#: config/config.php:113
+msgid "We are happy to inform you that your booking has been confirmed."
+msgstr "Wir freuen uns, Ihnen mitzuteilen, dass Ihre Buchung bestätigt wurde."
+
+#: config/config.php:115
+msgid "Your booking has been cancelled"
+msgstr "Ihre Buchung wurde storniert."
+
+#: config/config.php:117
+msgid "You haven't confirmed your reservation."
+msgstr "Sie haben Ihre Reservierung nicht bestätigt."
+
+#: config/config.php:119
+msgid "You haven't checked in."
+msgstr "Sie haben nicht eingecheckt."
+
+#: config/config.php:121
+msgid "Unfortunately we have to cancel your booking on {{date}} at {{time}}."
+msgstr "Leider müssen wir die Buchung am {{date}} um {{time}} stornieren."
+
+#: config/config.php:133
+msgid "Additional informations"
+msgstr "Weitere Informationen"
+
+#: config/config.php:135
 msgid ""
-"<strong>The timeslot you selected lies in the past.</strong><br>Please try "
-"again."
+"I agree that my contact details may be stored for the duration of the "
+"booking process and for up to 4 weeks afterwards for the purpose of tracking "
+"in accordance with the legal basis for combating corona. Room managers and "
+"organizers of office hours are also given the right to inspect the following "
+"booking data for the duration of the booking process and until the end of "
+"the selected appointment: e-mail address, surname, first name. Room managers "
+"and organizers of office hours receive this data solely for the purpose of "
+"carrying out and managing the appointment in accordance with Section 6 (1) a "
+"GDPR. The telephone number is only recorded for the purpose of contact "
+"tracking due to the legal basis for fighting pandemics for health "
+"authorities."
 msgstr ""
-"<strong>Der gewählte Termin liegt in der Vergangenheit.</strong><br />Bitte "
-"versuchen Sie es erneut."
+"Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des "
+"Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der "
+"Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung "
+"gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter "
+"von Sprechstunden das Recht eingeräumt, während der Dauer des "
+"Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in "
+"folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. "
+"Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten "
+"allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a "
+"DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund "
+"der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden "
+"erfasst."
 
-#: includes/Shortcodes/Bookings.php:588
+#: config/config.php:136
 msgid ""
-"<strong>This seat has been reserved for you.</strong><br>You can cancel it "
-"at any time if you cannot keep the appointment. You can find information on "
-"this in your confirmation email."
+"<h4>Additional Requirements regarding Covid-19</h4><p>I hereby confirm with "
+"this voluntary disclosure that I comply with the currently valid "
+"requirements regarding Covid-19 vaccination, testing or recovery (‘3G-"
+"Regelung’) to enter this institution and can prove this fact with one of the "
+"following:</p><ul><li>I am fully vaccinated against Covid-19 and am in "
+"possession of proof of vaccination as defined by the Covid-19 Protective "
+"Measures Exemption Directive  <abbr title=\"COVID-19-Schutzmaßnahmen-"
+"Ausnahmenverordnung \">SchAusnahmV</abbr>.</li><li>I have recovered from an "
+"infection with Covid-19 and am in possession of proof of recovery as defined "
+"by the Covid-19 Protective Measures Exemption Directive <abbr title="
+"\"COVID-19-Schutzmaßnahmen-Ausnahmenverordnung \">SchAusnahmV</abbr>.</"
+"li><li> I have been tested and am in possession of proof of a negative test "
+"result (on paper/electronic) listed as a valid type of proof in the Bavarian "
+"Regulation on Infection Prevention and Control Measures  (please refer to  "
+"<a href=\"https://www.stmgp.bayern.de/coronavirus/rechtsgrundlagen/"
+"\">https://www.stmgp.bayern.de/coronavirus/rechtsgrundlagen/</a>)</li></"
+"ul><p><strong>Please note:</strong> You are committing an offence and could "
+"be liable for a fine if you wilfully or negligently fail to comply with the "
+"rules requiring proof of Covid-19 vaccination, testing or recovery (3G-"
+"Regelung) as set out in the current version of the Regulation on Infection "
+"Prevention and Control Measures (BayIfSMV).</p>"
 msgstr ""
-"<strong>Dieser Platz wurde für Sie reserviert.</strong><br>Sie können den "
-"Platz jederzeit stornieren, wenn Sie den Termin nicht einhalten können. "
-"Informationen dazu finden Sie in Ihrer Bestätigungs-E-Mail."
+"<h4>Ergänzende Auflagen zur 3G-Regelung</h4><p>Ich bestätige mit dieser "
+"freiwilligen Selbstauskunft die jeweils aktuell gültigen Auflagen zur 3G-"
+"Regelung zum Besuch der Einrichtung zu erfüllen und kann dies nachweisen:</"
+"p><ul><li>Vollständig gegen COVID-19 geimpft und im Besitz eines "
+"Impfnachweises im Sinne der <abbr title=“COVID-19-Schutzmaßnahmen-"
+"Ausnahmenverordnung “>SchAusnahmV</abbr>.</li><li>Genesen und im Besitz "
+"eines Genesenennachweises im Sinne der <abbr title=“COVID-19-Schutzmaßnahmen-"
+"Ausnahmenverordnung “>SchAusnahmV</abbr>.</li><li> Getestet und im Besitz "
+"eines negativen Testnachweises (schriftlich/ elektronisch), der von der "
+"<abbr title=“Bayerische Infektionsschutzmaßnahmenverordnung”>BayIfSMV</abbr> "
+"als Nachweismöglichkeit aufgeführt wird (vgl. <a href=“https://www.stmgp."
+"bayern.de/coronavirus/rechtsgrundlagen/“>https://www.stmgp.bayern.de/"
+"coronavirus/rechtsgrundlagen/</a>)</li></ul><p><strong>Hinweis:</strong> "
+"Wenn Sie vorsätzlich oder fahrlässig gegen die 3G-Regel der jeweils "
+"geltenden BayIfSMV verstoßen, handeln Sie ordnungswidrig und es kann gegen "
+"Sie ein Bußgeldverfahren eingeleitet werden.</p>"
 
-#: includes/Shortcodes/Bookings.php:467
+#: config/config.php:151
+msgid "RRZE RSVP Settings"
+msgstr "Einstellungen &rsaquo; RRZE RSVP"
+
+#: config/config.php:164
+msgid "General Settings"
+msgstr "Allgemeine Einstellungen"
+
+#: config/config.php:168
+msgid "E-Mail Settings"
+msgstr "E-Mail-Einstellungen"
+
+#: config/config.php:172
+msgid "QR PDF Settings"
+msgstr "QR-Code-Einstellungen"
+
+#: config/config.php:176
+msgid "LDAP Settings"
+msgstr "LDAP Einstellungen"
+
+#: config/config.php:180
+msgid "Reset Settings"
+msgstr "Einstellungen zurücksetzen"
+
+#: config/config.php:196
+msgid "Allowed Check-In Time."
+msgstr "Erlaubter Zeitraum für Check-In"
+
+#: config/config.php:203
+msgid "Show Availability table on Room page."
+msgstr "Zeige die verfügbaren Termine in der Raumansicht"
+
+#: config/config.php:207
+msgid "Yes (with seats linked to booking form)"
+msgstr "Ja (mit Link von den Plätzen zum Buchungsformular)"
+
+#: config/config.php:208
+msgid "Yes (no link)"
+msgstr "Ja (keine Verlinkung)"
+
+#: config/config.php:209 config/config.php:245 config/config.php:256
+msgid "No"
+msgstr "Nein"
+
+#: config/config.php:214
+msgid "Note for admins"
+msgstr "Hinweis für Administratoren"
+
+#: config/config.php:215 config/config.php:223
+msgid "Allowed HTML-Tags are:"
+msgstr "Erlaubte HTML-Tags:"
+
+#: config/config.php:222
+msgid "Note for Public Displays"
+msgstr "Hinweis für öffentliche Displays"
+
+#: config/config.php:232
+msgid "Notification email"
+msgstr "Benachrichtigungs-Adresse"
+
+#: config/config.php:233
+msgid "Email address for notifications."
+msgstr ""
+"E-Mail-Adresse für Mitteilungen und Benachrichtigungen vom Buchungssystem."
+
+#: config/config.php:240
+msgid "Booking Notification"
+msgstr "Benachrichtigung bei neuer Buchung"
+
+#: config/config.php:241
+msgid "New booking notification."
+msgstr "E-Mail erhalten, wenn eine neue Buchung eingegangen ist."
+
+#: config/config.php:244 config/config.php:255
+msgid "Yes"
+msgstr "Ja"
+
+#: config/config.php:251
+msgid "Cancel Notification"
+msgstr "Benachrichtigung bei Stornierung"
+
+#: config/config.php:252
+msgid "Notification of booking cancellation."
+msgstr "E-Mail erhalten, wenn eine Buchung storniert wurde."
+
+#: config/config.php:262 config/config.php:264
+msgid "Sender name"
+msgstr "Name des Absenders"
+
+#: config/config.php:263
+msgid "Name for Sender for the booking system."
+msgstr "Name des Absenders für E-Mails vom Buchungssystem."
+
+#: config/config.php:271
+msgid "Sender email"
+msgstr "Absender-Adresse"
+
+#: config/config.php:272
+msgid "Email address of sender."
+msgstr "E-Mail-Adresse des Absenders für E-Mails vom Buchungssystem."
+
+#: config/config.php:279
+msgid "Subject of the received booking"
+msgstr "Betreff für Reservierungsanfragen"
+
+#: config/config.php:280 config/config.php:288
+msgid "Subject of the email replying to a booking received."
+msgstr "Betreff der E-Mail, die auf eine Reservierungsanfrage antwortet."
+
+#: config/config.php:287
+msgid "Subject of the received booking (english)"
+msgstr "Betreff für Reservierungsanfragen (englisch)"
+
+#: config/config.php:296
+msgid "Text of the received booking"
+msgstr "E-Mail-Text für Reservierungsanfragen"
+
+#: config/config.php:302
+msgid "Text of the received booking (english)"
+msgstr "E-Mail-Text für Reservierungsanfragen (englisch)"
+
+#: config/config.php:309
+msgid "Subject for confirmation required."
+msgstr "Betreff \"Bestätigung erforderlich\""
+
+#: config/config.php:310 config/config.php:318
 msgid ""
-"<strong>You have already booked a seat for the specified time slot.</strong>"
-"<br>If you want to change your booking, please cancel the existing booking "
-"first. You will find the link to do so in your confirmation email."
+"Subject of the email where confirmation of the booking by the customer is "
+"required."
 msgstr ""
-"<strong>Sie haben an diesem Termin bereits einen anderen Platz gebucht."
-"</strong><br>Wenn Sie Ihre Buchung ändern möchten, stornieren Sie bitte "
-"zuerst die bestehende Buchung. Den Link dazu finden Sie in Ihrer "
-"Bestätigungs-E-Mail."
+"Betreff der E-Mail, wenn eine Bestätigung der Buchung durch den Kunden "
+"erforderlich ist."
 
-#: includes/Email.php:139
-msgid "[RSVP] Booking cancelled"
-msgstr "[RSVP] Buchung storniert"
+#: config/config.php:317
+msgid "Subject for confirmation required (english)"
+msgstr "Betreff \"Bestätigung erforderlich\" (englisch)"
 
-#: includes/Email.php:141
-msgid "A booking has been cancelled by the customer."
-msgstr "Eine Reservierung wurde durch den Bucher storniert."
+#: config/config.php:326
+msgid "Text for confirmation required"
+msgstr "E-Mail-Text \"Bestätigung erforderlich\""
 
-#: includes/Metaboxes.php:395
+#: config/config.php:332
+msgid "Text for confirmation required (english)"
+msgstr "E-Mail-Text \"Bestätigung erforderlich\" (englisch)"
+
+#: config/config.php:339
+msgid "Subject Confirmation"
+msgstr "Betreff für Buchungsbestätigung"
+
+#: config/config.php:340 config/config.php:348
+msgid "Subject for confirmation mails"
+msgstr "Betreff der E-Mail für Bestätigungen"
+
+#: config/config.php:347
+msgid "Subject Confirmation (english)"
+msgstr "Betreff für Buchungsbestätigung (englisch)"
+
+#: config/config.php:356
+msgid "Confirmation Text"
+msgstr "E-Mail-Text für Buchungsbestätigung"
+
+#: config/config.php:362
+msgid "Confirmation Text (english)"
+msgstr "E-Mail-Text für Buchungsbestätigung (englisch)"
+
+#: config/config.php:369
+msgid "Subject Cancelling"
+msgstr "Betreff für Buchungsabsagen"
+
+#: config/config.php:370 config/config.php:378
+msgid "Subject for cancelling mails"
+msgstr "Betreff der E-Mail für Buchungsabsagen"
+
+#: config/config.php:377
+msgid "Subject Cancelling (english)"
+msgstr "Betreff für Buchungsabsagen (englisch)"
+
+#: config/config.php:386
+msgid "Reason Cancelling Not Confirmed"
+msgstr "Stornierungsgrund 'Nicht bestätigt'"
+
+#: config/config.php:387 config/config.php:395
+msgid "Reason for cancelling mails because there is no confirmation"
+msgstr "Begründung für Stornierungsmails wegen fehlender Bestätigung."
+
+#: config/config.php:394
+msgid "Reason Cancelling Not Confirmed (english)"
+msgstr "Stornierungsgrund 'Nicht bestätigt' (englisch)"
+
+#: config/config.php:403
+msgid "Reason Cancelling Not Checked In"
+msgstr "Stornierungsgrund 'Nicht eingecheckt'"
+
+#: config/config.php:404 config/config.php:412
+msgid "Reason for cancelling mails because there is no check-in"
+msgstr "Begründung für Stornierungsmails wegen fehlenden Check-Ins."
+
+#: config/config.php:411
+msgid "Reason Cancelling Not Checked In (english)"
+msgstr "Stornierungsgrund 'Nicht eingecheckt' (englisch)"
+
+#: config/config.php:420
+msgid "Cancel Text"
+msgstr "E-Mail-Text für Buchungsabsagen"
+
+#: config/config.php:426
+msgid "Cancel Text (english)"
+msgstr "E-Mail-Text für Buchungsabsagen (englisch)"
+
+#: config/config.php:435
+msgid "Print FAU logo"
+msgstr "FAU-Logo drucken"
+
+#: config/config.php:441
+msgid "Print website's logo or title"
+msgstr "Das Logo oder den Titel der Website drucken"
+
+#: config/config.php:447
+msgid "Print website's URL"
+msgstr "URL der Website drucken"
+
+#: config/config.php:453 config/config.php:455
+msgid "Instructions in German"
+msgstr "Anleitung auf Deutsch"
+
+#: config/config.php:454 config/config.php:463
+msgid "This text will be shown above the QR code."
+msgstr "Dieser Text wird über dem QR Code angezeigt."
+
+#: config/config.php:462 config/config.php:464
+msgid "Instructions in English"
+msgstr "Anleitung auf Englisch"
+
+#: config/config.php:471
+msgid "Print room's text"
+msgstr "Raumbeschreibung drucken"
+
+#: config/config.php:483
+msgid "Print room's address"
+msgstr "Raumadresse drucken"
+
+#: config/config.php:495
+msgid "Print seats' equipment"
+msgstr "Platzaustattung drucken"
+
+#: config/config.php:503
+msgid "Server"
+msgstr "Server"
+
+#: config/config.php:504
 msgid ""
-"A copy of the confirmed booking will be sent to the specified email address "
-"with a calendar file (.ics) as an attachment."
+"LDAP server URL. Leave blank if you are not using LDAP as an authentication "
+"system."
 msgstr ""
-"Eine Kopie der bestätigten Buchung wird mit einer Kalenderdatei (.ics) als "
-"Anhang an die angegebene E-Mail-Adresse gesendet."
+"LDAP Server URL. Lassen Sie das Feld leer, wenn Sie LDAP nicht als "
+"Authentifizierungssystem verwenden."
 
-#: includes/Email.php:160
-msgid "A customer has checked out from a seat:"
-msgstr "Ein Bucher hat von einem Platz ausgecheckt:"
+#: config/config.php:510
+msgid "Port"
+msgstr "Port"
 
-#: includes/Tools.php:162 includes/Tools.php:176
-msgid "A-Z"
-msgstr "A-Z"
+#: config/config.php:511
+msgid "LDAP server port."
+msgstr "LDAP server port."
 
-#: includes/Actions.php:928 includes/Actions.php:1092
+#: config/config.php:517
+msgid "DN"
+msgstr "DN"
+
+#: config/config.php:518
+msgid "LDAP Distinguished Name."
+msgstr "LDAP Distinguished Name."
+
+#: config/config.php:524
+msgid "Bind Base DN"
+msgstr "Bind Base DN"
+
+#: config/config.php:525
+msgid "DN to bind on."
+msgstr "DN to bind on."
+
+#: config/config.php:531
+msgid "Search Base DN"
+msgstr "Search Base DN"
+
+#: config/config.php:532
+msgid "DN to search in."
+msgstr "DN to search in."
+
+#: config/config.php:541
+msgid "Yes, I want to reset <strong>all</strong> settings."
+msgstr "Ja, ich möchte alle Einstellungen auf ihre Standardwerte zurücksetzen."
+
+#: config/config.php:560
+msgid "RSVP Booking"
+msgstr "RSVP Buchungsformular"
+
+#: config/config.php:564 config/config.php:599 config/config.php:635
+msgid "Find the settings on the right side"
+msgstr "Die Einstellungen finden Sie auf der rechten Seite"
+
+#: config/config.php:569 config/config.php:604
+msgid "Days in advance"
+msgstr "Zeitraum für Vorabreservierung (Tage)."
+
+#: config/config.php:575 includes/CPT/Bookings.php:105 includes/CPT/CPT.php:164
+#: includes/CPT/Rooms.php:59 includes/CPT/Rooms.php:86
+#: includes/CPT/Seats.php:117 includes/Metaboxes.php:528
+#: includes/Printing/Printing.php:128 includes/Shortcodes/Bookings.php:281
+#: includes/Shortcodes/Bookings.php:574 includes/templates/single-seat.php:133
+#: includes/Tools.php:133
+msgid "Room"
+msgstr "Raum"
+
+#: config/config.php:580
+msgid "Require SSO Authentication"
+msgstr "SSO-Authentifizierung verlangen"
+
+#: config/config.php:586
+msgid "Require LDAP Authentication"
+msgstr "LDAP Authentifizierung erforderlich"
+
+#: config/config.php:595
+msgid "RSVP Availability"
+msgstr "RSVP Platzverfügbarkeit"
+
+#: config/config.php:610
+msgid "Room(s)"
+msgstr "Räume"
+
+#: config/config.php:616
+msgid "Seat(s)"
+msgstr "Plätze"
+
+#: config/config.php:621
+msgid "Show booking link"
+msgstr "Zeige Link zur Buchung"
+
+#: config/config.php:640
+msgid "Seat ID"
+msgstr "Platz-ID"
+
+#: includes/Actions.php:139
+msgid ""
+"Booking can only be checked in between 15 minutes before the start of the "
+"timeslot and the end of the timeslot."
+msgstr ""
+"Die Buchung kann nur ab 15 Minuten vor dem Start und bis zum Ende des "
+"gebuchten Termins eingecheckt werden."
+
+#: includes/Actions.php:140 includes/Actions.php:615 includes/Actions.php:759
+#: includes/Actions.php:837
+msgid "Update Error"
+msgstr "Aktualisierungsfehler"
+
+#: includes/Actions.php:198 includes/Actions.php:296
+msgctxt "Booking"
+msgid "Delete"
+msgstr "Löschen"
+
+#: includes/Actions.php:253
+msgctxt "Room|Seat"
+msgid "Delete"
+msgstr "Löschen"
+
+#: includes/Actions.php:278 includes/Actions.php:1062
+#: includes/CPT/Bookings.php:209 includes/Email.php:255
+msgctxt "Booking"
+msgid "Cancel"
+msgstr "Stornieren"
+
+#: includes/Actions.php:602
+msgid "This item cannot be deleted."
+msgstr "Dieser Eintrag kann nicht gelöscht werden."
+
+#: includes/Actions.php:608
+msgid "This item cannot be updated."
+msgstr "Dieser Eintrag kann nicht aktualisiert werden."
+
+#: includes/Actions.php:694
+msgid "Seat unavailable."
+msgstr "Sitzplatz nicht verfügbar."
+
+#: includes/Actions.php:721
+msgid "This item is used in a booking and cannot be deleted."
+msgstr ""
+"Dieses Objekt kann nicht gelöscht werden, da bereits Buchungen für dieses "
+"Objekt vorliegen."
+
+#: includes/Actions.php:726
+msgid ""
+"This item is used in a booking and cannot be set to draft, to private or "
+"scheduled to be published in a future date."
+msgstr ""
+"Dieses Objekt kann nicht auf Entwurf, Privat oder ein zukünftiges "
+"Veröffentlichungsdatum gesetzt werden, da bereits Buchungen für dieses "
+"Objekt vorliegen."
+
+#: includes/Actions.php:731
+msgid "This item is used in a booking and cannot be password protected."
+msgstr ""
+"Dieses Objekt kann nicht passwortgeschützt werden, da bereits Buchtungen für "
+"dieses Objekt vorliegen."
+
+#: includes/Actions.php:748
+msgid ""
+"Unable to save post: End time must be greater than start time in timeslot "
+"no. %s."
+msgid_plural ""
+"Unable to save post: End time must be greater than start time in timeslots "
+"no. %s."
+msgstr[0] ""
+"Änderungen konnten nicht gespeichert werden: Die Endzeit muss nach der "
+"Startzeit liegen in Termin Nr. %s."
+msgstr[1] ""
+"Änderungen konnten nicht gespeichert werden: Die Endzeit muss nach der "
+"Startzeit liegen in Terminen Nr. %s."
+
+#: includes/Actions.php:829
+msgid ""
+"This seat is used in a booking and cannot be assigned to a different room."
+msgstr ""
+"Dieser Platz kann keinem anderen Raum zugeordnet werden, da bereits "
+"Buchungen für diesen Platz vorliegen."
+
+#: includes/Actions.php:932 includes/Actions.php:942 includes/Actions.php:1088
+msgid "Booking Confirmed"
+msgstr "Buchung bestätigt"
+
+#: includes/Actions.php:933 includes/Actions.php:938
+msgid "The booking has been %s"
+msgstr "Die Buchung wurde %s"
+
+#: includes/Actions.php:933 includes/Actions.php:943
+msgctxt "Booking"
+msgid "confirmed"
+msgstr "bestätigt"
+
+#: includes/Actions.php:934
+msgid "Your customer has received an email confirmation."
+msgstr "Der Bucher hat eine E-Mail-Bestätigung erhalten."
+
+#: includes/Actions.php:937 includes/Actions.php:946 includes/Actions.php:1074
+#: includes/Actions.php:1081
+msgid "Booking Cancelled"
+msgstr "Buchung storniert"
+
+#: includes/Actions.php:938 includes/Actions.php:947
+msgctxt "Booking"
+msgid "cancelled"
+msgstr "storniert"
+
+#: includes/Actions.php:939
+msgid "Your customer has received an email cancellation."
+msgstr "Der Bucher hat eine E-Mail-Stornierung erhalten."
+
+#: includes/Actions.php:943 includes/Actions.php:947
+msgid "The booking has already been %s."
+msgstr "Die Buchung wurde bereits %s."
+
+#: includes/Actions.php:950 includes/Actions.php:1118
 msgid "Action not available"
 msgstr "Aktion nicht verfügbar"
+
+#: includes/Actions.php:951 includes/Actions.php:1119
+msgid "No action was taken."
+msgstr "Es wurde keine Änderung vorgenommen."
+
+#: includes/Actions.php:955 includes/CPT/Bookings.php:107
+#: includes/Email.php:213 includes/Email.php:338
+msgid "Name"
+msgstr "Name"
+
+#: includes/Actions.php:956 includes/CPT/Bookings.php:108
+#: includes/Email.php:214 includes/Email.php:339 includes/Metaboxes.php:195
+#: includes/Shortcodes/Bookings.php:330 includes/Shortcodes/Bookings.php:339
+#: includes/Shortcodes/Bookings.php:368 includes/Tracking.php:150
+msgid "Email"
+msgstr "E-Mail"
+
+#: includes/Actions.php:1067 includes/ICS.php:43
+msgid "Cancel Booking"
+msgstr "Buchung stornieren"
+
+#: includes/Actions.php:1068
+msgid "Do you really want to cancel your booking?"
+msgstr "Wollen Sie wirklich Ihre Buchung stornieren?"
+
+#: includes/Actions.php:1075
+msgid ""
+"Your booking has been cancelled. Please contact us to find a different "
+"arrangement."
+msgstr ""
+"Ihre Buchung wurde storniert. Bitte setzen Sie sich mit uns in Verbindung um "
+"eine alternative Terminmöglichkeit zu finden."
+
+#: includes/Actions.php:1082
+msgid "The booking is already canceled."
+msgstr "Die Buchung ist bereits storniert."
+
+#: includes/Actions.php:1089
+msgid "Thank you for confirming your booking."
+msgstr "Vielen Dank für die Bestätigung der Buchung."
+
+#: includes/Actions.php:1094
+msgid "Booking Check In"
+msgstr "Buchung einchecken"
+
+#: includes/Actions.php:1095
+msgid "Check in is not possible at this time."
+msgstr "Einchecken ist derzeit nicht möglich."
+
+#: includes/Actions.php:1100 includes/templates/single-seat.php:146
+#: includes/templates/single-seat.php:190
+msgid "Booking Checked In"
+msgstr "Buchung eingecheckt"
+
+#: includes/Actions.php:1101 includes/templates/single-seat.php:147
+#: includes/templates/single-seat.php:191
+msgid "Check in has been completed."
+msgstr "Der Einchecken wurde erfolgreich ausgeführt."
+
+#: includes/Actions.php:1106
+msgid "Booking Check Out"
+msgstr "Buchung auschecken"
+
+#: includes/Actions.php:1107
+msgid "Check-out is not possible at this time."
+msgstr "Auschecken ist derzeit nicht möglich."
+
+#: includes/Actions.php:1112 includes/templates/single-seat.php:205
+msgid "Booking Checked Out"
+msgstr "Buchung ausgecheckt"
+
+#: includes/Actions.php:1113 includes/templates/single-seat.php:206
+msgid "Check-out has been completed."
+msgstr "Sie wurden erfolgreich ausgecheckt."
+
+#: includes/API.php:108 includes/API.php:127 includes/API.php:145
+#: includes/API.php:163
+msgid "message"
+msgstr "Nachricht"
+
+#: includes/Auth/IdM.php:62
+msgid "No name"
+msgstr "Kein Name"
+
+#: includes/Auth/IdM.php:69 includes/Auth/LDAP.php:80
+msgid "no@email"
+msgstr "keine@email"
+
+#: includes/CPT/Bookings.php:54
+msgctxt "Post type general name"
+msgid "Bookings"
+msgstr "Buchungen"
+
+#: includes/CPT/Bookings.php:55
+msgctxt "Post type singular name"
+msgid "Booking"
+msgstr "Buchung"
+
+#: includes/CPT/Bookings.php:56
+msgctxt "Admin Menu text"
+msgid "Bookings"
+msgstr "Buchungen"
+
+#: includes/CPT/Bookings.php:57
+msgctxt "Add New on Toolbar"
+msgid "Booking"
+msgstr "Buchung"
+
+#: includes/CPT/Bookings.php:58 includes/CPT/Rooms.php:37
+#: includes/CPT/Seats.php:46
+msgid "Add New"
+msgstr "Erstellen"
+
+#: includes/CPT/Bookings.php:59
+msgid "Add New Booking"
+msgstr "Buchung erstellen"
+
+#: includes/CPT/Bookings.php:60
+msgid "New Booking"
+msgstr "Neue Buchung"
+
+#: includes/CPT/Bookings.php:61
+msgid "Edit Booking"
+msgstr "Buchung bearbeiten"
+
+#: includes/CPT/Bookings.php:62
+msgid "View Booking"
+msgstr "Buchung ansehen"
+
+#: includes/CPT/Bookings.php:63
+msgid "All Bookings"
+msgstr "Alle Buchungen"
+
+#: includes/CPT/Bookings.php:64
+msgid "Search Bookings"
+msgstr "Buchungen durchsuchen"
+
+#: includes/CPT/Bookings.php:65
+msgid "No Bookings found."
+msgstr "Es wurden keine Buchungen gefunden."
+
+#: includes/CPT/Bookings.php:66
+msgid "No Bookings found in Trash."
+msgstr "Es wurde keine Buchungen im Papierkorb gefunden."
+
+#: includes/CPT/Bookings.php:67
+msgctxt ""
+"The post type archive label used in nav menus. Default “Post Archives”. "
+"Added in 4.4"
+msgid "Booking archives"
+msgstr "Buchungshistorie"
+
+#: includes/CPT/Bookings.php:68
+msgctxt ""
+"Screen reader text for the filter links heading on the post type listing "
+"screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+msgid "Filter Bookings list"
+msgstr "Buchungsliste filtern"
+
+#: includes/CPT/Bookings.php:69
+msgctxt ""
+"Screen reader text for the pagination heading on the post type listing "
+"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+msgid "Bookings list navigation"
+msgstr "Navigation der Buchungsliste"
+
+#: includes/CPT/Bookings.php:70
+msgctxt ""
+"Screen reader text for the items list heading on the post type listing "
+"screen. Default “Posts list”/”Pages list”. Added in 4.4"
+msgid "Bookings list"
+msgstr "Buchungsliste"
+
+#: includes/CPT/Bookings.php:74 includes/Main.php:62
+#: includes/templates/single-seat.php:215
+msgid "Booking"
+msgstr "Buchung"
+
+#: includes/CPT/Bookings.php:75
+msgid "Add and edit Booking informations"
+msgstr "Buchungsinformationen hinzufügen oder bearbeiten"
+
+#: includes/CPT/Bookings.php:103 includes/Shortcodes/Availability.php:133
+#: includes/Shortcodes/Bookings.php:279 includes/Shortcodes/Bookings.php:570
+msgid "Date"
+msgstr "Datum"
+
+#: includes/CPT/Bookings.php:104 includes/Shortcodes/Bookings.php:280
+#: includes/Shortcodes/Bookings.php:572
+msgid "Time"
+msgstr "Zeit"
+
+#: includes/CPT/Bookings.php:106 includes/CPT/Seats.php:68
+#: includes/CPT/Seats.php:116 includes/Functions.php:113
+#: includes/Functions.php:221 includes/Metaboxes.php:103
+#: includes/Printing/Printing.php:140 includes/Shortcodes/Bookings.php:282
+#: includes/Shortcodes/Bookings.php:576
+msgid "Seat"
+msgstr "Platz"
+
+#: includes/CPT/Bookings.php:110 includes/Metaboxes.php:206
+#: includes/Tracking.php:155
+msgid "Phone"
+msgstr "Telefon"
+
+#: includes/CPT/Bookings.php:112 includes/Metaboxes.php:155
+msgid "Status"
+msgstr "Status"
+
+#: includes/CPT/Bookings.php:162
+msgid "Booked on"
+msgstr "Gebucht am"
+
+#: includes/CPT/Bookings.php:170 includes/CPT/Bookings.php:192
+#: includes/Main.php:135
+msgctxt "Booking"
+msgid "Cancelled"
+msgstr "Storniert"
+
+#: includes/CPT/Bookings.php:173
+msgctxt "Booking"
+msgid "Booked"
+msgstr "Gebucht"
+
+#: includes/CPT/Bookings.php:176 includes/Main.php:136
+msgctxt "Booking"
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+#: includes/CPT/Bookings.php:179 includes/CPT/Bookings.php:235
+#: includes/CPT/Bookings.php:250
+msgctxt "Booking"
+msgid "Checked-In"
+msgstr "Eingecheckt"
+
+#: includes/CPT/Bookings.php:182 includes/CPT/Bookings.php:238
+#: includes/CPT/Bookings.php:252
+msgctxt "Booking"
+msgid "Checked-Out"
+msgstr "Ausgecheckt"
+
+#: includes/CPT/Bookings.php:216
+msgctxt "Booking"
+msgid "Check-In"
+msgstr "Einchecken"
+
+#: includes/CPT/Bookings.php:223
+msgctxt "Booking"
+msgid "Check-Out"
+msgstr "Auschecken"
+
+#: includes/CPT/Bookings.php:246
+msgctxt "Booking"
+msgid "Waiting for customer confirmation"
+msgstr "Bestätigung durch Bucher ausstehend"
+
+#: includes/CPT/Bookings.php:259 includes/Email.php:232
+msgctxt "Booking"
+msgid "Confirm"
+msgstr "Bestätigen"
+
+#: includes/CPT/Bookings.php:286
+msgid "Select timeslot"
+msgstr "Termin auswählen."
+
+#: includes/CPT/Bookings.php:295
+msgid "No timeslots available for this seat/day."
+msgstr "Für diesen Platz / Tag sind keine Termine verfügbar."
+
+#: includes/CPT/Bookings.php:308
+msgid "Show all dates"
+msgstr "Alle Termine anzeigen"
+
+#: includes/CPT/Bookings.php:309
+msgid "Show all time slots"
+msgstr "Alle Zeiträume anzeigen"
+
+#: includes/CPT/Bookings.php:310 includes/CPT/Seats.php:148
+msgid "Show all rooms"
+msgstr "Alle Räume anzeigen"
+
+#: includes/CPT/CPT.php:91 includes/CPT/CPT.php:92
+#: includes/Shortcodes/Bookings.php:1239 includes/templates/single-seat.php:35
+#: includes/Tools.php:186
+msgid "Equipment"
+msgstr "Ausstattung"
+
+#: includes/CPT/CPT.php:99 includes/Functions.php:84
+msgid "Room occupancy for today"
+msgstr "Raumbelegung heute"
+
+#: includes/CPT/CPT.php:100
+msgid "Room occupancy"
+msgstr "Raumbelegung"
+
+#: includes/CPT/CPT.php:160
+msgctxt "admin page title"
+msgid "Room occupancy for today"
+msgstr "Raumbelegung heute"
+
+#: includes/CPT/CPT.php:167
+msgid "Please select room"
+msgstr "Bitte wählen Sie einen Raum"
+
+#: includes/CPT/CPT.php:251
+msgid "Shortcodes"
+msgstr "Shortcodes"
+
+#: includes/CPT/CPT.php:256
+msgid ""
+"You can display a booking form or a table with the available time slots for "
+"this room by adding one of the following shortcodes to any page:"
+msgstr ""
+"Mit den folgenden Shortcodes können Sie ein Buchungsformular oder eine "
+"Übersicht über die verfügbaren Termine für diesen Raum auf jeder beliebigen "
+"Seite hinzufügen:"
+
+#: includes/CPT/CPT.php:257
+msgid "Booking Form"
+msgstr "Buchungsformular"
+
+#: includes/CPT/CPT.php:259
+msgid ""
+"Add <code>days=\"20\"</code> to overwrite the number of days you can book a "
+"seat in advance."
+msgstr ""
+"Fügen Sie <code>days=\"20\"</code> hinzu, um den Zeitraum für "
+"Vorabreservierung zu überschreiben."
+
+#: includes/CPT/CPT.php:261
+msgid "Availability Table"
+msgstr "Verfügbarkeit"
 
 #: includes/CPT/CPT.php:263
 msgid ""
@@ -128,348 +973,424 @@ msgstr ""
 "Mit <code>days=\"20\"</code> überschreiben Sie die Anzahlt der angezeigten "
 "Tage."
 
-#: includes/CPT/CPT.php:259
-msgid ""
-"Add <code>days=\"20\"</code> to overwrite the number of days you can book a "
-"seat in advance."
-msgstr ""
-"Fügen Sie <code>days=\"20\"</code> hinzu, um den Zeitraum für "
-"Vorabreservierung zu überschreiben."
+#: includes/CPT/Rooms.php:33
+msgctxt "Post type general name"
+msgid "Rooms"
+msgstr "Räume"
 
-#: includes/CPT/Bookings.php:74
-msgid "Add and edit Booking informations"
-msgstr "Buchungsinformationen hinzufügen oder bearbeiten"
-
-#: includes/CPT/Rooms.php:60
-msgid "Add and edit room informations"
-msgstr "Rauminformationen hinzufügen oder bearbeiten"
-
-#: includes/CPT/Seats.php:69
-msgid "Add and edit seat informations"
-msgstr "Informationen zum Platz hinzufügen oder bearbeiten"
-
-#: includes/CPT/Seats.php:46 includes/CPT/Bookings.php:57
-#: includes/CPT/Rooms.php:37
-msgid "Add New"
-msgstr "Erstellen"
-
-#: includes/CPT/Bookings.php:58
-msgid "Add New Booking"
-msgstr "Buchung erstellen"
-
-#: includes/CPT/Bookings.php:56
-msgctxt "Add New on Toolbar"
-msgid "Booking"
-msgstr "Buchung"
-
-#: includes/CPT/Rooms.php:36
-msgctxt "Add New on Toolbar"
+#: includes/CPT/Rooms.php:34
+msgctxt "Post type singular name"
 msgid "Room"
 msgstr "Raum"
-
-#: includes/CPT/Seats.php:45
-msgctxt "Add New on Toolbar"
-msgid "Seat"
-msgstr "Platz"
-
-#: includes/CPT/Rooms.php:38
-msgid "Add New Room"
-msgstr "Raum erstellen"
-
-#: includes/CPT/Seats.php:47
-msgid "Add New Seat"
-msgstr "Platz erstellen"
-
-#: includes/Metaboxes.php:394
-msgid "Additional ICS email"
-msgstr "Zusätzliche Kalender-Mail"
-
-#: includes/Metaboxes.php:447
-msgid "Additional information"
-msgstr "Weitere Informationen"
-
-#: includes/templates/single-seat.php:121
-#: includes/templates/single-seat.php:130
-#, php-format
-msgid ""
-"Additional information has been sent to your email address <strong>"
-"%s</strong>."
-msgstr ""
-"Zusätzliche Informationen wurden an Ihre E-Mail-Adresse <strong>%s</strong> "
-"gesendet."
-
-#: config/config.php:126
-msgid "Additional informations"
-msgstr "Weitere Informationen"
-
-#: includes/Tracking.php:81 includes/Tracking.php:92
-msgctxt "admin menu entry title"
-msgid "RSVP Contact tracking"
-msgstr "RSVP Kontaktverfolgung"
-
-#: includes/Tools.php:22
-msgctxt "admin menu entry title"
-msgid "RSVP Create Seats"
-msgstr "RSVP Platzgenerator"
-
-#: includes/CPT/Bookings.php:55
-msgctxt "Admin Menu text"
-msgid "Bookings"
-msgstr "Buchungen"
 
 #: includes/CPT/Rooms.php:35
 msgctxt "Admin Menu text"
 msgid "Rooms"
 msgstr "Räume"
 
-#: includes/CPT/Seats.php:44
-msgctxt "Admin Menu text"
-msgid "Seats"
-msgstr "Plätze"
+#: includes/CPT/Rooms.php:36
+msgctxt "Add New on Toolbar"
+msgid "Room"
+msgstr "Raum"
 
-#: includes/Tracking.php:80 includes/Tracking.php:91 includes/Tracking.php:110
-#: includes/Tracking.php:168
-msgctxt "admin page title"
-msgid "Contact tracking"
-msgstr "Kontaktverfolgung"
+#: includes/CPT/Rooms.php:38
+msgid "Add New Room"
+msgstr "Raum erstellen"
 
-#: includes/Tools.php:21 includes/Tools.php:41
-msgctxt "admin page title"
-msgid "Create Seats"
-msgstr "Platzgenerator"
+#: includes/CPT/Rooms.php:39
+msgid "New Room"
+msgstr "Neuer Raum"
 
-#: includes/CPT/CPT.php:160
-msgctxt "admin page title"
-msgid "Room occupancy for today"
-msgstr "Raumbelegung heute"
+#: includes/CPT/Rooms.php:40
+msgid "Edit Room"
+msgstr "Raum bearbeiten"
 
-#: includes/CPT/Bookings.php:62
-msgid "All Bookings"
-msgstr "Alle Buchungen"
+#: includes/CPT/Rooms.php:41
+msgid "View Room"
+msgstr "Raum ansehen"
 
 #: includes/CPT/Rooms.php:42
 msgid "All Rooms"
 msgstr "Alle Räume"
 
+#: includes/CPT/Rooms.php:43
+msgid "Search Rooms"
+msgstr "Räume durchsuchen"
+
+#: includes/CPT/Rooms.php:44
+msgid "No Rooms found."
+msgstr "Keine Räume gefunden."
+
+#: includes/CPT/Rooms.php:45
+msgid "No Rooms found in Trash."
+msgstr "Es wurden keine Räume im Papierkorb gefunden."
+
+#: includes/CPT/Rooms.php:46
+msgctxt ""
+"Overrides the “Featured Image” phrase for this post type. Added in 4.3"
+msgid "Room Image"
+msgstr "Raumbild"
+
+#: includes/CPT/Rooms.php:47
+msgctxt ""
+"Overrides the “Set featured image” phrase for this post type. Added in 4.3"
+msgid "Set room image"
+msgstr "Raumbild festlegen"
+
+#: includes/CPT/Rooms.php:48
+msgctxt ""
+"Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
+msgid "Remove room image"
+msgstr "Raumbild entfernen"
+
+#: includes/CPT/Rooms.php:49
+msgctxt ""
+"Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
+msgid "Use as Room image"
+msgstr "Als Raumbild verwenden"
+
+#: includes/CPT/Rooms.php:50
+msgctxt ""
+"The post type archive label used in nav menus. Default “Post Archives”. "
+"Added in 4.4"
+msgid "Room archives"
+msgstr "Raumindex"
+
+#: includes/CPT/Rooms.php:51
+msgctxt ""
+"Overrides the “Insert into post”/”Insert into page” phrase (used when "
+"inserting media into a post). Added in 4.4"
+msgid "Insert into Room"
+msgstr "Zum Raum hinzufügen"
+
+#: includes/CPT/Rooms.php:52
+msgctxt ""
+"Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used "
+"when viewing media attached to a post). Added in 4.4"
+msgid "Uploaded to this Room"
+msgstr "Zum Raum hochladen"
+
+#: includes/CPT/Rooms.php:53
+msgctxt ""
+"Screen reader text for the filter links heading on the post type listing "
+"screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+msgid "Filter Rooms list"
+msgstr "Raumliste filtern"
+
+#: includes/CPT/Rooms.php:54
+msgctxt ""
+"Screen reader text for the pagination heading on the post type listing "
+"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+msgid "Rooms list navigation"
+msgstr "Navigation der Raumliste"
+
+#: includes/CPT/Rooms.php:55
+msgctxt ""
+"Screen reader text for the items list heading on the post type listing "
+"screen. Default “Posts list”/”Pages list”. Added in 4.4"
+msgid "Rooms list"
+msgstr "Raumliste"
+
+#: includes/CPT/Rooms.php:60
+msgid "Add and edit room informations"
+msgstr "Rauminformationen hinzufügen oder bearbeiten"
+
+#: includes/CPT/Seats.php:42
+msgctxt "Post type general name"
+msgid "Seats"
+msgstr "Plätze"
+
+#: includes/CPT/Seats.php:43
+msgctxt "Post type singular name"
+msgid "Seat"
+msgstr "Platz"
+
+#: includes/CPT/Seats.php:44
+msgctxt "Admin Menu text"
+msgid "Seats"
+msgstr "Plätze"
+
+#: includes/CPT/Seats.php:45
+msgctxt "Add New on Toolbar"
+msgid "Seat"
+msgstr "Platz"
+
+#: includes/CPT/Seats.php:47
+msgid "Add New Seat"
+msgstr "Platz erstellen"
+
+#: includes/CPT/Seats.php:48
+msgid "New Seat"
+msgstr "Neuer Platz"
+
+#: includes/CPT/Seats.php:49
+msgid "Edit Seat"
+msgstr "Platz bearbeiten"
+
+#: includes/CPT/Seats.php:50
+msgid "View Seat"
+msgstr "Zeige Platz"
+
 #: includes/CPT/Seats.php:51
 msgid "All Seats"
 msgstr "Alle Plätze"
 
-#: includes/Metaboxes.php:402
-msgid "Allow Instant Check-In"
-msgstr "Erlaube das Einchecken ohne vorherige Platzreservierung"
+#: includes/CPT/Seats.php:52
+msgid "Search Seats"
+msgstr "Plätze durchsuchen"
 
-#: includes/Metaboxes.php:422
-msgid "Allowed Check-In Time (minutes)"
-msgstr "Erlaubter Zeitraum für Check-In (in Minuten)"
+#: includes/CPT/Seats.php:53
+msgid "No Seats found."
+msgstr "Es wurden keine Plätze gefunden."
 
-#: config/config.php:188
-msgid "Allowed Check-In Time."
-msgstr "Erlaubter Zeitraum für Check-In"
+#: includes/CPT/Seats.php:54
+msgid "No Seats found in Trash."
+msgstr "Es wurden keine Plätze im Papierkorb gefunden."
 
-#: config/config.php:207
-msgid "Allowed HTML-Tags are:"
-msgstr "Erlaubte HTML-Tags:"
+#: includes/CPT/Seats.php:55
+msgctxt ""
+"Overrides the “Featured Image” phrase for this post type. Added in 4.3"
+msgid "Seat Image"
+msgstr "Platzbild"
 
-#: includes/Shortcodes/Bookings.php:578
-msgid ""
-"An email with the confirmation link and your booking information has been "
-"sent to your email address.<br><strong>Please note that unconfirmed bookings "
-"automatically expire after one hour.</strong>"
+#: includes/CPT/Seats.php:56
+msgctxt ""
+"Overrides the “Set featured image” phrase for this post type. Added in 4.3"
+msgid "Set seat image"
+msgstr "Platzbild festlegen"
+
+#: includes/CPT/Seats.php:57
+msgctxt ""
+"Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
+msgid "Remove seat image"
+msgstr "Platzbild entfernen"
+
+#: includes/CPT/Seats.php:58
+msgctxt ""
+"Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
+msgid "Use as Seat image"
+msgstr "Als Platzbild verwenden"
+
+#: includes/CPT/Seats.php:59
+msgctxt ""
+"The post type archive label used in nav menus. Default “Post Archives”. "
+"Added in 4.4"
+msgid "Seat archives"
+msgstr "Plätze "
+
+#: includes/CPT/Seats.php:60
+msgctxt ""
+"Overrides the “Insert into post”/”Insert into page” phrase (used when "
+"inserting media into a post). Added in 4.4"
+msgid "Insert into Seat"
+msgstr "Zum Platz hinzufügen"
+
+#: includes/CPT/Seats.php:61
+msgctxt ""
+"Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used "
+"when viewing media attached to a post). Added in 4.4"
+msgid "Uploaded to this Seat"
+msgstr "Zum Platz hochladen"
+
+#: includes/CPT/Seats.php:62
+msgctxt ""
+"Screen reader text for the filter links heading on the post type listing "
+"screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+msgid "Filter Seats list"
+msgstr "Platzliste filtern"
+
+#: includes/CPT/Seats.php:63
+msgctxt ""
+"Screen reader text for the pagination heading on the post type listing "
+"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+msgid "Seats list navigation"
+msgstr "Navigation der Platzliste"
+
+#: includes/CPT/Seats.php:64
+msgctxt ""
+"Screen reader text for the items list heading on the post type listing "
+"screen. Default “Posts list”/”Pages list”. Added in 4.4"
+msgid "Seats list"
+msgstr "Platzliste"
+
+#: includes/CPT/Seats.php:69
+msgid "Add and edit seat informations"
+msgstr "Informationen zum Platz hinzufügen oder bearbeiten"
+
+#: includes/CPT/Seats.php:95
+msgctxt "taxonomy general name"
+msgid "Equipment"
+msgstr "Ausstattung"
+
+#: includes/CPT/Seats.php:96
+msgctxt "taxonomy singular name"
+msgid "Equipment"
+msgstr "Ausstattung"
+
+#: includes/Email.php:81 includes/Email.php:107
+msgctxt "Mail Subject for room admin: new booking received"
+msgid "[RSVP] Confirm new booking"
+msgstr "[RSVP] Neue Buchung bestätigen"
+
+#: includes/Email.php:83 includes/Email.php:109
+msgid "You received a new request for a booking."
+msgstr "Sie erhielten eine neue Reservierungsanfrage."
+
+#: includes/Email.php:132
+msgctxt "Mail Subject for room admin: new booking received"
+msgid "[RSVP] New booking"
+msgstr "[RSVP] Neue Buchung"
+
+#: includes/Email.php:134
+msgid "You received a new booking."
+msgstr "Sie haben eine neue Buchung erhalten."
+
+#: includes/Email.php:139
+msgid "[RSVP] Booking cancelled"
+msgstr "[RSVP] Buchung storniert"
+
+#: includes/Email.php:141
+msgid "A booking has been cancelled by the customer."
+msgstr "Eine Reservierung wurde durch den Bucher storniert."
+
+#: includes/Email.php:168
+msgid "Seat checked out"
+msgstr "Platz wurde ausgecheckt"
+
+#: includes/Email.php:170
+msgid "A customer has checked out from a seat:"
+msgstr "Ein Bucher hat von einem Platz ausgecheckt:"
+
+#: includes/Email.php:221 includes/Email.php:223
+msgid "Please confirm the customer's booking."
+msgstr "Bitte bestätigen Sie die Buchung."
+
+#: includes/Email.php:227 includes/Email.php:229
+msgid "Please confirm your booking now."
+msgstr "Bitte bestätigen Sie Ihre Buchung jetzt."
+
+#: includes/Email.php:250 includes/Email.php:252
+msgid "Please cancel your booking in time if your plans change."
 msgstr ""
-"Eine E-Mail mit dem Bestätigungslink und Ihren Buchungsinformationen wurde "
-"an Ihre E-Mail-Adresse geschickt.<br><strong>Bitte beachten Sie, dass "
-"unbestätigte Buchungen automatisch nach einer Stunde verfallen.</strong>"
+"Bitte stornieren Sie Ihre Buchung rechtzeitig, wenn sich Ihre Pläne ändern."
 
-#: includes/templates/auth/single-auth.php:86
-msgid "Authentication Required"
-msgstr "Authentifizierung erforderlich"
-
-#: includes/Metaboxes.php:367
-msgid "Automatic confirmation"
-msgstr "Automatische Bestätigung"
-
-#: includes/templates/single-room.php:174
-#: includes/templates/single-room.php:191
-msgid "Availability"
-msgstr "Verfügbarkeit"
-
-#: includes/templates/single-seat.php:373
-msgid "Availability information"
-msgstr "Freie Termine für diesen Platz"
-
-#: includes/CPT/CPT.php:261
-msgid "Availability Table"
-msgstr "Verfügbarkeit"
-
-#: includes/Metaboxes.php:354
-msgid "Available days in advance"
-msgstr "Zeitraum für Vorabreservierung"
-
-#: includes/Shortcodes/Bookings.php:1273
-msgid "Available seats:"
-msgstr "Verfügbare Plätze:"
-
-#: includes/Shortcodes/Availability.php:134
-msgid "Available Time Slots"
-msgstr "Freie Termine"
-
-#: includes/Shortcodes/Bookings.php:297
-msgid "Available time slots:"
-msgstr "Freie Termine:"
-
-#: config/config.php:508
-msgid "Bind Base DN"
-msgstr ""
-
-#: includes/Shortcodes/Bookings.php:260
-msgid "Book a seat at"
-msgstr "Platz buchen in"
-
-#: includes/Shortcodes/Availability.php:79
-#: includes/Shortcodes/Availability.php:144
-msgid "Book this seat/timeslot now"
-msgstr "Platz/Termin jetzt buchen"
-
-#: includes/CPT/Bookings.php:161
-msgid "Booked on"
-msgstr "Gebucht am"
-
-#: includes/Main.php:62 includes/CPT/Bookings.php:73
-#: includes/templates/single-seat.php:196
-msgid "Booking"
-msgstr "Buchung"
-
-#: includes/CPT/Bookings.php:171
-msgctxt "Booking"
-msgid "Booked"
-msgstr "Gebucht"
-
-#: includes/Email.php:239 includes/Actions.php:270 includes/Actions.php:1036
-#: includes/CPT/Bookings.php:205
-msgctxt "Booking"
-msgid "Cancel"
-msgstr "Stornieren"
-
-#: includes/Main.php:135 includes/CPT/Bookings.php:168
-#: includes/CPT/Bookings.php:190
-msgctxt "Booking"
-msgid "Cancelled"
-msgstr "Storniert"
-
-#: includes/Actions.php:916 includes/Actions.php:925
-msgctxt "Booking"
-msgid "cancelled"
-msgstr "storniert"
-
-#: includes/CPT/Bookings.php:212
-msgctxt "Booking"
-msgid "Check-In"
+#: includes/Email.php:266 includes/templates/single-seat.php:306
+#: includes/templates/single-seat.php:375
+#: includes/templates/single-seat.php:378
+msgid "Check In"
 msgstr "Einchecken"
 
-#: includes/CPT/Bookings.php:219
-msgctxt "Booking"
-msgid "Check-Out"
+#: includes/Email.php:287 includes/Email.php:289
+msgid "Please check-in your booking on site until %s."
+msgstr "Bitte checken Sie Ihre Buchung vor Ort bis spätestens %s ein."
+
+#: includes/Email.php:292 includes/Email.php:294
+msgid "Please check-in your booking on site."
+msgstr "Bitte checken Sie Ihre Buchung vor Ort ein."
+
+#: includes/Email.php:305 includes/templates/single-seat.php:325
+msgid "Check Out"
 msgstr "Auschecken"
 
-#: includes/CPT/Bookings.php:177 includes/CPT/Bookings.php:227
-msgctxt "Booking"
-msgid "Checked-In"
-msgstr "Eingecheckt"
+#: includes/Email.php:307 includes/Email.php:309
+#: includes/templates/single-seat.php:149
+#: includes/templates/single-seat.php:192
+msgid "Please check out when you leave the site."
+msgstr "Bitte checken Sie aus, wenn Sie den Raum verlassen."
 
-#: includes/CPT/Bookings.php:180 includes/CPT/Bookings.php:229
-msgctxt "Booking"
-msgid "Checked-Out"
-msgstr "Ausgecheckt"
+#: includes/Email.php:336
+msgid "New confirmed booking"
+msgstr "Neue bestätigte Buchung"
 
-#: includes/Email.php:216 includes/CPT/Bookings.php:236
-msgctxt "Booking"
-msgid "Confirm"
-msgstr "Bestätigen"
-
-#: includes/Main.php:136 includes/CPT/Bookings.php:174
-msgctxt "Booking"
-msgid "Confirmed"
-msgstr "Bestätigt"
-
-#: includes/Actions.php:911 includes/Actions.php:921
-msgctxt "Booking"
-msgid "confirmed"
-msgstr "bestätigt"
-
-#: includes/Actions.php:190 includes/Actions.php:272 includes/Actions.php:288
-msgctxt "Booking"
-msgid "Delete"
-msgstr "Löschen"
-
-#: includes/CPT/Bookings.php:196
-msgctxt "Booking"
-msgid "Restore"
-msgstr "Zurücksetzen"
-
-#: includes/CPT/Bookings.php:223
-msgctxt "Booking"
-msgid "Waiting for customer confirmation"
-msgstr "Bestätigung durch Bucher ausstehend"
-
-#: includes/Users.php:82
-msgid "Booking Agent"
-msgstr "Buchungsbearbeiter"
-
-#: includes/Actions.php:131
+#: includes/Email.php:337
 msgid ""
-"Booking can only be checked in between 15 minutes before the start of the "
-"timeslot and the end of the timeslot."
+"There is a new confirmed booking for your room. Calendar file (.ics) "
+"attached."
+msgstr "Es gibt eine neue Buchung für Ihren Raum. Kalenderdatei (.ics) anbei."
+
+#: includes/Functions.php:79
+msgid "This room has no available seat within %u days."
+msgstr "In diesem Raum gibt es keine freien Plätze in den nächsten %u Tagen."
+
+#: includes/Functions.php:90
+msgid "This room has no available seat for today."
+msgstr "In diesem Raum gibt es heute keine freien Plätze."
+
+#: includes/Functions.php:90
+msgid "The next available seat is on"
+msgid_plural "The next available seats are on"
+msgstr[0] "Den nächsten freien Platz gibt es am"
+msgstr[1] "Die nächsten freien Plätze gibt es am"
+
+#: includes/Functions.php:132 includes/Functions.php:239
+msgid "This room has no seats for today."
+msgstr "In diesem Raum gibt es heute keine freien Plätze."
+
+#: includes/Functions.php:330
+msgid "Links to display the current room occupancy"
+msgstr "Links zur aktuellen Raumbelegung"
+
+#: includes/Functions.php:330
+msgid "Normal website"
+msgstr "Normale Website"
+
+#: includes/Functions.php:330
+msgid "Website for public displays"
+msgstr "Darstellung für Public Displays"
+
+#: includes/ICS.php:45
+msgid "Generated"
+msgstr "Erstellt"
+
+#: includes/Main.php:134
+msgid "Do you want to cancel?"
+msgstr "Wollen Sie die Buchung stornieren?"
+
+#: includes/Main.php:139
+msgid "Please select a seat first."
+msgstr "Bitte wählen Sie zuerst einen Platz."
+
+#: includes/Main.php:155 includes/Tools.php:203
+msgid "Create Seats"
+msgstr "Plätze generieren"
+
+#: includes/Metaboxes.php:93 includes/Metaboxes.php:305
+#: includes/Metaboxes.php:518
+msgid "Details"
+msgstr "Details"
+
+#: includes/Metaboxes.php:106 includes/Metaboxes.php:158
+#: includes/Metaboxes.php:532 includes/Tools.php:136
+msgid "Please select"
+msgstr "Bitte wählen"
+
+#: includes/Metaboxes.php:115
+msgid "Timeslot"
+msgstr "Termin"
+
+#: includes/Metaboxes.php:131
+msgid "Click on the date input to select a date and a time slot."
 msgstr ""
-"Die Buchung kann nur ab 15 Minuten vor dem Start und bis zum Ende des "
-"gebuchten Termins eingecheckt werden."
+"Klicken Sie in das Datumsfeld, um ein Datum und einen Termin auszuwählen."
 
-#: includes/Actions.php:915 includes/Actions.php:924 includes/Actions.php:1048
-#: includes/Actions.php:1055
-msgid "Booking Cancelled"
-msgstr "Buchung storniert"
-
-#: includes/Actions.php:1068
-msgid "Booking Check In"
-msgstr "Buchung einchecken"
-
-#: includes/Actions.php:1080
-msgid "Booking Check Out"
-msgstr "Buchung auschecken"
-
-#: includes/Actions.php:1074 includes/templates/single-seat.php:128
-#: includes/templates/single-seat.php:171
-msgid "Booking Checked In"
-msgstr "Buchung eingecheckt"
-
-#: includes/Actions.php:1086 includes/templates/single-seat.php:186
-msgid "Booking Checked Out"
-msgstr "Buchung ausgecheckt"
-
-#: includes/Actions.php:910 includes/Actions.php:920 includes/Actions.php:1062
-msgid "Booking Confirmed"
-msgstr "Buchung bestätigt"
-
-#: includes/Shortcodes/Bookings.php:440
-msgid "Booking data"
-msgstr "Daten zur Buchung"
-
-#: includes/CPT/CPT.php:257
-msgid "Booking Form"
-msgstr "Buchungsformular"
-
-#: includes/Metaboxes.php:315
-msgid "Booking mode"
-msgstr "Buchungsmodus"
-
-#: config/config.php:224
-msgid "Booking Notification"
-msgstr "Benachrichtigung bei neuer Buchung"
+#: includes/Metaboxes.php:135
+msgid "End"
+msgstr "Ende"
 
 #: includes/Metaboxes.php:161
 msgctxt "Booking status in booking editor"
 msgid "Booked"
 msgstr "Gebucht"
+
+#: includes/Metaboxes.php:162
+msgctxt "Booking status in booking editor"
+msgid "Confirmed by customer"
+msgstr "Vom Bucher bestätigt"
+
+#: includes/Metaboxes.php:163
+msgctxt "Booking status in booking editor"
+msgid "Confirmed"
+msgstr "Vom Raumadmin oder automatisch bestätigt"
 
 #: includes/Metaboxes.php:164
 msgctxt "Booking status in booking editor"
@@ -486,243 +1407,65 @@ msgctxt "Booking status in booking editor"
 msgid "Checked Out"
 msgstr "Ausgecheckt"
 
-#: includes/Metaboxes.php:163
-msgctxt "Booking status in booking editor"
-msgid "Confirmed"
-msgstr "Vom Raumadmin oder automatisch bestätigt"
+#: includes/Metaboxes.php:173 includes/Shortcodes/Bookings.php:328
+#: includes/Shortcodes/Bookings.php:348
+msgid "Last name"
+msgstr "Nachname"
 
-#: includes/Metaboxes.php:162
-msgctxt "Booking status in booking editor"
-msgid "Confirmed by customer"
-msgstr "Vom Bucher bestätigt"
+#: includes/Metaboxes.php:184 includes/Shortcodes/Bookings.php:329
+#: includes/Shortcodes/Bookings.php:357
+msgid "First name"
+msgstr "Vorname"
 
-#: includes/Plugin.php:189
-#, php-format
-msgid "Call to undefined method %1$s::%2$s"
-msgstr "Aufruf einer unbekannten Methode %1$s::%2$s"
+#: includes/Metaboxes.php:218
+msgid "Notes"
+msgstr "Hinweise"
 
-#: includes/Actions.php:1041 includes/ICS.php:45
-msgid "Cancel Booking"
-msgstr "Buchung stornieren"
-
-#: config/config.php:235
-msgid "Cancel Notification"
-msgstr "Benachrichtigung bei Stornierung"
-
-#: config/config.php:404
-msgid "Cancel Text"
-msgstr "E-Mail-Text für Buchungsabsagen"
-
-#: config/config.php:410
-msgid "Cancel Text (english)"
-msgstr "E-Mail-Text für Buchungsabsagen (englisch)"
-
-#: includes/Email.php:250 includes/templates/single-seat.php:286
-#: includes/templates/single-seat.php:355
-#: includes/templates/single-seat.php:358
-msgid "Check In"
-msgstr "Einchecken"
-
-#: includes/templates/single-seat.php:283
-msgid "Check in"
-msgstr "Einchecken"
-
-#: includes/Actions.php:1075 includes/templates/single-seat.php:172
-msgid "Check in has been completed."
-msgstr "Der Einchecken wurde erfolgreich ausgeführt."
-
-#: includes/Actions.php:1069
-msgid "Check in is not possible at this time."
-msgstr "Einchecken ist derzeit nicht möglich."
-
-#: includes/Email.php:289 includes/templates/single-seat.php:305
-msgid "Check Out"
-msgstr "Auschecken"
-
-#: includes/templates/single-seat.php:144
-#: includes/templates/single-seat.php:169
-#: includes/templates/single-seat.php:302
-msgid "Check out"
-msgstr "Auschecken"
-
-#: includes/Metaboxes.php:324
-msgid "Check-in and check-out only on site"
-msgstr "Nur Einchecken und Auschecken am Platz"
-
-#: includes/Metaboxes.php:411
-msgid "Check-in is required"
-msgstr "Check-in erforderlich"
-
-#: includes/Actions.php:1087 includes/templates/single-seat.php:187
-msgid "Check-out has been completed."
-msgstr "Sie wurden erfolgreich ausgecheckt."
-
-#: includes/Actions.php:1081
-msgid "Check-out is not possible at this time."
-msgstr "Auschecken ist derzeit nicht möglich."
-
-#: includes/Shortcodes/Bookings.php:173
-msgid "Checkin in room"
-msgstr "Check-In im Raum"
-
-#: includes/Metaboxes.php:385
-msgid "Checkout notification"
-msgstr "Check-Out-Benachrichtigung"
-
-#: includes/Metaboxes.php:444
+#: includes/Metaboxes.php:221
 msgid ""
-"Choose a label for the text input on the booking form. E.g. 'Additional "
-"information' or 'Main interests'"
+"This textarea contains the 'Additional Information' field content if this "
+"option is activated in the room settings. It can also be used for notes for "
+"internal use."
 msgstr ""
-"Wählen Sie eine Beschriftung für die Texteingabe auf dem Buchungsformular, z."
-"B. \"Weitere Informationen\" oder \"Hauptinteressen\"."
+"Dieser Textbereich enthält den Feldinhalt 'Weitere Informationen', wenn "
+"diese Option in den Raumeinstellungen aktiviert ist. Es kann auch für "
+"Notizen für den internen Gebrauch verwendet werden."
 
-#: includes/Metaboxes.php:463
-msgid "City"
-msgstr "Stadt"
-
-#: includes/Metaboxes.php:131
-msgid "Click on the date input to select a date and a time slot."
-msgstr ""
-"Klicken Sie in das Datumsfeld, um ein Datum und einen Termin auszuwählen."
-
-#: includes/Metaboxes.php:443
-msgid "Comment input label"
-msgstr "Beschriftung für Kommentarfeld"
-
-#: config/config.php:340
-msgid "Confirmation Text"
-msgstr "E-Mail-Text für Buchungsbestätigung"
-
-#: config/config.php:346
-msgid "Confirmation Text (english)"
-msgstr "E-Mail-Text für Buchungsbestätigung (englisch)"
-
-#: includes/templates/single-seat.php:119
-msgid "Consult"
-msgstr "Sprechstunde"
-
-#: includes/Metaboxes.php:323 includes/templates/single-seat.php:370
-msgid "Consultation"
-msgstr "Sprechstunde"
-
-#: includes/Shortcodes/Bookings.php:530
-msgid "Continue booking"
-msgstr "Weiter zur Buchung"
-
-#: includes/Main.php:155 includes/Tools.php:203
-msgid "Create Seats"
-msgstr "Plätze generieren"
-
-#: includes/Shortcodes/Bookings.php:213 includes/templates/single-room.php:168
-msgid "Current Room Occupancy"
-msgstr "Aktuelle Raumbelegung"
-
-#: includes/Metaboxes.php:376
-msgid "Customer confirmation required"
-msgstr "Bestätigung duch Bucher erforderlich"
-
-#: includes/CPT/Bookings.php:102 includes/Shortcodes/Availability.php:133
-#: includes/Shortcodes/Bookings.php:279 includes/Shortcodes/Bookings.php:564
-msgid "Date"
-msgstr "Datum"
-
-#: includes/Shortcodes/Availability.php:61
-msgid "Date/Time"
-msgstr "Datum/Zeit"
-
-#: includes/Tracking.php:146
-msgid "days"
-msgstr "Tage"
-
-#: includes/Metaboxes.php:295
-msgid "Days closed"
-msgstr "Geschlossen am"
-
-#: config/config.php:553 config/config.php:588
-msgid "Days in advance"
-msgstr "Zeitraum für Vorabreservierung (Tage)."
+#: includes/Metaboxes.php:229
+msgid "Timeslots"
+msgstr "Termine"
 
 #: includes/Metaboxes.php:241
 msgid "Define bookable time slots."
 msgstr "Buchbare Termine festlegen."
 
-#: includes/Metaboxes.php:93 includes/Metaboxes.php:305
-#: includes/Metaboxes.php:498
-msgid "Details"
-msgstr "Details"
+#: includes/Metaboxes.php:243
+msgid "Time slot {#}"
+msgstr "Termin {#}"
 
-#: config/config.php:501
-msgid "DN"
-msgstr ""
+#: includes/Metaboxes.php:253
+msgid "Week day"
+msgstr "Wochentag"
 
-#: config/config.php:509
-msgid "DN to bind on."
-msgstr ""
-
-#: config/config.php:516
-msgid "DN to search in."
-msgstr ""
-
-#: includes/Actions.php:1042
-msgid "Do you really want to cancel your booking?"
-msgstr "Wollen Sie wirklich Ihre Buchung stornieren?"
-
-#: includes/Main.php:134
-msgid "Do you want to cancel?"
-msgstr "Wollen Sie die Buchung stornieren?"
-
-#: includes/Tools.php:117
-msgid "Done!"
-msgstr "Erledigt"
-
-#: includes/Tracking.php:127
-msgid "Download CSV"
-msgstr "CSV-Datei herunterladen"
-
-#: includes/Shortcodes/Bookings.php:702
-msgid "DSGVO field is required."
-msgstr "Die Bestätigung des Datenschutzhinweises ist notwendig."
-
-#: config/config.php:160
-msgid "E-Mail Settings"
-msgstr "E-Mail-Einstellungen"
-
-#: includes/CPT/Bookings.php:60
-msgid "Edit Booking"
-msgstr "Buchung bearbeiten"
-
-#: includes/CPT/Rooms.php:40
-msgid "Edit Room"
-msgstr "Raum bearbeiten"
-
-#: includes/CPT/Seats.php:49
-msgid "Edit Seat"
-msgstr "Platz bearbeiten"
-
-#: includes/Email.php:198 includes/Email.php:323 includes/Actions.php:934
-#: includes/Tracking.php:150 includes/Metaboxes.php:195
-#: includes/CPT/Bookings.php:107 includes/Shortcodes/Bookings.php:330
-#: includes/Shortcodes/Bookings.php:339 includes/Shortcodes/Bookings.php:368
-msgid "Email"
-msgstr "E-Mail"
-
-#: config/config.php:217
-msgid "Email address for notifications."
-msgstr ""
-"E-Mail-Adresse für Mitteilungen und Benachrichtigungen vom Buchungssystem."
-
-#: config/config.php:256
-msgid "Email address of sender."
-msgstr "E-Mail-Adresse des Absenders für E-Mails vom Buchungssystem."
-
-#: includes/Metaboxes.php:135
-msgid "End"
-msgstr "Ende"
+#: includes/Metaboxes.php:263
+msgid "Start time"
+msgstr "Startzeit"
 
 #: includes/Metaboxes.php:272
 msgid "End time"
 msgstr "Endzeit"
+
+#: includes/Metaboxes.php:281
+msgid "Valid from (optional)"
+msgstr "Gültig von (optional)"
+
+#: includes/Metaboxes.php:288
+msgid "Valid until (optional)"
+msgstr "Gültig bis (optional)"
+
+#: includes/Metaboxes.php:295
+msgid "Days closed"
+msgstr "Geschlossen am"
 
 #: includes/Metaboxes.php:296
 msgid ""
@@ -734,126 +1477,29 @@ msgstr ""
 "JJJJ-MM-TT). Ein Datum pro Zeile. Dies überschreibt die allgemeinen Termine "
 "(z.B. Raum ist verfügbar Montags, 9-12 Uhr, außer am 21.09.2020)."
 
-#: includes/Tools.php:186 includes/CPT/CPT.php:91 includes/CPT/CPT.php:92
-#: includes/Shortcodes/Bookings.php:1218
-msgid "Equipment"
-msgstr "Ausstattung"
+#: includes/Metaboxes.php:315
+msgid "Booking mode"
+msgstr "Buchungsmodus"
 
-#: includes/Printing/Printing.php:201
-msgid "Equipment:"
-msgstr "Ausstattung:"
+#: includes/Metaboxes.php:321
+msgid "Reservation with check-in"
+msgstr "Platzreservierung mit Check-In"
 
-#: includes/Shortcodes/Bookings.php:415
-msgid ""
-"Error retrieving your data from SSO. Please try again or contact the website "
-"administrator."
-msgstr ""
-"Fehler beim Abrufen Ihrer Daten aus SSO. Bitte versuchen Sie es erneut oder "
-"wenden Sie sich an den Website-Administrator."
+#: includes/Metaboxes.php:322
+msgid "Reservation without check-in"
+msgstr "Platzreservierung ohne Check-In"
 
-#: includes/Shortcodes/Bookings.php:454
-msgid "Error saving the booking."
-msgstr "Fehler beim Speichern der Buchung."
+#: includes/Metaboxes.php:323 includes/templates/single-seat.php:390
+msgid "Consultation"
+msgstr "Sprechstunde"
 
-#: includes/Schedule.php:54
-msgid "Every five minutes"
-msgstr "Alle fünf Minuten"
+#: includes/Metaboxes.php:324
+msgid "Check-in and check-out only on site"
+msgstr "Nur Einchecken und Auschecken am Platz"
 
-#. Description of the plugin
-msgid "FAU Reservation Tool"
-msgstr "Platzbuchungssystem der FAU"
-
-#: config/config.php:548 config/config.php:583 config/config.php:619
-msgid "Find the settings on the right side"
-msgstr "Die Einstellungen finden Sie auf der rechten Seite"
-
-#: includes/Metaboxes.php:184 includes/Shortcodes/Bookings.php:329
-#: includes/Shortcodes/Bookings.php:357
-msgid "First name"
-msgstr "Vorname"
-
-#: includes/templates/single-room.php:201
-msgid "Floor Plan"
-msgstr "Grundriss"
-
-#: includes/Metaboxes.php:469
-msgid "Floor plan"
-msgstr "Grundriss"
-
-#: config/config.php:156
-msgid "General Settings"
-msgstr "Allgemeine Einstellungen"
-
-#: includes/Printing/Printing.php:35 includes/Printing/Printing.php:218
-msgid "Generate PDF"
-msgstr "PDF erstellen"
-
-#: includes/Printing/Printing.php:263
-#, php-format
-msgid "Generate PDF for %s seat"
-msgid_plural "Generate PDF for %s seats"
-msgstr[0] "PDF für %s Platz erstellen"
-msgstr[1] "PDF für %s Plätze erstellen"
-
-#: includes/ICS.php:47
-msgid "Generated"
-msgstr "Erstellt"
-
-#: includes/Tracking.php:126
-msgid "Guests found!"
-msgstr "Personen gefunden!"
-
-#. Author URI of the plugin
-msgid "https://blogs.fau.de/webworking/"
-msgstr "https://blogs.fau.de/webworking/"
-
-#. URI of the plugin
-msgid "https://github.com/RRZE-Webteam/rrze-rsvp"
-msgstr "https://github.com/RRZE-Webteam/rrze-rsvp"
-
-#: config/config.php:128
-msgid ""
-"Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des "
-"Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der "
-"Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung "
-"gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter "
-"von Sprechstunden das Recht eingeräumt, während der Dauer des "
-"Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in "
-"folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. "
-"Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten "
-"allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a "
-"DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund "
-"der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden "
-"erfasst."
-msgstr ""
-"Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des "
-"Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der "
-"Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung "
-"gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter "
-"von Sprechstunden das Recht eingeräumt, während der Dauer des "
-"Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in "
-"folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. "
-"Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten "
-"allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a "
-"DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund "
-"der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden "
-"erfasst."
-
-#: includes/Metaboxes.php:346
-msgid ""
-"If LDAP is enabled, the customer must log in via LDAP in order to use the "
-"booking system."
-msgstr ""
-"Wenn LDAP aktiviert ist, muss sich der Bucher über LDAP anmelden, um das "
-"Buchungssystem nutzen zu können."
-
-#: includes/Metaboxes.php:436
-msgid ""
-"If not checked, the comment text input will still be visible in the backend "
-"for booking admins for internal notes."
-msgstr ""
-"Wenn diese Option nicht aktiviert ist, wird die Kommentareingabe für "
-"Administratoren für interne Notizen weiterhin im Backend angezeigt."
+#: includes/Metaboxes.php:336
+msgid "SSO is required"
+msgstr "SSO erforderlich"
 
 #: includes/Metaboxes.php:337
 msgid ""
@@ -863,7 +1509,557 @@ msgstr ""
 "Wenn SSO aktiviert ist, muss sich der Bucher über SSO anmelden, um das "
 "Buchungssystem nutzen zu können."
 
-#: includes/templates/single-seat.php:197
+#: includes/Metaboxes.php:345
+msgid "LDAP is required"
+msgstr "LDAP ist erforderlich"
+
+#: includes/Metaboxes.php:346
+msgid ""
+"If LDAP is enabled, the customer must log in via LDAP in order to use the "
+"booking system."
+msgstr ""
+"Wenn LDAP aktiviert ist, muss sich der Bucher über LDAP anmelden, um das "
+"Buchungssystem nutzen zu können."
+
+#: includes/Metaboxes.php:354
+msgid "Available days in advance"
+msgstr "Zeitraum für Vorabreservierung"
+
+#: includes/Metaboxes.php:355
+msgid "Number of days for which bookings are available in advance."
+msgstr "Anzahl der Tage, bis zu denen eine Reservierung im voraus möglich ist."
+
+#: includes/Metaboxes.php:367
+msgid "Automatic confirmation"
+msgstr "Automatische Bestätigung"
+
+#: includes/Metaboxes.php:368
+msgid ""
+"Incoming bookings do <u>not</u> need to be confirmed by the booking managers."
+msgstr ""
+"Eingehende Buchungen müssen nicht vom Raumverantwortlichen bestätigt werden."
+
+#: includes/Metaboxes.php:376
+msgid "Customer confirmation required"
+msgstr "Bestätigung duch Bucher erforderlich"
+
+#: includes/Metaboxes.php:377
+msgid ""
+"The customer must confirm his reservation within one hour. Otherwise the "
+"system will cancel the booking."
+msgstr ""
+"Der Bucher muss seine Reservierung innerhalb einer Stunde bestätigen. "
+"Andernfalls wird die Reservierung automatisch storniert."
+
+#: includes/Metaboxes.php:385
+msgid "Checkout notification"
+msgstr "Check-Out-Benachrichtigung"
+
+#: includes/Metaboxes.php:386
+msgid "Send an email to the booking manager when customer has checked out."
+msgstr ""
+"E-Mail an Raumverantwortlichen senden, wenn von einem Sitzplatz ausgecheckt "
+"wurde (z.B. um Reinigung zu veranlassen)."
+
+#: includes/Metaboxes.php:394
+msgid "Additional ICS email"
+msgstr "Zusätzliche Kalender-Mail"
+
+#: includes/Metaboxes.php:395
+msgid ""
+"A copy of the confirmed booking will be sent to the specified email address "
+"with a calendar file (.ics) as an attachment."
+msgstr ""
+"Eine Kopie der bestätigten Buchung wird mit einer Kalenderdatei (.ics) als "
+"Anhang an die angegebene E-Mail-Adresse gesendet."
+
+#: includes/Metaboxes.php:402
+msgid "Allow Instant Check-In"
+msgstr "Erlaube das Einchecken ohne vorherige Platzreservierung"
+
+#: includes/Metaboxes.php:403
+msgid ""
+"Seats can be booked and checked-in in one step. This only works if automatic "
+"confirmation activated!"
+msgstr ""
+"Plätze können in einem Schritt gebucht und eingecheckt werden. Bitte "
+"beachten Sie, dass hierzu die automatische Buchungsbestätigung aktiviert "
+"sein muss!"
+
+#: includes/Metaboxes.php:411
+msgid "Check-in is required"
+msgstr "Check-in erforderlich"
+
+#: includes/Metaboxes.php:412
+msgid ""
+"The customer must check-in their booking within a certain time from the "
+"start of the event. Otherwise the system will cancel the booking. The time "
+"allowed can be set just below in the \"Allowed Check-In Time\" section."
+msgstr ""
+"Der Bucher muss innerhalb einer bestimmten Zeit ab Beginn des Termins "
+"einchecken. Andernfalls wird die Buchung automatisch storniert. Die erlaubte "
+"Zeit kann in der nächsten Zeile (\"Erlaubter Zeitraum für Check-In\") "
+"eingestellt werden."
+
+#: includes/Metaboxes.php:422
+msgid "Allowed Check-In Time (minutes)"
+msgstr "Erlaubter Zeitraum für Check-In (in Minuten)"
+
+#: includes/Metaboxes.php:423
+msgid ""
+"You can specify an allowed check-in time for this room. If \"Check-In "
+"required\" is checked, the system will cancel the booking after this time. "
+"Default is %s minutes."
+msgstr ""
+"Sie können einen erlaubten Check-In-Zeitraum für diesen Raum definieren. "
+"Wenn die Option \"Check-In erforderlich\" angekreuzt ist, storniert das "
+"System die Buchung autmatisch nach dieser Zeit. Standardeinstellung ist %s "
+"Minuten."
+
+#: includes/Metaboxes.php:435
+msgid "Show notes/comment input in booking form"
+msgstr "Notizen / Kommentareingabe im Buchungsformular anzeigen"
+
+#: includes/Metaboxes.php:436
+msgid ""
+"If not checked, the comment text input will still be visible in the backend "
+"for booking admins for internal notes."
+msgstr ""
+"Wenn diese Option nicht aktiviert ist, wird die Kommentareingabe für "
+"Administratoren für interne Notizen weiterhin im Backend angezeigt."
+
+#: includes/Metaboxes.php:443
+msgid "Comment input label"
+msgstr "Beschriftung für Kommentarfeld"
+
+#: includes/Metaboxes.php:444
+msgid ""
+"Choose a label for the text input on the booking form. E.g. 'Additional "
+"information' or 'Main interests'"
+msgstr ""
+"Wählen Sie eine Beschriftung für die Texteingabe auf dem Buchungsformular, z."
+"B. \"Weitere Informationen\" oder \"Hauptinteressen\"."
+
+#: includes/Metaboxes.php:447
+msgid "Additional information"
+msgstr "Weitere Informationen"
+
+#: includes/Metaboxes.php:451
+msgid "Street"
+msgstr "Straße"
+
+#: includes/Metaboxes.php:457
+msgid "ZIP"
+msgstr "PLZ"
+
+#: includes/Metaboxes.php:463
+msgid "City"
+msgstr "Stadt"
+
+#: includes/Metaboxes.php:469
+msgid "Floor plan"
+msgstr "Grundriss"
+
+#: includes/Metaboxes.php:496
+msgid "Public Displays"
+msgstr "Public Displays"
+
+#: includes/Metaboxes.php:506
+msgid "Text"
+msgstr "Text"
+
+#: includes/Metaboxes.php:509
+msgid ""
+"This textarea contains the 'Additional Information' to show on top of "
+"occupancy grids shown on public displays only."
+msgstr ""
+"Dieser Textbereich enthält die ‘Zusätzlichen Informationen’, die nur auf "
+"öffentlichen Displays angezeigt werden."
+
+#: includes/Metaboxes.php:591
+msgid "Time slot booked"
+msgstr "Gebuchter Termin"
+
+#: includes/Plugin.php:189
+msgid "Call to undefined method %1$s::%2$s"
+msgstr "Aufruf einer unbekannten Methode %1$s::%2$s"
+
+#: includes/Printing/Printing.php:35 includes/Printing/Printing.php:218
+msgid "Generate PDF"
+msgstr "PDF erstellen"
+
+#: includes/Printing/Printing.php:61 includes/Printing/Printing.php:69
+#: includes/Printing/Printing.php:266
+msgid "No seats found"
+msgstr "Keine Plätze gefunden"
+
+#: includes/Printing/Printing.php:201
+msgid "Equipment:"
+msgstr "Ausstattung:"
+
+#: includes/Printing/Printing.php:263
+msgid "Generate PDF for %s seat"
+msgid_plural "Generate PDF for %s seats"
+msgstr[0] "PDF für %s Platz erstellen"
+msgstr[1] "PDF für %s Plätze erstellen"
+
+#: includes/Schedule.php:54
+msgid "Every five minutes"
+msgstr "Alle fünf Minuten"
+
+#: includes/Settings.php:316
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+#: includes/Shortcodes/Availability.php:61
+msgid "Date/Time"
+msgstr "Datum/Zeit"
+
+#: includes/Shortcodes/Availability.php:62
+#: includes/Shortcodes/Bookings.php:1138
+msgid "Seats available"
+msgstr "Verfügbare Plätze"
+
+#: includes/Shortcodes/Availability.php:79
+#: includes/Shortcodes/Availability.php:144
+msgid "Book this seat/timeslot now"
+msgstr "Platz/Termin jetzt buchen"
+
+#: includes/Shortcodes/Availability.php:94
+msgid "No seats available."
+msgstr "Keine Plätze verfügbar."
+
+#: includes/Shortcodes/Availability.php:113 includes/Shortcodes/QR.php:59
+msgid "Please enter a valid seat slug or ID"
+msgstr "Bitte geben Sie gültige Platzbezeichnung oder ID an. "
+
+#: includes/Shortcodes/Availability.php:129
+msgid "No timeslots available for this seat."
+msgstr "Für diesen Platz sind keine freien Termine verfügbar."
+
+#: includes/Shortcodes/Availability.php:134
+msgid "Available Time Slots"
+msgstr "Freie Termine"
+
+#: includes/Shortcodes/Availability.php:159
+msgid "Please specify a room ID in your Shortcode."
+msgstr "Bitte geben Sie eine Raum-ID im Shortcode an."
+
+#: includes/Shortcodes/Bookings.php:148
+msgid "Room specified in shortcode does not exist."
+msgstr "Die im Shortcode angegebene Raum-ID ist falsch oder existiert nicht."
+
+#: includes/Shortcodes/Bookings.php:173
+msgid "Checkin in room"
+msgstr "Check-In im Raum"
+
+#: includes/Shortcodes/Bookings.php:174
+msgid "Reservations disabled. Please checkin at the seats in the room."
+msgstr ""
+"Die Reservierung ist nicht aktiv. Bitte checken Sie sich direkt vor Ort am "
+"Platz ein."
+
+#: includes/Shortcodes/Bookings.php:187 includes/templates/single-room.php:22
+msgid "Weekday"
+msgstr "Wochentag"
+
+#: includes/Shortcodes/Bookings.php:188 includes/templates/single-room.php:23
+msgid "Time slots"
+msgstr "Termine"
+
+#: includes/Shortcodes/Bookings.php:206 includes/Shortcodes/Bookings.php:222
+#: includes/templates/single-room.php:183
+#: includes/templates/single-room.php:200
+msgid "Schedule"
+msgstr "Zeitplan"
+
+#: includes/Shortcodes/Bookings.php:213 includes/templates/single-room.php:186
+msgid "Current Room Occupancy"
+msgstr "Aktuelle Raumbelegung"
+
+#: includes/Shortcodes/Bookings.php:260
+msgid "Book a seat at"
+msgstr "Platz buchen in"
+
+#: includes/Shortcodes/Bookings.php:271 includes/Shortcodes/Bookings.php:508
+msgid "Timeslot not available."
+msgstr "Termin nicht verfügbar."
+
+#: includes/Shortcodes/Bookings.php:278
+msgid "Your booking"
+msgstr "Ihre Buchung"
+
+#: includes/Shortcodes/Bookings.php:286
+msgid "Select date and time"
+msgstr "Datum und Uhrzeit wählen"
+
+#: includes/Shortcodes/Bookings.php:297
+msgid "Available time slots:"
+msgstr "Freie Termine:"
+
+#: includes/Shortcodes/Bookings.php:301 includes/Shortcodes/Bookings.php:1208
+msgid "Please select a date."
+msgstr "Wählen Sie ein Datum."
+
+#: includes/Shortcodes/Bookings.php:312 includes/Shortcodes/Bookings.php:1211
+#: includes/Shortcodes/Bookings.php:1292
+msgid "Please select a date and a time slot."
+msgstr "Bitte wählen Sie ein Datum und einen Termin."
+
+#: includes/Shortcodes/Bookings.php:320
+msgid "Your data"
+msgstr "Ihre Daten"
+
+#: includes/Shortcodes/Bookings.php:320
+msgid "Required"
+msgstr "Pflichtfeld"
+
+#: includes/Shortcodes/Bookings.php:380
+msgid "Phone Number"
+msgstr "Telefonnummer"
+
+#: includes/Shortcodes/Bookings.php:401
+msgid "Submit booking"
+msgstr "Buchung absenden"
+
+#: includes/Shortcodes/Bookings.php:415
+msgid "SSO error"
+msgstr "SSO-Fehler"
+
+#: includes/Shortcodes/Bookings.php:416
+msgid ""
+"Error retrieving your data from SSO. Please try again or contact the website "
+"administrator."
+msgstr ""
+"Fehler beim Abrufen Ihrer Daten aus SSO. Bitte versuchen Sie es erneut oder "
+"wenden Sie sich an den Website-Administrator."
+
+#: includes/Shortcodes/Bookings.php:441
+msgid "Booking data"
+msgstr "Daten zur Buchung"
+
+#: includes/Shortcodes/Bookings.php:442
+msgid "Invalid or missing booking data."
+msgstr "Ungültige oder fehlende Buchungsdaten."
+
+#: includes/Shortcodes/Bookings.php:454 includes/Shortcodes/Bookings.php:469
+msgid "Save booking"
+msgstr "Fehler beim Speichern"
+
+#: includes/Shortcodes/Bookings.php:455 includes/Shortcodes/Bookings.php:470
+msgid "Error saving the booking."
+msgstr "Fehler beim Speichern der Buchung."
+
+#: includes/Shortcodes/Bookings.php:488
+msgid "Seat already booked"
+msgstr "Platz bereits ausgebucht"
+
+#: includes/Shortcodes/Bookings.php:489
+msgid ""
+"<strong>Sorry! The seat you selected is no longer available.</"
+"strong><br>Please try again."
+msgstr ""
+"<strong>Der von Ihnen gewählte Platz ist nicht mehr verfügbar.</"
+"strong><br>Bitte versuchen Sie es erneut."
+
+#: includes/Shortcodes/Bookings.php:490 includes/Shortcodes/Bookings.php:510
+msgid "<a href=\"%s\">Back to booking form &rarr;</a>"
+msgstr "<a href=\"%s\">Zurück zum Buchungsformular &rarr;</a>"
+
+#: includes/Shortcodes/Bookings.php:509
+msgid ""
+"<strong>The timeslot you selected lies in the past.</strong><br>Please try "
+"again."
+msgstr ""
+"<strong>Der gewählte Termin liegt in der Vergangenheit.</strong><br />Bitte "
+"versuchen Sie es erneut."
+
+#: includes/Shortcodes/Bookings.php:530
+msgid "Please select a room."
+msgstr "Bitte wählen Sie einen Raum."
+
+#: includes/Shortcodes/Bookings.php:536
+msgid "Continue booking"
+msgstr "Weiter zur Buchung"
+
+#: includes/Shortcodes/Bookings.php:580
+msgid "These data were also sent to your email address <strong>%s</strong>."
+msgstr ""
+"Diese Daten wurden auch an Ihre E-Mail-Adresse <strong>%s</strong> gesendet."
+
+#: includes/Shortcodes/Bookings.php:583
+msgid "Your reservation has been submitted. Please confirm your booking!"
+msgstr ""
+"Ihre Reservierung wurde übermittelt. Bitte bestätigen Sie Ihre Buchung!"
+
+#: includes/Shortcodes/Bookings.php:584
+msgid ""
+"An email with the confirmation link and your booking information has been "
+"sent to your email address.<br><strong>Please note that unconfirmed bookings "
+"automatically expire after one hour.</strong>"
+msgstr ""
+"Eine E-Mail mit dem Bestätigungslink und Ihren Buchungsinformationen wurde "
+"an Ihre E-Mail-Adresse geschickt.<br><strong>Bitte beachten Sie, dass "
+"unbestätigte Buchungen automatisch nach einer Stunde verfallen.</strong>"
+
+#: includes/Shortcodes/Bookings.php:586
+msgid "Your reservation has been submitted. Thank you for booking!"
+msgstr "Ihre Reservierung wurde verarbeitet. Vielen Dank für Ihre Buchung."
+
+#: includes/Shortcodes/Bookings.php:589
+msgid "Your reservation:"
+msgstr "Ihre Reservierung: "
+
+#: includes/Shortcodes/Bookings.php:591
+msgid "Your reservation request:"
+msgstr "Ihre Reservierungsanfrage: "
+
+#: includes/Shortcodes/Bookings.php:594
+msgid ""
+"<strong>This seat has been reserved for you.</strong><br>You can cancel it "
+"at any time if you cannot keep the appointment. You can find information on "
+"this in your confirmation email."
+msgstr ""
+"<strong>Dieser Platz wurde für Sie reserviert.</strong><br>Sie können den "
+"Platz jederzeit stornieren, wenn Sie den Termin nicht einhalten können. "
+"Informationen dazu finden Sie in Ihrer Bestätigungs-E-Mail."
+
+#: includes/Shortcodes/Bookings.php:596
+msgid ""
+"<strong>Please note that this is only a reservation request.</strong><br>It "
+"only becomes binding as soon as we confirm your booking by email."
+msgstr ""
+"<strong>Bitte beachten Sie, dass dies nur eine Reservierungsanfrage ist.</"
+"strong><br>Sie wird erst verbindlich, sobald wir Ihre Buchung per E-Mail "
+"bestätigen."
+
+#: includes/Shortcodes/Bookings.php:599
+msgid ""
+"Please remember to <strong>check in</strong> to your seat when you arrive!"
+msgstr ""
+"Bitte denken Sie daran, bei Ihrer Ankunft an Ihrem Platz "
+"<strong>einzuchecken</strong>!"
+
+#: includes/Shortcodes/Bookings.php:708
+msgid "DSGVO field is required."
+msgstr "Die Bestätigung des Datenschutzhinweises ist notwendig."
+
+#: includes/Shortcodes/Bookings.php:717
+msgid "The date or time of the booking is not valid."
+msgstr "Datum oder Uhrzeit der Buchung ist nicht gültig."
+
+#: includes/Shortcodes/Bookings.php:726
+msgid "The room does not exist."
+msgstr "Der Raum existiert nicht."
+
+#: includes/Shortcodes/Bookings.php:735
+msgid "Your last name is required."
+msgstr "Der Nachname ist notwendig."
+
+#: includes/Shortcodes/Bookings.php:747
+msgid "Your name is required."
+msgstr "Der Vorname ist notwendig."
+
+#: includes/Shortcodes/Bookings.php:759
+msgid "The email address is not valid."
+msgstr "Die E-Mail-Adresse ist ungültig."
+
+#: includes/Shortcodes/Bookings.php:771
+msgid "Your phone number is not valid."
+msgstr "Die Telefonnummer ist ungültig."
+
+#: includes/Shortcodes/Bookings.php:1125
+msgid "Not bookable (outside booking period)"
+msgstr "Nicht buchbar (Datum außerhalb des Buchungszeitraums)"
+
+#: includes/Shortcodes/Bookings.php:1129
+msgid "Not bookable (soldout or room blocked)"
+msgstr "Nicht buchbar (Raum ausgebucht oder nicht verfügbar)"
+
+#: includes/Shortcodes/Bookings.php:1235
+msgid "Seat %s"
+msgstr "Platz %s"
+
+#: includes/Shortcodes/Bookings.php:1259
+msgid "No time slots available."
+msgstr "Keine freien Termine verfügbar."
+
+#: includes/Shortcodes/Bookings.php:1294
+msgid "Available seats:"
+msgstr "Verfügbare Plätze:"
+
+#: includes/Shortcodes/QR.php:67
+msgid "Please specify a seat ID in your Shortcode."
+msgstr "Bitte geben Sie in Ihrem Shortcode eine Platz-ID an."
+
+#: includes/templates/auth/single-auth.php:15
+msgid "Please login to the account you have used to book this seat."
+msgstr ""
+"Bitte melden Sie sich mit den Benutzerdaten an, mit denen Sie diesen Platz "
+"gebucht haben."
+
+#: includes/templates/auth/single-auth.php:39
+msgid "Login denied"
+msgstr "Zugang verweigert"
+
+#: includes/templates/auth/single-auth.php:45
+msgid "<a href=\"%s\">Please login with your IdM username</a>."
+msgstr "<a href=\"%s\">Bitte melden Sie sich mit Ihrer IdM-Kennung an</a>."
+
+#: includes/templates/auth/single-auth.php:86
+msgid "Authentication Required"
+msgstr "Authentifizierung erforderlich"
+
+#: includes/templates/auth/single-auth.php:99
+msgid "Oder"
+msgstr "Oder"
+
+#: includes/templates/auth/single-auth.php:103
+msgid "Please login with your UB-AD username"
+msgstr "Bitte melden Sie sich mit Ihrem UB-AD Benutzernamen an"
+
+#: includes/templates/single-room.php:71
+msgid "No floorplan available."
+msgstr "Kein Grundriss verfügbar."
+
+#: includes/templates/single-room.php:192
+#: includes/templates/single-room.php:209
+msgid "Availability"
+msgstr "Verfügbarkeit"
+
+#: includes/templates/single-room.php:219
+msgid "Floor Plan"
+msgstr "Grundriss"
+
+#: includes/templates/single-seat.php:137
+msgid "Consult"
+msgstr "Sprechstunde"
+
+#: includes/templates/single-seat.php:138
+msgid "This time slot has been reserved for you."
+msgstr "Dieser Termin wurde für Sie reserviert."
+
+#: includes/templates/single-seat.php:139
+#: includes/templates/single-seat.php:148
+msgid ""
+"Additional information has been sent to your email address <strong>%s</"
+"strong>."
+msgstr ""
+"Zusätzliche Informationen wurden an Ihre E-Mail-Adresse <strong>%s</strong> "
+"gesendet."
+
+#: includes/templates/single-seat.php:162
+#: includes/templates/single-seat.php:188
+#: includes/templates/single-seat.php:322
+msgid "Check out"
+msgstr "Auschecken"
+
+#: includes/templates/single-seat.php:174
+#: includes/templates/single-seat.php:234
+msgid "Room:"
+msgstr "Raum:"
+
+#: includes/templates/single-seat.php:216
 msgid ""
 "If you reserved this seat please refer to the message sent to your email "
 "address."
@@ -871,308 +2067,67 @@ msgstr ""
 "Wenn Sie diesen Platz reserviert haben, lesen Sie bitte die Nachricht an "
 "Ihre E-Mail-Adresse."
 
-#: includes/Metaboxes.php:368
-#| msgid ""
-#| "Incoming bookings do not need to be confirmed by the booking managers"
+#: includes/templates/single-seat.php:303
+msgid "Check in"
+msgstr "Einchecken"
+
+#: includes/templates/single-seat.php:307
 msgid ""
-"Incoming bookings do <u>not</u> need to be confirmed by the booking managers."
+"This seat is currently reserved. If you have reserved this seat, please "
+"check in."
 msgstr ""
-"Eingehende Buchungen müssen nicht vom Raumverantwortlichen bestätigt werden."
+"Dieser Platz ist bereits reserviert. Falls Sie diesen Platz reserviert "
+"haben, checken Sie bitte ein."
 
-#: config/config.php:446 config/config.php:448
-msgid "Instructions in English"
-msgstr "Anleitung auf Englisch"
-
-#: config/config.php:437 config/config.php:439
-msgid "Instructions in German"
-msgstr "Anleitung auf Deutsch"
-
-#: includes/Shortcodes/Bookings.php:441
-msgid "Invalid or missing booking data."
-msgstr "Ungültige oder fehlende Buchungsdaten."
-
-#: includes/Metaboxes.php:173 includes/Shortcodes/Bookings.php:328
-#: includes/Shortcodes/Bookings.php:348
-msgid "Last name"
-msgstr "Nachname"
-
-#: config/config.php:502
-msgid "LDAP Distinguished Name."
-msgstr ""
-
-#: includes/Metaboxes.php:345
-msgid "LDAP is required"
-msgstr "LDAP ist erforderlich"
-
-#: config/config.php:495
-msgid "LDAP server port."
-msgstr ""
-
-#: config/config.php:488
+#: includes/templates/single-seat.php:326
 msgid ""
-"LDAP server URL. Leave blank if you are not using LDAP as an authentication "
-"system."
+"This seat is currently reserved. If you have reserved this seat, please "
+"check out when you leave the site."
 msgstr ""
-"LDAP Server URL. Lassen Sie das Feld leer, wenn Sie LDAP nicht als "
-"Authentifizierungssystem verwenden."
+"Dieser Platz ist derzeit reserviert. Wenn Sie diesen Platz reserviert haben, "
+"checken Sie bitte aus, wenn Sie den Raum verlassen."
 
-#: config/config.php:168
-msgid "LDAP Settings"
-msgstr "LDAP Einstellungen"
+#: includes/templates/single-seat.php:379
+msgid ""
+"This seat is free for instant check-in (booking and check-in in one step) "
+"for the current timeslot."
+msgstr ""
+"Dieser Platz steht zum sofortigen Einchecken im aktuellen Zeitfenster zur "
+"Verfügung."
 
-#: includes/Functions.php:330
-msgid "Links to display the current room occupancy"
-msgstr "Links zur aktuellen Raumbelegung"
+#: includes/templates/single-seat.php:391
+msgid "Please reserve a time slot for a consultation."
+msgstr "Bitte reservieren Sie einen Termin für eine Sprechstunde."
 
-#: includes/templates/auth/single-auth.php:39
-msgid "Login denied"
-msgstr "Zugang verweigert"
+#: includes/templates/single-seat.php:393
+msgid "Availability information"
+msgstr "Freie Termine für diesen Platz"
 
-#: includes/Email.php:81 includes/Email.php:107
-msgctxt "Mail Subject for room admin: new booking received"
-msgid "[RSVP] Confirm new booking"
-msgstr "[RSVP] Neue Buchung bestätigen"
+#: includes/templates/single-seat.php:394
+msgid ""
+"This seat is for instant check-in only and cannot be reserved. These are the "
+"next available time slots:"
+msgstr ""
+"Dieser Platz kann nur direkt eingecheckt und nicht reserviert werden. Dies "
+"sind die nächsten verfügbaren Termine:"
 
-#: includes/Email.php:132
-#| msgid "[RSVP] New booking received"
-msgctxt "Mail Subject for room admin: new booking received"
-msgid "[RSVP] New booking"
-msgstr "[RSVP] Neue Buchung"
+#: includes/templates/single-seat.php:396
+msgid "Reservation"
+msgstr "Platzreservierung"
 
-#: includes/API.php:108 includes/API.php:127 includes/API.php:145
-#: includes/API.php:163
-msgid "message"
-msgstr "Nachricht"
+#: includes/templates/single-seat.php:397
+msgid "Please reserve a time slot for this seat"
+msgstr "Bitte reservieren Sie einen Termin für diesen Platz"
 
-#: includes/Shortcodes/Bookings.php:466
-msgid "Multiple Booking"
-msgstr "Mehrfachbuchung"
+#: includes/Tools.php:21 includes/Tools.php:41
+msgctxt "admin page title"
+msgid "Create Seats"
+msgstr "Platzgenerator"
 
-#: includes/Email.php:197 includes/Email.php:322 includes/Actions.php:933
-#: includes/CPT/Bookings.php:106
-msgid "Name"
-msgstr "Name"
-
-#: config/config.php:247
-msgid "Name for Sender for the booking system."
-msgstr "Name des Absenders für E-Mails vom Buchungssystem."
-
-#: includes/CPT/Bookings.php:59
-msgid "New Booking"
-msgstr "Neue Buchung"
-
-#: config/config.php:225
-msgid "New booking notification."
-msgstr "E-Mail erhalten, wenn eine neue Buchung eingegangen ist."
-
-#: includes/Email.php:320
-msgid "New confirmed booking"
-msgstr "Neue bestätigte Buchung"
-
-#: includes/CPT/Rooms.php:39
-msgid "New Room"
-msgstr "Neuer Raum"
-
-#: includes/CPT/Seats.php:48
-msgid "New Seat"
-msgstr "Neuer Platz"
-
-#: config/config.php:201 config/config.php:229 config/config.php:240
-msgid "No"
-msgstr "Nein"
-
-#: includes/Actions.php:929 includes/Actions.php:1093
-msgid "No action was taken."
-msgstr "Es wurde keine Änderung vorgenommen."
-
-#: includes/CPT/Bookings.php:65
-msgid "No Bookings found in Trash."
-msgstr "Es wurde keine Buchungen im Papierkorb gefunden."
-
-#: includes/CPT/Bookings.php:64
-msgid "No Bookings found."
-msgstr "Es wurden keine Buchungen gefunden."
-
-#: includes/templates/single-room.php:71
-msgid "No floorplan available."
-msgstr "Kein Grundriss verfügbar."
-
-#: includes/Tracking.php:131
-msgid "No guest found."
-msgstr "Keine Personn gefunden."
-
-#: includes/Auth/IdM.php:62
-msgid "No name"
-msgstr "Kein Name"
-
-#: includes/CPT/Rooms.php:45
-msgid "No Rooms found in Trash."
-msgstr "Es wurden keine Räume im Papierkorb gefunden."
-
-#: includes/CPT/Rooms.php:44
-msgid "No Rooms found."
-msgstr "Keine Räume gefunden."
-
-#: includes/Shortcodes/Availability.php:94
-msgid "No seats available."
-msgstr "Keine Plätze verfügbar."
-
-#: includes/Printing/Printing.php:61 includes/Printing/Printing.php:69
-#: includes/Printing/Printing.php:266
-msgid "No seats found"
-msgstr "Keine Plätze gefunden"
-
-#: includes/CPT/Seats.php:54
-msgid "No Seats found in Trash."
-msgstr "Es wurden keine Plätze im Papierkorb gefunden."
-
-#: includes/CPT/Seats.php:53
-msgid "No Seats found."
-msgstr "Es wurden keine Plätze gefunden."
-
-#: includes/Shortcodes/Bookings.php:1238
-msgid "No time slots available."
-msgstr "Keine freien Termine verfügbar."
-
-#: includes/Shortcodes/Availability.php:129
-msgid "No timeslots available for this seat."
-msgstr "Für diesen Platz sind keine freien Termine verfügbar."
-
-#: includes/CPT/Bookings.php:272
-msgid "No timeslots available for this seat/day."
-msgstr "Für diesen Platz / Tag sind keine Termine verfügbar."
-
-#: includes/Auth/IdM.php:69 includes/Auth/LDAP.php:72
-msgid "no@email"
-msgstr "keine@email"
-
-#: includes/Functions.php:330
-msgid "Normal website"
-msgstr "Normale Website"
-
-#: includes/Shortcodes/Bookings.php:1104
-msgid "Not bookable (outside booking period)"
-msgstr "Nicht buchbar (Datum außerhalb des Buchungszeitraums)"
-
-#: includes/Shortcodes/Bookings.php:1108
-msgid "Not bookable (soldout or room blocked)"
-msgstr "Nicht buchbar (Raum ausgebucht oder nicht verfügbar)"
-
-#: config/config.php:206
-msgid "Note for admins"
-msgstr "Hinweis für Administratoren"
-
-#: includes/Metaboxes.php:218
-msgid "Notes"
-msgstr "Hinweise"
-
-#: config/config.php:216
-msgid "Notification email"
-msgstr "Benachrichtigungs-Adresse"
-
-#: config/config.php:236
-msgid "Notification of booking cancellation."
-msgstr "E-Mail erhalten, wenn eine Buchung storniert wurde."
-
-#: includes/Metaboxes.php:355
-msgid "Number of days for which bookings are available in advance."
-msgstr "Anzahl der Tage, bis zu denen eine Reservierung im voraus möglich ist."
-
-#: includes/Tools.php:150
-msgid "Number of Rows"
-msgstr "Anzahl der Reihen"
-
-#: includes/Tools.php:155
-msgid "Number of Seats per Row"
-msgstr "Anzahl der Plätze pro Reihe"
-
-#: includes/Tools.php:161 includes/Tools.php:175
-msgid "Numeric (1 - 999)"
-msgstr "Numerisch (1 - 999)"
-
-#: includes/templates/auth/single-auth.php:99
-msgid "Oder"
-msgstr "Oder"
-
-#: includes/Tools.php:167 includes/Tools.php:180 includes/Tools.php:186
-msgid "optional"
-msgstr "optional"
-
-#: includes/CPT/Rooms.php:46
-msgctxt ""
-"Overrides the “Featured Image” phrase for this post type. Added in 4.3"
-msgid "Room Image"
-msgstr "Raumbild"
-
-#: includes/CPT/Seats.php:55
-msgctxt ""
-"Overrides the “Featured Image” phrase for this post type. Added in 4.3"
-msgid "Seat Image"
-msgstr "Platzbild"
-
-#: includes/CPT/Rooms.php:51
-msgctxt ""
-"Overrides the “Insert into post”/”Insert into page” phrase (used when "
-"inserting media into a post). Added in 4.4"
-msgid "Insert into Room"
-msgstr "Zum Raum hinzufügen"
-
-#: includes/CPT/Seats.php:60
-msgctxt ""
-"Overrides the “Insert into post”/”Insert into page” phrase (used when "
-"inserting media into a post). Added in 4.4"
-msgid "Insert into Seat"
-msgstr "Zum Platz hinzufügen"
-
-#: includes/CPT/Rooms.php:48
-msgctxt ""
-"Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
-msgid "Remove room image"
-msgstr "Raumbild entfernen"
-
-#: includes/CPT/Seats.php:57
-msgctxt ""
-"Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
-msgid "Remove seat image"
-msgstr "Platzbild entfernen"
-
-#: includes/CPT/Rooms.php:47
-msgctxt ""
-"Overrides the “Set featured image” phrase for this post type. Added in 4.3"
-msgid "Set room image"
-msgstr "Raumbild festlegen"
-
-#: includes/CPT/Seats.php:56
-msgctxt ""
-"Overrides the “Set featured image” phrase for this post type. Added in 4.3"
-msgid "Set seat image"
-msgstr "Platzbild festlegen"
-
-#: includes/CPT/Rooms.php:52
-msgctxt ""
-"Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used "
-"when viewing media attached to a post). Added in 4.4"
-msgid "Uploaded to this Room"
-msgstr "Zum Raum hochladen"
-
-#: includes/CPT/Seats.php:61
-msgctxt ""
-"Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used "
-"when viewing media attached to a post). Added in 4.4"
-msgid "Uploaded to this Seat"
-msgstr "Zum Platz hochladen"
-
-#: includes/CPT/Rooms.php:49
-msgctxt ""
-"Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
-msgid "Use as Room image"
-msgstr "Als Raumbild verwenden"
-
-#: includes/CPT/Seats.php:58
-msgctxt ""
-"Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
-msgid "Use as Seat image"
-msgstr "Als Platzbild verwenden"
+#: includes/Tools.php:22
+msgctxt "admin menu entry title"
+msgid "RSVP Create Seats"
+msgstr "RSVP Platzgenerator"
 
 #: includes/Tools.php:77
 msgctxt "part of the generated seat name"
@@ -1184,287 +2139,43 @@ msgctxt "part of the generated seat name"
 msgid "Seat"
 msgstr "Platz"
 
-#: includes/Tracking.php:155 includes/Metaboxes.php:206
-#: includes/CPT/Bookings.php:109
-msgid "Phone"
-msgstr "Telefon"
+#: includes/Tools.php:117
+msgid "Done!"
+msgstr "Erledigt"
 
-#: includes/Shortcodes/Bookings.php:380
-msgid "Phone Number"
-msgstr "Telefonnummer"
+#: includes/Tools.php:119
+msgid "%s new seat has been created."
+msgid_plural "%s new seats have been created."
+msgstr[0] "%s Platz wurde erstellt."
+msgstr[1] "%s Plätze wurden erstellt."
 
-#: includes/Email.php:234 includes/Email.php:236
-msgid "Please cancel your booking in time if your plans change."
-msgstr ""
-"Bitte stornieren Sie Ihre Buchung rechtzeitig, wenn sich Ihre Pläne ändern."
+#: includes/Tools.php:150
+msgid "Number of Rows"
+msgstr "Anzahl der Reihen"
 
-#: includes/Email.php:291 includes/Email.php:293
-#: includes/templates/single-seat.php:131
-#: includes/templates/single-seat.php:173
-msgid "Please check out when you leave the site."
-msgstr "Bitte checken Sie aus, wenn Sie den Raum verlassen."
+#: includes/Tools.php:155
+msgid "Number of Seats per Row"
+msgstr "Anzahl der Plätze pro Reihe"
 
-#: includes/Email.php:271 includes/Email.php:273
-#, php-format
-msgid "Please check-in your booking on site until %s."
-msgstr "Bitte checken Sie Ihre Buchung vor Ort bis spätestens %s ein."
+#: includes/Tools.php:160
+msgid "Rows Numbering System"
+msgstr "Reihennummerierung"
 
-#: includes/Email.php:276 includes/Email.php:278
-msgid "Please check-in your booking on site."
-msgstr "Bitte checken Sie Ihre Buchung vor Ort ein."
+#: includes/Tools.php:161 includes/Tools.php:175
+msgid "Numeric (1 - 999)"
+msgstr "Numerisch (1 - 999)"
 
-#: includes/Email.php:205 includes/Email.php:207
-msgid "Please confirm the customer's booking."
-msgstr "Bitte bestätigen Sie die Buchung."
+#: includes/Tools.php:162 includes/Tools.php:176
+msgid "A-Z"
+msgstr "A-Z"
 
-#: config/config.php:100
-msgid "Please confirm your booking"
-msgstr "Bitte bestätigen Sie Ihre Buchung"
+#: includes/Tools.php:167
+msgid "Starting number"
+msgstr "Startnummer"
 
-#: includes/Email.php:211 includes/Email.php:213
-msgid "Please confirm your booking now."
-msgstr "Bitte bestätigen Sie Ihre Buchung jetzt."
-
-#: includes/Shortcodes/Availability.php:113 includes/Shortcodes/QR.php:59
-msgid "Please enter a valid seat slug or ID"
-msgstr "Bitte geben Sie gültige Platzbezeichnung oder ID an. "
-
-#: includes/templates/auth/single-auth.php:15
-msgid "Please login to the account you have used to book this seat."
-msgstr ""
-"Bitte melden Sie sich mit den Benutzerdaten an, mit denen Sie diesen Platz "
-"gebucht haben."
-
-#: includes/templates/auth/single-auth.php:103
-msgid "Please login with your UB-AD username"
-msgstr "Bitte melden Sie sich mit Ihrem UB-AD Benutzernamen an"
-
-#: includes/Shortcodes/Bookings.php:593
-msgid ""
-"Please remember to <strong>check in</strong> to your seat when you arrive!"
-msgstr ""
-"Bitte denken Sie daran, bei Ihrer Ankunft an Ihrem Platz <strong>"
-"einzuchecken</strong>!"
-
-#: includes/templates/single-seat.php:371
-msgid "Please reserve a time slot for a consultation."
-msgstr "Bitte reservieren Sie einen Termin für eine Sprechstunde."
-
-#: includes/templates/single-seat.php:377
-msgid "Please reserve a time slot for this seat"
-msgstr "Bitte reservieren Sie einen Termin für diesen Platz"
-
-#: includes/Tools.php:136 includes/Metaboxes.php:106 includes/Metaboxes.php:158
-#: includes/Metaboxes.php:512
-msgid "Please select"
-msgstr "Bitte wählen"
-
-#: includes/Shortcodes/Bookings.php:312 includes/Shortcodes/Bookings.php:1190
-#: includes/Shortcodes/Bookings.php:1271
-msgid "Please select a date and a time slot."
-msgstr "Bitte wählen Sie ein Datum und einen Termin."
-
-#: includes/Shortcodes/Bookings.php:301 includes/Shortcodes/Bookings.php:1187
-msgid "Please select a date."
-msgstr "Wählen Sie ein Datum."
-
-#: includes/Shortcodes/Bookings.php:524
-msgid "Please select a room."
-msgstr "Bitte wählen Sie einen Raum."
-
-#: includes/Main.php:139
-msgid "Please select a seat first."
-msgstr "Bitte wählen Sie zuerst einen Platz."
-
-#: includes/CPT/CPT.php:167
-msgid "Please select room"
-msgstr "Bitte wählen Sie einen Raum"
-
-#: includes/Shortcodes/Availability.php:159
-msgid "Please specify a room ID in your Shortcode."
-msgstr "Bitte geben Sie eine Raum-ID im Shortcode an."
-
-#: includes/Shortcodes/QR.php:67
-msgid "Please specify a seat ID in your Shortcode."
-msgstr "Bitte geben Sie in Ihrem Shortcode eine Platz-ID an."
-
-#: rrze-rsvp.php:137
-#, php-format
-msgid "Plugins: %1$s: %2$s"
-msgstr "Plugins: %1$s: %2$s"
-
-#: config/config.php:494
-msgid "Port"
-msgstr ""
-
-#: includes/CPT/Bookings.php:53
-msgctxt "Post type general name"
-msgid "Bookings"
-msgstr "Buchungen"
-
-#: includes/CPT/Rooms.php:33
-msgctxt "Post type general name"
-msgid "Rooms"
-msgstr "Räume"
-
-#: includes/CPT/Seats.php:42
-msgctxt "Post type general name"
-msgid "Seats"
-msgstr "Plätze"
-
-#: includes/CPT/Bookings.php:54
-msgctxt "Post type singular name"
-msgid "Booking"
-msgstr "Buchung"
-
-#: includes/CPT/Rooms.php:34
-msgctxt "Post type singular name"
-msgid "Room"
-msgstr "Raum"
-
-#: includes/CPT/Seats.php:43
-msgctxt "Post type singular name"
-msgid "Seat"
-msgstr "Platz"
-
-#: includes/Tools.php:180
-msgid "Prefix"
-msgstr "Präfix"
-
-#: includes/Tools.php:199
-msgid ""
-"Preselect equipment that will be available on all seats. You can modify the "
-"equipment later by editing the seats individually or by bulk editing several "
-"seats in the seats table."
-msgstr ""
-"Wählen Sie Ausstattung aus, die an allen Plätzen verfügbar ist. Sie können "
-"die Ausstattung später individuell bei den Plätzen anpassen, oder mehrere "
-"zugleich über die Mehrfachaktionen in der Platz-Tabelle zuweisen."
-
-#: config/config.php:419
-msgid "Print FAU logo"
-msgstr "FAU-Logo drucken"
-
-#: config/config.php:467
-msgid "Print room's address"
-msgstr "Raumadresse drucken"
-
-#: config/config.php:455
-msgid "Print room's text"
-msgstr "Raumbeschreibung drucken"
-
-#: config/config.php:479
-msgid "Print seats' equipment"
-msgstr "Platzaustattung drucken"
-
-#: config/config.php:425
-msgid "Print website's logo or title"
-msgstr "Das Logo oder den Titel der Website drucken"
-
-#: config/config.php:431
-msgid "Print website's URL"
-msgstr "URL der Website drucken"
-
-#: config/config.php:164
-msgid "QR PDF Settings"
-msgstr "QR-Code-Einstellungen"
-
-#: config/config.php:387
-msgid "Reason Cancelling Not Checked In"
-msgstr "Stornierungsgrund 'Nicht eingecheckt'"
-
-#: config/config.php:395
-msgid "Reason Cancelling Not Checked In (english)"
-msgstr "Stornierungsgrund 'Nicht eingecheckt' (englisch)"
-
-#: config/config.php:370
-msgid "Reason Cancelling Not Confirmed"
-msgstr "Stornierungsgrund 'Nicht bestätigt'"
-
-#: config/config.php:378
-msgid "Reason Cancelling Not Confirmed (english)"
-msgstr "Stornierungsgrund 'Nicht bestätigt' (englisch)"
-
-#: config/config.php:388 config/config.php:396
-msgid "Reason for cancelling mails because there is no check-in"
-msgstr "Begründung für Stornierungsmails wegen fehlenden Check-Ins."
-
-#: config/config.php:371 config/config.php:379
-msgid "Reason for cancelling mails because there is no confirmation"
-msgstr "Begründung für Stornierungsmails wegen fehlender Bestätigung."
-
-#: config/config.php:570
-msgid "Require LDAP Authentication"
-msgstr "LDAP Authentifizierung erforderlich"
-
-#: config/config.php:564
-msgid "Require SSO Authentication"
-msgstr "SSO-Authentifizierung verlangen"
-
-#: includes/Shortcodes/Bookings.php:320
-msgid "Required"
-msgstr "Pflichtfeld"
-
-#: includes/templates/single-seat.php:376
-msgid "Reservation"
-msgstr "Platzreservierung"
-
-#: includes/Metaboxes.php:321
-msgid "Reservation with check-in"
-msgstr "Platzreservierung mit Check-In"
-
-#: includes/Metaboxes.php:322
-msgid "Reservation without check-in"
-msgstr "Platzreservierung ohne Check-In"
-
-#: includes/Shortcodes/Bookings.php:174
-msgid "Reservations disabled. Please checkin at the seats in the room."
-msgstr ""
-"Die Reservierung ist nicht aktiv. Bitte checken Sie sich direkt vor Ort am "
-"Platz ein."
-
-#: includes/Settings.php:316
-msgid "Reset"
-msgstr "Zurücksetzen"
-
-#: config/config.php:172
-msgid "Reset Settings"
-msgstr "Einstellungen zurücksetzen"
-
-#: config/config.php:559 includes/Tools.php:133 includes/Metaboxes.php:508
-#: includes/CPT/CPT.php:164 includes/CPT/Seats.php:117
-#: includes/CPT/Bookings.php:104 includes/CPT/Rooms.php:59
-#: includes/CPT/Rooms.php:86 includes/Printing/Printing.php:128
-#: includes/Shortcodes/Bookings.php:281 includes/Shortcodes/Bookings.php:568
-#: includes/templates/single-seat.php:116
-msgid "Room"
-msgstr "Raum"
-
-#: includes/CPT/CPT.php:100
-msgid "Room occupancy"
-msgstr "Raumbelegung"
-
-#: includes/Functions.php:84 includes/CPT/CPT.php:99
-msgid "Room occupancy for today"
-msgstr "Raumbelegung heute"
-
-#: includes/Shortcodes/Bookings.php:148
-msgid "Room specified in shortcode does not exist."
-msgstr "Die im Shortcode angegebene Raum-ID ist falsch oder existiert nicht."
-
-#: config/config.php:594
-msgid "Room(s)"
-msgstr "Räume"
-
-#: includes/templates/single-seat.php:156
-#: includes/templates/single-seat.php:215
-msgid "Room:"
-msgstr "Raum:"
-
-#: includes/Actions.php:245
-msgctxt "Room|Seat"
-msgid "Delete"
-msgstr "Löschen"
+#: includes/Tools.php:167 includes/Tools.php:180 includes/Tools.php:186
+msgid "optional"
+msgstr "optional"
 
 #: includes/Tools.php:169
 msgid ""
@@ -1474,152 +2185,13 @@ msgstr ""
 "Reihennummern beginnen standardmäßig mit 1. Hier können Sie eine abweichende "
 "Startnummer festlegen (z.B. 101)."
 
-#: includes/Tools.php:160
-msgid "Rows Numbering System"
-msgstr "Reihennummerierung"
+#: includes/Tools.php:174
+msgid "Seats Numbering System"
+msgstr "Platznummerierung"
 
-#. Name of the plugin
-#: config/config.php:139 config/config.php:140
-msgid "RRZE RSVP"
-msgstr "RRZE RSVP"
-
-#: config/config.php:143
-msgid "RRZE RSVP Settings"
-msgstr "Einstellungen &rsaquo; RRZE RSVP"
-
-#. Author of the plugin
-msgid "RRZE-Webteam"
-msgstr "RRZE-Webteam"
-
-#: config/config.php:579
-msgid "RSVP Availability"
-msgstr "RSVP Platzverfügbarkeit"
-
-#: config/config.php:544
-msgid "RSVP Booking"
-msgstr "RSVP Buchungsformular"
-
-#: includes/Shortcodes/Bookings.php:453
-msgid "Save booking"
-msgstr "Fehler beim Speichern"
-
-#: includes/Shortcodes/Bookings.php:206 includes/Shortcodes/Bookings.php:222
-#: includes/templates/single-room.php:165
-#: includes/templates/single-room.php:182
-msgid "Schedule"
-msgstr "Zeitplan"
-
-#: includes/CPT/Bookings.php:67
-msgctxt ""
-"Screen reader text for the filter links heading on the post type listing "
-"screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
-msgid "Filter Bookings list"
-msgstr "Buchungsliste filtern"
-
-#: includes/CPT/Rooms.php:53
-msgctxt ""
-"Screen reader text for the filter links heading on the post type listing "
-"screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
-msgid "Filter Rooms list"
-msgstr "Raumliste filtern"
-
-#: includes/CPT/Seats.php:62
-msgctxt ""
-"Screen reader text for the filter links heading on the post type listing "
-"screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
-msgid "Filter Seats list"
-msgstr "Platzliste filtern"
-
-#: includes/CPT/Bookings.php:69
-msgctxt ""
-"Screen reader text for the items list heading on the post type listing "
-"screen. Default “Posts list”/”Pages list”. Added in 4.4"
-msgid "Bookings list"
-msgstr "Buchungsliste"
-
-#: includes/CPT/Rooms.php:55
-msgctxt ""
-"Screen reader text for the items list heading on the post type listing "
-"screen. Default “Posts list”/”Pages list”. Added in 4.4"
-msgid "Rooms list"
-msgstr "Raumliste"
-
-#: includes/CPT/Seats.php:64
-msgctxt ""
-"Screen reader text for the items list heading on the post type listing "
-"screen. Default “Posts list”/”Pages list”. Added in 4.4"
-msgid "Seats list"
-msgstr "Platzliste"
-
-#: includes/CPT/Bookings.php:68
-msgctxt ""
-"Screen reader text for the pagination heading on the post type listing "
-"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
-msgid "Bookings list navigation"
-msgstr "Navigation der Buchungsliste"
-
-#: includes/CPT/Rooms.php:54
-msgctxt ""
-"Screen reader text for the pagination heading on the post type listing "
-"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
-msgid "Rooms list navigation"
-msgstr "Navigation der Raumliste"
-
-#: includes/CPT/Seats.php:63
-msgctxt ""
-"Screen reader text for the pagination heading on the post type listing "
-"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
-msgid "Seats list navigation"
-msgstr "Navigation der Platzliste"
-
-#: includes/Tracking.php:160
-msgid "Search"
-msgstr "Suchen"
-
-#: config/config.php:515
-msgid "Search Base DN"
-msgstr ""
-
-#: includes/CPT/Bookings.php:63
-msgid "Search Bookings"
-msgstr "Buchungen durchsuchen"
-
-#: includes/Tracking.php:141
-msgid "Search date"
-msgstr "Suchdatum"
-
-#: includes/CPT/Rooms.php:43
-msgid "Search Rooms"
-msgstr "Räume durchsuchen"
-
-#: includes/CPT/Seats.php:52
-msgid "Search Seats"
-msgstr "Plätze durchsuchen"
-
-#: includes/Functions.php:113 includes/Functions.php:221
-#: includes/Metaboxes.php:103 includes/CPT/Seats.php:68
-#: includes/CPT/Seats.php:116 includes/CPT/Bookings.php:105
-#: includes/Printing/Printing.php:140 includes/Shortcodes/Bookings.php:282
-#: includes/Shortcodes/Bookings.php:570
-msgid "Seat"
-msgstr "Platz"
-
-#: includes/Shortcodes/Bookings.php:1214
-#, php-format
-msgid "Seat %s"
-msgstr "Platz %s"
-
-#: includes/Shortcodes/Bookings.php:483
-msgid "Seat already booked"
-msgstr "Platz bereits ausgebucht"
-
-#: includes/Email.php:158
-msgid "Seat checked out"
-msgstr "Platz wurde ausgecheckt"
-
-#: config/config.php:624
-msgid "Seat ID"
-msgstr "Platz-ID"
+#: includes/Tools.php:180
+msgid "Prefix"
+msgstr "Präfix"
 
 #: includes/Tools.php:182
 msgid ""
@@ -1636,274 +2208,56 @@ msgstr ""
 "ein Präfix eingegeben wurde, wird es vor der Reihenbezeichnung eingefügt, z."
 "B. \"Erdgeschoss 15A\"."
 
-#: includes/Actions.php:684
-msgid "Seat unavailable."
-msgstr "Sitzplatz nicht verfügbar."
-
-#: config/config.php:600
-msgid "Seat(s)"
-msgstr "Plätze"
-
-#: includes/Shortcodes/Availability.php:62
-#: includes/Shortcodes/Bookings.php:1117
-msgid "Seats available"
-msgstr "Verfügbare Plätze"
-
-#: includes/Metaboxes.php:403
+#: includes/Tools.php:199
 msgid ""
-"Seats can be booked and checked-in in one step. This only works if automatic "
-"confirmation activated!"
+"Preselect equipment that will be available on all seats. You can modify the "
+"equipment later by editing the seats individually or by bulk editing several "
+"seats in the seats table."
 msgstr ""
-"Plätze können in einem Schritt gebucht und eingecheckt werden. Bitte "
-"beachten Sie, dass hierzu die automatische Buchungsbestätigung aktiviert "
-"sein muss!"
+"Wählen Sie Ausstattung aus, die an allen Plätzen verfügbar ist. Sie können "
+"die Ausstattung später individuell bei den Plätzen anpassen, oder mehrere "
+"zugleich über die Mehrfachaktionen in der Platz-Tabelle zuweisen."
 
-#: includes/Tools.php:174
-msgid "Seats Numbering System"
-msgstr "Platznummerierung"
+#: includes/Tracking.php:80 includes/Tracking.php:91 includes/Tracking.php:110
+#: includes/Tracking.php:168
+msgctxt "admin page title"
+msgid "Contact tracking"
+msgstr "Kontaktverfolgung"
 
-#: includes/Shortcodes/Bookings.php:286
-msgid "Select date and time"
-msgstr "Datum und Uhrzeit wählen"
+#: includes/Tracking.php:81 includes/Tracking.php:92
+msgctxt "admin menu entry title"
+msgid "RSVP Contact tracking"
+msgstr "RSVP Kontaktverfolgung"
 
-#: includes/CPT/Bookings.php:263
-msgid "Select timeslot"
-msgstr "Termin auswählen."
+#: includes/Tracking.php:126
+msgid "Guests found!"
+msgstr "Personen gefunden!"
 
-#: includes/Metaboxes.php:386
-msgid "Send an email to the booking manager when customer has checked out."
-msgstr ""
-"E-Mail an Raumverantwortlichen senden, wenn von einem Sitzplatz ausgecheckt "
-"wurde (z.B. um Reinigung zu veranlassen)."
+#: includes/Tracking.php:127
+msgid "Download CSV"
+msgstr "CSV-Datei herunterladen"
 
-#: config/config.php:255
-msgid "Sender email"
-msgstr "Absender-Adresse"
+#: includes/Tracking.php:131
+msgid "No guest found."
+msgstr "Keine Personn gefunden."
 
-#: config/config.php:246 config/config.php:248
-msgid "Sender name"
-msgstr "Name des Absenders"
+#: includes/Tracking.php:141
+msgid "Search date"
+msgstr "Suchdatum"
 
-#: config/config.php:487
-msgid "Server"
-msgstr ""
+#: includes/Tracking.php:146
+msgid "days"
+msgstr "Tage"
 
-#: includes/CPT/CPT.php:251
-msgid "Shortcodes"
-msgstr "Shortcodes"
+#: includes/Tracking.php:160
+msgid "Search"
+msgstr "Suchen"
 
-#: includes/CPT/Bookings.php:292
-msgid "Show all dates"
-msgstr "Alle Termine anzeigen"
-
-#: includes/CPT/Seats.php:148 includes/CPT/Bookings.php:294
-msgid "Show all rooms"
-msgstr "Alle Räume anzeigen"
-
-#: includes/CPT/Bookings.php:293
-msgid "Show all time slots"
-msgstr "Alle Zeiträume anzeigen"
-
-#: config/config.php:195
-msgid "Show Availability table on Room page."
-msgstr "Zeige die verfügbaren Termine in der Raumansicht"
-
-#: config/config.php:605
-msgid "Show booking link"
-msgstr "Zeige Link zur Buchung"
-
-#: includes/Metaboxes.php:435
-msgid "Show notes/comment input in booking form"
-msgstr "Notizen / Kommentareingabe im Buchungsformular anzeigen"
-
-#: includes/Shortcodes/Bookings.php:414
-msgid "SSO error"
-msgstr "SSO-Fehler"
-
-#: includes/Metaboxes.php:336
-msgid "SSO is required"
-msgstr "SSO erforderlich"
-
-#: includes/Metaboxes.php:263
-msgid "Start time"
-msgstr "Startzeit"
-
-#: includes/Tools.php:167
-msgid "Starting number"
-msgstr "Startnummer"
-
-#: includes/Metaboxes.php:155 includes/CPT/Bookings.php:111
-msgid "Status"
-msgstr "Status"
-
-#: includes/Metaboxes.php:451
-msgid "Street"
-msgstr "Straße"
-
-#: config/config.php:353
-msgid "Subject Cancelling"
-msgstr "Betreff für Buchungsabsagen"
-
-#: config/config.php:361
-msgid "Subject Cancelling (english)"
-msgstr "Betreff für Buchungsabsagen (englisch)"
-
-#: config/config.php:323
-msgid "Subject Confirmation"
-msgstr "Betreff für Buchungsbestätigung"
-
-#: config/config.php:331
-msgid "Subject Confirmation (english)"
-msgstr "Betreff für Buchungsbestätigung (englisch)"
-
-#: config/config.php:354 config/config.php:362
-msgid "Subject for cancelling mails"
-msgstr "Betreff der E-Mail für Buchungsabsagen"
-
-#: config/config.php:324 config/config.php:332
-msgid "Subject for confirmation mails"
-msgstr "Betreff der E-Mail für Bestätigungen"
-
-#: config/config.php:301
-msgid "Subject for confirmation required (english)"
-msgstr "Betreff \"Bestätigung erforderlich\" (englisch)"
-
-#: config/config.php:293
-msgid "Subject for confirmation required."
-msgstr "Betreff \"Bestätigung erforderlich\""
-
-#: config/config.php:264 config/config.php:272
-msgid "Subject of the email replying to a booking received."
-msgstr "Betreff der E-Mail, die auf eine Reservierungsanfrage antwortet."
-
-#: config/config.php:294 config/config.php:302
-msgid ""
-"Subject of the email where confirmation of the booking by the customer is "
-"required."
-msgstr ""
-"Betreff der E-Mail, wenn eine Bestätigung der Buchung durch den Kunden "
-"erforderlich ist."
-
-#: config/config.php:263
-msgid "Subject of the received booking"
-msgstr "Betreff für Reservierungsanfragen"
-
-#: config/config.php:271
-msgid "Subject of the received booking (english)"
-msgstr "Betreff für Reservierungsanfragen (englisch)"
-
-#: includes/Shortcodes/Bookings.php:400
-msgid "Submit booking"
-msgstr "Buchung absenden"
-
-#: includes/CPT/Seats.php:95
-msgctxt "taxonomy general name"
-msgid "Equipment"
-msgstr "Ausstattung"
-
-#: includes/CPT/Seats.php:96
-msgctxt "taxonomy singular name"
-msgid "Equipment"
-msgstr "Ausstattung"
-
-#: config/config.php:310
-msgid "Text for confirmation required"
-msgstr "E-Mail-Text \"Bestätigung erforderlich\""
-
-#: config/config.php:316
-msgid "Text for confirmation required (english)"
-msgstr "E-Mail-Text \"Bestätigung erforderlich\" (englisch)"
-
-#: config/config.php:280
-msgid "Text of the received booking"
-msgstr "E-Mail-Text für Reservierungsanfragen"
-
-#: config/config.php:286
-msgid "Text of the received booking (english)"
-msgstr "E-Mail-Text für Reservierungsanfragen (englisch)"
-
-#: config/config.php:96
-msgid "Thank you for booking"
-msgstr "Vielen Dank für Ihre Buchung"
-
-#: includes/Actions.php:1063
-msgid "Thank you for confirming your booking."
-msgstr "Vielen Dank für die Bestätigung der Buchung."
-
-#: includes/Actions.php:921 includes/Actions.php:925
-#, php-format
-msgid "The booking has already been %s."
-msgstr "Die Buchung wurde bereits %s."
-
-#: includes/Actions.php:911 includes/Actions.php:916
-#, php-format
-msgid "The booking has been %s"
-msgstr "Die Buchung wurde %s"
-
-#: includes/Actions.php:1056
-msgid "The booking is already canceled."
-msgstr "Die Buchung ist bereits storniert."
-
-#: includes/Metaboxes.php:412
-msgid ""
-"The customer must check-in their booking within a certain time from the "
-"start of the event. Otherwise the system will cancel the booking. The time "
-"allowed can be set just below in the \"Allowed Check-In Time\" section."
-msgstr ""
-"Der Bucher muss innerhalb einer bestimmten Zeit ab Beginn des Termins "
-"einchecken. Andernfalls wird die Buchung automatisch storniert. Die erlaubte "
-"Zeit kann in der nächsten Zeile (\"Erlaubter Zeitraum für Check-In\") "
-"eingestellt werden."
-
-#: includes/Metaboxes.php:377
-msgid ""
-"The customer must confirm his reservation within one hour. Otherwise the "
-"system will cancel the booking."
-msgstr ""
-"Der Bucher muss seine Reservierung innerhalb einer Stunde bestätigen. "
-"Andernfalls wird die Reservierung automatisch storniert."
-
-#: includes/Shortcodes/Bookings.php:711
-msgid "The date or time of the booking is not valid."
-msgstr "Datum oder Uhrzeit der Buchung ist nicht gültig."
-
-#: includes/Shortcodes/Bookings.php:753
-msgid "The email address is not valid."
-msgstr "Die E-Mail-Adresse ist ungültig."
-
-#: includes/Functions.php:90
-msgid "The next available seat is on"
-msgid_plural "The next available seats are on"
-msgstr[0] "Den nächsten freien Platz gibt es am"
-msgstr[1] "Die nächsten freien Plätze gibt es am"
-
-#: includes/CPT/Bookings.php:66
-msgctxt ""
-"The post type archive label used in nav menus. Default “Post Archives”. "
-"Added in 4.4"
-msgid "Booking archives"
-msgstr "Buchungshistorie"
-
-#: includes/CPT/Rooms.php:50
-msgctxt ""
-"The post type archive label used in nav menus. Default “Post Archives”. "
-"Added in 4.4"
-msgid "Room archives"
-msgstr "Raumindex"
-
-#: includes/CPT/Seats.php:59
-msgctxt ""
-"The post type archive label used in nav menus. Default “Post Archives”. "
-"Added in 4.4"
-msgid "Seat archives"
-msgstr "Plätze "
-
-#: includes/Shortcodes/Bookings.php:720
-msgid "The room does not exist."
-msgstr "Der Raum existiert nicht."
+#: includes/Users.php:82
+msgid "Booking Agent"
+msgstr "Buchungsbearbeiter"
 
 #: rrze-rsvp.php:66
-#, php-format
 msgid ""
 "The server is running PHP version %1$s. The Plugin requires at least PHP "
 "version %2$s."
@@ -1912,7 +2266,6 @@ msgstr ""
 "mindestens Version %2$s."
 
 #: rrze-rsvp.php:68
-#, php-format
 msgid ""
 "The server is running WordPress version %1$s. The Plugin requires at least "
 "WordPress version %2$s."
@@ -1920,339 +2273,53 @@ msgstr ""
 "Der Server verwendet WordPress in der Version %1$s. Dieses Plugin benötigt "
 "als Mindestversion %2$s."
 
-#: includes/Email.php:321
-msgid ""
-"There is a new confirmed booking for your room. Calendar file (.ics) "
-"attached."
-msgstr "Es gibt eine neue Buchung für Ihren Raum. Kalenderdatei (.ics) anbei."
-
-#: includes/Shortcodes/Bookings.php:574
-#, php-format
-msgid "These data were also sent to your email address <strong>%s</strong>."
-msgstr ""
-"Diese Daten wurden auch an Ihre E-Mail-Adresse <strong>%s</strong> gesendet."
-
-#: includes/Actions.php:592
-msgid "This item cannot be deleted."
-msgstr "Dieser Eintrag kann nicht gelöscht werden."
-
-#: includes/Actions.php:598
-msgid "This item cannot be updated."
-msgstr "Dieser Eintrag kann nicht aktualisiert werden."
-
-#: includes/Actions.php:711
-msgid "This item is used in a booking and cannot be deleted."
-msgstr ""
-"Dieses Objekt kann nicht gelöscht werden, da bereits Buchungen für dieses "
-"Objekt vorliegen."
-
-#: includes/Actions.php:721
-msgid "This item is used in a booking and cannot be password protected."
-msgstr ""
-"Dieses Objekt kann nicht passwortgeschützt werden, da bereits Buchtungen für "
-"dieses Objekt vorliegen."
-
-#: includes/Actions.php:716
-msgid ""
-"This item is used in a booking and cannot be set to draft, to private or "
-"scheduled to be published in a future date."
-msgstr ""
-"Dieses Objekt kann nicht auf Entwurf, Privat oder ein zukünftiges "
-"Veröffentlichungsdatum gesetzt werden, da bereits Buchungen für dieses "
-"Objekt vorliegen."
-
-#: includes/Functions.php:90
-msgid "This room has no available seat for today."
-msgstr "In diesem Raum gibt es heute keine freien Plätze."
-
-#: includes/Functions.php:79
-#, php-format
-msgid "This room has no available seat within %u days."
-msgstr "In diesem Raum gibt es keine freien Plätze in den nächsten %u Tagen."
-
-#: includes/Functions.php:132 includes/Functions.php:239
-msgid "This room has no seats for today."
-msgstr "In diesem Raum gibt es heute keine freien Plätze."
-
-#: includes/templates/single-seat.php:129
-msgid "This seat has been reserved for you."
-msgstr "Dieser Platz wurde für Sie reserviert."
-
-#: includes/templates/single-seat.php:287
-msgid ""
-"This seat is currently reserved. If you have reserved this seat, please "
-"check in."
-msgstr ""
-"Dieser Platz ist bereits reserviert. Falls Sie diesen Platz reserviert haben,"
-" checken Sie bitte ein."
-
-#: includes/templates/single-seat.php:306
-msgid ""
-"This seat is currently reserved. If you have reserved this seat, please "
-"check out when you leave the site."
-msgstr ""
-"Dieser Platz ist derzeit reserviert. Wenn Sie diesen Platz reserviert haben, "
-"checken Sie bitte aus, wenn Sie den Raum verlassen."
-
-#: includes/templates/single-seat.php:374
-msgid ""
-"This seat is for instant check-in only and cannot be reserved. These are the "
-"next available time slots:"
-msgstr ""
-"Dieser Platz kann nur direkt eingecheckt und nicht reserviert werden. Dies "
-"sind die nächsten verfügbaren Termine:"
-
-#: includes/templates/single-seat.php:359
-msgid ""
-"This seat is free for instant check-in (booking and check-in in one step) "
-"for the current timeslot."
-msgstr ""
-"Dieser Platz steht zum sofortigen Einchecken im aktuellen Zeitfenster zur "
-"Verfügung."
-
-#: includes/Actions.php:819
-msgid ""
-"This seat is used in a booking and cannot be assigned to a different room."
-msgstr ""
-"Dieser Platz kann keinem anderen Raum zugeordnet werden, da bereits "
-"Buchungen für diesen Platz vorliegen."
-
-#: config/config.php:438 config/config.php:447
-msgid "This text will be shown above the QR code."
-msgstr "Dieser Text wird über dem QR Code angezeigt."
-
-#: includes/Metaboxes.php:221
-msgid ""
-"This textarea contains the 'Additional Information' field content if this "
-"option is activated in the room settings. It can also be used for notes for "
-"internal use."
-msgstr ""
-"Dieser Textbereich enthält den Feldinhalt 'Weitere Informationen', wenn "
-"diese Option in den Raumeinstellungen aktiviert ist. Es kann auch für "
-"Notizen für den internen Gebrauch verwendet werden."
-
-#: includes/templates/single-seat.php:120
-msgid "This time slot has been reserved for you."
-msgstr "Dieser Termin wurde für Sie reserviert."
-
-#: includes/CPT/Bookings.php:103 includes/Shortcodes/Bookings.php:280
-#: includes/Shortcodes/Bookings.php:566
-msgid "Time"
-msgstr "Zeit"
-
-#: includes/Metaboxes.php:571
-msgid "Time slot booked"
-msgstr "Gebuchter Termin"
-
-#: includes/Metaboxes.php:243
-msgid "Time slot {#}"
-msgstr "Termin {#}"
-
-#: includes/Shortcodes/Bookings.php:188 includes/templates/single-room.php:23
-msgid "Time slots"
-msgstr "Termine"
-
-#: includes/Metaboxes.php:115
-msgid "Timeslot"
-msgstr "Termin"
-
-#: includes/Shortcodes/Bookings.php:271 includes/Shortcodes/Bookings.php:502
-msgid "Timeslot not available."
-msgstr "Termin nicht verfügbar."
-
-#: includes/Metaboxes.php:229
-msgid "Timeslots"
-msgstr "Termine"
-
-#: includes/Actions.php:738
-#, php-format
-msgid ""
-"Unable to save post: End time must be greater than start time in timeslot no."
-" %s."
-msgid_plural ""
-"Unable to save post: End time must be greater than start time in timeslots "
-"no. %s."
-msgstr[0] ""
-"Änderungen konnten nicht gespeichert werden: Die Endzeit muss nach der "
-"Startzeit liegen in Termin Nr. %s."
-msgstr[1] ""
-"Änderungen konnten nicht gespeichert werden: Die Endzeit muss nach der "
-"Startzeit liegen in Terminen Nr. %s."
-
-#: config/config.php:114
-msgid "Unfortunately we have to cancel your booking on {{date}} at {{time}}."
-msgstr "Leider müssen wir die Buchung am {{date}} um {{time}} stornieren."
-
-#: includes/Actions.php:132 includes/Actions.php:605 includes/Actions.php:749
-#: includes/Actions.php:827
-msgid "Update Error"
-msgstr "Aktualisierungsfehler"
-
-#: includes/Metaboxes.php:281
-msgid "Valid from (optional)"
-msgstr "Gültig von (optional)"
-
-#: includes/Metaboxes.php:288
-msgid "Valid until (optional)"
-msgstr "Gültig bis (optional)"
-
-#: includes/CPT/Bookings.php:61
-msgid "View Booking"
-msgstr "Buchung ansehen"
-
-#: includes/CPT/Rooms.php:41
-msgid "View Room"
-msgstr "Raum ansehen"
-
-#: includes/CPT/Seats.php:50
-msgid "View Seat"
-msgstr "Zeige Platz"
-
-#: config/config.php:106
-msgid "We are happy to inform you that your booking has been confirmed."
-msgstr "Wir freuen uns, Ihnen mitzuteilen, dass Ihre Buchung bestätigt wurde."
-
-#: config/config.php:98
-msgid ""
-"We received your booking and we will notify you once it has been confirmed."
-msgstr ""
-"Wir haben Ihre Reservierungsanfrage erhalten und werden Sie informieren, "
-"sobald diese bearbeitet wurde."
-
-#: includes/Functions.php:330
-msgid "Website for public displays"
-msgstr "Darstellung für Public Displays"
-
-#: includes/Metaboxes.php:253
-msgid "Week day"
-msgstr "Wochentag"
-
-#: includes/Shortcodes/Bookings.php:187 includes/templates/single-room.php:22
-msgid "Weekday"
-msgstr "Wochentag"
-
-#: config/config.php:228 config/config.php:239
-msgid "Yes"
-msgstr "Ja"
-
-#: config/config.php:200
-msgid "Yes (no link)"
-msgstr "Ja (keine Verlinkung)"
-
-#: config/config.php:199
-msgid "Yes (with seats linked to booking form)"
-msgstr "Ja (mit Link von den Plätzen zum Buchungsformular)"
-
-#: config/config.php:525
-msgid "Yes, I want to reset <strong>all</strong> settings."
-msgstr "Ja, ich möchte alle Einstellungen auf ihre Standardwerte zurücksetzen."
-
-#: config/config.php:102
-msgid ""
-"You are required to confirm the booking now. Please note that unconfirmed "
-"bookings automatically expire after one hour."
-msgstr ""
-"Sie müssen die Buchung jetzt bestätigen. Bitte beachten Sie, dass nicht "
-"bestätigte Buchungen automatisch nach einer Stunde verfallen."
-
-#: includes/CPT/CPT.php:256
-msgid ""
-"You can display a booking form or a table with the available time slots for "
-"this room by adding one of the following shortcodes to any page:"
-msgstr ""
-"Mit den folgenden Shortcodes können Sie ein Buchungsformular oder eine "
-"Übersicht über die verfügbaren Termine für diesen Raum auf jeder beliebigen "
-"Seite hinzufügen:"
-
-#: includes/Metaboxes.php:423
-#, php-format
-msgid ""
-"You can specify an allowed check-in time for this room. If \"Check-In "
-"required\" is checked, the system will cancel the booking after this time. "
-"Default is %s minutes."
-msgstr ""
-"Sie können einen erlaubten Check-In-Zeitraum für diesen Raum definieren. "
-"Wenn die Option \"Check-In erforderlich\" angekreuzt ist, storniert das "
-"System die Buchung autmatisch nach dieser Zeit. Standardeinstellung ist %s "
-"Minuten."
-
-#: config/config.php:112
-msgid "You haven't checked in."
-msgstr "Sie haben nicht eingecheckt."
-
-#: config/config.php:110
-msgid "You haven't confirmed your reservation."
-msgstr "Sie haben Ihre Reservierung nicht bestätigt."
-
-#: includes/Email.php:134
-msgid "You received a new booking."
-msgstr "Sie haben eine neue Buchung erhalten."
-
-#: includes/Email.php:83 includes/Email.php:109
-msgid "You received a new request for a booking."
-msgstr "Sie erhielten eine neue Reservierungsanfrage."
-
-#: includes/Shortcodes/Bookings.php:278
-msgid "Your booking"
-msgstr "Ihre Buchung"
-
-#: config/config.php:108
-msgid "Your booking has been cancelled"
-msgstr "Ihre Buchung wurde storniert."
-
-#: includes/Actions.php:1049
-msgid ""
-"Your booking has been cancelled. Please contact us to find a different "
-"arrangement."
-msgstr ""
-"Ihre Buchung wurde storniert. Bitte setzen Sie sich mit uns in Verbindung um "
-"eine alternative Terminmöglichkeit zu finden."
-
-#: config/config.php:104
-msgid "Your booking has been confirmed"
-msgstr "Ihre Buchung wurde bestätigt."
-
-#: includes/Actions.php:917
-msgid "Your customer has received an email cancellation."
-msgstr "Der Bucher hat eine E-Mail-Stornierung erhalten."
-
-#: includes/Actions.php:912
-msgid "Your customer has received an email confirmation."
-msgstr "Der Bucher hat eine E-Mail-Bestätigung erhalten."
-
-#: includes/Shortcodes/Bookings.php:320
-msgid "Your data"
-msgstr "Ihre Daten"
-
-#: includes/Shortcodes/Bookings.php:729
-msgid "Your last name is required."
-msgstr "Der Nachname ist notwendig."
-
-#: includes/Shortcodes/Bookings.php:741
-msgid "Your name is required."
-msgstr "Der Vorname ist notwendig."
-
-#: includes/Shortcodes/Bookings.php:765
-msgid "Your phone number is not valid."
-msgstr "Die Telefonnummer ist ungültig."
-
-#: includes/Shortcodes/Bookings.php:577
-msgid "Your reservation has been submitted. Please confirm your booking!"
-msgstr ""
-"Ihre Reservierung wurde übermittelt. Bitte bestätigen Sie Ihre Buchung!"
-
-#: includes/Shortcodes/Bookings.php:580
-msgid "Your reservation has been submitted. Thank you for booking!"
-msgstr "Ihre Reservierung wurde verarbeitet. Vielen Dank für Ihre Buchung."
-
-#: includes/Shortcodes/Bookings.php:585
-msgid "Your reservation request:"
-msgstr "Ihre Reservierungsanfrage: "
-
-#: includes/Shortcodes/Bookings.php:583
-msgid "Your reservation:"
-msgstr "Ihre Reservierung: "
-
-#: includes/Metaboxes.php:457
-msgid "ZIP"
-msgstr "PLZ"
+#: rrze-rsvp.php:137
+msgid "Plugins: %1$s: %2$s"
+msgstr "Plugins: %1$s: %2$s"
+
+#~ msgid ""
+#~ "<strong>You have already booked a seat for the specified time slot.</"
+#~ "strong><br>If you want to change your booking, please cancel the existing "
+#~ "booking first. You will find the link to do so in your confirmation email."
+#~ msgstr ""
+#~ "<strong>Sie haben an diesem Termin bereits einen anderen Platz gebucht.</"
+#~ "strong><br>Wenn Sie Ihre Buchung ändern möchten, stornieren Sie bitte "
+#~ "zuerst die bestehende Buchung. Den Link dazu finden Sie in Ihrer "
+#~ "Bestätigungs-E-Mail."
+
+#~ msgctxt "Booking"
+#~ msgid "Restore"
+#~ msgstr "Zurücksetzen"
+
+#~ msgid ""
+#~ "Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des "
+#~ "Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der "
+#~ "Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung "
+#~ "gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und "
+#~ "Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer "
+#~ "des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick "
+#~ "in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. "
+#~ "Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese "
+#~ "Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß "
+#~ "§6 Abs1 a DSGVO. Die Telefonnummer wird nur zum Zwecke der "
+#~ "Kontaktverfolgung aufgrund der gesetzlicher Grundlagen zur "
+#~ "Pandemiebekämpfung für Gesundheitsbehörden erfasst."
+#~ msgstr ""
+#~ "Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des "
+#~ "Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der "
+#~ "Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung "
+#~ "gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und "
+#~ "Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer "
+#~ "des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick "
+#~ "in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. "
+#~ "Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese "
+#~ "Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß "
+#~ "§6 Abs1 a DSGVO. Die Telefonnummer wird nur zum Zwecke der "
+#~ "Kontaktverfolgung aufgrund der gesetzlicher Grundlagen zur "
+#~ "Pandemiebekämpfung für Gesundheitsbehörden erfasst."
+
+#~ msgid "Multiple Booking"
+#~ msgstr "Mehrfachbuchung"
+
+#~ msgid "This seat has been reserved for you."
+#~ msgstr "Dieser Platz wurde für Sie reserviert."
