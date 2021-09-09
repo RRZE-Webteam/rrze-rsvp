@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: rrze-rsvp\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rrze-rsvp\n"
 "POT-Creation-Date: 2021-09-09T09:32:19+00:00\n"
-"PO-Revision-Date: 2021-09-09 11:36+0200\n"
+"PO-Revision-Date: 2021-09-09 12:05+0200\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -97,17 +97,16 @@ msgstr "Weitere Informationen"
 
 #: config/config.php:135
 msgid ""
-"I agree that my contact details may be stored for the duration of the "
-"booking process and for up to 4 weeks afterwards for the purpose of tracking "
-"in accordance with the legal basis for combating corona. Room managers and "
+"I agree that my contact details may be stored for the duration of the booking "
+"process and for up to 4 weeks afterwards for the purpose of tracking in "
+"accordance with the legal basis for combating corona. Room managers and "
 "organizers of office hours are also given the right to inspect the following "
-"booking data for the duration of the booking process and until the end of "
-"the selected appointment: e-mail address, surname, first name. Room managers "
-"and organizers of office hours receive this data solely for the purpose of "
+"booking data for the duration of the booking process and until the end of the "
+"selected appointment: e-mail address, surname, first name. Room managers and "
+"organizers of office hours receive this data solely for the purpose of "
 "carrying out and managing the appointment in accordance with Section 6 (1) a "
 "GDPR. The telephone number is only recorded for the purpose of contact "
-"tracking due to the legal basis for fighting pandemics for health "
-"authorities."
+"tracking due to the legal basis for fighting pandemics for health authorities."
 msgstr ""
 "Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des "
 "Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der "
@@ -125,43 +124,43 @@ msgstr ""
 #: config/config.php:136
 msgid ""
 "<h4>Additional Requirements regarding Covid-19</h4><p>I hereby confirm with "
-"this voluntary disclosure that I comply with the currently valid "
-"requirements regarding Covid-19 vaccination, testing or recovery (‘3G-"
-"Regelung’) to enter this institution and can prove this fact with one of the "
-"following:</p><ul><li>I am fully vaccinated against Covid-19 and am in "
-"possession of proof of vaccination as defined by the Covid-19 Protective "
-"Measures Exemption Directive  <abbr title=\"COVID-19-Schutzmaßnahmen-"
-"Ausnahmenverordnung \">SchAusnahmV</abbr>.</li><li>I have recovered from an "
-"infection with Covid-19 and am in possession of proof of recovery as defined "
-"by the Covid-19 Protective Measures Exemption Directive <abbr title="
-"\"COVID-19-Schutzmaßnahmen-Ausnahmenverordnung \">SchAusnahmV</abbr>.</"
-"li><li> I have been tested and am in possession of proof of a negative test "
-"result (on paper/electronic) listed as a valid type of proof in the Bavarian "
-"Regulation on Infection Prevention and Control Measures  (please refer to  "
-"<a href=\"https://www.stmgp.bayern.de/coronavirus/rechtsgrundlagen/"
-"\">https://www.stmgp.bayern.de/coronavirus/rechtsgrundlagen/</a>)</li></"
-"ul><p><strong>Please note:</strong> You are committing an offence and could "
-"be liable for a fine if you wilfully or negligently fail to comply with the "
-"rules requiring proof of Covid-19 vaccination, testing or recovery (3G-"
-"Regelung) as set out in the current version of the Regulation on Infection "
-"Prevention and Control Measures (BayIfSMV).</p>"
+"this voluntary disclosure that I comply with the currently valid requirements "
+"regarding Covid-19 vaccination, testing or recovery (‘3G-Regelung’) to enter "
+"this institution and can prove this fact with one of the following:</"
+"p><ul><li>I am fully vaccinated against Covid-19 and am in possession of proof "
+"of vaccination as defined by the Covid-19 Protective Measures Exemption "
+"Directive  <abbr title=\"COVID-19-Schutzmaßnahmen-Ausnahmenverordnung "
+"\">SchAusnahmV</abbr>.</li><li>I have recovered from an infection with "
+"Covid-19 and am in possession of proof of recovery as defined by the Covid-19 "
+"Protective Measures Exemption Directive <abbr title=\"COVID-19-Schutzmaßnahmen-"
+"Ausnahmenverordnung \">SchAusnahmV</abbr>.</li><li> I have been tested and am "
+"in possession of proof of a negative test result (on paper/electronic) listed "
+"as a valid type of proof in the Bavarian Regulation on Infection Prevention "
+"and Control Measures  (please refer to  <a href=\"https://www.stmgp.bayern.de/"
+"coronavirus/rechtsgrundlagen/\">https://www.stmgp.bayern.de/coronavirus/"
+"rechtsgrundlagen/</a>)</li></ul><p><strong>Please note:</strong> You are "
+"committing an offence and could be liable for a fine if you wilfully or "
+"negligently fail to comply with the rules requiring proof of Covid-19 "
+"vaccination, testing or recovery (3G-Regelung) as set out in the current "
+"version of the Regulation on Infection Prevention and Control Measures "
+"(BayIfSMV).</p>"
 msgstr ""
 "<h4>Ergänzende Auflagen zur 3G-Regelung</h4><p>Ich bestätige mit dieser "
 "freiwilligen Selbstauskunft die jeweils aktuell gültigen Auflagen zur 3G-"
 "Regelung zum Besuch der Einrichtung zu erfüllen und kann dies nachweisen:</"
 "p><ul><li>Vollständig gegen COVID-19 geimpft und im Besitz eines "
-"Impfnachweises im Sinne der <abbr title=“COVID-19-Schutzmaßnahmen-"
-"Ausnahmenverordnung “>SchAusnahmV</abbr>.</li><li>Genesen und im Besitz "
-"eines Genesenennachweises im Sinne der <abbr title=“COVID-19-Schutzmaßnahmen-"
-"Ausnahmenverordnung “>SchAusnahmV</abbr>.</li><li> Getestet und im Besitz "
-"eines negativen Testnachweises (schriftlich/ elektronisch), der von der "
-"<abbr title=“Bayerische Infektionsschutzmaßnahmenverordnung”>BayIfSMV</abbr> "
-"als Nachweismöglichkeit aufgeführt wird (vgl. <a href=“https://www.stmgp."
-"bayern.de/coronavirus/rechtsgrundlagen/“>https://www.stmgp.bayern.de/"
-"coronavirus/rechtsgrundlagen/</a>)</li></ul><p><strong>Hinweis:</strong> "
-"Wenn Sie vorsätzlich oder fahrlässig gegen die 3G-Regel der jeweils "
-"geltenden BayIfSMV verstoßen, handeln Sie ordnungswidrig und es kann gegen "
-"Sie ein Bußgeldverfahren eingeleitet werden.</p>"
+"Impfnachweises im Sinne der <abbr title=\"COVID-19-Schutzmaßnahmen-"
+"Ausnahmenverordnung \">SchAusnahmV</abbr>.</li><li>Genesen und im Besitz eines "
+"Genesenennachweises im Sinne der <abbr title=\"COVID-19-Schutzmaßnahmen-"
+"Ausnahmenverordnung \">SchAusnahmV</abbr>.</li><li> Getestet und im Besitz "
+"eines negativen Testnachweises (schriftlich/ elektronisch), der von der <abbr "
+"title=\"Bayerische Infektionsschutzmaßnahmenverordnung\">BayIfSMV</abbr> als "
+"Nachweismöglichkeit aufgeführt wird (vgl. <a href=\"https://www.stmgp.bayern."
+"de/coronavirus/rechtsgrundlagen/\">https://www.stmgp.bayern.de/coronavirus/"
+"rechtsgrundlagen/</a>)</li></ul><p><strong>Hinweis:</strong> Wenn Sie "
+"vorsätzlich oder fahrlässig gegen die 3G-Regel der jeweils geltenden BayIfSMV "
+"verstoßen, handeln Sie ordnungswidrig und es kann gegen Sie ein "
+"Bußgeldverfahren eingeleitet werden.</p>"
 
 #: config/config.php:151
 msgid "RRZE RSVP Settings"
@@ -469,11 +468,10 @@ msgid "Days in advance"
 msgstr "Zeitraum für Vorabreservierung (Tage)."
 
 #: config/config.php:575 includes/CPT/Bookings.php:105 includes/CPT/CPT.php:164
-#: includes/CPT/Rooms.php:59 includes/CPT/Rooms.php:86
-#: includes/CPT/Seats.php:117 includes/Metaboxes.php:528
-#: includes/Printing/Printing.php:128 includes/Shortcodes/Bookings.php:281
-#: includes/Shortcodes/Bookings.php:574 includes/templates/single-seat.php:133
-#: includes/Tools.php:133
+#: includes/CPT/Rooms.php:59 includes/CPT/Rooms.php:86 includes/CPT/Seats.php:117
+#: includes/Metaboxes.php:528 includes/Printing/Printing.php:128
+#: includes/Shortcodes/Bookings.php:281 includes/Shortcodes/Bookings.php:574
+#: includes/templates/single-seat.php:133 includes/Tools.php:133
 msgid "Room"
 msgstr "Raum"
 
@@ -558,8 +556,8 @@ msgid ""
 "scheduled to be published in a future date."
 msgstr ""
 "Dieses Objekt kann nicht auf Entwurf, Privat oder ein zukünftiges "
-"Veröffentlichungsdatum gesetzt werden, da bereits Buchungen für dieses "
-"Objekt vorliegen."
+"Veröffentlichungsdatum gesetzt werden, da bereits Buchungen für dieses Objekt "
+"vorliegen."
 
 #: includes/Actions.php:731
 msgid "This item is used in a booking and cannot be password protected."
@@ -569,11 +567,11 @@ msgstr ""
 
 #: includes/Actions.php:748
 msgid ""
-"Unable to save post: End time must be greater than start time in timeslot "
-"no. %s."
+"Unable to save post: End time must be greater than start time in timeslot no. "
+"%s."
 msgid_plural ""
-"Unable to save post: End time must be greater than start time in timeslots "
-"no. %s."
+"Unable to save post: End time must be greater than start time in timeslots no. "
+"%s."
 msgstr[0] ""
 "Änderungen konnten nicht gespeichert werden: Die Endzeit muss nach der "
 "Startzeit liegen in Termin Nr. %s."
@@ -585,8 +583,8 @@ msgstr[1] ""
 msgid ""
 "This seat is used in a booking and cannot be assigned to a different room."
 msgstr ""
-"Dieser Platz kann keinem anderen Raum zugeordnet werden, da bereits "
-"Buchungen für diesen Platz vorliegen."
+"Dieser Platz kann keinem anderen Raum zugeordnet werden, da bereits Buchungen "
+"für diesen Platz vorliegen."
 
 #: includes/Actions.php:932 includes/Actions.php:942 includes/Actions.php:1088
 msgid "Booking Confirmed"
@@ -631,13 +629,13 @@ msgstr "Aktion nicht verfügbar"
 msgid "No action was taken."
 msgstr "Es wurde keine Änderung vorgenommen."
 
-#: includes/Actions.php:955 includes/CPT/Bookings.php:107
-#: includes/Email.php:213 includes/Email.php:338
+#: includes/Actions.php:955 includes/CPT/Bookings.php:107 includes/Email.php:213
+#: includes/Email.php:338
 msgid "Name"
 msgstr "Name"
 
-#: includes/Actions.php:956 includes/CPT/Bookings.php:108
-#: includes/Email.php:214 includes/Email.php:339 includes/Metaboxes.php:195
+#: includes/Actions.php:956 includes/CPT/Bookings.php:108 includes/Email.php:214
+#: includes/Email.php:339 includes/Metaboxes.php:195
 #: includes/Shortcodes/Bookings.php:330 includes/Shortcodes/Bookings.php:339
 #: includes/Shortcodes/Bookings.php:368 includes/Tracking.php:150
 msgid "Email"
@@ -773,8 +771,8 @@ msgstr "Es wurde keine Buchungen im Papierkorb gefunden."
 
 #: includes/CPT/Bookings.php:67
 msgctxt ""
-"The post type archive label used in nav menus. Default “Post Archives”. "
-"Added in 4.4"
+"The post type archive label used in nav menus. Default “Post Archives”. Added "
+"in 4.4"
 msgid "Booking archives"
 msgstr "Buchungshistorie"
 
@@ -787,15 +785,15 @@ msgstr "Buchungsliste filtern"
 
 #: includes/CPT/Bookings.php:69
 msgctxt ""
-"Screen reader text for the pagination heading on the post type listing "
-"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+"Screen reader text for the pagination heading on the post type listing screen. "
+"Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
 msgid "Bookings list navigation"
 msgstr "Navigation der Buchungsliste"
 
 #: includes/CPT/Bookings.php:70
 msgctxt ""
-"Screen reader text for the items list heading on the post type listing "
-"screen. Default “Posts list”/”Pages list”. Added in 4.4"
+"Screen reader text for the items list heading on the post type listing screen. "
+"Default “Posts list”/”Pages list”. Added in 4.4"
 msgid "Bookings list"
 msgstr "Buchungsliste"
 
@@ -961,11 +959,11 @@ msgstr "Verfügbarkeit"
 
 #: includes/CPT/CPT.php:263
 msgid ""
-"Add <code>booking_link=\"true\"</code> to link the available timeslots to "
-"the pre-filled booking form."
+"Add <code>booking_link=\"true\"</code> to link the available timeslots to the "
+"pre-filled booking form."
 msgstr ""
-"Durch <code>booking_link=\"true\"</code> werden die verfügbaren Termine "
-"direkt mit dem vorausgefüllten Buchungsformular verlinkt."
+"Durch <code>booking_link=\"true\"</code> werden die verfügbaren Termine direkt "
+"mit dem vorausgefüllten Buchungsformular verlinkt."
 
 #: includes/CPT/CPT.php:264
 msgid "Add <code>days=\"20\"</code> to overwrite the default number of days."
@@ -1026,8 +1024,7 @@ msgid "No Rooms found in Trash."
 msgstr "Es wurden keine Räume im Papierkorb gefunden."
 
 #: includes/CPT/Rooms.php:46
-msgctxt ""
-"Overrides the “Featured Image” phrase for this post type. Added in 4.3"
+msgctxt "Overrides the “Featured Image” phrase for this post type. Added in 4.3"
 msgid "Room Image"
 msgstr "Raumbild"
 
@@ -1051,8 +1048,8 @@ msgstr "Als Raumbild verwenden"
 
 #: includes/CPT/Rooms.php:50
 msgctxt ""
-"The post type archive label used in nav menus. Default “Post Archives”. "
-"Added in 4.4"
+"The post type archive label used in nav menus. Default “Post Archives”. Added "
+"in 4.4"
 msgid "Room archives"
 msgstr "Raumindex"
 
@@ -1079,15 +1076,15 @@ msgstr "Raumliste filtern"
 
 #: includes/CPT/Rooms.php:54
 msgctxt ""
-"Screen reader text for the pagination heading on the post type listing "
-"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+"Screen reader text for the pagination heading on the post type listing screen. "
+"Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
 msgid "Rooms list navigation"
 msgstr "Navigation der Raumliste"
 
 #: includes/CPT/Rooms.php:55
 msgctxt ""
-"Screen reader text for the items list heading on the post type listing "
-"screen. Default “Posts list”/”Pages list”. Added in 4.4"
+"Screen reader text for the items list heading on the post type listing screen. "
+"Default “Posts list”/”Pages list”. Added in 4.4"
 msgid "Rooms list"
 msgstr "Raumliste"
 
@@ -1148,8 +1145,7 @@ msgid "No Seats found in Trash."
 msgstr "Es wurden keine Plätze im Papierkorb gefunden."
 
 #: includes/CPT/Seats.php:55
-msgctxt ""
-"Overrides the “Featured Image” phrase for this post type. Added in 4.3"
+msgctxt "Overrides the “Featured Image” phrase for this post type. Added in 4.3"
 msgid "Seat Image"
 msgstr "Platzbild"
 
@@ -1173,8 +1169,8 @@ msgstr "Als Platzbild verwenden"
 
 #: includes/CPT/Seats.php:59
 msgctxt ""
-"The post type archive label used in nav menus. Default “Post Archives”. "
-"Added in 4.4"
+"The post type archive label used in nav menus. Default “Post Archives”. Added "
+"in 4.4"
 msgid "Seat archives"
 msgstr "Plätze "
 
@@ -1201,15 +1197,15 @@ msgstr "Platzliste filtern"
 
 #: includes/CPT/Seats.php:63
 msgctxt ""
-"Screen reader text for the pagination heading on the post type listing "
-"screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+"Screen reader text for the pagination heading on the post type listing screen. "
+"Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
 msgid "Seats list navigation"
 msgstr "Navigation der Platzliste"
 
 #: includes/CPT/Seats.php:64
 msgctxt ""
-"Screen reader text for the items list heading on the post type listing "
-"screen. Default “Posts list”/”Pages list”. Added in 4.4"
+"Screen reader text for the items list heading on the post type listing screen. "
+"Default “Posts list”/”Pages list”. Added in 4.4"
 msgid "Seats list"
 msgstr "Platzliste"
 
@@ -1275,8 +1271,7 @@ msgstr ""
 "Bitte stornieren Sie Ihre Buchung rechtzeitig, wenn sich Ihre Pläne ändern."
 
 #: includes/Email.php:266 includes/templates/single-seat.php:306
-#: includes/templates/single-seat.php:375
-#: includes/templates/single-seat.php:378
+#: includes/templates/single-seat.php:375 includes/templates/single-seat.php:378
 msgid "Check In"
 msgstr "Einchecken"
 
@@ -1293,8 +1288,7 @@ msgid "Check Out"
 msgstr "Auschecken"
 
 #: includes/Email.php:307 includes/Email.php:309
-#: includes/templates/single-seat.php:149
-#: includes/templates/single-seat.php:192
+#: includes/templates/single-seat.php:149 includes/templates/single-seat.php:192
 msgid "Please check out when you leave the site."
 msgstr "Bitte checken Sie aus, wenn Sie den Raum verlassen."
 
@@ -1304,8 +1298,7 @@ msgstr "Neue bestätigte Buchung"
 
 #: includes/Email.php:337
 msgid ""
-"There is a new confirmed booking for your room. Calendar file (.ics) "
-"attached."
+"There is a new confirmed booking for your room. Calendar file (.ics) attached."
 msgstr "Es gibt eine neue Buchung für Ihren Raum. Kalenderdatei (.ics) anbei."
 
 #: includes/Functions.php:79
@@ -1427,9 +1420,9 @@ msgid ""
 "option is activated in the room settings. It can also be used for notes for "
 "internal use."
 msgstr ""
-"Dieser Textbereich enthält den Feldinhalt 'Weitere Informationen', wenn "
-"diese Option in den Raumeinstellungen aktiviert ist. Es kann auch für "
-"Notizen für den internen Gebrauch verwendet werden."
+"Dieser Textbereich enthält den Feldinhalt 'Weitere Informationen', wenn diese "
+"Option in den Raumeinstellungen aktiviert ist. Es kann auch für Notizen für "
+"den internen Gebrauch verwendet werden."
 
 #: includes/Metaboxes.php:229
 msgid "Timeslots"
@@ -1474,8 +1467,8 @@ msgid ""
 "2020-09-21.)"
 msgstr ""
 "Geben Sie hier Tage ein, an denen der Raum nicht gebucht werden kann (Format "
-"JJJJ-MM-TT). Ein Datum pro Zeile. Dies überschreibt die allgemeinen Termine "
-"(z.B. Raum ist verfügbar Montags, 9-12 Uhr, außer am 21.09.2020)."
+"JJJJ-MM-TT). Ein Datum pro Zeile. Dies überschreibt die allgemeinen Termine (z."
+"B. Raum ist verfügbar Montags, 9-12 Uhr, außer am 21.09.2020)."
 
 #: includes/Metaboxes.php:315
 msgid "Booking mode"
@@ -1582,9 +1575,8 @@ msgid ""
 "Seats can be booked and checked-in in one step. This only works if automatic "
 "confirmation activated!"
 msgstr ""
-"Plätze können in einem Schritt gebucht und eingecheckt werden. Bitte "
-"beachten Sie, dass hierzu die automatische Buchungsbestätigung aktiviert "
-"sein muss!"
+"Plätze können in einem Schritt gebucht und eingecheckt werden. Bitte beachten "
+"Sie, dass hierzu die automatische Buchungsbestätigung aktiviert sein muss!"
 
 #: includes/Metaboxes.php:411
 msgid "Check-in is required"
@@ -1592,9 +1584,9 @@ msgstr "Check-in erforderlich"
 
 #: includes/Metaboxes.php:412
 msgid ""
-"The customer must check-in their booking within a certain time from the "
-"start of the event. Otherwise the system will cancel the booking. The time "
-"allowed can be set just below in the \"Allowed Check-In Time\" section."
+"The customer must check-in their booking within a certain time from the start "
+"of the event. Otherwise the system will cancel the booking. The time allowed "
+"can be set just below in the \"Allowed Check-In Time\" section."
 msgstr ""
 "Der Bucher muss innerhalb einer bestimmten Zeit ab Beginn des Termins "
 "einchecken. Andernfalls wird die Buchung automatisch storniert. Die erlaubte "
@@ -1607,14 +1599,13 @@ msgstr "Erlaubter Zeitraum für Check-In (in Minuten)"
 
 #: includes/Metaboxes.php:423
 msgid ""
-"You can specify an allowed check-in time for this room. If \"Check-In "
-"required\" is checked, the system will cancel the booking after this time. "
-"Default is %s minutes."
+"You can specify an allowed check-in time for this room. If \"Check-In required"
+"\" is checked, the system will cancel the booking after this time. Default is "
+"%s minutes."
 msgstr ""
-"Sie können einen erlaubten Check-In-Zeitraum für diesen Raum definieren. "
-"Wenn die Option \"Check-In erforderlich\" angekreuzt ist, storniert das "
-"System die Buchung autmatisch nach dieser Zeit. Standardeinstellung ist %s "
-"Minuten."
+"Sie können einen erlaubten Check-In-Zeitraum für diesen Raum definieren. Wenn "
+"die Option \"Check-In erforderlich\" angekreuzt ist, storniert das System die "
+"Buchung autmatisch nach dieser Zeit. Standardeinstellung ist %s Minuten."
 
 #: includes/Metaboxes.php:435
 msgid "Show notes/comment input in booking form"
@@ -1715,8 +1706,7 @@ msgstr "Zurücksetzen"
 msgid "Date/Time"
 msgstr "Datum/Zeit"
 
-#: includes/Shortcodes/Availability.php:62
-#: includes/Shortcodes/Bookings.php:1138
+#: includes/Shortcodes/Availability.php:62 includes/Shortcodes/Bookings.php:1138
 msgid "Seats available"
 msgstr "Verfügbare Plätze"
 
@@ -1768,8 +1758,7 @@ msgid "Time slots"
 msgstr "Termine"
 
 #: includes/Shortcodes/Bookings.php:206 includes/Shortcodes/Bookings.php:222
-#: includes/templates/single-room.php:183
-#: includes/templates/single-room.php:200
+#: includes/templates/single-room.php:183 includes/templates/single-room.php:200
 msgid "Schedule"
 msgstr "Zeitplan"
 
@@ -1889,17 +1878,16 @@ msgstr ""
 
 #: includes/Shortcodes/Bookings.php:583
 msgid "Your reservation has been submitted. Please confirm your booking!"
-msgstr ""
-"Ihre Reservierung wurde übermittelt. Bitte bestätigen Sie Ihre Buchung!"
+msgstr "Ihre Reservierung wurde übermittelt. Bitte bestätigen Sie Ihre Buchung!"
 
 #: includes/Shortcodes/Bookings.php:584
 msgid ""
-"An email with the confirmation link and your booking information has been "
-"sent to your email address.<br><strong>Please note that unconfirmed bookings "
+"An email with the confirmation link and your booking information has been sent "
+"to your email address.<br><strong>Please note that unconfirmed bookings "
 "automatically expire after one hour.</strong>"
 msgstr ""
-"Eine E-Mail mit dem Bestätigungslink und Ihren Buchungsinformationen wurde "
-"an Ihre E-Mail-Adresse geschickt.<br><strong>Bitte beachten Sie, dass "
+"Eine E-Mail mit dem Bestätigungslink und Ihren Buchungsinformationen wurde an "
+"Ihre E-Mail-Adresse geschickt.<br><strong>Bitte beachten Sie, dass "
 "unbestätigte Buchungen automatisch nach einer Stunde verfallen.</strong>"
 
 #: includes/Shortcodes/Bookings.php:586
@@ -1916,9 +1904,9 @@ msgstr "Ihre Reservierungsanfrage: "
 
 #: includes/Shortcodes/Bookings.php:594
 msgid ""
-"<strong>This seat has been reserved for you.</strong><br>You can cancel it "
-"at any time if you cannot keep the appointment. You can find information on "
-"this in your confirmation email."
+"<strong>This seat has been reserved for you.</strong><br>You can cancel it at "
+"any time if you cannot keep the appointment. You can find information on this "
+"in your confirmation email."
 msgstr ""
 "<strong>Dieser Platz wurde für Sie reserviert.</strong><br>Sie können den "
 "Platz jederzeit stornieren, wenn Sie den Termin nicht einhalten können. "
@@ -1937,8 +1925,8 @@ msgstr ""
 msgid ""
 "Please remember to <strong>check in</strong> to your seat when you arrive!"
 msgstr ""
-"Bitte denken Sie daran, bei Ihrer Ankunft an Ihrem Platz "
-"<strong>einzuchecken</strong>!"
+"Bitte denken Sie daran, bei Ihrer Ankunft an Ihrem Platz <strong>einzuchecken</"
+"strong>!"
 
 #: includes/Shortcodes/Bookings.php:708
 msgid "DSGVO field is required."
@@ -2022,8 +2010,7 @@ msgstr "Bitte melden Sie sich mit Ihrem UB-AD Benutzernamen an"
 msgid "No floorplan available."
 msgstr "Kein Grundriss verfügbar."
 
-#: includes/templates/single-room.php:192
-#: includes/templates/single-room.php:209
+#: includes/templates/single-room.php:192 includes/templates/single-room.php:209
 msgid "Availability"
 msgstr "Verfügbarkeit"
 
@@ -2039,23 +2026,19 @@ msgstr "Sprechstunde"
 msgid "This time slot has been reserved for you."
 msgstr "Dieser Termin wurde für Sie reserviert."
 
-#: includes/templates/single-seat.php:139
-#: includes/templates/single-seat.php:148
+#: includes/templates/single-seat.php:139 includes/templates/single-seat.php:148
 msgid ""
-"Additional information has been sent to your email address <strong>%s</"
-"strong>."
+"Additional information has been sent to your email address <strong>%s</strong>."
 msgstr ""
 "Zusätzliche Informationen wurden an Ihre E-Mail-Adresse <strong>%s</strong> "
 "gesendet."
 
-#: includes/templates/single-seat.php:162
-#: includes/templates/single-seat.php:188
+#: includes/templates/single-seat.php:162 includes/templates/single-seat.php:188
 #: includes/templates/single-seat.php:322
 msgid "Check out"
 msgstr "Auschecken"
 
-#: includes/templates/single-seat.php:174
-#: includes/templates/single-seat.php:234
+#: includes/templates/single-seat.php:174 includes/templates/single-seat.php:234
 msgid "Room:"
 msgstr "Raum:"
 
@@ -2064,8 +2047,8 @@ msgid ""
 "If you reserved this seat please refer to the message sent to your email "
 "address."
 msgstr ""
-"Wenn Sie diesen Platz reserviert haben, lesen Sie bitte die Nachricht an "
-"Ihre E-Mail-Adresse."
+"Wenn Sie diesen Platz reserviert haben, lesen Sie bitte die Nachricht an Ihre "
+"E-Mail-Adresse."
 
 #: includes/templates/single-seat.php:303
 msgid "Check in"
@@ -2073,24 +2056,24 @@ msgstr "Einchecken"
 
 #: includes/templates/single-seat.php:307
 msgid ""
-"This seat is currently reserved. If you have reserved this seat, please "
-"check in."
+"This seat is currently reserved. If you have reserved this seat, please check "
+"in."
 msgstr ""
-"Dieser Platz ist bereits reserviert. Falls Sie diesen Platz reserviert "
-"haben, checken Sie bitte ein."
+"Dieser Platz ist bereits reserviert. Falls Sie diesen Platz reserviert haben, "
+"checken Sie bitte ein."
 
 #: includes/templates/single-seat.php:326
 msgid ""
-"This seat is currently reserved. If you have reserved this seat, please "
-"check out when you leave the site."
+"This seat is currently reserved. If you have reserved this seat, please check "
+"out when you leave the site."
 msgstr ""
 "Dieser Platz ist derzeit reserviert. Wenn Sie diesen Platz reserviert haben, "
 "checken Sie bitte aus, wenn Sie den Raum verlassen."
 
 #: includes/templates/single-seat.php:379
 msgid ""
-"This seat is free for instant check-in (booking and check-in in one step) "
-"for the current timeslot."
+"This seat is free for instant check-in (booking and check-in in one step) for "
+"the current timeslot."
 msgstr ""
 "Dieser Platz steht zum sofortigen Einchecken im aktuellen Zeitfenster zur "
 "Verfügung."
@@ -2195,18 +2178,18 @@ msgstr "Präfix"
 
 #: includes/Tools.php:182
 msgid ""
-"Seat names will look like \"15A\" or \"C7\" where the first element "
-"indicates the row and the second indicates the seat. <br />If the same "
-"numbering system ist used for rows and seats, labels will be added "
-"automatically: \"Row 20 - Seat 3\".<br />If a name prefix is given, it will "
-"be added before the row, e.g. \"1st floor 15A\""
+"Seat names will look like \"15A\" or \"C7\" where the first element indicates "
+"the row and the second indicates the seat. <br />If the same numbering system "
+"ist used for rows and seats, labels will be added automatically: \"Row 20 - "
+"Seat 3\".<br />If a name prefix is given, it will be added before the row, e."
+"g. \"1st floor 15A\""
 msgstr ""
 "Platznamen werden nach dem Schema \"15A\" bzw. \"C7\" erstellt, wobei das "
-"erste Element die Reihe, das zweite die Platznummer bezeichnet. <br />Wenn "
-"für Reihen und Plätze die gleiche Nummerierungsart verwendet wird, werden "
-"automatisch Bezeichnungen ergänzt, z.B. \"Reihe 20 - Platz 3\".<br />Wenn "
-"ein Präfix eingegeben wurde, wird es vor der Reihenbezeichnung eingefügt, z."
-"B. \"Erdgeschoss 15A\"."
+"erste Element die Reihe, das zweite die Platznummer bezeichnet. <br />Wenn für "
+"Reihen und Plätze die gleiche Nummerierungsart verwendet wird, werden "
+"automatisch Bezeichnungen ergänzt, z.B. \"Reihe 20 - Platz 3\".<br />Wenn ein "
+"Präfix eingegeben wurde, wird es vor der Reihenbezeichnung eingefügt, z.B. "
+"\"Erdgeschoss 15A\"."
 
 #: includes/Tools.php:199
 msgid ""
@@ -2214,9 +2197,9 @@ msgid ""
 "equipment later by editing the seats individually or by bulk editing several "
 "seats in the seats table."
 msgstr ""
-"Wählen Sie Ausstattung aus, die an allen Plätzen verfügbar ist. Sie können "
-"die Ausstattung später individuell bei den Plätzen anpassen, oder mehrere "
-"zugleich über die Mehrfachaktionen in der Platz-Tabelle zuweisen."
+"Wählen Sie Ausstattung aus, die an allen Plätzen verfügbar ist. Sie können die "
+"Ausstattung später individuell bei den Plätzen anpassen, oder mehrere zugleich "
+"über die Mehrfachaktionen in der Platz-Tabelle zuweisen."
 
 #: includes/Tracking.php:80 includes/Tracking.php:91 includes/Tracking.php:110
 #: includes/Tracking.php:168
@@ -2262,16 +2245,16 @@ msgid ""
 "The server is running PHP version %1$s. The Plugin requires at least PHP "
 "version %2$s."
 msgstr ""
-"Der Server verwendet PHP in der Version  %1$s. Das Plugin benötigt "
-"mindestens Version %2$s."
+"Der Server verwendet PHP in der Version  %1$s. Das Plugin benötigt mindestens "
+"Version %2$s."
 
 #: rrze-rsvp.php:68
 msgid ""
 "The server is running WordPress version %1$s. The Plugin requires at least "
 "WordPress version %2$s."
 msgstr ""
-"Der Server verwendet WordPress in der Version %1$s. Dieses Plugin benötigt "
-"als Mindestversion %2$s."
+"Der Server verwendet WordPress in der Version %1$s. Dieses Plugin benötigt als "
+"Mindestversion %2$s."
 
 #: rrze-rsvp.php:137
 msgid "Plugins: %1$s: %2$s"
@@ -2296,27 +2279,27 @@ msgstr "Plugins: %1$s: %2$s"
 #~ "Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der "
 #~ "Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung "
 #~ "gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und "
-#~ "Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer "
-#~ "des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick "
-#~ "in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. "
-#~ "Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese "
-#~ "Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß "
-#~ "§6 Abs1 a DSGVO. Die Telefonnummer wird nur zum Zwecke der "
-#~ "Kontaktverfolgung aufgrund der gesetzlicher Grundlagen zur "
-#~ "Pandemiebekämpfung für Gesundheitsbehörden erfasst."
+#~ "Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer des "
+#~ "Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in "
+#~ "folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. "
+#~ "Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten "
+#~ "allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 "
+#~ "a DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung "
+#~ "aufgrund der gesetzlicher Grundlagen zur Pandemiebekämpfung für "
+#~ "Gesundheitsbehörden erfasst."
 #~ msgstr ""
 #~ "Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des "
 #~ "Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der "
 #~ "Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung "
 #~ "gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und "
-#~ "Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer "
-#~ "des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick "
-#~ "in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. "
-#~ "Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese "
-#~ "Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß "
-#~ "§6 Abs1 a DSGVO. Die Telefonnummer wird nur zum Zwecke der "
-#~ "Kontaktverfolgung aufgrund der gesetzlicher Grundlagen zur "
-#~ "Pandemiebekämpfung für Gesundheitsbehörden erfasst."
+#~ "Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer des "
+#~ "Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in "
+#~ "folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. "
+#~ "Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten "
+#~ "allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 "
+#~ "a DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung "
+#~ "aufgrund der gesetzlicher Grundlagen zur Pandemiebekämpfung für "
+#~ "Gesundheitsbehörden erfasst."
 
 #~ msgid "Multiple Booking"
 #~ msgstr "Mehrfachbuchung"
