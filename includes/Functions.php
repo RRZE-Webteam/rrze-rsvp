@@ -8,6 +8,12 @@ use DateTime;
 
 class Functions
 {
+
+    public static function formatDateGMT($timestamp){
+		$date = new \DateTime(get_gmt_from_date(date('Y-m-d H:i:s', $timestamp)));
+		return $date->format('Ymd\THis\Z');
+	}
+
     public static function dateFormat(int $timestamp): string
     {
         return date_i18n(get_option('date_format'), $timestamp);
