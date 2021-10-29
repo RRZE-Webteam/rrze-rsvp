@@ -11,8 +11,12 @@ use SimpleSAML\Session as Session;
 
 final class IdM extends Auth
 {
+    protected $ssoPlugin = 'rrze-sso/rrze-sso.php';
+    // Backward compatibility
     protected $webssoPlugin = 'fau-websso/fau-websso.php';
 
+    protected $ssoOptionName = 'rrze_sso';
+    // Backward compatibility
     protected $webssoOptionName = '_fau_websso';
 
     public $simplesamlAuth = null;
@@ -89,14 +93,21 @@ final class IdM extends Auth
 
     private function simplesamlAuth()
     {
-        if (!$this->isPluginActive($this->webssoPlugin)) {
-            return null;
-        }
-
-        if (is_multisite()) {
-            $options = get_site_option($this->webssoOptionName);
+        if ($this->isPluginActive($this->ssoPlugin)) {
+            if (is_multisite()) {
+                $options = get_site_option($this->ssoOptionName);
+            } else {
+                $options = get_option($this->ssoOptionName);
+            }
+        // Backward compatibility
+        } elseif ($this->isPluginActive($this->webssoPlugin)) {
+            if (is_multisite()) {
+                $options = get_site_option($this->webssoOptionName);
+            } else {
+                $options = get_option($this->webssoOptionName);
+            }
         } else {
-            $options = get_option($this->webssoOptionName);
+            return null;
         }
 
         if (!isset($options['simplesaml_include']) || !isset($options['simplesaml_auth_source'])) {

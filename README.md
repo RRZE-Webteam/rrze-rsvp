@@ -38,13 +38,13 @@ https://www.wordpress.rrze.fau.de/plugins/fau-und-rrze-plugins/rsvp/
 
 Das Plugin unterstützt die Anmeldung für zentral-vergebene Kennungen von Studierenden und Beschäftigten der Universität Erlangen-Nürnberg. Mit dieser Option ist es möglich, den Zugriff auf die Reservierungsseite nur für Personen zu autorisieren, die eine IdM-Kennung haben.
 
-Damit die SSO-Option funktioniert, muss zuerst das FAU-WebSSO-Plugin installiert und aktiviert werden.
-Vgl. https://github.com/RRZE-Webteam/fau-websso
+Damit die SSO-Option funktioniert, muss zuerst das RRZE-SSO-Plugin installiert und aktiviert werden.
+Vgl. https://github.com/RRZE-Webteam/rrze-sso
 
 Folgen Sie dann den Anweisungen unter folgendem Link:
-https://github.com/RRZE-Webteam/fau-websso/blob/master/README.md
+https://github.com/RRZE-Webteam/rrze-sso/blob/master/README.md
 
-Nachdem Sie den korrekten Betrieb des FAU-WebSSO-Plugins überprüft haben, können Sie die SSO-Option des RSVP-Plugins verwenden.
+Nachdem Sie den korrekten Betrieb des RRZE-SSO-Plugins überprüft haben, können Sie die SSO-Option des RSVP-Plugins verwenden.
 
 
 ## Verwendung der LDAP-Option (Raum Einstellungen)
