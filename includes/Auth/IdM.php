@@ -49,11 +49,20 @@ final class IdM extends Auth
     {
         $this->personAttributes = $this->simplesamlAuth->getAttributes();
 
-        $this->uid = isset($this->personAttributes['urn:mace:dir:attribute-def:uid'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:uid'][0] : null;
-        $this->mail = isset($this->personAttributes['urn:mace:dir:attribute-def:mail'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:mail'][0] : null;
-        $this->displayName = isset($this->personAttributes['urn:mace:dir:attribute-def:displayName'][0]) ? $this->personAttributes['urn:mace:dir:attribute-def:displayName'][0] : null;
-        $this->eduPersonAffiliation = isset($this->personAttributes['urn:mace:dir:attribute-def:eduPersonAffiliation']) ? $this->personAttributes['urn:mace:dir:attribute-def:eduPersonAffiliation'] : null;
-        $this->eduPersonEntitlement = isset($this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement']) ? $this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement'] : null;
+        if ($this->isPluginActive($this->ssoPlugin)) {
+            $this->uid = $this->personAttributes['uid'][0] ?? null;
+            $this->mail = $this->personAttributes['mail'][0] ?? null;
+            $this->displayName = $this->personAttributes['displayName'][0] ?? null;
+            $this->eduPersonAffiliation = $this->personAttributes['eduPersonAffiliation'] ?? null;
+            $this->eduPersonEntitlement = $this->personAttributes['eduPersonEntitlement'] ?? null;
+        // Backward compatibility    
+        } elseif ($this->isPluginActive($this->webssoPlugin)) {
+            $this->uid = $this->personAttributes['urn:mace:dir:attribute-def:uid'][0] ?? null;
+            $this->mail = $this->personAttributes['urn:mace:dir:attribute-def:mail'][0] ?? null;
+            $this->displayName = $this->personAttributes['urn:mace:dir:attribute-def:displayName'][0] ?? null;
+            $this->eduPersonAffiliation = $this->personAttributes['urn:mace:dir:attribute-def:eduPersonAffiliation'] ?? null;
+            $this->eduPersonEntitlement = $this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement'] ?? null;    
+        }
     }
 
     public function getCustomerData(): array
