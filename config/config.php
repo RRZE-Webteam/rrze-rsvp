@@ -133,7 +133,9 @@ function defaultOptions()  {
             'room-notes-label' => __('Additional informations', 'rrze-rsvp'),
             'check-in-time' => '15',
             'dsgvo-declaration' => __('I agree that my contact details may be stored for the duration of the booking process and for up to 4 weeks afterwards for the purpose of tracking in accordance with the legal basis for combating corona. Room managers and organizers of office hours are also given the right to inspect the following booking data for the duration of the booking process and until the end of the selected appointment: e-mail address, surname, first name. Room managers and organizers of office hours receive this data solely for the purpose of carrying out and managing the appointment in accordance with Section 6 (1) a GDPR. The telephone number is only recorded for the purpose of contact tracking due to the legal basis for fighting pandemics for health authorities.', 'rrze-rsvp'),
-            'dsgvo-supplement' => __('<h4>Additional Requirements regarding Covid-19</h4><p>I hereby confirm with this voluntary disclosure that I comply with the currently valid requirements regarding Covid-19 vaccination, testing or recovery (‘3G-Regelung’) to enter this institution and can prove this fact with one of the following:</p><ul><li>I am fully vaccinated against Covid-19 and am in possession of proof of vaccination as defined by the Covid-19 Protective Measures Exemption Directive  <abbr title="COVID-19-Schutzmaßnahmen-Ausnahmenverordnung ">SchAusnahmV</abbr>.</li><li>I have recovered from an infection with Covid-19 and am in possession of proof of recovery as defined by the Covid-19 Protective Measures Exemption Directive <abbr title="COVID-19-Schutzmaßnahmen-Ausnahmenverordnung ">SchAusnahmV</abbr>.</li><li> I have been tested and am in possession of proof of a negative test result (on paper/electronic) listed as a valid type of proof in the Bavarian Regulation on Infection Prevention and Control Measures  (please refer to  <a href="https://www.stmgp.bayern.de/coronavirus/rechtsgrundlagen/">https://www.stmgp.bayern.de/coronavirus/rechtsgrundlagen/</a>)</li></ul><p><strong>Please note:</strong> You are committing an offence and could be liable for a fine if you wilfully or negligently fail to comply with the rules requiring proof of Covid-19 vaccination, testing or recovery (3G-Regelung) as set out in the current version of the Regulation on Infection Prevention and Control Measures (BayIfSMV).</p>', 'rrze-rsvp'),
+            'show_dsgvo_supplement' => 'on',
+            'dsgvo_supplement_de' => '<h4>Ergänzende Auflagen zur 3G-Regelung</h4><p>Ich bestätige mit dieser freiwilligen Selbstauskunft die jeweils aktuell gültigen Auflagen zur 3G-Regelung zum Besuch der Einrichtung zu erfüllen und kann dies nachweisen:</p><ul><li>Vollständig gegen COVID-19 geimpft und im Besitz eines Impfnachweises im Sinne der <abbr title="COVID-19-Schutzmaßnahmen-Ausnahmenverordnung ">SchAusnahmV</abbr>.</li><li>Genesen und im Besitz eines Genesenennachweises im Sinne der <abbr title="COVID-19-Schutzmaßnahmen-Ausnahmenverordnung ">SchAusnahmV</abbr>.</li><li> Getestet und im Besitz eines negativen Testnachweises (schriftlich/ elektronisch), der von der <abbr title="Bayerische Infektionsschutzmaßnahmenverordnung">BayIfSMV</abbr> als Nachweismöglichkeit aufgeführt wird (vgl. <a href="https://www.stmgp.bayern.de/coronavirus/rechtsgrundlagen/">https://www.stmgp.bayern.de/coronavirus/rechtsgrundlagen/</a>)</li></ul><p><strong>Hinweis:</strong> Wenn Sie vorsätzlich oder fahrlässig gegen die 3G-Regel der jeweils geltenden BayIfSMV verstoßen, handeln Sie ordnungswidrig und es kann gegen Sie ein Bußgeldverfahren eingeleitet werden.</p>',
+            'dsgvo_supplement_en' => '<h4>Additional Requirements regarding Covid-19</h4><p>I hereby confirm with this voluntary disclosure that I comply with the currently valid requirements regarding Covid-19 vaccination, testing or recovery (‘3G-Regelung’) to enter this institution and can prove this fact with one of the following:</p><ul><li>I am fully vaccinated against Covid-19 and am in possession of proof of vaccination as defined by the Covid-19 Protective Measures Exemption Directive  <abbr title="COVID-19-Schutzmaßnahmen-Ausnahmenverordnung ">SchAusnahmV</abbr>.</li><li>I have recovered from an infection with Covid-19 and am in possession of proof of recovery as defined by the Covid-19 Protective Measures Exemption Directive <abbr title="COVID-19-Schutzmaßnahmen-Ausnahmenverordnung ">SchAusnahmV</abbr>.</li><li> I have been tested and am in possession of proof of a negative test result (on paper/electronic) listed as a valid type of proof in the Bavarian Regulation on Infection Prevention and Control Measures  (please refer to  <a href="https://www.stmgp.bayern.de/coronavirus/rechtsgrundlagen/">https://www.stmgp.bayern.de/coronavirus/rechtsgrundlagen/</a>)</li></ul><p><strong>Please note:</strong> You are committing an offence and could be liable for a fine if you wilfully or negligently fail to comply with the rules requiring proof of Covid-19 vaccination, testing or recovery (3G-Regelung) as set out in the current version of the Regulation on Infection Prevention and Control Measures (BayIfSMV).</p>',
         ];
     }
     
@@ -224,6 +226,29 @@ function getFields(){
                 'type'    => 'textarea',
                 'default' =>  '',
                 'sanitize_callback' => 'wp_kses_custom'                
+            ],
+            [
+                'name'    => 'show_dsgvo_supplement',
+                'label'   => __('Show Additional Note on Registration Form', 'rrze-rsvp'),
+                'desc'    => __('Show an additional text at the bottom of the registration form, just before the submit button. Please enter a german and, if applicable, an english text in the fields below. ', 'rrze-rsvp'),
+                'default' => $defaults['show_dsgvo_supplement'],
+                'type'    => 'checkbox'
+            ],
+            [
+                'name'    => 'dsgvo_supplement_de',
+                'label'   => __('Additional Registration Note Text (German)', 'rrze-rsvp'),
+                'desc'    => __('Allowed HTML-Tags are:', 'rrze-rsvp') . esc_html(' <' . implode('> <', array_keys(getAllowedHTML())) . '>'),
+                'type'    => 'textarea',
+                'default' =>  $defaults['dsgvo_supplement_de'],
+                'sanitize_callback' => 'wp_kses_custom'
+            ],
+            [
+                'name'    => 'dsgvo_supplement_en',
+                'label'   => __('Additional Registration Note Text (English)', 'rrze-rsvp'),
+                'desc'    => __('Allowed HTML-Tags are:', 'rrze-rsvp') . esc_html(' <' . implode('> <', array_keys(getAllowedHTML())) . '>'),
+                'type'    => 'textarea',
+                'default' =>  $defaults['dsgvo_supplement_en'],
+                'sanitize_callback' => 'wp_kses_custom'
             ],
         ],
         'email' => [

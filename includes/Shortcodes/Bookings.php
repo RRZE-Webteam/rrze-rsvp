@@ -391,13 +391,20 @@ class Bookings extends Shortcodes {
                 . '<label for="rsvp_comment">' . $label . '</label>'
                 . '<textarea name="rsvp_comment" id="rsvp_comment"></textarea>';
         }
-
+        $showSupplement = !empty($this->options->general_show_dsgvo_supplement) ? $this->options->general_show_dsgvo_supplement : $defaults['show_dsgvo_supplement'];
+        if ($showSupplement == 'on') {
+            $lang = (strpos(get_locale(), 'de_') === 0 ? 'de' : 'en');
+            $optionName = 'general_dsgvo_supplement_' . $lang;
+            $dsgvo_supplement = !empty($this->options->$optionName) ? $this->options->$optionName : $defaults['dsgvo_supplement_'.$lang];
+        } else {
+            $dsgvo_supplement = '';
+        }
         $output .= '<div class="form-group">'
                     . '<input type="checkbox" value="1" id="rsvp_dsgvo" name="rsvp_dsgvo" required> '
                     . '<label for="rsvp_dsgvo">' . $defaults['dsgvo-declaration'] . '</label>'
-                    . $defaults['dsgvo-supplement']
+                    . $dsgvo_supplement
                     . '</div>';
-	$output .= '</fieldset>';
+	    $output .= '</fieldset>';
         $output .= '<button type="submit" class="btn btn-primary">' . __('Submit booking', 'rrze-rsvp') . '</button>
             </form>
         </div>';
