@@ -188,7 +188,13 @@ class Email
 
         // Misc mail infos
         $data['is_locale_not_english'] = !$this->isLocaleEnglish ? true : false;
-        $data['to_admin'] = $recipient == 'admin' ? true : false;
+
+        if ($bookingMode == 'consultation'){
+            $data['to_admin'] = true;    
+        }else{
+            $data['to_admin'] = $recipient == 'admin' ? true : false;
+        }
+
         $data['instant_checkin'] = false;
         $data['checked_in'] = ($status == 'checked-in');
 
