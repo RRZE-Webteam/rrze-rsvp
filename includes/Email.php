@@ -195,6 +195,8 @@ class Email
             $data['to_admin'] = $recipient == 'admin' ? true : false;
         }
 
+        $booking['booking_mode'] = $bookingMode;
+
         $data['instant_checkin'] = false;
         $data['checked_in'] = ($status == 'checked-in');
 

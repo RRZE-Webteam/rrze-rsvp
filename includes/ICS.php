@@ -75,6 +75,12 @@ class ICS
 
 		$description = $booking['room_name'] . '\\n';
 		$description .= !empty($booking['seat_name']) ? $booking['seat_name'] . '\\n' : '';
+
+		if ($booking['booking_mode'] == 'consultation' && $recipient != 'customer'){
+            $description .= '\\n' . sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']) . '\\n';
+            $description .= sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']) . '\\n';
+		}
+
 		if ($recipient == 'customer') {
 			$cancelUrl = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $booking['id'], $booking['start']), $booking['id']);
 			$description .= "\\n\\n" . __('Cancel Booking', 'rrze-rsvp') . ':\\n' . $cancelUrl;	
