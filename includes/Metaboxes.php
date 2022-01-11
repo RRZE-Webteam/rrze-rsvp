@@ -390,13 +390,45 @@ class Metaboxes
             'classes' => ['hide-no-check', 'hide-consultation']
         ));
 
-        $cmb_general->add_field(array(
+
+        // BK EDIT 2022-01-11
+        // https://github.com/RRZE-Webteam/rrze-rsvp/issues/311
+
+        $aArgs = [
             'name' => __('Additional ICS email', 'rrze-rsvp'),
             'desc' => __('A copy of the confirmed booking will be sent to the specified email address with a calendar file (.ics) as an attachment.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-send-to-email',
-            'type' => 'text_email',
-            'default' => '',
-        ));
+        ];
+
+        if (is_plugin_active('fau-person/fau-person.php')){
+            $aContactSelect = [];
+            $aPersons = \FAU_Person\Data::get_contactdata();
+
+            if (!empty($aPersons)){
+                $aContactSelect = [
+                    '0' => __('None', 'rrze-rsvp')
+                ];
+
+                foreach($aPersons as $ID => $val){
+                    $email = get_post_meta($ID, 'fau_person_email', true);
+                    $aContactSelect[$email] = $val;
+                }
+
+                $aArgs['type'] = 'select';
+                $aArgs['options'] = $aContactSelect;
+                $aArgs['default'] = '0';
+            }else{
+                $aArgs['type'] = 'text_email';
+                $aArgs['default'] = '';
+            }
+        }else{
+            $aArgs['type'] = 'text_email';
+            $aArgs['default'] = '';
+        }
+        $cmb_general->add_field($aArgs);
+
+
+
 
         $cmb_general->add_field(array(
             'name' => __('Allow Instant Check-In', 'rrze-rsvp'),
