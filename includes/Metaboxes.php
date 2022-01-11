@@ -404,14 +404,19 @@ class Metaboxes
             $aContactSelect = [];
             $aPersons = \FAU_Person\Data::get_contactdata();
 
+
             if (!empty($aPersons)){
                 $aContactSelect = [
                     '0' => __('None', 'rrze-rsvp')
                 ];
 
                 foreach($aPersons as $ID => $val){
-                    $email = get_post_meta($ID, 'fau_person_email', true);
-                    $aContactSelect[$email] = $val;
+
+                    $aDetails = \FAU_Person\Data::get_kontakt_data($ID); // delivers all details including email but very poor performance
+                    $email = $aDetails['email'];
+
+                    // $email = get_post_meta('1400', 'fau_person_email', true); // not all emails are stored as meta field, f.e. ID == 1400 isn't
+                   $aContactSelect[$email] = $val;
                 }
 
                 $aArgs['type'] = 'select';
