@@ -13,7 +13,7 @@ RSVP Form Adjustments
         legend {
             padding-bottom: 5px;
             margin-bottom: 10px;
-	        border-bottom: none;
+	    border-bottom: none;
         }
 	
 	
@@ -31,9 +31,6 @@ RSVP Form Adjustments
         }
         .error-message {
             display: none;
-        }
-        &.no-flex {
-            display: block;
         }
     }
     .error-message {
@@ -87,17 +84,9 @@ RSVP Form Adjustments
         padding-top: 2px;
         line-height: 1.3;
         hyphens: auto;
+	
     }
     .notice-required {
-	    @include sr-only();
-    }
-
-    .rrze-2019 & {
-        label[for="rsvp_dsgvo"] {
-            flex-grow: 1;
-        }
-        .form-group {
-            margin: .5em 0;
-        }
+	@include sr-only();
     }
 }
