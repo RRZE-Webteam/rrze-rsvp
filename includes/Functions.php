@@ -894,7 +894,7 @@ class Functions
 
         if (!empty($aPersons)) {
             $aContactSelect = [
-                '0' => __('None', 'rrze-rsvp')
+                '0' => '-- ' . __('None', 'rrze-rsvp') . ' --'
             ];
 
             foreach ($aPersons as $ID => $val) {
