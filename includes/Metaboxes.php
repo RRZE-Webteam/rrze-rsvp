@@ -6,6 +6,9 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Settings;
 
+use RRZE\RSVP\Functions;
+
+
 class Metaboxes
 {
     public function __construct()
@@ -391,45 +394,29 @@ class Metaboxes
         ));
 
 
-        // BK EDIT 2022-01-11
         // https://github.com/RRZE-Webteam/rrze-rsvp/issues/311
-
         $aArgs = [
             'name' => __('Additional ICS email', 'rrze-rsvp'),
             'desc' => __('A copy of the confirmed booking will be sent to the specified email address with a calendar file (.ics) as an attachment.', 'rrze-rsvp'),
             'id'   => 'rrze-rsvp-room-send-to-email',
         ];
 
-        // if (is_plugin_active('fau-person/fau-person.php')){
-        //     $aContactSelect = [];
-        //     $aPersons = \FAU_Person\Data::get_contactdata();
+        if (is_plugin_active('fau-person/fau-person.php')){
 
+            $aContactSelect = Functions::getAdditionalEmail();
 
-        //     if (!empty($aPersons)){
-        //         $aContactSelect = [
-        //             '0' => __('None', 'rrze-rsvp')
-        //         ];
-
-        //         foreach($aPersons as $ID => $val){
-
-        //             $aDetails = \FAU_Person\Data::get_kontakt_data($ID); // delivers all details including email but very poor performance
-        //             $email = $aDetails['email'];
-
-        //             // $email = get_post_meta('1400', 'fau_person_email', true); // not all emails are stored as meta field, f.e. ID == 1400 isn't
-        //            $aContactSelect[$email] = $val;
-        //         }
-
-        //         $aArgs['type'] = 'select';
-        //         $aArgs['options'] = $aContactSelect;
-        //         $aArgs['default'] = '0';
-        //     }else{
-        //         $aArgs['type'] = 'text_email';
-        //         $aArgs['default'] = '';
-        //     }
-        // }else{
+            if (!empty($aContactSelect)){
+                $aArgs['type'] = 'select';
+                $aArgs['options'] = $aContactSelect;
+                $aArgs['default'] = '0';
+            }else{
+                $aArgs['type'] = 'text_email';
+                $aArgs['default'] = '';
+            }
+        }else{
             $aArgs['type'] = 'text_email';
             $aArgs['default'] = '';
-            // }
+            }
         $cmb_general->add_field($aArgs);
 
 
