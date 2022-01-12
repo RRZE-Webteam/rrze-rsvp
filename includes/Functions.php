@@ -880,4 +880,34 @@ class Functions
         $queryAry = array_diff_key(array_merge($queryAry, $add), array_fill_keys($remove, ''));
         return http_build_query($queryAry);
     }
+
+    public static function getAdditionalEmail(){
+        $aContactSelect = get_transient('rrze_rsvp_additional_email_cache');
+
+        if (!empty($aContactSelect)) {
+            return $aContactSelect;
+        }
+    
+        $aContactSelect = [];
+
+        $aPersons = \FAU_Person\Data::get_contactdata();
+
+        if (!empty($aPersons)) {
+            $aContactSelect = [
+                '0' => '-- ' . __('None', 'rrze-rsvp') . ' --'
+            ];
+
+            foreach ($aPersons as $ID => $val) {
+                // $email = get_post_meta('1400', 'fau_person_email', true); // not all emails are stored as meta field, f.e. postID == 1400 isn't
+                $aDetails = \FAU_Person\Data::get_kontakt_data($ID);
+                $email = $aDetails['email'];
+
+                $aContactSelect[$email] = $val;
+            }
+        }
+        set_transient('rrze_rsvp_additional_email_cache', $aContactSelect, DAY_IN_SECONDS);
+
+        return $aContactSelect;
+    }
+
 }
