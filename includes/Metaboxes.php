@@ -400,36 +400,36 @@ class Metaboxes
             'id'   => 'rrze-rsvp-room-send-to-email',
         ];
 
-        if (is_plugin_active('fau-person/fau-person.php')){
-            $aContactSelect = [];
-            $aPersons = \FAU_Person\Data::get_contactdata();
+        // if (is_plugin_active('fau-person/fau-person.php')){
+        //     $aContactSelect = [];
+        //     $aPersons = \FAU_Person\Data::get_contactdata();
 
 
-            if (!empty($aPersons)){
-                $aContactSelect = [
-                    '0' => __('None', 'rrze-rsvp')
-                ];
+        //     if (!empty($aPersons)){
+        //         $aContactSelect = [
+        //             '0' => __('None', 'rrze-rsvp')
+        //         ];
 
-                foreach($aPersons as $ID => $val){
+        //         foreach($aPersons as $ID => $val){
 
-                    $aDetails = \FAU_Person\Data::get_kontakt_data($ID); // delivers all details including email but very poor performance
-                    $email = $aDetails['email'];
+        //             $aDetails = \FAU_Person\Data::get_kontakt_data($ID); // delivers all details including email but very poor performance
+        //             $email = $aDetails['email'];
 
-                    // $email = get_post_meta('1400', 'fau_person_email', true); // not all emails are stored as meta field, f.e. ID == 1400 isn't
-                   $aContactSelect[$email] = $val;
-                }
+        //             // $email = get_post_meta('1400', 'fau_person_email', true); // not all emails are stored as meta field, f.e. ID == 1400 isn't
+        //            $aContactSelect[$email] = $val;
+        //         }
 
-                $aArgs['type'] = 'select';
-                $aArgs['options'] = $aContactSelect;
-                $aArgs['default'] = '0';
-            }else{
-                $aArgs['type'] = 'text_email';
-                $aArgs['default'] = '';
-            }
-        }else{
+        //         $aArgs['type'] = 'select';
+        //         $aArgs['options'] = $aContactSelect;
+        //         $aArgs['default'] = '0';
+        //     }else{
+        //         $aArgs['type'] = 'text_email';
+        //         $aArgs['default'] = '';
+        //     }
+        // }else{
             $aArgs['type'] = 'text_email';
             $aArgs['default'] = '';
-        }
+            // }
         $cmb_general->add_field($aArgs);
 
 
