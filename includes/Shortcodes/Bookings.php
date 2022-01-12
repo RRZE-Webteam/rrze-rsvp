@@ -379,7 +379,8 @@ class Bookings extends Shortcodes {
         $output .= '<div class="form-group' . $error . '"><label for="rsvp_phone">'
             . __('Phone Number', 'rrze-rsvp') . '</label>'
             . '<input type="text" name="rsvp_phone" value="' . $value . '" pattern="^([+])?(\d{1,3})?\s?(\(\d{3,5}\)|\d{3,5})?\s?(\d{1,3}\s?|\d{1,3}[-])?(\d{3,8})$" id="rsvp_phone">'
-            . '<div class="error-message">' . $message . '</div>';
+            . '<div class="error-message">' . $message . '</div>'
+            . '</div>';
         
         $defaults = defaultOptions();
         if ($comment) {
@@ -389,7 +390,8 @@ class Bookings extends Shortcodes {
             }
             $output .= '<div class="form-group">'
                 . '<label for="rsvp_comment">' . $label . '</label>'
-                . '<textarea name="rsvp_comment" id="rsvp_comment"></textarea>';
+                . '<textarea name="rsvp_comment" id="rsvp_comment"></textarea>'
+                . '</div>';
         }
         $showSupplement = !empty($this->options->general_show_dsgvo_supplement) ? $this->options->general_show_dsgvo_supplement : $defaults['show_dsgvo_supplement'];
         if ($showSupplement == 'on') {
@@ -402,6 +404,8 @@ class Bookings extends Shortcodes {
         $output .= '<div class="form-group">'
                     . '<input type="checkbox" value="1" id="rsvp_dsgvo" name="rsvp_dsgvo" required> '
                     . '<label for="rsvp_dsgvo">' . $defaults['dsgvo-declaration'] . '</label>'
+                    . '</div>'
+                    .'<div class="form-group no-flex">'
                     . $dsgvo_supplement
                     . '</div>';
 	    $output .= '</fieldset>';
