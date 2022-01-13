@@ -54,6 +54,7 @@ function getAllowedHTML(){
         ],
         'br' => [],
         'h3' => [],
+        'strong' => [],
         'li' => [],
         'p' => [],
         'ul' => [],
