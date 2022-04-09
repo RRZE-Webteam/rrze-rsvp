@@ -816,17 +816,13 @@ msgid ""
 "authorities."
 msgstr ""
 "Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des "
-"Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der "
-"Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung "
+"Vorganges der Platzbuchung und für Rückfragen (z.B. Fundsachen) bis zu 1 Tag nach der Veranstaltung"
 "gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter "
-"von Sprechstunden das Recht eingeräumt, während der Dauer des "
-"Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in "
+"von Sprechstunden das Recht eingeräumt, Einblick in "
 "folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. "
 "Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten "
 "allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a "
-"DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund "
-"der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden "
-"erfasst."
+"DSGVO. Die Angabe der Telefonnummer ist freiwillig und wird nur für eventuelle Rückfragen (z.B. Stornierung, Fundsachen) verwendet."
 
 #: includes/Metaboxes.php:349
 msgid ""
@@ -1181,7 +1177,7 @@ msgstr "Telefon"
 
 #: includes/Shortcodes/Bookings.php:380
 msgid "Phone Number"
-msgstr "Telefonnummer"
+msgstr "Telefonnummer (freiwillige Angabe)"
 
 #: includes/Email.php:258 includes/Email.php:260
 msgid "Please cancel your booking in time if your plans change."
