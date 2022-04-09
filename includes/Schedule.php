@@ -97,12 +97,12 @@ class Schedule
 
     /**
      * deleteOldBookings
-     * Delete all reservations whose start datetime is older than 4 weeks.
+     * Delete all reservations whose start datetime is older than 1 day.
      * @return void
      */
     protected function deleteOldBookings()
     {
-        $timeStampBefore = current_time('timestamp') - (4 * WEEK_IN_SECONDS);
+        $timeStampBefore = current_time('timestamp') - (1 * DAY_IN_SECONDS);
 
         $args = [
             'fields'            => 'ids',
@@ -331,7 +331,7 @@ class Schedule
 
     /**
      * deleteOldTrackingData
-     * Delete all tracking data older than 4 weeks.
+     * Delete all tracking data older than 1 day.
      * 
      * @return void
      */    
@@ -339,6 +339,6 @@ class Schedule
     {
         global $wpdb;
         $dbTable = Tracking::getTableName();
-        $wpdb->query("DELETE FROM $dbTable WHERE ts_inserted < (NOW() - INTERVAL 4 WEEK)");
+        $wpdb->query("DELETE FROM $dbTable WHERE ts_inserted < (NOW() - INTERVAL 1 DAY)");
     }
 }
