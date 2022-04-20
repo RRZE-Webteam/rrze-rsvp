@@ -567,7 +567,7 @@ class Bookings extends Shortcodes {
         if (!$booking) {
             return '';
         }
-        
+
         $data = [];
         $roomId = $booking['room'];
         $bookingMode = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true);
@@ -587,6 +587,17 @@ class Bookings extends Shortcodes {
         $data['seat_label'] = __('Seat', 'rrze-rsvp');        
         $data['customer']['name'] = sprintf('%s %s', $booking['guest_firstname'], $booking['guest_lastname']);
         $data['customer']['email'] = $booking['guest_email'];
+        $data['show_notes'] = false;
+        if (isset($roomMeta['notes-check']) && $roomMeta['notes-check'][0] == 'on') {
+            $defaults = defaultOptions();
+            $notesLabel = $roomMeta['rrze-rsvp-room-notes-label'][0];
+            if ($notesLabel == '') {
+                $notesLabel = $defaults['room-notes-label'];
+            }
+            $data['notes_label'] = $notesLabel;
+            $data['customer']['notes'] = $booking['notes'];
+            $data['show_notes'] = true;
+        }
 
         $data['data_sent_to_customer_email'] = sprintf(__('These data were also sent to your email address <strong>%s</strong>.', 'rrze-rsvp'), $booking['guest_email']);
 

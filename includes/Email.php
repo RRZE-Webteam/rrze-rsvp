@@ -2,6 +2,8 @@
 
 namespace RRZE\RSVP;
 
+use function RRZE\RSVP\Config\defaultOptions;
+
 defined('ABSPATH') || exit;
 
 class Email
@@ -61,11 +63,20 @@ class Email
         $showCheckinButton = false;
         $showCheckoutButton = false;
         $showCancelButton = false;
+        $showNotes = false;
         if ($cancelReason == '') {
             $cancelReason = false;
             $cancelReason_en = false;
         }
 
+        // TODO: welche E-Mails enthalten die Bemerkungen
+        /* TODO: Label für Bemerkungen
+         * $defaults = defaultOptions();
+            $notesLabel = $roomMeta['rrze-rsvp-room-notes-label'][0];
+            if ($notesLabel == '') {
+                $notesLabel = $defaults['room-notes-label'];
+            }
+         */
         switch ($mailContext) {
             case 'customerConfirmationRequired':
                 $subject = $this->options->email_force_to_confirm_subject;
@@ -74,6 +85,7 @@ class Email
                 $text_en = $this->options->email_force_to_confirm_text_en;
                 $showConfirmationButton = true;
                 $showCancelButton = true;
+                $showNotes = true;
                 break;
             case 'customerConfirmed':
                 if ($adminConfirmationRequired) {
@@ -84,6 +96,7 @@ class Email
                         $text_en = 'You received a new request for a booking.';
                         $showConfirmationButton = true;
                         $showCancelButton = true;
+                        $showNotes = true;
                     } elseif ($recipient == 'customer') {
                         $subject = $this->options->email_received_subject;;
                         $subject_en = $this->options->email_received_subject_en;
@@ -110,6 +123,7 @@ class Email
                     $text_en = 'You received a new request for a booking.';
                     $showConfirmationButton = true;
                     $showCancelButton = true;
+                    $showNotes = true;
                 } elseif ($recipient == 'customer') {
                     $subject = $this->options->email_received_subject;;
                     $subject_en = $this->options->email_received_subject_en;
@@ -133,6 +147,7 @@ class Email
                 $subject_en = '[RSVP] New booking';
                 $text = __('You received a new booking.', 'rrze-rsvp');
                 $text_en = 'You received a new booking.';
+                $showNotes = true;
                 break;
             case 'bookingCancelled':
                 if ($recipient == 'admin') {
@@ -220,6 +235,11 @@ class Email
         $data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
         $data['customer']['name'] = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
         $data['customer']['email'] = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
+
+        // Show Booking Notes
+        if ($showNotes){
+            $data['customer']['notes'] = $booking['notes'];
+        }
 
         // Confirmation Button
         if ($showConfirmationButton) {
@@ -353,6 +373,7 @@ class Email
             $data['show_check_btns'] = false;
             $data['show_cancel_btn'] = false;
             $data['show_confirm_button'] = false;
+            $data['show_notes'] = true;
 
             $message = $this->template->getContent('email/email', $data);
             $altMessage = $this->template->getContent('email/email.txt', $data);
@@ -415,7 +436,8 @@ class Email
             'room_name' => $booking['room_name'],
             'seat_name' => $booking['seat_name'],
             'guest_name' => $booking['guest_firstname'] . ' ' . $booking['guest_lastname'],
-            'guest_email' => $booking['guest_email']
+            'guest_email' => $booking['guest_email'],
+            'notes' => $booking['notes'],
         ];
 
         foreach ($data as $key => $field) {
