@@ -588,7 +588,7 @@ class Bookings extends Shortcodes {
         $data['customer']['name'] = sprintf('%s %s', $booking['guest_firstname'], $booking['guest_lastname']);
         $data['customer']['email'] = $booking['guest_email'];
         $data['show_notes'] = false;
-        if (isset($roomMeta['notes-check']) && $roomMeta['notes-check'][0] == 'on') {
+        if (isset($roomMeta['rrze-rsvp-room-notes-check']) && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on' && $booking['notes'] != '') {
             $defaults = defaultOptions();
             $notesLabel = $roomMeta['rrze-rsvp-room-notes-label'][0];
             if ($notesLabel == '') {

@@ -220,8 +220,11 @@ class Metaboxes
         $cmb->add_field(array(
             'name' => __('Notes', 'rrze-rsvp'),
             'id' => 'rrze-rsvp-booking-notes',
-            'type' => 'textarea',
+            'type' => 'textarea_small',
             'desc' => __("This textarea contains the 'Additional Information' field content if this option is activated in the room settings. It can also be used for notes for internal use.", 'rrze-rsvp'),
+            'attributes' => [
+                'readonly' => 'readonly',
+            ]
         ));
     }
 

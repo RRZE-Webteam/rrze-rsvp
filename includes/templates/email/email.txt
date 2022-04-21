@@ -69,6 +69,10 @@
 {{=customer.email}}
 {{/to_admin}}
 
+{{show_notes}}
+{{=customer.notes}}
+{{/show_notes}}
+
 {{show_confirm_button}}
 {{=alt_confirm_text_en}}
 {{=confirm_url}}

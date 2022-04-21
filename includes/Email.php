@@ -69,14 +69,7 @@ class Email
             $cancelReason_en = false;
         }
 
-        // TODO: welche E-Mails enthalten die Bemerkungen
-        /* TODO: Label für Bemerkungen
-         * $defaults = defaultOptions();
-            $notesLabel = $roomMeta['rrze-rsvp-room-notes-label'][0];
-            if ($notesLabel == '') {
-                $notesLabel = $defaults['room-notes-label'];
-            }
-         */
+        // TODO: neues internes Bemerkungsfeld
         switch ($mailContext) {
             case 'customerConfirmationRequired':
                 $subject = $this->options->email_force_to_confirm_subject;
@@ -140,6 +133,7 @@ class Email
                 $showCheckinButton = true;
                 $showCheckoutButton = true;
                 $showCancelButton = true;
+                $showNotes = true;
                 $status = 'confirmed';
                 break;
             case 'newBooking':
@@ -237,8 +231,19 @@ class Email
         $data['customer']['email'] = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
 
         // Show Booking Notes
-        if ($showNotes){
-            $data['customer']['notes'] = $booking['notes'];
+        if (isset($roomMeta['rrze-rsvp-room-notes-check'])
+            && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on'
+            && $showNotes === true
+            && $booking['notes'] != '') {
+            $defaults = defaultOptions();
+            $notesLabel = $roomMeta['rrze-rsvp-room-notes-label'][0];
+            if ($notesLabel == '') {
+                $notesLabel = $defaults['room-notes-label'];
+            }
+            $data['show_notes'] = true;
+            $data['customer']['notes'] = sprintf('%s<br />%s', $notesLabel, $booking['notes']);
+        } else {
+            $data['show_notes'] = false;
         }
 
         // Confirmation Button
@@ -373,7 +378,20 @@ class Email
             $data['show_check_btns'] = false;
             $data['show_cancel_btn'] = false;
             $data['show_confirm_button'] = false;
-            $data['show_notes'] = true;
+            if (isset($roomMeta['rrze-rsvp-room-notes-check'])
+                && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on'
+                && $showNotes === true
+                && $booking['notes'] != '') {
+                $defaults = defaultOptions();
+                $notesLabel = $roomMeta['rrze-rsvp-room-notes-label'][0];
+                if ($notesLabel == '') {
+                    $notesLabel = $defaults['room-notes-label'];
+                }
+                $data['show_notes'] = true;
+                $data['customer']['notes'] = sprintf('%s<br />%s', $notesLabel, $booking['notes']);
+            } else {
+                $data['show_notes'] = false;
+            }
 
             $message = $this->template->getContent('email/email', $data);
             $altMessage = $this->template->getContent('email/email.txt', $data);
