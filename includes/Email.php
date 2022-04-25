@@ -106,6 +106,7 @@ class Email
                     $showCheckoutButton = true;
                     $showCancelButton = true;
                     $status = 'confirmed';
+                    $showNotes = true;
                 }
                 break;
             case 'adminConfirmationRequired':
@@ -241,7 +242,7 @@ class Email
                 $notesLabel = $defaults['room-notes-label'];
             }
             $data['show_notes'] = true;
-            $data['customer']['notes'] = sprintf('%s<br />%s', $notesLabel, $booking['notes']);
+            $data['customer']['notes'] = sprintf('%s:<br />%s', $notesLabel, $booking['notes']);
         } else {
             $data['show_notes'] = false;
         }
