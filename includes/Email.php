@@ -366,7 +366,7 @@ class Email
         $this->send($to, $subject, $message, $altMessage, $attachment);
 
         // Send ICS to separate address if requested
-        if (is_email($sendToEmail) && ($status == 'confirmed') && in_array($bookingMode, ['reservation', 'consultation', 'no-check'])) {
+        if (is_email($sendToEmail) && (in_array($status, ['confirmed', 'cancelled'])) && in_array($bookingMode, ['reservation', 'consultation', 'no-check'])) {
             $subject = __('New confirmed booking', 'rrze-rsvp');
             $text = __('There is a new confirmed booking for your room. Calendar file (.ics) attached.', 'rrze-rsvp');
             $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
