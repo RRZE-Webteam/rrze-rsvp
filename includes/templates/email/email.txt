@@ -22,6 +22,10 @@
 {{=customer.email}}
 {{/to_admin}}
 
+{{show_notes}}
+{{=customer.notes}}
+{{/show_notes}}
+
 {{show_confirm_button}}
 {{=alt_confirm_text}}
 {{=confirm_url}}
@@ -64,6 +68,10 @@
 {{=customer.name}}
 {{=customer.email}}
 {{/to_admin}}
+
+{{show_notes}}
+{{=customer.notes}}
+{{/show_notes}}
 
 {{show_confirm_button}}
 {{=alt_confirm_text_en}}
