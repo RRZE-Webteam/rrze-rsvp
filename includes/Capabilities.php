@@ -8,25 +8,41 @@ class Capabilities
 {
     protected static function currentCptArgs()
     {
-        return [
-            'booking' => [
-                'capability_type' => ['booking', 'bookings'],
-                'capabilities' => [
-                    'read_customer_phone' => 'read_customer_phone'
+
+        if (CORONA_MODE){
+            return [
+                'booking' => [
+                    'capability_type' => ['booking', 'bookings'],
+                    'capabilities' => [
+                        'read_customer_phone' => 'read_customer_phone'
+                    ],
+                    'map_meta_cap' => true
                 ],
-                'map_meta_cap' => true
-            ],
-            'room' => [
-                'capability_type' => ['room', 'rooms'],
-                'capabilities' => [],
-                'map_meta_cap' => true
-            ],
-            'seat' => [
-                'capability_type' => ['seat', 'seats'],
-                'capabilities' => [],
-                'map_meta_cap' => true
-            ]
-        ];
+                'room' => [
+                    'capability_type' => ['room', 'rooms'],
+                    'capabilities' => [],
+                    'map_meta_cap' => true
+                ],
+                'seat' => [
+                    'capability_type' => ['seat', 'seats'],
+                    'capabilities' => [],
+                    'map_meta_cap' => true
+                ]
+            ];
+        }else{
+            return [
+                'room' => [
+                    'capability_type' => ['room', 'rooms'],
+                    'capabilities' => [],
+                    'map_meta_cap' => true
+                ],
+                'seat' => [
+                    'capability_type' => ['seat', 'seats'],
+                    'capabilities' => [],
+                    'map_meta_cap' => true
+                ]
+            ];
+        }
     }
 
     protected static function defaultCptArgs()
