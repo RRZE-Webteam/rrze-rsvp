@@ -58,7 +58,7 @@ class Bookings extends Shortcodes
         add_action('wp_ajax_nopriv_UpdateForm', [$this, 'ajaxUpdateForm']);
         add_action('wp_ajax_ShowItemInfo', [$this, 'ajaxShowItemInfo']);
         add_action('wp_ajax_nopriv_ShowItemInfo', [$this, 'ajaxShowItemInfo']);
-        add_shortcode('rsvp-booking', [$this, 'shortcodeBooking'], 10, 2);
+        add_shortcode('rsvp-booking', [$this, 'shortcodeBooking']);
     }
 
     public function maybeAuthenticate()

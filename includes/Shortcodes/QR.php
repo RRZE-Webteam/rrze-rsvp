@@ -32,7 +32,7 @@ class QR extends Shortcodes {
 
 
     public function onLoaded() {
-        add_shortcode('rsvp-qr', [$this, 'shortcodeQR'], 10, 2);
+        add_shortcode('rsvp-qr', [$this, 'shortcodeQR']);
     }
 
     public function shortcodeQR($atts, $content = '', $tag) {
