@@ -375,14 +375,16 @@ class Bookings extends Shortcodes
                 . '</div>';
         }
 
-        $error = isset($fieldErrors['rsvp_phone']) ? ' error' : '';
-        $value = isset($fieldErrors['rsvp_phone']['value']) ? $fieldErrors['rsvp_phone']['value'] : '';
-        $message = isset($fieldErrors['rsvp_phone']['message']) ? $fieldErrors['rsvp_phone']['message'] : '';
-        $output .= '<div class="form-group' . $error . '"><label for="rsvp_phone">'
-        . __('Phone Number', 'rrze-rsvp') . '</label>'
-            . '<input type="text" name="rsvp_phone" value="' . $value . '" pattern="^([+])?(\d{1,3})?\s?(\(\d{3,5}\)|\d{3,5})?\s?(\d{1,3}\s?|\d{1,3}[-])?(\d{3,8})$" id="rsvp_phone">'
-            . '<div class="error-message">' . $message . '</div>'
-            . '</div>';
+        if (CORONA_MODE){
+            $error = isset($fieldErrors['rsvp_phone']) ? ' error' : '';
+            $value = isset($fieldErrors['rsvp_phone']['value']) ? $fieldErrors['rsvp_phone']['value'] : '';
+            $message = isset($fieldErrors['rsvp_phone']['message']) ? $fieldErrors['rsvp_phone']['message'] : '';
+            $output .= '<div class="form-group' . $error . '"><label for="rsvp_phone">'
+            . __('Phone Number', 'rrze-rsvp') . '</label>'
+                . '<input type="text" name="rsvp_phone" value="' . $value . '" pattern="^([+])?(\d{1,3})?\s?(\(\d{3,5}\)|\d{3,5})?\s?(\d{1,3}\s?|\d{1,3}[-])?(\d{3,8})$" id="rsvp_phone">'
+                . '<div class="error-message">' . $message . '</div>'
+                . '</div>';
+        }
 
         $defaults = defaultOptions();
         if ($comment) {
@@ -395,12 +397,17 @@ class Bookings extends Shortcodes
                 . '<textarea name="rsvp_comment" id="rsvp_comment"></textarea>'
                 . '</div>';
         }
-        $showSupplement = !empty($this->options->general_show_dsgvo_supplement) ? $this->options->general_show_dsgvo_supplement : $defaults['show_dsgvo_supplement'];
-        if ($showSupplement == 'on') {
-            $lang = (strpos(get_locale(), 'de_') === 0 ? 'de' : 'en');
-            $optionName = 'general_dsgvo_supplement_' . $lang;
-            $dsgvo_supplement = !empty($this->options->$optionName) ? $this->options->$optionName : $defaults['dsgvo_supplement_' . $lang];
-        } else {
+
+        if (CORONA_MODE){
+            $showSupplement = !empty($this->options->general_show_dsgvo_supplement) ? $this->options->general_show_dsgvo_supplement : $defaults['show_dsgvo_supplement'];
+            if ($showSupplement == 'on') {
+                $lang = (strpos(get_locale(), 'de_') === 0 ? 'de' : 'en');
+                $optionName = 'general_dsgvo_supplement_' . $lang;
+                $dsgvo_supplement = !empty($this->options->$optionName) ? $this->options->$optionName : $defaults['dsgvo_supplement_' . $lang];
+            } else {
+                $dsgvo_supplement = '';
+            }
+        }else{
             $dsgvo_supplement = '';
         }
 
@@ -657,7 +664,11 @@ class Bookings extends Shortcodes
         $booking_date = sanitize_text_field($posted_data['rsvp_date']);
         $booking_start = sanitize_text_field($posted_data['rsvp_time']);
         $booking_timestamp_start = strtotime($booking_date . ' ' . $booking_start);
-        $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
+
+        if (CORONA_MODE){
+            $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
+        }
+
         $booking_instant = (isset($posted_data['rsvp_instant']) && $posted_data['rsvp_instant'] == '1');
         $booking_comment = (isset($posted_data['rsvp_comment']) ? sanitize_textarea_field($posted_data['rsvp_comment']) : '');
         $booking_dsgvo = (isset($posted_data['rsvp_dsgvo']) && $posted_data['rsvp_dsgvo'] == '1');
@@ -802,17 +813,20 @@ class Bookings extends Shortcodes
             // encrypt user data
             $booking_email = Functions::crypt($booking_email, 'encrypt');
         }
-        if (!Functions::validatePhone($booking_phone)) {
-            $transientData->addData(
-                'rsvp_phone',
-                [
-                    'value' => $booking_phone,
-                    'message' => __('Your phone number is not valid.', 'rrze-rsvp'),
-                ]
-            );
-        } else {
-            // encrypt user data
-            $booking_phone = Functions::crypt($booking_phone, 'encrypt');
+
+        if (CORONA_MODE){
+            if (!Functions::validatePhone($booking_phone)) {
+                $transientData->addData(
+                    'rsvp_phone',
+                    [
+                        'value' => $booking_phone,
+                        'message' => __('Your phone number is not valid.', 'rrze-rsvp'),
+                    ]
+                );
+            } else {
+                // encrypt user data
+                $booking_phone = Functions::crypt($booking_phone, 'encrypt');
+            }
         }
 
         if (!empty($transientData->getData(false))) {
@@ -978,7 +992,10 @@ class Bookings extends Shortcodes
         update_post_meta($booking_id, 'rrze-rsvp-booking-guest-lastname', $booking_lastname);
         update_post_meta($booking_id, 'rrze-rsvp-booking-guest-firstname', $booking_firstname);
         update_post_meta($booking_id, 'rrze-rsvp-booking-guest-email', $booking_email);
-        update_post_meta($booking_id, 'rrze-rsvp-booking-guest-phone', $booking_phone);
+
+        if (CORONA_MODE){
+            update_post_meta($booking_id, 'rrze-rsvp-booking-guest-phone', $booking_phone);
+        }
 
         // Set booking status
         $timestamp = current_time('timestamp');

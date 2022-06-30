@@ -373,7 +373,10 @@ class Functions
         $data['guest_firstname'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-firstname', true), 'decrypt');
         $data['guest_lastname'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-lastname', true), 'decrypt');
         $data['guest_email'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-email', true), 'decrypt');
-        $data['guest_phone'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-phone', true), 'decrypt');
+
+        if (CORONA_MODE){
+            $data['guest_phone'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-phone', true), 'decrypt');
+        }
 
         $data['post_status'] = $post->post_status;
 
