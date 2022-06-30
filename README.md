@@ -23,6 +23,7 @@ auf ihren jeweiligen Webauftritten eine Buchungsmöglichkeit für Plätze in Sem
 Personen, die einen Platz buchen wollen, können sich vor Ort zu einem Platz ein- und abbuchen. 
 Zusätzlich soll auch optional eine Reservierungsmöglichkeit angeboten werden.
 
+SEIT 30.07.2022 IST DIE KONTAKTVERFOLGUNG DEAKTIVIERT (CORONA_MODE == false):
 In Bezug auf die notwendigen Maßnahmen zur Eindämmung der Corona-Pandemie eignet sich das System auch für eine Kontaktverfolgung.
 
 Das System eignet sich auch für die Verwaltung von Sprechstundenterminen.
@@ -53,6 +54,8 @@ Das Plugin unterstützt auch die Anmeldung über LDAP. Mit dieser Option ist es 
 
 
 ## Kontaktverfolgung
+
+SEIT 30.07.2022 IST DIE KONTAKTVERFOLGUNG DEAKTIVIERT (CORONA_MODE == false und das Plugin rrze-rsvp-network ist deaktiviert):
 
 Das Plugin bietet auch die Möglichkeit, alle Personen zu ermitteln, die sich mit einer gesuchten Person zeitgleich in denselben Räumen befanden.
 Das Suchformular hierfür wird über "Werkzeuge" -> "RSVP Kontaktverfolgung" aufgerufen.

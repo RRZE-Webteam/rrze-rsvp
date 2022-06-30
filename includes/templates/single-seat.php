@@ -4,8 +4,8 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Auth\{IdM, LDAP};
-
+use RRZE\RSVP\Auth\IdM;
+use RRZE\RSVP\Auth\LDAP;
 use WP_Query;
 
 $idm = new IdM;
@@ -21,7 +21,8 @@ $checkInBooking = null;
 $seatCheckInOut = null;
 $action = null;
 
-function buildSeatInfo($seatID = '') {
+function buildSeatInfo($seatID = '')
+{
     if ($seatID == '') {
         return '';
     }
@@ -29,15 +30,14 @@ function buildSeatInfo($seatID = '') {
     $equipment = get_the_terms($seatID, 'rrze-rsvp-equipment');
     if ($equipment !== false) {
         $output .= '<div class="rsvp-item-info">';
-        foreach  ($equipment as $e) {
+        foreach ($equipment as $e) {
             $e_arr[] = $e->name;
         }
-        $output .= '<p><strong>' . __('Equipment','rrze-rsvp') . '</strong>: ' . implode(', ', $e_arr) . '</p>';
+        $output .= '<p><strong>' . __('Equipment', 'rrze-rsvp') . '</strong>: ' . implode(', ', $e_arr) . '</p>';
         $output .= '</div>';
     }
     return $output;
 }
-
 
 if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rrze-rsvp-checkin-booked-' . $_GET['id'])) {
     $bookingId = absint($_GET['id']);
@@ -51,7 +51,7 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
         $ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-sso-required', true));
         $ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-ldap-required', true));
         $ldapRequired = $ldapRequired && $settings->getOption('ldap', 'server') ? true : false;
-  
+
         $bSSO = true;
         if (!$ssoRequired || !$idm->isAuthenticated()) {
             $bSSO = false;
@@ -67,23 +67,23 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
                 $idm->setAttributes();
                 $customerData = $idm->getCustomerData();
                 // check if booking email is logged in email
-                if ($customerEmail != $customerData['customer_email']){
-                    $idm->logout(home_url( add_query_arg( null, null ) . '&email_error=1'));
+                if ($customerEmail != $customerData['customer_email']) {
+                    $idm->logout(home_url(add_query_arg(null, null) . '&email_error=1'));
                     exit;
-                }else{
-                    $idm->logout(home_url( add_query_arg( null, null ) . '&sso_loggedout=1'));
+                } else {
+                    $idm->logout(home_url(add_query_arg(null, null) . '&sso_loggedout=1'));
                 }
             } elseif ($bLDAP) {
                 $ldapInstance->setAttributes();
                 $customerData = $ldapInstance->getCustomerData();
                 $ldapInstance->logout();
                 // check if booking email is logged in email
-                if ($customerEmail != $customerData['customer_email']){
-                    wp_redirect(home_url( add_query_arg( null, null ) . '&email_error=1'));
+                if ($customerEmail != $customerData['customer_email']) {
+                    wp_redirect(home_url(add_query_arg(null, null) . '&email_error=1'));
                     exit;
                 }
-            }   
-        }                
+            }
+        }
     }
 }
 
@@ -141,7 +141,7 @@ if ($checkInBooking) {
         echo $date . '<br>';
         echo $time;
         echo '</p>';
-        echo '<p>' . $roomName . '</p>';    
+        echo '<p>' . $roomName . '</p>';
     } else {
         echo '<h2>' . __('Booking Checked In', 'rrze-rsvp') . '</h2>';
         echo '<p>', __('Check in has been completed.', 'rrze-rsvp') . '</p>';
@@ -161,7 +161,7 @@ if ($checkInBooking) {
             $nonce,
             __('Check out', 'rrze-rsvp')
         );
-        echo '<p>' . $link . '</p>';        
+        echo '<p>' . $link . '</p>';
     }
     echo '</div> </div>';
 } elseif ($seatCheckInOut) {
@@ -178,7 +178,9 @@ if ($checkInBooking) {
         case 'checkin':
             if ($status == 'confirmed') {
                 update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
-                do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+                if (CORONA_MODE) {
+                    do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+                }
             }
             $link = sprintf(
                 '<a href="%1$s?id=%2$d&action=checkout&nonce=%3$s" class="button button-checkout" data-id="%2$d">%4$s</a>',
@@ -227,7 +229,7 @@ if ($checkInBooking) {
     $status = null;
     $ssoRequired = false;
     $ldapRequired = false;
-   
+
     $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
     $now = current_time('timestamp');
 
@@ -241,25 +243,25 @@ if ($checkInBooking) {
         'nopaging' => true,
         'meta_query' => [
             'booking_status_clause' => [
-                'key'       => 'rrze-rsvp-booking-status',
-                'value'     => ['confirmed', 'checked-in'],
-                'compare'   => 'IN'
+                'key' => 'rrze-rsvp-booking-status',
+                'value' => ['confirmed', 'checked-in'],
+                'compare' => 'IN',
             ],
             'seat_id_clause' => [
                 'key' => 'rrze-rsvp-booking-seat',
-                'value'   => $seatId,
+                'value' => $seatId,
             ],
             'booking_start_clause' => [
-                'key'     => 'rrze-rsvp-booking-start',
+                'key' => 'rrze-rsvp-booking-start',
                 'value' => $now,
                 'compare' => '<=',
-                'type' => 'numeric'
+                'type' => 'numeric',
             ],
             'booking_end_clause' => [
-                'key'     => 'rrze-rsvp-booking-end',
+                'key' => 'rrze-rsvp-booking-end',
                 'value' => $now,
                 'compare' => '>=',
-                'type' => 'numeric'
+                'type' => 'numeric',
             ],
         ],
     ];
@@ -292,7 +294,7 @@ if ($checkInBooking) {
     $allowInstant = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-instant-check-in', true));
 
     //$nonceQuery = (!$ssoRequired ? '' : '&nonce=' . $nonce );
-    $nonceQuery = ( !$ssoRequired && !$ldapRequired ? '' : '&nonce=' . $nonce );
+    $nonceQuery = (!$ssoRequired && !$ldapRequired ? '' : '&nonce=' . $nonce);
 
     if ($bookingmode == 'reservation' && $status == 'confirmed') {
         $link = sprintf(
@@ -354,7 +356,7 @@ if ($checkInBooking) {
                 }
             }
         }
-        
+
         if ($bookingStart && $bookingEnd) {
             $start = strtotime($day . ' ' . $bookingStart);
             $end = strtotime($day . ' ' . $bookingEnd);
@@ -407,6 +409,3 @@ echo $div_close;
 
 wp_enqueue_style('rrze-rsvp-shortcode');
 get_footer();
-
-
-
