@@ -31,6 +31,12 @@ class Capabilities
             ];
         }else{
             return [
+                'booking' => [
+                    'capability_type' => ['booking', 'bookings'],
+                    'capabilities' => [
+                    ],
+                    'map_meta_cap' => true
+                ],
                 'room' => [
                     'capability_type' => ['room', 'rooms'],
                     'capabilities' => [],
