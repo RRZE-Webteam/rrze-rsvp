@@ -51,7 +51,7 @@ class Schedule
     {
         $schedules['rrze_rsvp_every5minutes'] = [
             'interval' => 5 * MINUTE_IN_SECONDS,
-            'display' => __('Every five minutes', 'rrze-rsvp')
+            'display' => __('Every five minutes', 'rrze-rsvp'),
         ];
         return $schedules;
     }
@@ -92,7 +92,9 @@ class Schedule
     {
         $this->deleteOldBookings();
         $this->deleteCancelledBookings();
-        $this->deleteOldTrackingData();
+        if (CORONA_MODE) {
+            $this->deleteOldTrackingData();
+        }
     }
 
     /**
@@ -105,17 +107,17 @@ class Schedule
         $timeStampBefore = current_time('timestamp') - (4 * WEEK_IN_SECONDS);
 
         $args = [
-            'fields'            => 'ids',
-            'post_type'         => ['booking'],
-            'post_status'       => 'publish',
-            'nopaging'          => true,
-            'meta_query'        => [
+            'fields' => 'ids',
+            'post_type' => ['booking'],
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'meta_query' => [
                 [
-                    'key'       => 'rrze-rsvp-booking-start',
-                    'value'     => $timeStampBefore,
-                    'compare'   => '<'
-                ]
-            ]
+                    'key' => 'rrze-rsvp-booking-start',
+                    'value' => $timeStampBefore,
+                    'compare' => '<',
+                ],
+            ],
         ];
 
         $query = new WP_Query($args);
@@ -139,23 +141,23 @@ class Schedule
         $timeStampBefore = current_time('timestamp') - (1 * DAY_IN_SECONDS);
 
         $args = [
-            'fields'            => 'ids',
-            'post_type'         => ['booking'],
-            'post_status'       => 'publish',
-            'nopaging'          => true,
-            'date_query'        => [
+            'fields' => 'ids',
+            'post_type' => ['booking'],
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'date_query' => [
                 [
-                    'before'    => date('Y-m-d H:i:s', $timeStampBefore),
+                    'before' => date('Y-m-d H:i:s', $timeStampBefore),
                     'inclusive' => false,
                 ],
             ],
-            'meta_query'        => [
+            'meta_query' => [
                 [
-                    'key'       => 'rrze-rsvp-booking-status',
-                    'value'     => ['cancelled'],
-                    'compare'   => 'IN'
-                ]
-            ]
+                    'key' => 'rrze-rsvp-booking-status',
+                    'value' => ['cancelled'],
+                    'compare' => 'IN',
+                ],
+            ],
         ];
 
         $query = new WP_Query($args);
@@ -171,8 +173,8 @@ class Schedule
 
     /**
      * cancelUnconfirmedBookings
-     * Cancel bookings with a date greater than 1 hour that were not 
-     * confirmed by the customer. It depends on whether the request for 
+     * Cancel bookings with a date greater than 1 hour that were not
+     * confirmed by the customer. It depends on whether the request for
      * confirmation by the customer is activated in the room settings.
      * @return void
      */
@@ -181,23 +183,23 @@ class Schedule
         $timeStampBefore = current_time('timestamp') - (1 * HOUR_IN_SECONDS);
 
         $args = [
-            'fields'            => 'ids',
-            'post_type'         => ['booking'],
-            'post_status'       => 'publish',
-            'nopaging'          => true,
-            'date_query'        => [
+            'fields' => 'ids',
+            'post_type' => ['booking'],
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'date_query' => [
                 [
-                    'before'    => date('Y-m-d H:i:s', $timeStampBefore),
+                    'before' => date('Y-m-d H:i:s', $timeStampBefore),
                     'inclusive' => false,
                 ],
             ],
-            'meta_query'        => [
+            'meta_query' => [
                 'booking_status_clause' => [
-                    'key'       => 'rrze-rsvp-booking-status',
-                    'value'     => 'booked',
-                    'compare'   => '='
-                ]
-            ]
+                    'key' => 'rrze-rsvp-booking-status',
+                    'value' => 'booked',
+                    'compare' => '=',
+                ],
+            ],
         ];
 
         $query = new WP_Query($args);
@@ -211,7 +213,9 @@ class Schedule
                 if (get_post_meta($roomId, 'rrze-rsvp-room-force-to-confirm', true)) {
                     update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
                     $this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled', 'notconfirmed');
-                    do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+                    if (CORONA_MODE) {
+                        do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+                    }
                 }
             }
             wp_reset_postdata();
@@ -221,25 +225,25 @@ class Schedule
     /**
      * cancelNotCheckedInBookings
      * Cancel booking that were not checked-in in time
-     * of starting the event. It depends on whether the check-in requirement 
+     * of starting the event. It depends on whether the check-in requirement
      * is activated in the room settings.
      * @return void
      */
     protected function cancelNotCheckedInBookings()
     {
         $args = [
-            'fields'            => 'ids',
-            'post_type'         => ['booking'],
-            'post_status'       => 'publish',
-            'nopaging'          => true,
-            'meta_query'        => [
-                'relation'      => 'AND',
+            'fields' => 'ids',
+            'post_type' => ['booking'],
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'meta_query' => [
+                'relation' => 'AND',
                 'booking_status_clause' => [
-                    'key'       => 'rrze-rsvp-booking-status',
-                    'value'     => ['confirmed'],
-                    'compare'   => 'IN'
+                    'key' => 'rrze-rsvp-booking-status',
+                    'value' => ['confirmed'],
+                    'compare' => 'IN',
                 ],
-            ]
+            ],
         ];
 
         $query = new WP_Query($args);
@@ -275,11 +279,15 @@ class Schedule
                 }
                 if (in_array($bookingMode, ['consultation', 'no-check'])) {
                     update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
-                    do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+                    if (CORONA_MODE) {
+                        do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+                    }
                 } elseif ($checkInRequired) {
                     update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
                     $this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled', 'notcheckedin');
-                    do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+                    if (CORONA_MODE) {
+                        do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
+                    }
                 }
             }
             wp_reset_postdata();
@@ -288,7 +296,7 @@ class Schedule
 
     /**
      * checkOutNotCheckedOutBookings
-     * Check-out booking with checked-in status that were 
+     * Check-out booking with checked-in status that were
      * not checked-out by the customer.
      * @return void
      */
@@ -297,24 +305,24 @@ class Schedule
         $timeStamp = current_time('timestamp');
 
         $args = [
-            'fields'            => 'ids',
-            'post_type'         => ['booking'],
-            'post_status'       => 'publish',
-            'nopaging'          => true,
-            'meta_query'        => [
-                'relation'      => 'AND',
+            'fields' => 'ids',
+            'post_type' => ['booking'],
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'meta_query' => [
+                'relation' => 'AND',
                 'booking_status_clause' => [
-                    'key'       => 'rrze-rsvp-booking-status',
-                    'value'     => ['checked-in'],
-                    'compare'   => 'IN'
+                    'key' => 'rrze-rsvp-booking-status',
+                    'value' => ['checked-in'],
+                    'compare' => 'IN',
                 ],
                 'booking_start_clause' => [
-                    'key'       => 'rrze-rsvp-booking-end',
-                    'value'     => $timeStamp,
-                    'compare'   => '<',
-                    'type' => 'numeric'
-                ]
-            ]
+                    'key' => 'rrze-rsvp-booking-end',
+                    'value' => $timeStamp,
+                    'compare' => '<',
+                    'type' => 'numeric',
+                ],
+            ],
         ];
 
         $query = new WP_Query($args);
@@ -323,7 +331,9 @@ class Schedule
             while ($query->have_posts()) {
                 $query->the_post();
                 update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'checked-out');
-                do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
+                if (CORONA_MODE) {
+                    do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
+                }
             }
             wp_reset_postdata();
         }
@@ -332,9 +342,9 @@ class Schedule
     /**
      * deleteOldTrackingData
      * Delete all tracking data older than 4 weeks.
-     * 
+     *
      * @return void
-     */    
+     */
     protected function deleteOldTrackingData()
     {
         global $wpdb;
