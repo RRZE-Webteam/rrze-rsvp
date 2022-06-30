@@ -32,7 +32,7 @@ class Availability extends Shortcodes
     public function onLoaded()
     {
 
-        add_shortcode('rsvp-availability', [$this, 'shortcodeAvailability'], 10, 2);
+        add_shortcode('rsvp-availability', [$this, 'shortcodeAvailability']);
     }
 
     public function shortcodeAvailability($atts, $content = '', $tag)
