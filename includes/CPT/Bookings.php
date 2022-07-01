@@ -8,10 +8,9 @@ namespace RRZE\RSVP\CPT;
 
 defined('ABSPATH') || exit;
 
-use function RRZE\RSVP\Config\isAllowedSearchForGuest;
 use RRZE\RSVP\Capabilities;
 use RRZE\RSVP\Functions;
-
+use function RRZE\RSVP\Config\isAllowedSearchForGuest;
 // use RRZE\RSVP\Carbon;
 
 class Bookings
@@ -24,6 +23,7 @@ class Bookings
     protected $filterStart;
     protected $filterEnd;
     protected $sSearch;
+
 
     public function __construct()
     {
@@ -48,54 +48,58 @@ class Bookings
         add_action('pre_get_posts', [$this, 'searchBookings']);
     }
 
+
+
+
     // Register Custom Post Type
     public function booking_post_type()
     {
         $labels = [
-            'name' => _x('Bookings', 'Post type general name', 'rrze-rsvp'),
-            'singular_name' => _x('Booking', 'Post type singular name', 'rrze-rsvp'),
-            'menu_name' => _x('Bookings', 'Admin Menu text', 'rrze-rsvp'),
-            'name_admin_bar' => _x('Booking', 'Add New on Toolbar', 'rrze-rsvp'),
-            'add_new' => __('Add New', 'rrze-rsvp'),
-            'add_new_item' => __('Add New Booking', 'rrze-rsvp'),
-            'new_item' => __('New Booking', 'rrze-rsvp'),
-            'edit_item' => __('Edit Booking', 'rrze-rsvp'),
-            'view_item' => __('View Booking', 'rrze-rsvp'),
-            'all_items' => __('All Bookings', 'rrze-rsvp'),
-            'search_items' => __('Search Bookings', 'rrze-rsvp'),
-            'not_found' => __('No Bookings found.', 'rrze-rsvp'),
-            'not_found_in_trash' => __('No Bookings found in Trash.', 'rrze-rsvp'),
-            'archives' => _x('Booking archives', 'The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4', 'rrze-rsvp'),
-            'filter_items_list' => _x('Filter Bookings list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'rrze-rsvp'),
-            'items_list_navigation' => _x('Bookings list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'rrze-rsvp'),
-            'items_list' => _x('Bookings list', 'Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4', 'rrze-rsvp'),
+            'name'                      => _x('Bookings', 'Post type general name', 'rrze-rsvp'),
+            'singular_name'             => _x('Booking', 'Post type singular name', 'rrze-rsvp'),
+            'menu_name'                 => _x('Bookings', 'Admin Menu text', 'rrze-rsvp'),
+            'name_admin_bar'            => _x('Booking', 'Add New on Toolbar', 'rrze-rsvp'),
+            'add_new'                   => __('Add New', 'rrze-rsvp'),
+            'add_new_item'              => __('Add New Booking', 'rrze-rsvp'),
+            'new_item'                  => __('New Booking', 'rrze-rsvp'),
+            'edit_item'                 => __('Edit Booking', 'rrze-rsvp'),
+            'view_item'                 => __('View Booking', 'rrze-rsvp'),
+            'all_items'                 => __('All Bookings', 'rrze-rsvp'),
+            'search_items'              => __('Search Bookings', 'rrze-rsvp'),
+            'not_found'                 => __('No Bookings found.', 'rrze-rsvp'),
+            'not_found_in_trash'        => __('No Bookings found in Trash.', 'rrze-rsvp'),
+            'archives'                  => _x('Booking archives', 'The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4', 'rrze-rsvp'),
+            'filter_items_list'         => _x('Filter Bookings list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'rrze-rsvp'),
+            'items_list_navigation'     => _x('Bookings list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'rrze-rsvp'),
+            'items_list'                => _x('Bookings list', 'Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4', 'rrze-rsvp'),
         ];
 
         $args = [
-            'label' => __('Booking', 'rrze-rsvp'),
-            'description' => __('Add and edit Booking informations', 'rrze-rsvp'),
-            'labels' => $labels,
-            'supports' => ['author'], // , 'revisions'
-            'hierarchical' => false,
-            'public' => false,
-            'show_ui' => true,
-            'show_in_menu' => true,
-            'show_in_admin_bar' => true,
-            'menu_position' => 18,
-            'menu_icon' => 'dashicons-calendar-alt',
-            'can_export' => false,
-            'has_archive' => false,
-            'exclude_from_search' => true,
-            'publicly_queryable' => false,
-            'delete_with_user' => false,
-            'show_in_rest' => false,
-            'capability_type' => Capabilities::getCptCapabilityType('booking'),
-            'capabilities' => (array) Capabilities::getCptCaps('booking'),
-            'map_meta_cap' => Capabilities::getCptMapMetaCap('booking'),
+            'label'                     => __('Booking', 'rrze-rsvp'),
+            'description'               => __('Add and edit Booking informations', 'rrze-rsvp'),
+            'labels'                    => $labels,
+            'supports'                  => ['author'], // , 'revisions'
+            'hierarchical'              => false,
+            'public'                    => false,
+            'show_ui'                   => true,
+            'show_in_menu'              => true,
+            'show_in_admin_bar'         => true,
+            'menu_position'             => 18,
+            'menu_icon'                 => 'dashicons-calendar-alt',
+            'can_export'                => false,
+            'has_archive'               => false,
+            'exclude_from_search'       => true,
+            'publicly_queryable'        => false,
+            'delete_with_user'          => false,
+            'show_in_rest'              => false,
+            'capability_type'           => Capabilities::getCptCapabilityType('booking'),
+            'capabilities'              => (array) Capabilities::getCptCaps('booking'),
+            'map_meta_cap'              => Capabilities::getCptMapMetaCap('booking')
         ];
 
         register_post_type('booking', $args);
     }
+
 
     public function addBookingColumns($columns)
     {
@@ -107,10 +111,8 @@ class Bookings
         $columns['seat'] = __('Seat', 'rrze-rsvp');
         $columns['name'] = __('Name', 'rrze-rsvp');
         $columns['email'] = __('Email', 'rrze-rsvp');
-        if (current_user_can('read_customer_phone')) {
-            if (CORONA_MODE) {
-                $columns['phone'] = __('Phone', 'rrze-rsvp');
-            }
+        if (CORONA_MODE && current_user_can('read_customer_phone')) {
+            $columns['phone'] = __('Phone', 'rrze-rsvp');
         }
         $columns['status'] = __('Status', 'rrze-rsvp');
         return $columns;
@@ -124,10 +126,8 @@ class Bookings
         $columns['seat'] = 'seat';
         $columns['name'] = 'name';
         $columns['email'] = 'email';
-        if (current_user_can('read_customer_phone')) {
-            if (CORONA_MODE){
-                $columns['phone'] = 'phone';
-            }
+        if (CORONA_MODE && current_user_can('read_customer_phone')) {
+            $columns['phone'] = 'phone';
         }
         $columns['status'] = 'status';
         return $columns;
@@ -248,7 +248,7 @@ class Bookings
                                     break;
                                 case 'booked':
                                 default:
-                                    $button = $checkInButton;
+                                    $button =  $checkInButton;
                                     break;
                             }
                         } elseif ($status == 'booked' && $forceToConfirm) {
@@ -278,10 +278,11 @@ class Bookings
         }
     }
 
+
     public function ajaxShowTimeslots()
     {
         $output = '';
-        $seat = ((isset($_POST['seat']) && $_POST['seat'] > 0) ? (int) $_POST['seat'] : '');
+        $seat = ((isset($_POST['seat']) && $_POST['seat'] > 0) ? (int)$_POST['seat'] : '');
         $date_raw = (isset($_POST['date']) ? sanitize_text_field($_POST['date']) : false);
         if (strpos($date_raw, '.') !== false) {
             $date_parts = explode('.', $date_raw);
@@ -291,7 +292,7 @@ class Bookings
         $output .= '<div class="select_timeslot_container" style="display:inline-block;padding-left: 10px;">';
         if (isset($availability[$date])) {
             $output .= '<select class="select_timeslot">'
-            . '<option value="">' . __('Select timeslot', 'rrze-rsvp') . '</option>';
+                . '<option value="">' . __('Select timeslot', 'rrze-rsvp') . '</option>';
 
             foreach ($availability[$date] as $timeslot) {
                 $time_parts = explode('-', $timeslot);
@@ -324,7 +325,7 @@ class Bookings
         $aBookingIds = get_posts([
             'post_type' => 'booking',
             'nopaging' => true,
-            'fields' => 'ids',
+            'fields' => 'ids'
         ]);
 
         $aBookingDates = [];
@@ -334,10 +335,10 @@ class Bookings
         foreach ($aBookingIds as $bookingId) {
             // 2. get unique dates
             $bookingStart = get_post_meta($bookingId, 'rrze-rsvp-booking-start', true);
-            $aBookingDates[date("Y-m-d", $bookingStart)] = Functions::dateFormat((int) $bookingStart);
+            $aBookingDates[date("Y-m-d", $bookingStart)] = Functions::dateFormat((int)$bookingStart);
 
             $bookingEnd = get_post_meta($bookingId, 'rrze-rsvp-booking-end', true);
-            $bookingTimeslot = sprintf('%05s', Functions::timeFormat((int) $bookingStart)) . ' - ' . sprintf('%05s', Functions::timeFormat((int) $bookingEnd));
+            $bookingTimeslot = sprintf('%05s', Functions::timeFormat((int)$bookingStart)) . ' - ' . sprintf('%05s', Functions::timeFormat((int)$bookingEnd));
             $aBookingTimeslots[$bookingTimeslot] = $bookingTimeslot;
             // 3. get unique rooms via seat
             $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
@@ -361,12 +362,13 @@ class Bookings
         }
     }
 
+
     private function getBookingIDsBySeatRoomTitle($sSearch)
     {
         global $wpdb;
         $aBookingIDs = [];
         $aIDs = $wpdb->get_results("SELECT ID FROM $wpdb->posts p, $wpdb->postmeta pm WHERE p.post_type = 'booking' AND p.post_status = 'publish' AND p.id = pm.post_id AND pm.meta_key = 'rrze-rsvp-booking-seat' AND pm.meta_value IN (
-                SELECT ID FROM $wpdb->posts p, $wpdb->postmeta pm WHERE p.post_type = 'seat' AND p.post_status = 'publish' AND p.id = pm.post_id AND (p.post_title LIKE '%" . $sSearch . "%' OR (pm.meta_key = 'rrze-rsvp-seat-room' AND pm.meta_value IN
+                SELECT ID FROM $wpdb->posts p, $wpdb->postmeta pm WHERE p.post_type = 'seat' AND p.post_status = 'publish' AND p.id = pm.post_id AND (p.post_title LIKE '%" . $sSearch . "%' OR (pm.meta_key = 'rrze-rsvp-seat-room' AND pm.meta_value IN 
                 (SELECT ID FROM $wpdb->posts WHERE post_type = 'room' AND post_status = 'publish' AND post_title LIKE '%" . $sSearch . "%'))))", ARRAY_A);
 
         foreach ($aIDs as $aID) {
@@ -387,6 +389,7 @@ class Bookings
             $this->filterEnd = $parts[1];
         }
     }
+
 
     public function getBookingByGuest($sSearch)
     {
@@ -414,8 +417,8 @@ class Bookings
 
             foreach ($encryptedFields as $field) {
                 $meta_query[] = [
-                    'key' => $field,
-                    'value' => $encryptedSearch,
+                    'key'     => $field,
+                    'value'   => $encryptedSearch,
                     'compare' => 'LIKE',
                 ];
             }
@@ -427,9 +430,9 @@ class Bookings
 
         $args = array(
             'fields' => 'ids',
-            'post_type' => 'booking',
-            'post_status' => 'publish',
-            'nopaging' => true,
+            'post_type'         => 'booking',
+            'post_status'       => 'publish',
+            'nopaging'          => true,
             'meta_query' => array($meta_query),
         );
 
@@ -467,6 +470,7 @@ class Bookings
         return $ret;
     }
 
+
     public function filterBookings($query)
     {
         if (!(is_admin() && $query->is_main_query())) {
@@ -500,10 +504,14 @@ class Bookings
         return $query;
     }
 
+
+
     public function searchBookings($query)
     {
-        if (!$query->is_main_query()
-            || !(isset($query->query_vars['post_type']) && $query->query_vars['post_type'] == 'booking')) {
+        if (
+            !$query->is_main_query()
+            || !(isset($query->query_vars['post_type']) && $query->query_vars['post_type'] == 'booking')
+        ) {
             return;
         }
 
@@ -569,5 +577,4 @@ class Bookings
         }
         return $months;
     }
-
 }
