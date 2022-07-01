@@ -1,49 +1,48 @@
 {
-  "name": "rrze-rsvp",
-  "version": "2.9.4",
-  "description": "Platzbuchungssystem der FAU.",
-  "main": "rrze-rsvp.php",
-  "textdomain": "rrze-rsvp",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "jsdir": "./assets/js/",
-  "cssdir": "./assets/css/",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RRZE-Webteam/rrze-rsvp.git",
-    "issues": "https://github.com/RRZE-Webteam/rrze-rsvp/issues",
-    "clone": "git+https://github.com/RRZE-Webteam/rrze-rsvp.git"
-  },
-  "browserslist": [
-    "last 3 years",
-    "ie 11"
-  ],
-  "supports": {
-    "email": "webmaster@fau.de",
-    "docs": "https://www.wordpress.rrze.fau.de/plugins/fau-und-rrze-plugins/rsvp/"
-  },
-  "author": "RRZE-Webteam <webmaster@fau.de> (https://www.wordpress.rrze.fau.de/person/webmaster)",
-  "license": "GPL-3.0-or-later",
-  "devDependencies": {
-    "@babel/core": "^7.11.1",
-    "@babel/preset-env": "^7.11.0",
-    "autoprefixer": "^9.8.6",
-    "gulp": "^4.0.2",
-    "gulp-babel": "^8.0.0",
-    "gulp-bump": "^3.2.0",
-    "gulp-clean-css": "^4.3.0",
-    "gulp-csso": "^3.0.1",
-    "gulp-postcss": "^8.0.0",
-    "gulp-sass": "^4.1.0",
-    "gulp-touch-cmd": "0.0.1",
-    "gulp-uglify": "^3.0.2",
-    "gulp-wp-pot": "^2.4.3",
-    "node-sass": "^4.14.1",
-    "semver": "^6.3.0"
-  },
-  "bugs": {
-    "url": "https://github.com/RRZE-Webteam/rrze-rsvp/issues"
-  },
-  "homepage": "https://github.com/RRZE-Webteam/rrze-rsvp#readme"
+    "name": "rrze-rsvp",
+    "main": "webpack.config.js",
+    "scripts": {
+        "start": "webpack --mode=development --watch",
+        "build": "webpack --mode=production",
+        "clean": "rm -rf build/",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/RRZE-Webteam/rrze-rsvp.git",
+        "issues": "https://github.com/RRZE-Webteam/rrze-rsvp/issues",
+        "clone": "git+https://github.com/RRZE-Webteam/rrze-rsvp.git"
+    },
+    "browserslist": [
+        "last 3 years",
+        "ie 11"
+    ],
+    "supports": {
+        "email": "webmaster@fau.de",
+        "docs": "https://www.wordpress.rrze.fau.de/plugins/fau-und-rrze-plugins/rsvp/"
+    },
+    "author": "RRZE-Webteam <webmaster@fau.de> (https://www.wordpress.rrze.fau.de/person/webmaster)",
+    "license": "GPL-3.0-or-later",
+    "bugs": {
+        "url": "https://github.com/RRZE-Webteam/rrze-rsvp/issues"
+    },
+    "homepage": "https://github.com/RRZE-Webteam/rrze-rsvp#readme",
+    "devDependencies": {
+        "@babel/core": "^7.14",
+        "@babel/preset-env": "^7.14",
+        "autoprefixer": "^10.3.1",
+        "babel-loader": "^8.2.2",
+        "clean-webpack-plugin": "^3.0.0",
+        "css-loader": "^6.2.0",
+        "css-minimizer-webpack-plugin": "^3.0.2",
+        "mini-css-extract-plugin": "^2.1.0",
+        "postcss-loader": "^6.1.1",
+        "sass": "^1.49.9",
+        "sass-loader": "^12.1.0",
+        "semver": "^7.3.5",
+        "style-loader": "^3.2.1",
+        "terser-webpack-plugin": "^5.1.4",
+        "webpack": "^5.46.0",
+        "webpack-cli": "^4.7.2"
+    }
 }
