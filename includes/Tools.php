@@ -7,26 +7,30 @@ defined('ABSPATH') || exit;
 class Tools
 {
 
-    public function __construct() {
+    public function __construct()
+    {
         //
     }
 
-    public function onLoaded() {
-        add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
-        add_action( 'admin_head', array( $this, 'create_seats_add_js' ) );
+    public function onLoaded()
+    {
+        add_action('admin_menu', array($this, 'add_admin_menu'));
+        add_action('admin_head', array($this, 'create_seats_add_js'));
     }
 
-    public function add_admin_menu() {
+    public function add_admin_menu()
+    {
         $menu_id = add_management_page(
-            _x( 'Create Seats', 'admin page title', 'rrze-rsvp' ),
-            _x( 'RSVP Create Seats', 'admin menu entry title', 'rrze-rsvp' ),
+            _x('Create Seats', 'admin page title', 'rrze-rsvp'),
+            _x('RSVP Create Seats', 'admin menu entry title', 'rrze-rsvp'),
             'manage_options',
             'rrze-rsvp-tools',
-            array( $this, 'admin_page' )
+            array($this, 'admin_page')
         );
     }
 
-    function admin_page() {
+    function admin_page()
+    {
         // Empty the form so it won't be submitted twice.
         $value_room = '';
         $value_num_rows = '';
@@ -38,9 +42,9 @@ class Tools
         $value_start_number = '';
 
         echo '<div class="wrap">';
-        echo '<h1>' . esc_html_x( 'Create Seats', 'admin page title', 'rrze-rsvp' ) . '</h1>';
+        echo '<h1>' . esc_html_x('Create Seats', 'admin page title', 'rrze-rsvp') . '</h1>';
 
-        if ( isset( $_GET['status']) && $_GET['status'] == 'submit') {
+        if (isset($_GET['status']) && $_GET['status'] == 'submit') {
             /*
              * Submit Form, Create Seats
              */
@@ -64,7 +68,7 @@ class Tools
             if (!empty($errors)) {
                 echo '<div class="notice notice-error">';
                 echo '<h2>' . __('An error occurred') . '</h2>';
-                echo '<p>' . explode('<br />', $errors) . '</p>';
+                echo '<p>' . implode('<br />', $errors) . '</p>';
                 echo '</div>';
             } else {
                 $room_id = isset($_GET['room_id']) ? absint($_GET['room_id']) : '';
@@ -206,19 +210,20 @@ class Tools
         echo '</div>';
     }
 
-    public function create_seats_add_js() {
-        ?>
+    public function create_seats_add_js()
+    {
+?>
         <script type="text/javascript">
-            jQuery(document).ready(function($){
+            jQuery(document).ready(function($) {
                 var form = $('#rsvp-create-seats'),
                     optional = form.find('tr.optional_start_number');
                 if (optional.find('input#start_number').val() < 1) {
                     optional.hide();
                 }
                 form.find('input[name="schema_rows"]').change(function() {
-                    if ( $(this).val() == 'num') {
+                    if ($(this).val() == 'num') {
                         optional.fadeIn();
-                    }  else {
+                    } else {
                         optional.find('input#start_number').val('');
                         optional.hide();
 
@@ -226,6 +231,6 @@ class Tools
                 });
             });
         </script>
-        <?php
+<?php
     }
 }
