@@ -9,10 +9,11 @@ use DateTime;
 class Functions
 {
 
-    public static function formatDateGMT($timestamp){
-		$date = new \DateTime(get_gmt_from_date(date('Y-m-d H:i:s', $timestamp)));
-		return $date->format('Ymd\THis\Z');
-	}
+    public static function formatDateGMT($timestamp)
+    {
+        $date = new \DateTime(get_gmt_from_date(date('Y-m-d H:i:s', $timestamp)));
+        return $date->format('Ymd\THis\Z');
+    }
 
     public static function dateFormat(int $timestamp): string
     {
@@ -78,14 +79,14 @@ class Functions
         $today = date('Y-m-d', $timestamp);
         $start = $today;
         $end = date("Y-m-d", strtotime("+$duration day"));
-        
+
         $aRoomAvailability = self::getRoomAvailability($room_id, $start, $end);
 
-        if (!$aRoomAvailability){
+        if (!$aRoomAvailability) {
             return '<span class="rrze-rsvp-occupancy-title">' . sprintf(__('This room has no available seat within %u days.', 'rrze-rsvp'), $duration) . '</span>';
         }
 
-        if (isset($aRoomAvailability[$today])){
+        if (isset($aRoomAvailability[$today])) {
             // we have a seat for today
             $output = '<span class="rrze-rsvp-occupancy-title">' . __('Room occupancy for today', 'rrze-rsvp') . '</span>';
             $output .= self::getOccupancyByRoomIdHTML($room_id, true);
@@ -94,7 +95,7 @@ class Functions
             $nextAvailableDay = array_key_first($aRoomAvailability);
             $countSeats = count(array_values($aRoomAvailability[$nextAvailableDay])[0]);
             $output = '<span class="rrze-rsvp-occupancy-title">' . __('This room has no available seat for today.', 'rrze-rsvp') . ' ' . _n('The next available seat is on', 'The next available seats are on', $countSeats, 'rrze-rsvp') . ' ' . self::dateFormat(strtotime($nextAvailableDay)) . '</span>';
-            $output .= self::getOccupancyByRoomIdHTML($room_id, true, strtotime($nextAvailableDay) );
+            $output .= self::getOccupancyByRoomIdHTML($room_id, true, strtotime($nextAvailableDay));
         }
         return $output;
     }
@@ -110,34 +111,34 @@ class Functions
      */
     public static function getOccupancyByRoomIdHTML(int $room_id, bool $from_now = NULL, int $timestamp = 0): string
     {
-       
+
 
         $seats_slots = self::getOccupancyByRoomId($room_id, $from_now, $timestamp);
 
-        if ($seats_slots){
-	    $output = '<table class="rsvp-room-occupancy"><tr>';
-            $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
-            foreach($seats_slots['room_slots'] as $room_slot){
+        if ($seats_slots) {
+            $output = '<table class="rsvp-room-occupancy"><tr>';
+            $output .= '<th>' . __('Seat', 'rrze-rsvp') . '</th>';
+            foreach ($seats_slots['room_slots'] as $room_slot) {
                 $output .= '<th scope="col"><span class="rrze-rsvp-timeslot">' . str_replace('-', ' - ', $room_slot) . '</span></th>';
             }
             $output .= '</tr>';
             $aRoomSlots = $seats_slots['room_slots'];
             unset($seats_slots['room_slots']);
 
-            foreach($seats_slots as $seat_id => $aSlots){
+            foreach ($seats_slots as $seat_id => $aSlots) {
                 $output .= '<tr>';
-                $output .= '<th scope="row">' . get_the_title( $seat_id ) . '</th>';
-                foreach($aRoomSlots as $slot){
-                    $class = ( $aSlots[$slot] ? 'available' : 'not-available' );
-                    $output .= '<td><span class="'.$class.'">' . ( $aSlots[$slot] ? 'available' : 'not-available' ) . '</span></td>';
+                $output .= '<th scope="row">' . get_the_title($seat_id) . '</th>';
+                foreach ($aRoomSlots as $slot) {
+                    $class = ($aSlots[$slot] ? 'available' : 'not-available');
+                    $output .= '<td><span class="' . $class . '">' . ($aSlots[$slot] ? 'available' : 'not-available') . '</span></td>';
                 }
                 $output .= '</tr>';
             }
-	    $output .= '</table>';
-        }else{
+            $output .= '</table>';
+        } else {
             $output = '<div class="alert">' . __('This room has no seats for today.', 'rrze-rsvp') . '</div>';
         }
-       
+
 
         return $output;
     }
@@ -152,9 +153,10 @@ class Functions
      * @param int $timestamp (optional, the timestampt to check occupancies at, default: current_time('timestamp') )
      * @return array
      */
-    public static function getOccupancyByRoomId(int $room_id, bool $from_now = NULL, int $timestamp = 0): array {
+    public static function getOccupancyByRoomId(int $room_id, bool $from_now = NULL, int $timestamp = 0): array
+    {
         $data = [];
-        $timestamp = ( !$timestamp ? current_time('timestamp') : $timestamp );
+        $timestamp = (!$timestamp ? current_time('timestamp') : $timestamp);
         $thisDay = date('Y-m-d', $timestamp);
         $thisDay_weeknumber = date('N', $timestamp);
 
@@ -163,10 +165,10 @@ class Functions
         $slots_thisDay_tmp = (isset($slots[$thisDay_weeknumber]) ? $slots[$thisDay_weeknumber] : []);
 
         $slots_thisDay = [];
-        foreach($slots_thisDay_tmp as $start => $end){
+        foreach ($slots_thisDay_tmp as $start => $end) {
             $end_timestamp = strtotime($thisDay . ' ' . $end);
-            if ($from_now){
-                if ($end_timestamp > $timestamp){
+            if ($from_now) {
+                if ($end_timestamp > $timestamp) {
                     $slots_thisDay[] = $start . '-' . $end;
                     $data['room_slots'][] =  $start . '-' . $end;
                 }
@@ -184,26 +186,25 @@ class Functions
             'meta_key' => 'rrze-rsvp-seat-room',
             'meta_value' => $room_id,
             // 'fields' => 'ids',
-            'orderby'=> 'title', 
+            'orderby' => 'title',
             'order' => 'ASC'
         ]);
 
         // sort by title naturally
         $seatSortedByTitle = [];
-        foreach($seatIds as $seat){
+        foreach ($seatIds as $seat) {
             $seatSortedByTitle[$seat->ID] = $seat->post_title;
         }
         natsort($seatSortedByTitle);
 
-        foreach ($seatSortedByTitle as $seat_id => $title){
+        foreach ($seatSortedByTitle as $seat_id => $title) {
             $slots_free = self::getSeatAvailability($seat_id, $thisDay, $thisDay);
-            $slots_free_thisDay_tmp = ( isset($slots_free[$thisDay]) ? $slots_free[$thisDay] : [] );
+            $slots_free_thisDay_tmp = (isset($slots_free[$thisDay]) ? $slots_free[$thisDay] : []);
             $slots_free_thisDay = array_combine($slots_free_thisDay_tmp, $slots_free_thisDay_tmp); // set values to keys
 
-            foreach($slots_thisDay as $timespan){
-                $data[$seat_id][$timespan] = (isset($slots_free_thisDay[$timespan])?true:false);
+            foreach ($slots_thisDay as $timespan) {
+                $data[$seat_id][$timespan] = (isset($slots_free_thisDay[$timespan]) ? true : false);
             }
-
         }
         return $data;
     }
@@ -218,33 +219,33 @@ class Functions
      */
     public static function getOccupancyByRoomIdHTMLAdmin(int $room_id): string
     {
-        
+
 
         $seats_slots = self::getOccupancyByRoomIdAdmin($room_id);
 
-        if ($seats_slots){
-	    $output = '<table class="rsvp-room-occupancy"><tr>';
-            $output .= '<th>' . __( 'Seat', 'rrze-rsvp' ) . '</th>';
-            foreach($seats_slots['room_slots'] as $room_slot){
+        if ($seats_slots) {
+            $output = '<table class="rsvp-room-occupancy"><tr>';
+            $output .= '<th>' . __('Seat', 'rrze-rsvp') . '</th>';
+            foreach ($seats_slots['room_slots'] as $room_slot) {
                 $output .= '<th scope="col"><span class="rrze-rsvp-timeslot">' . $room_slot . '</span></th>';
             }
             $output .= '</tr>';
             $aRoomSlots = $seats_slots['room_slots'];
             unset($seats_slots['room_slots']);
 
-            foreach($seats_slots as $seat_id => $aSlots){
+            foreach ($seats_slots as $seat_id => $aSlots) {
                 $output .= '<tr>';
-                $output .= '<th scope="row">' . get_the_title( $seat_id ) . '</th>';
-                foreach($aRoomSlots as $slot){
+                $output .= '<th scope="row">' . get_the_title($seat_id) . '</th>';
+                foreach ($aRoomSlots as $slot) {
                     $output .= '<td><span class="' . $aSlots[$slot] . '">' . $aSlots[$slot] . '</span></td>';
                 }
                 $output .= '</tr>';
             }
-	    $output .= '</table>';
-        }else{
-	    $output = '<div class="alert">' . __('This room has no seats for today.', 'rrze-rsvp') . '</div>';
+            $output .= '</table>';
+        } else {
+            $output = '<div class="alert">' . __('This room has no seats for today.', 'rrze-rsvp') . '</div>';
         }
-        
+
 
         return $output;
     }
@@ -270,7 +271,7 @@ class Functions
         $slots = self::getRoomSchedule($roomId); // liefert [wochentag-nummer][startzeit] = end-zeit;
         $slots_today_tmp = (isset($slots[$today_weeknumber]) ? $slots[$today_weeknumber] : []);
         $slots_today = [];
-        foreach($slots_today_tmp as $start => $end){
+        foreach ($slots_today_tmp as $start => $end) {
             $slots_today[] = $start . ' - ' . $end;
             $data['room_slots'][] =  $start . ' - ' . $end;
         }
@@ -283,7 +284,7 @@ class Functions
             'meta_key' => 'rrze-rsvp-seat-room',
             'meta_value' => $roomId,
             'fields' => 'ids',
-            'orderby'=> 'title', 
+            'orderby' => 'title',
             'order' => 'ASC'
         ]);
 
@@ -314,8 +315,8 @@ class Functions
                 ],
             ]);
 
-            if ($aBookingIds){
-                foreach ( $aBookingIds as $bookingId ){
+            if ($aBookingIds) {
+                foreach ($aBookingIds as $bookingId) {
                     // set booking-status as value of key "startTime-endTime"
                     $aBookingMeta = get_post_meta($bookingId);
                     $timespan = date('H:i', $aBookingMeta['rrze-rsvp-booking-start'][0]) . ' - ' . date('H:i', $aBookingMeta['rrze-rsvp-booking-end'][0]);
@@ -323,8 +324,8 @@ class Functions
                 }
             }
 
-            foreach($slots_today as $timespan){
-                $data[$seatId][$timespan] = (isset($data[$seatId][$timespan])?$data[$seatId][$timespan]:'available');
+            foreach ($slots_today as $timespan) {
+                $data[$seatId][$timespan] = (isset($data[$seatId][$timespan]) ? $data[$seatId][$timespan] : 'available');
             }
         }
         return $data;
@@ -335,9 +336,10 @@ class Functions
         $url = esc_url(get_permalink($roomId));
         return '<span class="rrze-rsvp-occupancylinktitle">' . __('Links to display the current room occupancy', 'rrze-rsvp') . '</span>: <span class="rrze-rsvp-occupancylink"><a href="' . $url . '" target="_blank">' . __('Normal website', 'rrze-rsvp') . '</a></span> <span class="rrze-rsvp-occupancylink"><a href="' . $url . '?format=embedded&show=occupancy_nextavailable" target="_blank">' . __('Website for public displays', 'rrze-rsvp') . '</a></span>';
     }
-    
 
-    public static function getBooking(int $bookingId): array {
+
+    public static function getBooking(int $bookingId): array
+    {
         $data = [];
 
         $post = get_post($bookingId);
@@ -373,8 +375,7 @@ class Functions
         $data['guest_firstname'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-firstname', true), 'decrypt');
         $data['guest_lastname'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-lastname', true), 'decrypt');
         $data['guest_email'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-email', true), 'decrypt');
-
-        if (CORONA_MODE){
+        if (CORONA_MODE) {
             $data['guest_phone'] = Functions::crypt(get_post_meta($post->ID, 'rrze-rsvp-booking-guest-phone', true), 'decrypt');
         }
 
@@ -383,15 +384,15 @@ class Functions
         return $data;
     }
 
-	public static function isBookingArchived(int $postId): bool
-	{
-		$now = current_time('timestamp');
-		$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
-		$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
-		$end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
-		$end = $end ? $end : $start->endOfDay()->getTimestamp();
-		return ($end < $now);
-	}
+    public static function isBookingArchived(int $postId): bool
+    {
+        $now = current_time('timestamp');
+        $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
+        $start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
+        $end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
+        $end = $end ? $end : $start->endOfDay()->getTimestamp();
+        return ($end < $now);
+    }
 
     public static function canDeletePost(int $postId, string $postType): bool
     {
@@ -404,24 +405,24 @@ class Functions
                 return Functions::canDeleteSeat($postId);
             default:
                 return false;
-        }        
+        }
     }
 
-	public static function canDeleteBooking(int $postId): bool
-	{
-		$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
-		$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
-		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
-		if (
-			self::isBookingArchived($postId)
-			&& !(in_array($status, ['checked-in', 'checked-out']) || $start->endOfDay()->gt(new Carbon('now')))
-		) {
-			return true;
-		} else {
-			return false;
-		}
+    public static function canDeleteBooking(int $postId): bool
+    {
+        $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
+        $start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
+        $status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+        if (
+            self::isBookingArchived($postId)
+            && !(in_array($status, ['checked-in', 'checked-out']) || $start->endOfDay()->gt(new Carbon('now')))
+        ) {
+            return true;
+        } else {
+            return false;
+        }
     }
-        
+
     public static function canDeleteSeat(int $postId): bool
     {
         $args = [
@@ -443,7 +444,7 @@ class Functions
     public static function canDeleteRoom(int $postId): bool
     {
         $seats = self::getAllRoomSeats($postId);
-        if(empty($seats)) {
+        if (empty($seats)) {
             return true;
         }
         $args = [
@@ -479,12 +480,12 @@ class Functions
         ];
         return get_posts($args);
     }
-        
+
     public static function bookingReplyUrl(string $action, string $password, int $id): string
     {
         $hash = self::crypt($password);
         return get_site_url() . "/rsvp-booking/?booking-reply=" . $hash . "&id=" . $id . "&action=" . $action;
-    }    
+    }
 
     public static function crypt(string $string, string $action = 'encrypt')
     {
@@ -531,12 +532,14 @@ class Functions
         $days_blocked = explode("\n", str_replace("\r", '', $days_blocked_raw));
         // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
         $bookingMode = isset($room_meta['rrze-rsvp-room-bookingmode']) ? $room_meta['rrze-rsvp-room-bookingmode'][0] : '';
-        $args_seats = ['post_type' => 'seat',
+        $args_seats = [
+            'post_type' => 'seat',
             'post_status' => 'publish',
             'meta_key' => 'rrze-rsvp-seat-room',
             'meta_value' => $room_id,
             'orderby' => 'date',
-            'order' => 'ASC',];
+            'order' => 'ASC',
+        ];
         if ($bookingMode == 'consultation') {
             $args_seats['numberposts'] = 1;
         } else {
@@ -599,7 +602,8 @@ class Functions
                     if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $loopstart >= $valid_from && $loopstart <= $valid_to)
                         || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $loopstart >= $valid_from)
                         || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $loopstart <= $valid_to)
-                        || ($valid_from == 'unlimited' && $valid_to == 'unlimited')) {
+                        || ($valid_from == 'unlimited' && $valid_to == 'unlimited')
+                    ) {
                         $room_availability[strtotime('+' . intval($time_parts[0]) . ' hours, + ' . $time_parts[1] . ' minutes', $loopstart)] = $seat_ids;
                     }
                 }
@@ -635,7 +639,8 @@ class Functions
                 if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $timestamp >= $valid_from && $timestamp <= $valid_to)
                     || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $timestamp >= $valid_from)
                     || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $timestamp <= $valid_to)
-                    || ($valid_from == 'unlimited' && $valid_to == 'unlimited')) {
+                    || ($valid_from == 'unlimited' && $valid_to == 'unlimited')
+                ) {
                     if ($data['start'] == $start) {
                         $end = $data['end'];
                     }
@@ -643,14 +648,14 @@ class Functions
             }
             // remove past timeslots from today if needed
             if ($showPast == false) {
-                $endTimestamp = strtotime(date('Y-m-d', $timestamp). ' ' . $end);
+                $endTimestamp = strtotime(date('Y-m-d', $timestamp) . ' ' . $end);
                 if ($endTimestamp <= current_time('timestamp')) {
                     continue;
                 }
             }
             $availability[date('Y-m-d', $timestamp)][$start . '-' . $end] = $v;
         }
-//echo Helper::get_html_var_dump($availability);
+        //echo Helper::get_html_var_dump($availability);
         return $availability;
     }
 
@@ -729,7 +734,8 @@ class Functions
                         if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $loopstart >= $valid_from && $loopstart <= $valid_to)
                             || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $loopstart >= $valid_from)
                             || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $loopstart <= $valid_to)
-                            || ($valid_from == 'unlimited' && $valid_to == 'unlimited')) {
+                            || ($valid_from == 'unlimited' && $valid_to == 'unlimited')
+                        ) {
                             $seat_availability[$timestamp] = $timestamp_end;
                         }
                     }
@@ -800,23 +806,24 @@ class Functions
         if (is_array($room_timeslots)) {
             foreach ($room_timeslots as $week) {
                 if (isset($week['rrze-rsvp-room-weekday'])) {
-                    foreach ($week[ 'rrze-rsvp-room-weekday' ] as $day) {
-                        if (isset($week[ 'rrze-rsvp-room-starttime' ]) && isset($week[ 'rrze-rsvp-room-endtime' ])) {
-                            $valid_from = ((isset($week[ 'rrze-rsvp-room-timeslot-valid-from' ]) && $week[ 'rrze-rsvp-room-timeslot-valid-from' ] != '') ? $week[ 'rrze-rsvp-room-timeslot-valid-from' ] : 'unlimited');
-                            $valid_to   = ((isset($week[ 'rrze-rsvp-room-timeslot-valid-to' ]) && $week[ 'rrze-rsvp-room-timeslot-valid-to' ] != '') ? strtotime(
+                    foreach ($week['rrze-rsvp-room-weekday'] as $day) {
+                        if (isset($week['rrze-rsvp-room-starttime']) && isset($week['rrze-rsvp-room-endtime'])) {
+                            $valid_from = ((isset($week['rrze-rsvp-room-timeslot-valid-from']) && $week['rrze-rsvp-room-timeslot-valid-from'] != '') ? $week['rrze-rsvp-room-timeslot-valid-from'] : 'unlimited');
+                            $valid_to   = ((isset($week['rrze-rsvp-room-timeslot-valid-to']) && $week['rrze-rsvp-room-timeslot-valid-to'] != '') ? strtotime(
                                 '+23 hours, +59 minutes',
-                                intval($week[ 'rrze-rsvp-room-timeslot-valid-to' ])
+                                intval($week['rrze-rsvp-room-timeslot-valid-to'])
                             ) : 'unlimited');
                             if ($with_duration == true) {
-                                $schedule[ $day ][ $valid_from . '-' . $valid_to . '-' . $week[ 'rrze-rsvp-room-starttime' ] . '-' . $week[ 'rrze-rsvp-room-endtime' ] ][ 'start' ] = $week[ 'rrze-rsvp-room-starttime' ];
-                                $schedule[ $day ][ $valid_from . '-' . $valid_to . '-' . $week[ 'rrze-rsvp-room-starttime' ] . '-' . $week[ 'rrze-rsvp-room-endtime' ] ][ 'end' ]   = $week[ 'rrze-rsvp-room-endtime' ];
+                                $schedule[$day][$valid_from . '-' . $valid_to . '-' . $week['rrze-rsvp-room-starttime'] . '-' . $week['rrze-rsvp-room-endtime']]['start'] = $week['rrze-rsvp-room-starttime'];
+                                $schedule[$day][$valid_from . '-' . $valid_to . '-' . $week['rrze-rsvp-room-starttime'] . '-' . $week['rrze-rsvp-room-endtime']]['end']   = $week['rrze-rsvp-room-endtime'];
                             } else {
                                 $now = current_time('timestamp');
                                 if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $now >= $valid_from && $now <= $valid_to)
                                     || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $now >= $valid_from)
                                     || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $now <= $valid_to)
-                                    || ($valid_from == 'unlimited' && $valid_to == 'unlimited')) {
-                                    $schedule[ $day ][ $week[ 'rrze-rsvp-room-starttime' ] ] = $week[ 'rrze-rsvp-room-endtime' ];
+                                    || ($valid_from == 'unlimited' && $valid_to == 'unlimited')
+                                ) {
+                                    $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
                                 }
                             }
                         }
@@ -843,7 +850,7 @@ class Functions
     {
         $output = '<select id="' . $sSelect . '" name="' . $sSelect . '">';
         $output .= '<option value="0">' . $sAll . ' </option>';
-        foreach ($aOptions as $val => $desc){
+        foreach ($aOptions as $val => $desc) {
             $sel = ($val == $sSelected ? ' selected="selected"' : '');
             $output .= '<option value="' . $val . '"' . $sel . '>' . $desc . ' </option>';
         }
@@ -860,37 +867,36 @@ class Functions
     public static function sortArrayKeepKeys(array &$aInput)
     {
         uasort($aInput, function ($a, $b) {
-            if ($a == $b) { return 0;}
+            if ($a == $b) {
+                return 0;
+            }
             return ($a < $b) ? -1 : 1;
         });
-
     }
- 
+
     public static function getBoolValueFromAtt($att): bool
     {
         $att = (string) $att;
         $filter = preg_replace('/[^a-z0-9]/', '', strtolower($att));
         return (in_array($filter, ['1', 'on', 'true', 'wahr', 'aktiv', 'show', 'yes']));
     }
-    
+
     public static function getQueryStr(array $add = [], array $remove = []): string
     {
-        if (empty($_SERVER['QUERY_STRING']) && strpos($_SERVER['REQUEST_URI'], '?') === false) {
-            return '';
-        }
-        $queryStr = $_SERVER['QUERY_STRING'];
+        $queryStr = $_SERVER['QUERY_STRING'] ?? '';
         parse_str($queryStr, $queryAry);
         $queryAry = array_diff_key(array_merge($queryAry, $add), array_fill_keys($remove, ''));
         return http_build_query($queryAry);
     }
 
-    public static function getAdditionalEmail(){
+    public static function getAdditionalEmail()
+    {
         $aContactSelect = get_transient('rrze_rsvp_additional_email_cache');
 
         if (!empty($aContactSelect)) {
             return $aContactSelect;
         }
-    
+
         $aContactSelect = [];
 
         $aPersons = \FAU_Person\Data::get_contactdata();
@@ -912,5 +918,4 @@ class Functions
 
         return $aContactSelect;
     }
-
 }
