@@ -6,9 +6,6 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Functions;
 
-use SimpleSAML\Auth\Simple as SimpleSAMLAuthSimple;
-use SimpleSAML\Session as Session;
-
 final class IdM extends Auth
 {
     protected $ssoPlugin = 'rrze-sso/rrze-sso.php';
@@ -30,7 +27,9 @@ final class IdM extends Auth
     public function __construct()
     {
         $this->simplesamlAuth = $this->simplesamlAuth();
-        if ($this->simplesamlAuth) $this->setAttributes();
+        if ($this->isAuthenticated()) {
+            $this->setAttributes();
+        }
     }
 
     public function isAuthenticated(): bool
@@ -38,14 +37,14 @@ final class IdM extends Auth
         if ($this->simplesamlAuth && $this->simplesamlAuth->isAuthenticated()) {
             return true;
         } else {
-            if (class_exists('Session')){
-                Session::getSessionFromRequest()->cleanup();
+            if (class_exists('\SimpleSAML\Session')) {
+                \SimpleSAML\Session::getSessionFromRequest()->cleanup();
             }
             return false;
         }
     }
 
-    public function setAttributes()
+    private function setAttributes()
     {
         $this->personAttributes = $this->simplesamlAuth->getAttributes();
 
@@ -55,13 +54,13 @@ final class IdM extends Auth
             $this->displayName = $this->personAttributes['displayName'][0] ?? null;
             $this->eduPersonAffiliation = $this->personAttributes['eduPersonAffiliation'] ?? null;
             $this->eduPersonEntitlement = $this->personAttributes['eduPersonEntitlement'] ?? null;
-        // Backward compatibility    
+            // Backward compatibility    
         } elseif ($this->isPluginActive($this->webssoPlugin)) {
             $this->uid = $this->personAttributes['urn:mace:dir:attribute-def:uid'][0] ?? null;
             $this->mail = $this->personAttributes['urn:mace:dir:attribute-def:mail'][0] ?? null;
             $this->displayName = $this->personAttributes['urn:mace:dir:attribute-def:displayName'][0] ?? null;
             $this->eduPersonAffiliation = $this->personAttributes['urn:mace:dir:attribute-def:eduPersonAffiliation'] ?? null;
-            $this->eduPersonEntitlement = $this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement'] ?? null;    
+            $this->eduPersonEntitlement = $this->personAttributes['urn:mace:dir:attribute-def:eduPersonEntitlement'] ?? null;
         }
     }
 
@@ -79,18 +78,20 @@ final class IdM extends Auth
         return [
             'customer_firstname' => $customerFirstname,
             'customer_lastname' => $customerLastname,
-            'customer_email' => $this->mail ? $this->mail : __('no@email', 'rrze-rsvp')
+            'customer_email' => $this->mail ?: __('no@email', 'rrze-rsvp')
         ];
     }
 
     public function logout(string $returnTo = '')
     {
+        if (!$this->simplesamlAuth) {
+            return;
+        }
         if (filter_var($returnTo, FILTER_VALIDATE_URL)) {
             $this->simplesamlAuth->logout($returnTo);
         } else {
             $this->simplesamlAuth->logout();
         }
-        Session::getSessionFromRequest()->cleanup();
     }
 
     public function getLoginURL()
@@ -108,7 +109,7 @@ final class IdM extends Auth
             } else {
                 $options = get_option($this->ssoOptionName);
             }
-        // Backward compatibility
+            // Backward compatibility
         } elseif ($this->isPluginActive($this->webssoPlugin)) {
             if (is_multisite()) {
                 $options = get_site_option($this->webssoOptionName);
@@ -131,7 +132,7 @@ final class IdM extends Auth
             require_once(WP_CONTENT_DIR . $options['simplesaml_include']);
         }
 
-        return new SimpleSAMLAuthSimple($options['simplesaml_auth_source']);
+        return new \SimpleSAML\Auth\Simple($options['simplesaml_auth_source']);
     }
 
     private function isPluginActive($plugin)
