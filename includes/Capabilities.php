@@ -9,7 +9,7 @@ class Capabilities
     protected static function currentCptArgs()
     {
 
-        if (CORONA_MODE){
+        if (CORONA_MODE) {
             return [
                 'booking' => [
                     'capability_type' => ['booking', 'bookings'],
@@ -29,12 +29,11 @@ class Capabilities
                     'map_meta_cap' => true
                 ]
             ];
-        }else{
+        } else {
             return [
                 'booking' => [
                     'capability_type' => ['booking', 'bookings'],
-                    'capabilities' => [
-                    ],
+                    'capabilities' => [],
                     'map_meta_cap' => true
                 ],
                 'room' => [
