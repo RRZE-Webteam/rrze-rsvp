@@ -16,16 +16,13 @@ abstract class Auth
 
     abstract public function isAuthenticated(): bool;
 
-    abstract public function setAttributes();
-
     abstract public function getCustomerData(): array;
 
     abstract public function logout();
 
-    public static function tryLogIn()
+    public static function tryLogIn($queryStr = '')
     {
         $authNonce = sprintf('require-auth=%s', wp_create_nonce('require-auth'));
-        $queryStr = Functions::getQueryStr();
         $redirectUrl = trailingslashit(get_permalink()) . ($queryStr ? '?' . $queryStr . '&' : '?') . $authNonce;
         header('HTTP/1.0 403 Forbidden');
         wp_redirect($redirectUrl);
