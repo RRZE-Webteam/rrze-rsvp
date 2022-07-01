@@ -47,7 +47,8 @@ class Email
      * @param string $cancelReason [optional] Reason for cancelling in customer mails: 'notconfirmed' or 'notcheckedin'
      * @return void
      */
-    public function doEmail(string $mailContext = '', string $recipient = 'admin', int $bookingId, string $status = '', string $cancelReason = '') {
+    public function doEmail(string $mailContext = '', string $recipient = 'admin', int $bookingId = 0, string $status = '', string $cancelReason = '')
+    {
         $booking = Functions::getBooking($bookingId);
         if (empty($booking) || $mailContext == '') {
             return;
@@ -155,10 +156,10 @@ class Email
                     $subject_en = $this->options->email_cancel_subject_en;
                     $text = $this->options->email_cancel_text;
                     $text_en = $this->options->email_cancel_text_en;
-                    if ($cancelReason == 'notconfirmed'){
+                    if ($cancelReason == 'notconfirmed') {
                         $cancelReason = $this->options->email_cancel_reason_notconfirmed;
                         $cancelReason_en = $this->options->email_cancel_reason_notconfirmed_en;
-                    } elseif ($cancelReason == 'notcheckedin'){
+                    } elseif ($cancelReason == 'notcheckedin') {
                         $cancelReason = $this->options->email_cancel_reason_notcheckedin;
                         $cancelReason_en = $this->options->email_cancel_reason_notcheckedin_en;
                     }
@@ -184,7 +185,7 @@ class Email
                 break;
         }
 
-        if ($bookingMode == 'no-check' || $bookingMode == 'consultation'){
+        if ($bookingMode == 'no-check' || $bookingMode == 'consultation') {
             $showCheckinButton = false;
             $showCheckoutButton = false;
         }
@@ -199,9 +200,9 @@ class Email
         // Misc mail infos
         $data['is_locale_not_english'] = !$this->isLocaleEnglish ? true : false;
 
-        if ($bookingMode == 'consultation'){
-            $data['to_admin'] = true;    
-        }else{
+        if ($bookingMode == 'consultation') {
+            $data['to_admin'] = true;
+        } else {
             $data['to_admin'] = $recipient == 'admin' ? true : false;
         }
 
@@ -232,10 +233,12 @@ class Email
         $data['customer']['email'] = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
 
         // Show Booking Notes
-        if (isset($roomMeta['rrze-rsvp-room-notes-check'])
+        if (
+            isset($roomMeta['rrze-rsvp-room-notes-check'])
             && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on'
             && $showNotes === true
-            && $booking['notes'] != '') {
+            && $booking['notes'] != ''
+        ) {
             $defaults = defaultOptions();
             $notesLabel = $roomMeta['rrze-rsvp-room-notes-label'][0];
             if ($notesLabel == '') {
@@ -278,7 +281,6 @@ class Email
                 $data['cancel_text_en'] = '';
                 $data['alt_cancel_text'] = '';
                 $data['alt_cancel_text_en'] = '';
-
             } else {
                 $data['cancel_url'] = Functions::bookingReplyUrl('cancel', sprintf('%s-%s-customer', $bookingId, $booking['start']), $bookingId);
                 $data['cancel_text'] = __('Please cancel your booking in time if your plans change.', 'rrze-rsvp');
@@ -288,7 +290,6 @@ class Email
             }
             $data['cancel_btn'] = _x('Cancel', 'Booking', 'rrze-rsvp');
             $data['cancel_btn_en'] = 'Cancel';
-
         } else {
             $data['show_cancel_btn'] = false;
         }
@@ -379,10 +380,12 @@ class Email
             $data['show_check_btns'] = false;
             $data['show_cancel_btn'] = false;
             $data['show_confirm_button'] = false;
-            if (isset($roomMeta['rrze-rsvp-room-notes-check'])
+            if (
+                isset($roomMeta['rrze-rsvp-room-notes-check'])
                 && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on'
                 && $showNotes === true
-                && $booking['notes'] != '') {
+                && $booking['notes'] != ''
+            ) {
                 $defaults = defaultOptions();
                 $notesLabel = $roomMeta['rrze-rsvp-room-notes-label'][0];
                 if ($notesLabel == '') {
