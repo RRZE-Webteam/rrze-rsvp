@@ -198,7 +198,7 @@ function getFields()
         'general' => [
             [
                 'name' => 'check-in-time',
-                'label' => __('Allowed Check-In Time.', 'rrze-rsvp'),
+                'label' => __('Allowed Check-In Time', 'rrze-rsvp'),
                 'type' => 'number',
                 'default' => $defaults['check-in-time'],
                 'sanitize_callback' => 'sanitize_natint_field',
