@@ -11,7 +11,6 @@ class Metaboxes
 {
     public function __construct()
     {
-        require_once plugin()->getPath('vendor/cmb2') . 'init.php';
         $this->settings = new Settings(plugin()->getFile());
     }
 
@@ -70,11 +69,13 @@ class Metaboxes
 
             $startTimestamp = $bookingMeta['rrze-rsvp-booking-start'][0];
             $endTimestamp = $bookingMeta['rrze-rsvp-booking-end'][0];
-            if (date('H:i', $startTimestamp) == $starttime
+            if (
+                date('H:i', $startTimestamp) == $starttime
                 && date('H:i', $endTimestamp) == $endtime
                 && in_array(date('N', $startTimestamp), $weekdays)
                 && $startTimestamp > $validfrom
-                && $startTimestamp < $validto) {
+                && $startTimestamp < $validto
+            ) {
                 $field->args['attributes']['disabled'] = 'disabled';
                 break;
             }
@@ -214,7 +215,7 @@ class Metaboxes
                 'type' => 'text_medium',
                 'attributes' => array(
                     'type' => 'tel',
-//                'required' => 'required',
+                    //                'required' => 'required',
                 ),
                 'sanitization_cb' => [$this, 'cb_encrypt'],
                 'escape_cb' => [$this, 'cb_decrypt'],
@@ -539,7 +540,6 @@ class Metaboxes
             'type' => 'textarea',
             'desc' => __("This textarea contains the 'Additional Information' to show on top of occupancy grids shown on public displays only.", 'rrze-rsvp'),
         ));
-
     }
 
     public function seat()
@@ -621,8 +621,7 @@ class Metaboxes
         $end = get_post_meta($field->object_id, 'rrze-rsvp-booking-end', true);
         if ($start != '' && $end != '') {
             echo '<span class="display-timeslot">' . __('Time slot booked', 'rrze-rsvp') . ': ' . date_i18n(get_option('date_format'), $start) . ' // '
-            . date('H:i', $start) . ' - ' . date('H:i', $end) . '</span>';
+                . date('H:i', $start) . ' - ' . date('H:i', $end) . '</span>';
         }
-
     }
 }
