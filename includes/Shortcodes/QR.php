@@ -2,40 +2,27 @@
 
 namespace RRZE\RSVP\Shortcodes;
 
-use RRZE\RSVP\Helper;
-use function RRZE\RSVP\Config\getShortcodeSettings;
-
-use function RRZE\RSVP\plugin;
-
-require_once plugin()->getPath('vendor/tcpdf') . 'tcpdf_barcodes_2d.php';
+defined('ABSPATH') || exit;
 
 use TCPDF2DBarcode;
-
-
-
-defined('ABSPATH') || exit;
+use function RRZE\RSVP\Config\getShortcodeSettings;
 
 /**
  * Define Shortcode QR
  */
-class QR extends Shortcodes {
-    protected $pluginFile;
-    // private $settings = '';
+class QR extends Shortcodes
+{
     private $shortcodesettings = '';
 
-    public function __construct($pluginFile, $settings) {
-        $this->pluginFile = $pluginFile;
-        // $this->settings = $settings;
+    public function __construct()
+    {
         $this->shortcodesettings = getShortcodeSettings();
-        // $this->options = (object) $settings->getOptions();
-    }
 
-
-    public function onLoaded() {
         add_shortcode('rsvp-qr', [$this, 'shortcodeQR']);
     }
 
-    public function shortcodeQR($atts, $content = '', $tag) {
+    public function shortcodeQR($atts, $content = '', $tag = '')
+    {
         $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
         $output = '';
 
@@ -56,15 +43,15 @@ class QR extends Shortcodes {
                 if (!empty($seat_post)) {
                     $seat_id = $seat;
                 } else {
-                    return __( 'Please enter a valid seat slug or ID', 'rrze-rsvp' );;
+                    return __('Please enter a valid seat slug or ID', 'rrze-rsvp');;
                 }
             }
             $permalink = get_permalink($seat_id);
 
             $qr = new TCPDF2DBarcode($permalink, 'QRCODE,H');
-            $output = '<div class="rsvp-qr-container">' . $qr->getBarcodeSVGcode(3, 3, $color='black') . '</div>';
+            $output = '<div class="rsvp-qr-container">' . $qr->getBarcodeSVGcode(3, 3, $color = 'black') . '</div>';
         } else {
-            return __( 'Please specify a seat ID in your Shortcode.', 'rrze-rsvp' );
+            return __('Please specify a seat ID in your Shortcode.', 'rrze-rsvp');
         }
 
         wp_enqueue_style('rrze-rsvp-shortcode');
@@ -72,6 +59,4 @@ class QR extends Shortcodes {
 
         return $output;
     }
-
-
 }
