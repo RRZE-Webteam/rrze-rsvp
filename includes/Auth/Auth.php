@@ -24,7 +24,6 @@ abstract class Auth
     {
         $authNonce = sprintf('require-auth=%s', wp_create_nonce('require-auth'));
         $redirectUrl = trailingslashit(get_permalink()) . ($queryStr ? '?' . $queryStr . '&' : '?') . $authNonce;
-        header('HTTP/1.0 403 Forbidden');
         wp_redirect($redirectUrl);
         exit;
     }
