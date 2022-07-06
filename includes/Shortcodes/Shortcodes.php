@@ -44,7 +44,7 @@ class Shortcodes
         if ($ldapRequired && isset($_POST['submit_ldap'])) {
             $this->ldap->login();
             if (!$this->ldap->isAuthenticated()) {
-                $ldapError = '<br><p class="error-message">' . __('Login denied', 'rrze-rsvp') . '</p>';
+                $ldapError = '<p class="error-message">' . __('Login denied', 'rrze-rsvp') . '</p>';
             }
         }
 
@@ -62,16 +62,16 @@ class Shortcodes
         $sOr = '';
         if ($ssoRequired) {
             $output .= '<p>' . $idmLogin . '</p>';
-            $sOr = '<br><strong>' . __('Oder', 'rrze-rsvp') . '</strong><br>&nbsp;<br>';
+            $sOr = '<p><strong>' . __('Oder', 'rrze-rsvp') . '</strong></p>';
         }
 
         if ($ldapRequired) {
-            $output .= $sOr . __('Please login with your UB-AD username', 'rrze-rsvp') . ':' . $ldapError;
-
+            $output .= $sOr . '<p>' . __('Please login with your UB-AD username and password:', 'rrze-rsvp') . '</p>';
+            $output .= $ldapError;
             $output .= '<form action="#" method="POST">';
-            $output .= '<label for="username">Username: </label><input id="username" type="text" name="username" value="" />';
-            $output .= '<label for="password">Password: </label><input id="password" type="password" name="password"  value="" />';
-            $output .= '<input type="submit" name="submit_ldap" value="Submit" />';
+            $output .= '<label for="username">' . __('Username:', 'rrze-rsvp') . '</label><input id="username" type="text" name="username" value="" /><br />';
+            $output .= '<label for="password">' . __('Password:', 'rrze-rsvp') . '</label><input id="password" type="password" name="password"  value="" />';
+            $output .= '<input type="submit" name="submit_ldap" value="' . __('Submit', 'rrze-rsvp') . '" />';
             $output .= '</form>';
         }
 
