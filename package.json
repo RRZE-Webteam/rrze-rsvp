@@ -1,11 +1,16 @@
 {
     "name": "rrze-rsvp",
-    "main": "webpack.config.js",
+    "version": "2.10.0",
+    "main": "rrze-rsvp.php",
     "scripts": {
         "start": "webpack --mode=development --watch",
-        "build": "webpack --mode=production",
+        "build": "webpack --mode=production && gulp bundle",
         "clean": "rm -rf build/",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "major": "gulp major",
+        "minor": "gulp minor",
+        "patch": "gulp patch",
+        "prerelease": "gulp prerelease",
+        "bundle": "gulp bundle"
     },
     "repository": {
         "type": "git",
