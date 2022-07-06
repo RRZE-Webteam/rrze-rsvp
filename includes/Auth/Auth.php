@@ -4,8 +4,6 @@ namespace RRZE\RSVP\Auth;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Functions;
-
 abstract class Auth
 {
     protected $uid = null;
