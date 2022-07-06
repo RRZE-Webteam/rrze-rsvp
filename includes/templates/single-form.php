@@ -5,9 +5,14 @@ namespace RRZE\RSVP;
 defined('ABSPATH') || exit;
 
 $roomId = isset($_REQUEST['room_id']) ? absint($_REQUEST['room_id']) : null;
-$roomId = $roomId ? sprintf(' room=%d', $roomId) : '';
+if (!$roomId && isset($_GET['id'])) {
+    // get room ID from booking via seat
+    $bookingId = absint($_GET['id']);
+    $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
+    $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
+}
 
-$shortcodeOutput = do_shortcode(sprintf('[rsvp-booking%s]', $roomId));
+$shortcodeOutput = !empty($roomId) ? do_shortcode(sprintf('[rsvp-booking room=%d]', $roomId)) : '';
 
 get_header();
 
