@@ -107,13 +107,10 @@ class Main
             isset($_REQUEST['nonce']) &&
             wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')
         ) {
-            \RRZE\Legal\Utils::debug('template: form');
             $template = plugin()->getPath('includes/templates') . 'single-form.php';
         } elseif ($post->post_type == 'room') {
-            \RRZE\Legal\Utils::debug('template: room');
             $template = plugin()->getPath('includes/templates') . 'single-room.php';
         } elseif ($post->post_type == 'seat') {
-            \RRZE\Legal\Utils::debug('template: seat');
             $template = plugin()->getPath('includes/templates') . 'single-seat.php';
         }
 
