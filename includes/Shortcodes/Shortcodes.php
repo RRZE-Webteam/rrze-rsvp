@@ -4,126 +4,78 @@ namespace RRZE\RSVP\Shortcodes;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Shortcodes\Bookings;
-use RRZE\RSVP\Shortcodes\Availability;
-use RRZE\RSVP\Shortcodes\QR;
-
-use RRZE\RSVP\Auth\{Auth, IdM, LDAP};
-
-use function RRZE\RSVP\Config\getShortcodeSettings;
-use function RRZE\RSVP\plugin;
+use RRZE\RSVP\Auth\{IdM, LDAP};
 
 /**
  * Laden und definieren der Shortcodes
  */
-class Shortcodes{
-    protected $pluginFile;    
-    private $settings = '';
-    private $shortcodesettings = 'X';
+class Shortcodes
+{
     protected $idm;
-    // protected $ldap; 
 
-    public function __construct($pluginFile, $settings){
-        $this->pluginFile = $pluginFile;
-        $this->settings = $settings;
-        $this->shortcodesettings = getShortcodeSettings();
+    protected $ldap;
+
+    public function __construct()
+    {
         $this->idm = new IdM;
-        $this->ldapInstance = new LDAP;
+        $this->ldap = new LDAP;
     }
 
-    public function onLoaded(){
-        add_action('template_redirect', [$this, 'maybeAuthenticate']);
-        add_filter('single_template', [$this, 'includeSingleTemplate']);
-
-        $bookings_shortcode = new Bookings($this->pluginFile,  $this->settings);
-        $bookings_shortcode->onLoaded();
-
-        $availability_shortcode = new Availability($this->pluginFile,  $this->settings);
-        $availability_shortcode->onLoaded();
-
-        $qr_shortcode = new QR($this->pluginFile,  $this->settings);
-        $qr_shortcode->onLoaded();
-    }
-
-    public function gutenberg_init(){
-        // Skip block registration if Gutenberg is not enabled/merged.
-        if (!function_exists('register_block_type')) {
-            return;
-        }
-
-        $js = '../assets/js/gutenberg.js';
-        $editor_script = $this->settings['block']['blockname'] . '-blockJS';
-
-        wp_register_script(
-            $editor_script,
-            plugins_url($js, __FILE__),
-            array(
-                'wp-blocks',
-                'wp-i18n',
-                'wp-element',
-                'wp-components',
-                'wp-editor'
-            ),
-            filemtime(dirname(__FILE__) . '/' . $js)
-        );
-
-        wp_localize_script($editor_script, 'blockname', $this->settings['block']['blockname']);
-
-        register_block_type($this->settings['block']['blocktype'], array(
-            'editor_script' => $editor_script,
-            'render_callback' => [$this, 'shortcodeOutput'],
-            'attributes' => $this->settings
-        ));
-
-        wp_localize_script($editor_script, $this->settings['block']['blockname'] . 'Config', $this->settings);
-    }
-
-    public function shortcodeAtts($atts, $tag, $shortcodesettings){
-        // merge given attributes with default ones
-        $atts_default = array();
-        foreach ($shortcodesettings as $tagname => $settings) {
+    public function shortcodeAtts($atts, $tag, $settings)
+    {
+        // Merge given attributes with default ones.
+        $defaultAtts = [];
+        foreach ($settings as $tagname => $settings) {
             foreach ($settings as $k => $v) {
                 if ($k != 'block') {
-                    $atts_default[$tagname][$k] = $v['default'];
+                    $defaultAtts[$tagname][$k] = $v['default'];
                 }
             }
         }
-        return shortcode_atts($atts_default[$tag], $atts);
+        return shortcode_atts($defaultAtts[$tag], $atts);
     }
 
-    public function includeSingleTemplate($singleTemplate){
-        global $post;
-        if (isset($_GET['require-auth']) && wp_verify_nonce($_GET['require-auth'], 'require-auth')) {
-            return sprintf('%sincludes/templates/auth/single-auth.php', plugin()->getDirectory());
-        } elseif (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) {
-            return sprintf('%sincludes/templates/single-form.php', plugin()->getDirectory());
-        } elseif ($post->post_type == 'room') {
-            return dirname($this->pluginFile) . '/includes/templates/single-room.php';
-        } elseif ($post->post_type == 'seat') {
-            return dirname($this->pluginFile) . '/includes/templates/single-seat.php';
-        }
-        return $singleTemplate;
-    }
+    protected function authForm($ssoRequired = false, $ldapRequired = false)
+    {
+        $emailError = filter_input(INPUT_GET, 'email_error', FILTER_VALIDATE_INT);
+        $emailError = ($emailError ? '<p class="error-message">' . __('Please login to the account you have used to book this seat.', 'rrze-rsvp') . '</p><br><br>' : '');
 
-    public function maybeAuthenticate() {
-        global $post;
-        $sso_loggedout = filter_input(INPUT_GET, 'sso_loggedout', FILTER_VALIDATE_INT);
-
-        if (!is_a($post, '\WP_Post') || isset($_GET['require-auth']) || $sso_loggedout) {
-            return;
+        $ldapError = '';
+        if ($ldapRequired && isset($_POST['submit_ldap'])) {
+            $this->ldap->login();
+            if (!$this->ldap->isAuthenticated()) {
+                $ldapError = '<p class="error-message">' . __('Login denied', 'rrze-rsvp') . '</p>';
+            }
         }
-        
-        if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
-            $isAuth = false;
-            if ($this->idm->isAuthenticated()) {
-                $isAuth = true;
-            } elseif ($this->ldapInstance->isAuthenticated()) {
-                $isAuth = true;
-            }
-    
-            if (!$isAuth) {
-                Auth::tryLogIn();
-            }
-        }     
+
+        if ($ssoRequired && $this->idm->simplesamlAuth) {
+            $loginUrl = $this->idm->getLoginURL();
+            $idmLogin = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
+        }
+
+        $title = __('Authentication Required', 'rrze-rsvp');
+
+        $output = '<div class="rrze-rsvp">';
+        $output .= '<h2>' . $title . '</h2>';
+        $output .= $emailError;
+
+        $sOr = '';
+        if ($ssoRequired) {
+            $output .= '<p>' . $idmLogin . '</p>';
+            $sOr = '<p><strong>' . __('Oder', 'rrze-rsvp') . '</strong></p>';
+        }
+
+        if ($ldapRequired) {
+            $output .= $sOr . '<p>' . __('Please login with your UB-AD username and password:', 'rrze-rsvp') . '</p>';
+            $output .= $ldapError;
+            $output .= '<form action="#" method="POST">';
+            $output .= '<label for="username">' . __('Username:', 'rrze-rsvp') . '</label><input id="username" type="text" name="username" value="" /><br />';
+            $output .= '<label for="password">' . __('Password:', 'rrze-rsvp') . '</label><input id="password" type="password" name="password"  value="" />';
+            $output .= '<input type="submit" name="submit_ldap" value="' . __('Submit', 'rrze-rsvp') . '" />';
+            $output .= '</form>';
+        }
+
+        $output .= '</div>';
+        return $output;
     }
 }

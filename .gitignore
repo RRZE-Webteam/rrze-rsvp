@@ -1,20 +1,20 @@
-nbproject/project.properties
-/nbproject/private/
-nbproject/project.xml
-img/logos/Browse.plb
-node_modules
-.idea*
-.sass-cache*
-/package-lock.json
-tmp
-.vscode/sftp.json
-includes/.DS_Store
-includes/Printing/.DS_Store
-includes/Printing/tcpdf/.DS_Store
-assets/img/.DS_Store
-*.po~
-includes/templates/.DS_Store
-src/js/.DS_Store
-package.json
-*.DS_Store
-*.pot~
+### vscode ###
+.vscode/
+### NetBeans ###
+**/nbproject/
+### PhpStorm ###
+.idea/
+### macOS ###
+.DS_Store
+### Node ###
+node_modules/
+package-lock.json
+### Composer ###
+composer.lock
+### WordPress ###
+*.pot
+### Bundle ###
+bundle/
+### Tmp ###
+_tmp/
+tmp/

@@ -1,0 +1,21 @@
+/**
+ * RRZE-RSVP Plugin: Frontend Dependencies
+ */
+
+// Mixins
+@import "mixins";
+
+// Shortcode output
+@import "shortcode";
+
+// Formfields
+@import "form";
+
+// Booking Reply
+@import "booking-reply";
+
+// CPT Single View / Embedded
+@import "cpt";
+
+// Seat check in/out
+@import "seat-check-inout";

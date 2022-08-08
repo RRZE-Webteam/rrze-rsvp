@@ -155,7 +155,8 @@ class Settings
      * Gibt die Standardeinstellungen zurück.
      * @return array
      */
-    protected function defaultOptions()  {
+    protected function defaultOptions()
+    {
         $options = [];
 
         foreach ($this->settingsFields as $section => $field) {
@@ -310,16 +311,16 @@ class Settings
         foreach ($this->settingsSections as $section) {
             if ($this->settingsPrefix . $section['id'] != $this->currentTab) {
                 continue;
-            } 
-            switch ( $this->currentTab ) {
-                case 'rrze-rsvp-reset': 
-                    $btn_label = __('Reset', 'rrze-rsvp' );
+            }
+            switch ($this->currentTab) {
+                case 'rrze-rsvp-reset':
+                    $btn_label = __('Reset', 'rrze-rsvp');
                     break;
-                default: 
+                default:
                     $btn_label = '';
             }
-            
-            ?>
+
+?>
             <div id="<?php echo $this->settingsPrefix . $section['id']; ?>">
                 <form method="post" action="options.php">
                     <?php settings_fields($this->settingsPrefix . $section['id']); ?>
@@ -327,7 +328,7 @@ class Settings
                     <?php submit_button($btn_label); ?>
                 </form>
             </div>
-        <?php
+<?php
         }
     }
 
@@ -444,7 +445,7 @@ class Settings
      */
     public function adminEnqueueScripts()
     {
-//        wp_register_script('wp-color-picker-settings', plugins_url('assets/js/wp-color-picker.js', plugin_basename($this->pluginFile)));
+        //        wp_register_script('wp-color-picker-settings', plugins_url('assets/js/wp-color-picker.js', plugin_basename($this->pluginFile)));
         wp_register_script('wp-media-settings', plugins_url('assets/js/wp-media.js', plugin_basename($this->pluginFile)));
     }
 
@@ -454,9 +455,9 @@ class Settings
      */
     public function colorEnqueueScripts()
     {
-    //    wp_enqueue_style('wp-color-picker');
-    //    wp_enqueue_script('wp-color-picker');
-    //    wp_enqueue_script('wp-color-picker-settings');
+        //    wp_enqueue_style('wp-color-picker');
+        //    wp_enqueue_script('wp-color-picker');
+        //    wp_enqueue_script('wp-color-picker-settings');
         wp_enqueue_script('jquery');
     }
 
@@ -477,7 +478,7 @@ class Settings
      */
     public function getFieldDescription($args)
     {
-        if (! empty($args['desc'])) {
+        if (!empty($args['desc'])) {
             $desc = sprintf('<p class="description">%s</p>', $args['desc']);
         } else {
             $desc = '';
@@ -511,12 +512,12 @@ class Settings
 
         echo $html;
     }
-    
- /**
+
+    /**
      * Zeigt ein Textfeld für EMailaddressen für ein Einstellungsfeld an.
      * @param array   $args Argumente des Einstellungsfelds
      */
-    
+
     public function callbackEMail($args)
     {
         $value = esc_attr($this->getOption($args['section'], $args['id'], $args['default']));
@@ -717,7 +718,8 @@ class Settings
      * Zeigt eine Multi-Auswahlliste (Selectbox) für ein Einstellungsfeld an.
      * @param array   $args Argumente des Einstellungsfelds
      */
-    public function callbackMultiSelect($args) {
+    public function callbackMultiSelect($args)
+    {
         $value = $this->getOption($args['section'], $args['id'], $args['default']);
         $size  = isset($args['size']) && !is_null($args['size']) ? $args['size'] : 'regular';
         $html  = sprintf(
@@ -732,7 +734,7 @@ class Settings
             $html .= sprintf(
                 '<option value="%s"%s>%s</option>',
                 $key,
-                selected( true, in_array( $key, $value ), false ),
+                selected(true, in_array($key, $value), false),
                 $label
             );
         }

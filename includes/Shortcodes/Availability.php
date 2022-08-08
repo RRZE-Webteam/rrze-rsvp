@@ -3,11 +3,7 @@
 namespace RRZE\RSVP\Shortcodes;
 
 use RRZE\RSVP\Functions;
-use RRZE\RSVP\Helper;
 use function RRZE\RSVP\Config\getShortcodeSettings;
-use function RRZE\RSVP\Config\getShortcodeDefaults;
-
-
 
 defined('ABSPATH') || exit;
 
@@ -16,26 +12,17 @@ defined('ABSPATH') || exit;
  */
 class Availability extends Shortcodes
 {
-    protected $pluginFile;
-    private $settings = '';
     private $shortcodesettings = '';
 
-    public function __construct($pluginFile, $settings)
+    public function __construct($settings)
     {
-        $this->pluginFile = $pluginFile;
-        $this->settings = $settings;
         $this->shortcodesettings = getShortcodeSettings();
         $this->options = (object) $settings->getOptions();
-    }
-
-
-    public function onLoaded()
-    {
 
         add_shortcode('rsvp-availability', [$this, 'shortcodeAvailability']);
     }
 
-    public function shortcodeAvailability($atts, $content = '', $tag)
+    public function shortcodeAvailability($atts, $content = '', $tag = '')
     {
         $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
         $output = '';
@@ -110,7 +97,7 @@ class Availability extends Shortcodes
                 if (!empty($seat_post)) {
                     $seat_id = $seat;
                 } else {
-                    return __('Please enter a valid seat slug or ID', 'rrze-rsvp');;
+                    return __('Please enter a valid seat slug or ID.', 'rrze-rsvp');;
                 }
             }
             $room_id = get_post_meta($seat_id, 'rrze-rsvp-seat-room', true);

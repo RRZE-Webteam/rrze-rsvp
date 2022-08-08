@@ -41,7 +41,7 @@ if (!empty($scheduleData)) {
 
 // Floorplan ID
 if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id'] != '') {
-    $imgID = $meta['rrze-rsvp-room-floorplan_id'][0];
+    $imgId = $meta['rrze-rsvp-room-floorplan_id'][0];
 }
 
 get_header();
@@ -66,7 +66,7 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
                 break;
             case 'floorplan':
                 if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id'] != '') {
-                    echo wp_get_attachment_image($imgID, [$innerWidth, $innerHeight]);
+                    echo wp_get_attachment_image($imgId, [$innerWidth, $innerHeight]);
                 } else {
                     echo __('No floorplan available.', 'rrze-rsvp');
                 }
@@ -82,7 +82,7 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
                 echo do_shortcode('[rsvp-availability room=' . $roomId . ' days=' . $daysInAdvance . ']');
                 break;
             case 'occupancy':
-                if (!empty($options->general_pdtxt)){
+                if (!empty($options->general_pdtxt)) {
                     echo '<span class="rrze-rsvp-pdtxt">' . $options->general_pdtxt . '</span>';
                 }
                 if (!empty($meta['rrze-rsvp-room-pdtxt'][0])) {
@@ -91,7 +91,7 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
                 echo Functions::getOccupancyByRoomIdHTML($roomId);
                 break;
             case 'occupancy_now':
-                if (!empty($options->general_pdtxt)){
+                if (!empty($options->general_pdtxt)) {
                     echo '<span class="rrze-rsvp-pdtxt">' . $options->general_pdtxt . '</span>';
                 }
                 if (!empty($meta['rrze-rsvp-room-pdtxt'][0])) {
@@ -100,7 +100,7 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
                 echo Functions::getOccupancyByRoomIdHTML($roomId, true);
                 break;
             case 'occupancy_nextavailable':
-                if (!empty($options->general_pdtxt)){
+                if (!empty($options->general_pdtxt)) {
                     echo '<span class="rrze-rsvp-pdtxt">' . $options->general_pdtxt . '</span>';
                 }
                 if (!empty($meta['rrze-rsvp-room-pdtxt'][0])) {
@@ -216,10 +216,12 @@ while (have_posts()) : the_post();
     }
 
     if (isset($meta['rrze-rsvp-room-floorplan_id']) && $meta['rrze-rsvp-room-floorplan_id']  != '') {
-        echo '<h2>' . __('Floor Plan', 'rrze-rsvp') . '</h2>';
-        $imgSrc = wp_get_attachment_image_src($imgID, 'full');
-        $floorplan = wp_get_attachment_image($imgID, 'large');
-        echo '<a href="' . $imgSrc[0] . '" class="lightbox">' . $floorplan . '</a>';
+        $imgSrc = wp_get_attachment_image_src($imgId, 'full');
+        $floorplan = wp_get_attachment_image($imgId, 'large');
+        if ($imgSrc !== false && $floorplan != '') {
+            echo '<h2>' . __('Floor Plan', 'rrze-rsvp') . '</h2>';
+            echo '<a href="' . $imgSrc[0] . '" class="lightbox">' . $floorplan . '</a>';
+        }
     }
 
 

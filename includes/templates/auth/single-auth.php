@@ -14,17 +14,16 @@ $settings = new Settings(plugin()->getFile());
 $email_error = filter_input(INPUT_GET, 'email_error', FILTER_VALIDATE_INT);
 $email_error = ($email_error ? '<p class="error-message">' . __('Please login to the account you have used to book this seat.', 'rrze-rsvp') . '</p><br><br>' : '');
 
-
-$roomID = isset($_GET['room_id']) ? absint($_GET['room_id']) : 0;
-if (!$roomID && isset($_GET['id'])){
+$roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : 0;
+if (!$roomId && isset($_GET['id'])) {
     // get room ID from booking via seat
     $bookingID = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
     $seatID = get_post_meta($bookingID, 'rrze-rsvp-booking-seat', true);
-    $roomID = get_post_meta($seatID, 'rrze-rsvp-seat-room', true);
+    $roomId = get_post_meta($seatID, 'rrze-rsvp-seat-room', true);
 }
 
-$ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomID, 'rrze-rsvp-room-sso-required', true));
-$ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomID, 'rrze-rsvp-room-ldap-required', true));
+$ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
+$ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
 $ldapRequired = $ldapRequired && $settings->getOption('ldap', 'server') ? true : false;
 
 $loginDenied = '';

@@ -37,7 +37,7 @@ class Template
     protected function parseContent($template, $data)
     {
         $templateFile = $this->getTemplate($template);
-        if (! $templateFile || empty($data)) {
+        if (!$templateFile || empty($data)) {
             return '';
         }
         $parser = new Parser();

@@ -5,7 +5,14 @@ namespace RRZE\RSVP;
 defined('ABSPATH') || exit;
 
 $roomId = isset($_REQUEST['room_id']) ? absint($_REQUEST['room_id']) : null;
-$room = $roomId ? sprintf(' room=%d', $roomId) : '';
+if (!$roomId && isset($_GET['id'])) {
+    // get room ID from booking via seat
+    $bookingId = absint($_GET['id']);
+    $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
+    $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
+}
+
+$shortcodeOutput = !empty($roomId) ? do_shortcode(sprintf('[rsvp-booking room=%d]', $roomId)) : '';
 
 get_header();
 
@@ -47,15 +54,7 @@ if (Helper::isFauTheme()) {
  */
 echo $divOpen;
 
-// if ( shortcode_exists( 'rsvp-booking' ) ) {
-//     echo 'yes, it exists';
-//     echo '<pre>';
-//     var_dump($_REQUEST);
-// }else{
-//     echo 'no man, not existing.';
-// }
- 
-echo do_shortcode(sprintf('[rsvp-booking%s]', $room));
+echo $shortcodeOutput;
 
 echo $divClose;
 

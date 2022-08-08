@@ -4,10 +4,13 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use function RRZE\RSVP\Config\getOptionName;
 use RRZE\RSVP\CPT\CPT;
+use RRZE\RSVP\Shortcodes\{Availability, Bookings, QR};
 use RRZE\RSVP\Printing\Printing;
-use RRZE\RSVP\Shortcodes\Shortcodes;
+use RRZE\RSVP\Auth\{Auth, IdM, LDAP};
+
+use function RRZE\RSVP\Config\getOptionName;
+
 
 /**
  * [Main description]
@@ -30,7 +33,7 @@ class Main
         $settings = new Settings($this->pluginFile);
         $settings->onLoaded();
 
-        // Posttypes
+        // Posttypes 
         $cpt = new CPT;
         $cpt->onLoaded();
 
@@ -44,8 +47,10 @@ class Main
             $tracking->onLoaded();
         }
 
-        $shortcodes = new Shortcodes($this->pluginFile, $settings);
-        $shortcodes->onLoaded();
+        // Shortcodes
+        new Bookings($settings);
+        new Availability($settings);
+        new QR();
 
         $printing = new Printing;
         $printing->onLoaded();
@@ -65,18 +70,70 @@ class Main
         $actions = new Actions;
         $actions->onLoaded();
 
+        // Enqueue scripts
         add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
         add_action('wp_enqueue_scripts', [$this, 'wpEnqueueScripts']);
 
-        add_action('rest_api_init', function () {
-            //$api = new API;
-            //$api->register_routes();
-        });
+        // template redirects
+        add_action('template_redirect', [$this, 'maybeAuthenticate']);
+        add_action('template_redirect', [$this, 'includeSingleTemplate'], 99);
 
+        // Reset settings to default
         add_action('update_option_rrze_rsvp', [$this, 'resetSettings']);
 
         // RRZE Cache Plugin: Skip Cache
         add_filter('rrzecache_skip_cache', [$this, 'skipCache']);
+    }
+
+    public function includeSingleTemplate()
+    {
+        global $post;
+        if (!is_a($post, '\WP_Post')) {
+            return;
+        }
+
+        $idm = new IdM();
+        $ldap = new LDAP();
+
+        $template = '';
+        if (
+            !$idm->isAuthenticated() &&
+            !$ldap->isAuthenticated() &&
+            isset($_GET['require-auth']) &&
+            wp_verify_nonce($_GET['require-auth'], 'require-auth')
+        ) {
+            $template = plugin()->getPath('includes/templates/auth') . 'single-auth.php';
+        } elseif (
+            isset($_REQUEST['nonce']) &&
+            wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')
+        ) {
+            $template = plugin()->getPath('includes/templates') . 'single-form.php';
+        } elseif ($post->post_type == 'room') {
+            $template = plugin()->getPath('includes/templates') . 'single-room.php';
+        } elseif ($post->post_type == 'seat') {
+            $template = plugin()->getPath('includes/templates') . 'single-seat.php';
+        }
+
+        if (!is_readable($template)) {
+            return;
+        }
+
+        include($template);
+        exit;
+    }
+
+    public function maybeAuthenticate()
+    {
+        // Check In/Out (seat)
+        if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
+            $idm = new IdM;
+            $ldap = new LDAP;
+
+            if (!$idm->isAuthenticated() && !$ldap->isAuthenticated()) {
+                $queryStr = Functions::getQueryStr([], ['require-auth']);
+                Auth::tryLogIn($queryStr);
+            }
+        }
     }
 
     /**
@@ -107,7 +164,7 @@ class Main
 
         wp_enqueue_style(
             'rrze-rsvp-admin-menu',
-            plugins_url('assets/css/rrze-rsvp-admin-menu.css', plugin()->getBasename()),
+            plugins_url('build/menu.css', plugin()->getBasename()),
             [],
             plugin()->getVersion()
         );
@@ -118,14 +175,14 @@ class Main
 
         wp_enqueue_style(
             'rrze-rsvp-admin',
-            plugins_url('assets/css/rrze-rsvp-admin.css', plugin()->getBasename()),
+            plugins_url('build/admin.css', plugin()->getBasename()),
             [],
             plugin()->getVersion()
         );
 
         wp_enqueue_script(
             'rrze-rsvp-admin',
-            plugins_url('assets/js/rrze-rsvp-admin.js', plugin()->getBasename()),
+            plugins_url('build/admin.js', plugin()->getBasename()),
             ['jquery'],
             plugin()->getVersion()
         );
@@ -137,7 +194,7 @@ class Main
             'text_confirmed' => _x('Confirmed', 'Booking', 'rrze-rsvp'),
             'ajaxurl' => admin_url('admin-ajax.php'),
             // Strings für CPT Booking Backend
-            'alert_no_seat_date' => __('Please select a seat first.', 'rrze-rsvp'),
+            'alert_no_seat_date' => __('Please select a seat first.', 'rrze-rsvp')
         ));
 
         if ($post_type == 'booking') {
@@ -148,7 +205,7 @@ class Main
             wp_dequeue_script('autosave');
             wp_enqueue_script(
                 'rrze-rsvp-seat',
-                plugins_url('assets/js/rrze-rsvp-seat.js', plugin()->getBasename()),
+                plugins_url('build/seat.js', plugin()->getBasename()),
                 ['jquery'],
                 plugin()->getVersion()
             );
@@ -161,15 +218,19 @@ class Main
     {
         wp_register_style(
             'rrze-rsvp-shortcode',
-            plugins_url('assets/css/rrze-rsvp.css', plugin()->getBasename()),
+            plugins_url('build/shortcode.css', plugin()->getBasename()),
             [],
             plugin()->getVersion()
         );
         wp_register_script(
             'rrze-rsvp-shortcode',
-            plugins_url('assets/js/shortcode.js', plugin()->getBasename()),
+            plugins_url('build/shortcode.js', plugin()->getBasename()),
             ['jquery'],
             plugin()->getVersion()
         );
+        wp_localize_script('rrze-rsvp-shortcode', 'rsvp_ajax', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('rsvp-ajax-nonce'),
+        ]);
     }
 }

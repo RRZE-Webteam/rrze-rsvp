@@ -15,7 +15,7 @@ final class LDAP extends Auth
 
     protected $server;
 
-    protected $connection = '';
+    protected $connection = null;
 
     protected $port;
 
@@ -31,9 +31,9 @@ final class LDAP extends Auth
 
     protected $sessionName = 'rrze_rsvp';
 
-    protected $ldapUid = '';
+    protected $ldapUid = null;
 
-    protected $ldapMail = '';
+    protected $ldapMail = null;
 
     public function __construct()
     {
@@ -43,6 +43,10 @@ final class LDAP extends Auth
         $this->distinguished_name = $this->settings->getOption('ldap', 'distinguished_name');
         $this->bind_base_dn = $this->settings->getOption('ldap', 'bind_base_dn');
         $this->search_base_dn = $this->settings->getOption('ldap', 'search_base_dn');
+
+        if ($this->isAuthenticated()) {
+            $this->setAttributes();
+        }
     }
 
     public function isAuthenticated(): bool
@@ -54,34 +58,29 @@ final class LDAP extends Auth
             $sessionStarted = true;
         }
 
-        $this->ldapUid = !empty($_SESSION['ldap_uid']) ? $_SESSION['ldap_uid'] : '';
-        $this->ldapMail = !empty($_SESSION['ldap_mail']) ? $_SESSION['ldap_mail'] : '';
+        $this->ldapUid = !empty($_SESSION['ldap_uid']) ? $_SESSION['ldap_uid'] : null;
+        $this->ldapMail = !empty($_SESSION['ldap_mail']) ? $_SESSION['ldap_mail'] : null;
 
-        if($sessionStarted){
+        if ($sessionStarted) {
             session_write_close();
         }
-
-        $this->setAttributes();
 
         return !empty($this->ldapUid);
     }
 
-    public function setAttributes()
+    private function setAttributes()
     {
         $this->personAttributes = [
             'uid' => $this->ldapUid,
             'mail' => $this->ldapMail
         ];
-
-        $this->uid = $this->personAttributes['uid'];
-        $this->mail = $this->personAttributes['mail'];
     }
 
     public function getCustomerData(): array
     {
         $this->logout();
         return [
-            'customer_email' => $this->mail ? $this->mail : __('no@email', 'rrze-rsvp')
+            'customer_email' => $this->personAttributes['mail'] ?: __('no@email', 'rrze-rsvp')
         ];
     }
 
@@ -126,7 +125,7 @@ final class LDAP extends Auth
                                 }
                                 $_SESSION['ldap_uid'] = $username;
                                 $_SESSION['ldap_mail'] = $mail;
-                                if($sessionStarted){
+                                if ($sessionStarted) {
                                     session_write_close();
                                 }
                             } else {
