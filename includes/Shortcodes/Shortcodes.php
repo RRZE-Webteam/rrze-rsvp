@@ -11,14 +11,9 @@ use RRZE\RSVP\Auth\{IdM, LDAP};
  */
 class Shortcodes
 {
-    protected $idm;
-
-    protected $ldap;
-
     public function __construct()
     {
-        $this->idm = new IdM;
-        $this->ldap = new LDAP;
+        //
     }
 
     public function shortcodeAtts($atts, $tag, $settings)
@@ -37,19 +32,22 @@ class Shortcodes
 
     protected function authForm($ssoRequired = false, $ldapRequired = false)
     {
+        $idm = new IdM;
+        $ldap = new LDAP;
+
         $emailError = filter_input(INPUT_GET, 'email_error', FILTER_VALIDATE_INT);
         $emailError = ($emailError ? '<p class="error-message">' . __('Please login to the account you have used to book this seat.', 'rrze-rsvp') . '</p><br><br>' : '');
 
         $ldapError = '';
         if ($ldapRequired && isset($_POST['submit_ldap'])) {
-            $this->ldap->login();
-            if (!$this->ldap->isAuthenticated()) {
+            $ldap->login();
+            if (!$ldap->isAuthenticated()) {
                 $ldapError = '<p class="error-message">' . __('Login denied', 'rrze-rsvp') . '</p>';
             }
         }
 
-        if ($ssoRequired && $this->idm->simplesamlAuth) {
-            $loginUrl = $this->idm->getLoginURL();
+        if ($ssoRequired && $idm->simplesamlAuth) {
+            $loginUrl = $idm->getLoginURL();
             $idmLogin = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
         }
 
