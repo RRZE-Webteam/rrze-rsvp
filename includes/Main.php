@@ -92,17 +92,13 @@ class Main
             return;
         }
 
-        $idm = new IdM();
-        $ldap = new LDAP();
-
         $template = '';
-        if (
-            !$idm->isAuthenticated() &&
-            !$ldap->isAuthenticated() &&
-            isset($_GET['require-auth']) &&
-            wp_verify_nonce($_GET['require-auth'], 'require-auth')
-        ) {
-            $template = plugin()->getPath('includes/templates/auth') . 'single-auth.php';
+        if (isset($_GET['require-auth']) && wp_verify_nonce($_GET['require-auth'], 'require-auth')) {
+            $idm = new IdM;
+            $ldap = new LDAP;
+            if (!$idm->isAuthenticated() && !$ldap->isAuthenticated()) {
+                $template = plugin()->getPath('includes/templates/auth') . 'single-auth.php';
+            }
         } elseif (
             isset($_REQUEST['nonce']) &&
             wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')
@@ -128,7 +124,6 @@ class Main
         if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
             $idm = new IdM;
             $ldap = new LDAP;
-
             if (!$idm->isAuthenticated() && !$ldap->isAuthenticated()) {
                 $queryStr = Functions::getQueryStr([], ['require-auth']);
                 Auth::tryLogIn($queryStr);
