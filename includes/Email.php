@@ -92,7 +92,7 @@ class Email
                         $showCancelButton = true;
                         $showNotes = true;
                     } elseif ($recipient == 'customer') {
-                        $subject = $this->options->email_received_subject;;
+                        $subject = $this->options->email_received_subject;
                         $subject_en = $this->options->email_received_subject_en;
                         $text = $this->options->email_received_text;
                         $text_en = $this->options->email_received_text_en;
@@ -367,14 +367,30 @@ class Email
         $this->send($to, $subject, $message, $altMessage, $attachment);
 
         // Send ICS to separate address if requested
-        if (is_email($sendToEmail) && (in_array($status, ['confirmed', 'cancelled'])) && in_array($bookingMode, ['reservation', 'consultation', 'no-check'])) {
-            $subject = __('New confirmed booking', 'rrze-rsvp');
-            $text = __('There is a new confirmed booking for your room. Calendar file (.ics) attached.', 'rrze-rsvp');
+        if (is_email($sendToEmail) && (in_array($status, ['confirmed', 'cancelled', ''])) && in_array($bookingMode, ['reservation', 'consultation', 'no-check'])) {
+            if ($status == 'confirmed'){
+                $subject = __('New confirmed booking', 'rrze-rsvp');
+                $subject_en = 'New confirmed booking';
+                $text = __('There is a new confirmed booking for your room. Calendar file (.ics) attached.', 'rrze-rsvp');
+                $text_en = 'There is a new confirmed booking for your room. Calendar file (.ics) attached.';    
+            }elseif ($status == 'cancelled'){
+                $subject = __('Booking has been cancelled', 'rrze-rsvp');
+                $subject_en = 'Booking has been cancelled';
+                $text = __('A booking for your room has been cancelled by the administrator. Calendar file (.ics) attached.', 'rrze-rsvp');
+                $text_en = 'A booking for your room has been cancelled by the administrator. Calendar file (.ics) attached.';    
+            }else{
+                $subject = __('Booking has been cancelled', 'rrze-rsvp');
+                $subject_en = 'Booking has been cancelled';
+                $text = __('A booking for your room has been cancelled by the customer. Calendar file (.ics) attached.', 'rrze-rsvp');
+                $text_en = 'A booking for your room has been cancelled by the customer. Calendar file (.ics) attached.';    
+            }
             $customerName = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
             $customerEmail = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
 
             $data['subject'] = $subject;
+            $data['subject_en'] = $subject_en;
             $data['text'] = $text;
+            $data['text_en'] = $text_en;
             $data['customer']['name'] = $customerName;
             $data['customer']['email'] = $customerEmail;
             $data['show_check_btns'] = false;
