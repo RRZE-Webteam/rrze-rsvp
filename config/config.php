@@ -69,9 +69,9 @@ function wp_kses_custom($str)
     $allowed_html = getAllowedHTML();
 
     $allowed_protocols = [
-        'http' => [],
-        'https' => [],
-        'mailto' => [],
+        'http',
+        'https',
+        'mailto',
     ];
 
     return wp_kses($str, $allowed_html, $allowed_protocols);
