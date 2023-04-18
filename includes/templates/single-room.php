@@ -125,11 +125,13 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
  */
 $currentTheme = wp_get_theme();
 $vers = $currentTheme->get( 'Version' );
-if (Helper::isFauTheme() && version_compare($vers, "2.3", '<')) {
-    if (is_archive()) {
-        get_template_part('template-parts/hero', 'index');
-    } else {
-        get_template_part('template-parts/hero', 'small');
+if (Helper::isFauTheme()) {
+    if (version_compare($vers, "2.3", '<')) {
+        if (is_archive()) {
+            get_template_part('template-parts/hero', 'index');
+        } else {
+            get_template_part('template-parts/hero', 'small');
+        }
     }
     $divOpen = '<div id="content">
         <div class="container">
