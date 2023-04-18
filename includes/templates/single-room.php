@@ -123,7 +123,9 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
 /*
  * div-/Seitenstruktur für FAU- und andere Themes
  */
-if (Helper::isFauTheme()) {
+$currentTheme = wp_get_theme();
+$vers = $currentTheme->get( 'Version' );
+if (Helper::isFauTheme() && version_compare($vers, "2.3", '<')) {
     get_template_part('template-parts/hero', 'small');
     $divOpen = '<div id="content">
         <div class="container">
