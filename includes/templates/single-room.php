@@ -123,8 +123,16 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
 /*
  * div-/Seitenstruktur für FAU- und andere Themes
  */
+$currentTheme = wp_get_theme();
+$vers = $currentTheme->get( 'Version' );
 if (Helper::isFauTheme()) {
-    get_template_part('template-parts/hero', 'small');
+    if (version_compare($vers, "2.3", '<')) {
+        if (is_archive()) {
+            get_template_part('template-parts/hero', 'index');
+        } else {
+            get_template_part('template-parts/hero', 'small');
+        }
+    }
     $divOpen = '<div id="content">
         <div class="container">
             <div class="row">
@@ -141,15 +149,14 @@ if (Helper::isFauTheme()) {
         </div>
     </div>';
 } else {
-    $divOpen = '<div id="content">
+    $divOpen = ($currentTheme->get( 'Name' ) == 'FAU Events' ? '<div id="singlepost-wrap" class="entry-content">' : '') . '<div id="primary">
         <div class="container">
-            <div class="row">
-                <div class="col-xs-12">
-                <h1 class="entry-title">' . get_the_title() . '</h1>';
-    $divClose = '</div>
-            </div>
+            <div class="entry-header">
+                <h1 class="entry-title">' . (is_archive() ? get_the_archive_title() : get_the_title()) . '</h1>
+            </div>';
+    $divClose = '
         </div>
-    </div>';
+    </div>' . ($currentTheme->get( 'Name' ) == 'FAU Events' ? '</div>' : '');
 }
 
 
@@ -162,6 +169,11 @@ while (have_posts()) : the_post();
 
     if (has_post_thumbnail()) {
         the_post_thumbnail('medium', array("class" => "alignright"));
+    }
+    if (is_archive()) {
+        echo '<div class="post"><h2><a href="'.get_permalink().'">';
+        the_title();
+        echo '</a></h2>';
     }
     the_content();
 
@@ -222,6 +234,9 @@ while (have_posts()) : the_post();
             echo '<h2>' . __('Floor Plan', 'rrze-rsvp') . '</h2>';
             echo '<a href="' . $imgSrc[0] . '" class="lightbox">' . $floorplan . '</a>';
         }
+    }
+    if (is_archive()) {
+        echo '<hr /></div>';
     }
 
 

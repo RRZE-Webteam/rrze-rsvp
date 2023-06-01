@@ -4,7 +4,7 @@
 Plugin Name:     RRZE RSVP
 Plugin URI:      https://github.com/RRZE-Webteam/rrze-rsvp
 Description:     FAU Reservation Tool
-Version:         2.10.4
+Version:         2.11.0
 Author:          RRZE-Webteam
 Author URI:      https://blogs.fau.de/webworking/
 License:         GNU General Public License v2
@@ -56,14 +56,14 @@ function systemRequirements(): string
     if (version_compare(PHP_VERSION, RRZE_PHP_VERSION, '<')) {
         $error = sprintf(
             /* translators: 1: Server PHP version number, 2: Required PHP version number. */
-            __('The server is running PHP version %1$s. The Plugin requires at least PHP version %2$s.', 'rrze-legal'),
+            __('The server is running PHP version %1$s. The Plugin requires at least PHP version %2$s.', 'rrze-rsvp'),
             PHP_VERSION,
             RRZE_PHP_VERSION
         );
     } elseif (version_compare($GLOBALS['wp_version'], RRZE_WP_VERSION, '<')) {
         $error = sprintf(
             /* translators: 1: Server WordPress version number, 2: Required WordPress version number. */
-            __('The server is running WordPress version %1$s. The Plugin requires at least WordPress version %2$s.', 'rrze-legal'),
+            __('The server is running WordPress version %1$s. The Plugin requires at least WordPress version %2$s.', 'rrze-rsvp'),
             $GLOBALS['wp_version'],
             RRZE_WP_VERSION
         );
@@ -82,7 +82,7 @@ function activation()
         wp_die(
             sprintf(
                 /* translators: 1: The plugin name, 2: The error string. */
-                __('Plugins: %1$s: %2$s', 'rrze-legal'),
+                __('Plugins: %1$s: %2$s', 'rrze-rsvp'),
                 plugin_basename(__FILE__),
                 $error
             )
@@ -142,7 +142,7 @@ function loaded()
                     printf(
                         '<div class="notice notice-error"><p>' .
                             /* translators: 1: The plugin name, 2: The error string. */
-                            __('Plugins: %1$s: %2$s', 'rrze-legal') .
+                            __('Plugins: %1$s: %2$s', 'rrze-rsvp') .
                             '</p></div>',
                         esc_html($pluginName),
                         esc_html($error)

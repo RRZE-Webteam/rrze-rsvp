@@ -75,7 +75,9 @@ if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'
 
 get_header();
 
-if (Helper::isFauTheme()) {
+$currentTheme = wp_get_theme();
+$vers = $currentTheme->get( 'Version' );
+if (Helper::isFauTheme() && version_compare($vers, "2.3", '<')) {
     get_template_part('template-parts/hero', 'small');
     $div_open = '<div id="content">
         <div class="container">
