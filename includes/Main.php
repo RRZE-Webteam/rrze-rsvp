@@ -205,7 +205,7 @@ class Main
                 plugin()->getVersion()
             );
 
-            wp_localize_script('rrze-rsvp-seat', 'button_label', __('Create Seats', 'rrze-rsvp'));
+            wp_localize_script('rrze-rsvp-seat', 'button_label', ['label' => __('Create Seats', 'rrze-rsvp')]);
         }
     }
 
