@@ -22,8 +22,6 @@
  * @abstract TCPDF - Example: 2D barcodes.
  * @author Nicola Asuni
  * @since 2008-03-04
- * @group barcode
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).

@@ -22,8 +22,6 @@
  * @abstract TCPDF - Example: Colour gradients
  * @author Nicola Asuni
  * @since 2008-06-09
- * @group color
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).

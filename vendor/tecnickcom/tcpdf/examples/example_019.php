@@ -22,8 +22,6 @@
  * @abstract TCPDF - Example: Non unicode with alternative config file
  * @author Nicola Asuni
  * @since 2008-03-04
- * @group unicode
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).

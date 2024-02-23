@@ -22,8 +22,6 @@
  * @abstract TCPDF - Example: Set PDF viewer display preferences.
  * @author Nicola Asuni
  * @since 2008-06-09
- * @group viewer
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).

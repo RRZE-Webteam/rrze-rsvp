@@ -22,9 +22,6 @@
  * @abstract TCPDF - Example: XHTML Forms
  * @author Nicola Asuni
  * @since 2009-09-07
- * @group html
- * @group form
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).
@@ -72,7 +69,7 @@ if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
 // IMPORTANT: disable font subsetting to allow users editing the document
 $pdf->setFontSubsetting(false);
 
-// set font. 'helvetica' MUST be used to avoid a PHP notice from PHP 7.4+
+// set font
 $pdf->setFont('helvetica', '', 10, '', false);
 
 // add a page

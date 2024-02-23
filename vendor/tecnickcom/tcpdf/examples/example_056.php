@@ -22,8 +22,6 @@
  * @abstract TCPDF - Example: Crop marks and color registration bars
  * @author Nicola Asuni
  * @since 2010-03-26
- * @group color
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).

@@ -22,9 +22,6 @@
  * @abstract TCPDF - Example: SVG Image
  * @author Nicola Asuni
  * @since 2010-05-02
- * @group svg
- * @group image
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).

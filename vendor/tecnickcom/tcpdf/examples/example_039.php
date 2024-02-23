@@ -22,8 +22,6 @@
  * @abstract TCPDF - Example: HTML justification
  * @author Nicola Asuni
  * @since 2008-10-18
- * @group html
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).
