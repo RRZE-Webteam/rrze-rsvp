@@ -22,8 +22,6 @@
  * @abstract TCPDF - Example: Spot colors.
  * @author Nicola Asuni
  * @since 2008-09-12
- * @group color
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).

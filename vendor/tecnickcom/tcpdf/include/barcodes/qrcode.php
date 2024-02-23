@@ -884,15 +884,14 @@ class QRcode {
 	protected function getCode() {
 		if ($this->count < $this->dataLength) {
 			$row = $this->count % $this->blocks;
-			$col = (int)($this->count / $this->blocks);
+			$col = $this->count / $this->blocks;
 			if ($col >= $this->rsblocks[0]['dataLength']) {
 				$row += $this->b1;
 			}
-			$row = (int) $row;
 			$ret = $this->rsblocks[$row]['data'][$col];
 		} elseif ($this->count < $this->dataLength + $this->eccLength) {
 			$row = ($this->count - $this->dataLength) % $this->blocks;
-			$col = (int)(($this->count - $this->dataLength) / $this->blocks);
+			$col = ($this->count - $this->dataLength) / $this->blocks;
 			$ret = $this->rsblocks[$row]['ecc'][$col];
 		} else {
 			return 0;
@@ -1063,7 +1062,7 @@ class QRcode {
 	 protected function makeMaskNo($maskNo, $width, $s, &$d, $maskGenOnly=false) {
 		$b = 0;
 		$bitMask = array();
-		$bitMask = $this->generateMaskNo($maskNo, $width, $s);
+		$bitMask = $this->generateMaskNo($maskNo, $width, $s, $d);
 		if ($maskGenOnly) {
 			return;
 		}
@@ -1461,7 +1460,7 @@ class QRcode {
 		$stringLen = strlen($this->dataStr);
 		$p = 0;
 		while ($p < $stringLen) {
-			$mode = $this->identifyMode(substr($this->dataStr, $p));
+			$mode = $this->identifyMode(substr($this->dataStr, $p), $this->hint);
 			if ($mode == QR_MODE_KJ) {
 				$p += 2;
 			} else {
@@ -1693,7 +1692,7 @@ class QRcode {
 			return -1;
 		}
 		$buf = array($size, $index, $parity);
-		$entry = $this->newInputItem(QR_MODE_ST, 3, $buf);
+		$entry = $this->newInputItem(QR_MODE_ST, 3, buf);
 		array_unshift($items, $entry);
 		return $items;
 	}

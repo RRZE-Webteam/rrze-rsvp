@@ -22,8 +22,6 @@
  * @abstract TCPDF - Example: Text on multiple columns
  * @author Nicola Asuni
  * @since 2008-03-04
- * @group column
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).

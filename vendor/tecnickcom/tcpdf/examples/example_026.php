@@ -22,7 +22,6 @@
  * @abstract TCPDF - Example: Text Rendering Modes and Text Clipping
  * @author Nicola Asuni
  * @since 2008-03-04
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).

@@ -22,8 +22,6 @@
  * @abstract TCPDF - Example: RTL document with Persian language
  * @author Nicola Asuni
  * @since 2008-03-06
- * @group rtl
- * @group pdf
  */
 
 // Include the main TCPDF library (search for installation path).
