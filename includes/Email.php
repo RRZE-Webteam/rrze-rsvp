@@ -26,6 +26,8 @@ class Email
      */
     protected $isLocaleEnglish;
 
+    protected $settings;
+
     /**
      * __construct
      */
