@@ -10,6 +10,10 @@ class Actions
 
 	protected $template;
 
+    protected $settings;
+
+    protected $options;
+
 	public function __construct()
 	{
 		$this->email = new Email;
