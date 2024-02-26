@@ -18,6 +18,10 @@ class Schedule
      */
     protected $email;
 
+    protected $settings;
+
+    protected $options;
+
     /**
      * __construct
      */
