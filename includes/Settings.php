@@ -74,6 +74,8 @@ class Settings
      */
     protected $settingsPrefix;
 
+    protected $optionsPage;
+
     /**
      * Variablen Werte zuweisen.
      * @param string $pluginFile [description]
@@ -720,7 +722,7 @@ class Settings
      */
     public function callbackMultiSelect($args)
     {
-        $value = $this->getOption($args['section'], $args['id'], $args['default']);
+        $value = (array) $this->getOption($args['section'], $args['id'], $args['default']);
         $size  = isset($args['size']) && !is_null($args['size']) ? $args['size'] : 'regular';
         $html  = sprintf(
             '<select class="%1$s" id="%3$s-%4$s" name="%2$s[%3$s_%4$s][]" multiple="multiple">',
