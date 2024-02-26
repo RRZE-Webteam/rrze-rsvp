@@ -12,7 +12,9 @@ defined('ABSPATH') || exit;
  */
 class Availability extends Shortcodes
 {
-    private $shortcodesettings = '';
+    protected $options;
+
+    protected $shortcodesettings = '';
 
     public function __construct($settings)
     {
