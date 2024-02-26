@@ -11,7 +11,6 @@ defined('ABSPATH') || exit;
 use RRZE\RSVP\Capabilities;
 use RRZE\RSVP\Functions;
 use function RRZE\RSVP\Config\isAllowedSearchForGuest;
-// use RRZE\RSVP\Carbon;
 
 class Bookings
 {
@@ -317,8 +316,8 @@ class Bookings
         $sAllDates = __('Show all dates', 'rrze-rsvp');
         $sAllTimeslots = __('Show all time slots', 'rrze-rsvp');
         $sAllRoomes = __('Show all rooms', 'rrze-rsvp');
-        $sSelectedDate = (string) filter_input(INPUT_GET, $this->sDate, FILTER_SANITIZE_STRING);
-        $sSelectedTimeslot = (string) filter_input(INPUT_GET, $this->sTimeslot, FILTER_SANITIZE_STRING);
+        $sSelectedDate = htmlspecialchars($_GET[$this->sDate] ?? '');
+        $sSelectedTimeslot = htmlspecialchars($_GET[$this->sTimeslot] ?? '');
         $sSelectedRoom = (string) filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
 
         // 1. get all booking IDs
@@ -381,8 +380,8 @@ class Bookings
     private function setFilterParams()
     {
         $this->filterRoomIDs = filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
-        $this->filterDate = filter_input(INPUT_GET, $this->sDate, FILTER_SANITIZE_STRING);
-        $filterTime = filter_input(INPUT_GET, $this->sTimeslot, FILTER_SANITIZE_STRING);
+        $this->filterDate = htmlspecialchars($_GET[$this->sDate] ?? '');
+        $filterTime = htmlspecialchars($_GET[$this->sTimeslot] ?? '');
         if ($filterTime) {
             $parts = explode(" - ", $filterTime);
             $this->filterStart = $parts[0];
