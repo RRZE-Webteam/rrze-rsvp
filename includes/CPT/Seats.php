@@ -146,7 +146,7 @@ class Seats
 		}
 
 		$allRooms = __('Show all rooms', 'rrze-rsvp');
-		$selectedRoom = (string) filter_input(INPUT_GET, 'rrze-rsvp-seat-room', FILTER_SANITIZE_STRING);
+		$selectedRoom = htmlspecialchars($_GET['rrze-rsvp-seat-room'] ?? '');
 
 		$seatIds = get_posts([
 			'post_type' => 'seat',
