@@ -316,8 +316,8 @@ class Bookings
         $sAllDates = __('Show all dates', 'rrze-rsvp');
         $sAllTimeslots = __('Show all time slots', 'rrze-rsvp');
         $sAllRoomes = __('Show all rooms', 'rrze-rsvp');
-        $sSelectedDate = htmlspecialchars($_GET[$this->sDate] ?? '');
-        $sSelectedTimeslot = htmlspecialchars($_GET[$this->sTimeslot] ?? '');
+        $sSelectedDate = sanitize_text_field($_GET[$this->sDate] ?? '');
+        $sSelectedTimeslot = sanitize_text_field($_GET[$this->sTimeslot] ?? '');
         $sSelectedRoom = (string) filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
 
         // 1. get all booking IDs
@@ -380,8 +380,8 @@ class Bookings
     private function setFilterParams()
     {
         $this->filterRoomIDs = filter_input(INPUT_GET, $this->sRoom, FILTER_VALIDATE_INT);
-        $this->filterDate = htmlspecialchars($_GET[$this->sDate] ?? '');
-        $filterTime = htmlspecialchars($_GET[$this->sTimeslot] ?? '');
+        $this->filterDate = sanitize_text_field($_GET[$this->sDate] ?? '');
+        $filterTime = sanitize_text_field($_GET[$this->sTimeslot] ?? '');
         if ($filterTime) {
             $parts = explode(" - ", $filterTime);
             $this->filterStart = $parts[0];
