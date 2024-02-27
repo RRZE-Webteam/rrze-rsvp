@@ -86,10 +86,10 @@ final class LDAP extends Auth
 
     public function login()
     {
-        $username = htmlspecialchars($_POST['username'] ?? '');
-        $username = $username ? $username : htmlspecialchars($_GET['username'] ?? '');
-        $password = htmlspecialchars($_POST['password'] ?? '');
-        $password = $password ? $password : htmlspecialchars($_GET['password'] ?? '');
+        $username = sanitize_text_field($_POST['username'] ?? '');
+        $username = $username ? $username : sanitize_text_field($_GET['username'] ?? '');
+        $password = sanitize_text_field($_POST['password'] ?? '');
+        $password = $password ? $password : sanitize_text_field($_GET['password'] ?? '');
 
         if ($username && $password) {
             $this->connection = @ldap_connect($this->server, $this->port);
