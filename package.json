@@ -1,6 +1,6 @@
 {
     "name": "rrze-rsvp",
-    "version": "2.11.1",
+    "version": "2.11.4",
     "main": "rrze-rsvp.php",
     "scripts": {
         "start": "webpack --mode=development --watch",

@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'rrze/rrze-rsvp',
-        'pretty_version' => '2.10.1',
-        'version' => '2.10.1.0',
+        'pretty_version' => '2.11.3',
+        'version' => '2.11.3.0',
         'reference' => null,
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
@@ -20,8 +20,8 @@
             'dev_requirement' => false,
         ),
         'rrze/rrze-rsvp' => array(
-            'pretty_version' => '2.10.1',
-            'version' => '2.10.1.0',
+            'pretty_version' => '2.11.3',
+            'version' => '2.11.3.0',
             'reference' => null,
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
@@ -29,9 +29,9 @@
             'dev_requirement' => false,
         ),
         'tecnickcom/tcpdf' => array(
-            'pretty_version' => '6.4.4',
-            'version' => '6.4.4.0',
-            'reference' => '42cd0f9786af7e5db4fcedaa66f717b0d0032320',
+            'pretty_version' => '6.6.5',
+            'version' => '6.6.5.0',
+            'reference' => '5fce932fcee4371865314ab7f6c0d85423c5c7ce',
             'type' => 'library',
             'install_path' => __DIR__ . '/../tecnickcom/tcpdf',
             'aliases' => array(),

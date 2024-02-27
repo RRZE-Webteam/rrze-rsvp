@@ -9,6 +9,8 @@ use RRZE\RSVP\Settings;
 
 class Metaboxes
 {
+    protected $settings;
+
     public function __construct()
     {
         $this->settings = new Settings(plugin()->getFile());
