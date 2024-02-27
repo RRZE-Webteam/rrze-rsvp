@@ -117,11 +117,11 @@ class Tracking
         echo '<h1>' . esc_html_x('Contact tracking', 'admin page title', 'rrze-rsvp') . '</h1>';
 
         if (isset($_GET['submit'])) {
-            $searchdate = htmlspecialchars($_GET['searchdate'] ?? '');
+            $searchdate = sanitize_text_field($_GET['searchdate'] ?? '');
             $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
             $guest_email = filter_input(INPUT_GET, 'guest_email', FILTER_VALIDATE_EMAIL);
             $hash_guest_email = ($guest_email ? Functions::crypt($guest_email, 'encrypt') : '');
-            $guest_phone = htmlspecialchars($_GET['guest_phone'] ?? '');
+            $guest_phone = sanitize_text_field($_GET['guest_phone'] ?? '');
             $guest_phone = preg_replace('/[^0-9]/', '', $guest_phone);
             $hash_guest_phone = ($guest_phone ? Functions::crypt($guest_phone, 'encrypt') : '');
 
@@ -181,10 +181,10 @@ class Tracking
 
     public function tracking_csv_pull()
     {
-        $searchdate = htmlspecialchars($_GET['searchdate'] ?? '');
+        $searchdate = sanitize_text_field($_GET['searchdate'] ?? '');
         $delta = filter_input(INPUT_GET, 'delta', FILTER_VALIDATE_INT, ['min_range' => 0]);
-        $hash_guest_email = htmlspecialchars($_GET['hash_guest_email'] ?? '');
-        $hash_guest_phone = htmlspecialchars($_GET['hash_guest_phone'] ?? '');
+        $hash_guest_email = sanitize_text_field($_GET['hash_guest_email'] ?? '');
+        $hash_guest_phone = sanitize_text_field($_GET['hash_guest_phone'] ?? '');
 
         $aGuests = Tracking::getUsersInRoomAtDate($searchdate, $delta, $hash_guest_email, $hash_guest_phone);
 
