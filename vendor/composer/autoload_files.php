@@ -7,6 +7,4 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'beb2970633d960a1478cd41d6deb1e45' => $vendorDir . '/cmb2/cmb2/init.php',
-    '6d030cf9d09744a3d8177a5f1ec8d2b1' => $vendorDir . '/tecnickcom/tcpdf/tcpdf.php',
-    'c7ef859d45e06a52ad7c9f1a84a1e6e5' => $vendorDir . '/tecnickcom/tcpdf/tcpdf_barcodes_2d.php',
 );

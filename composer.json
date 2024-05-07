@@ -10,7 +10,9 @@
             "RRZE\\RSVP\\": "includes/"
         },
         "files": [
-            "vendor/cmb2/cmb2/init.php",
+            "vendor/cmb2/cmb2/init.php"
+        ],
+        "classmap": [
             "vendor/tecnickcom/tcpdf/tcpdf.php",
             "vendor/tecnickcom/tcpdf/tcpdf_barcodes_2d.php"
         ]
