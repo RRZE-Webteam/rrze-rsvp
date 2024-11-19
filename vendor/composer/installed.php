@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'rrze/rrze-rsvp',
-        'pretty_version' => '2.11.5',
-        'version' => '2.11.5.0',
+        'pretty_version' => '2.11.4',
+        'version' => '2.11.4.0',
         'reference' => NULL,
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
@@ -20,8 +20,8 @@
             'dev_requirement' => false,
         ),
         'rrze/rrze-rsvp' => array(
-            'pretty_version' => '2.11.5',
-            'version' => '2.11.5.0',
+            'pretty_version' => '2.11.4',
+            'version' => '2.11.4.0',
             'reference' => NULL,
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
