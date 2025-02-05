@@ -1,6 +1,6 @@
 {
     "name": "rrze/rrze-rsvp",
-    "version": "2.11.4",
+    "version": "2.11.5",
     "require": {
         "cmb2/cmb2": "^2.10.1",
         "tecnickcom/tcpdf": "^6.7.4"
