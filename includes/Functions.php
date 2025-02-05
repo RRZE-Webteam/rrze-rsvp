@@ -349,10 +349,10 @@ class Functions
 
         $data['id'] = $post->ID;
         $data['status'] = get_post_meta($post->ID, 'rrze-rsvp-booking-status', true);
-        $data['start'] = absint(get_post_meta($post->ID, 'rrze-rsvp-booking-start', true));
-        $start = new Carbon(date('Y-m-d H:i:s', $data['start']), wp_timezone());
+        $start = absint(get_post_meta($post->ID, 'rrze-rsvp-booking-start', true));
+        $data['start'] = $start;
         $end = absint(get_post_meta($post->ID, 'rrze-rsvp-booking-end', true));
-        $data['end'] = $end ? $end : $start->endOfDay()->getTimestamp();
+        $data['end'] = $end ? $end : Utils::getEndOfDayTimestamp($start);
         $data['date'] = self::dateFormat((int)$data['start']);
         $data['time'] = self::timeFormat((int)$data['start']) . ' - ' . self::timeFormat((int)$data['end']);
         $data['date_en'] = date('F j, Y', $data['start']);
@@ -388,9 +388,8 @@ class Functions
     {
         $now = current_time('timestamp');
         $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
-        $start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
         $end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
-        $end = $end ? $end : $start->endOfDay()->getTimestamp();
+        $end = $end ? $end : Utils::getEndOfDayTimestamp($start);
         return ($end < $now);
     }
 
@@ -410,12 +409,13 @@ class Functions
 
     public static function canDeleteBooking(int $postId): bool
     {
+        $now = current_time('timestamp');
         $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
-        $start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
+        $endOfDay = Utils::getEndOfDayTimestamp($start);
         $status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
         if (
             self::isBookingArchived($postId)
-            && !(in_array($status, ['checked-in', 'checked-out']) || $start->endOfDay()->gt(new Carbon('now')))
+            && !(in_array($status, ['checked-in', 'checked-out']) || $endOfDay > $now)
         ) {
             return true;
         } else {

@@ -1,16 +1,18 @@
 {
     "name": "rrze/rrze-rsvp",
-    "version": "2.11.4",
+    "version": "2.11.5",
     "require": {
         "cmb2/cmb2": "^2.10.1",
-        "tecnickcom/tcpdf": "^6.6.5"
+        "tecnickcom/tcpdf": "^6.7.4"
     },
     "autoload": {
         "psr-4": {
             "RRZE\\RSVP\\": "includes/"
         },
         "files": [
-            "vendor/cmb2/cmb2/init.php",
+            "vendor/cmb2/cmb2/init.php"
+        ],
+        "classmap": [
             "vendor/tecnickcom/tcpdf/tcpdf.php",
             "vendor/tecnickcom/tcpdf/tcpdf_barcodes_2d.php"
         ]

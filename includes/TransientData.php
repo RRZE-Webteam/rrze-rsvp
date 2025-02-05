@@ -15,7 +15,7 @@ class TransientData
      * transient
      * @var string
      */
-    public $dataTransient = '';
+    public $transient = '';
 
     /**
      * transientExpiration

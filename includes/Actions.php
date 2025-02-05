@@ -1157,21 +1157,21 @@ class Actions
 	{
 		$now = current_time('timestamp');
 		$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
-		$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
 		$end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
-		$end = $end ? $end : $start->endOfDay()->getTimestamp();
+		$end = $end ? $end : Utils::getEndOfDayTimestamp($start);
 		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
 		return (($status == 'cancelled') || ($end < $now));
 	}
 
 	protected function canDeleteBooking(int $postId): bool
 	{
+        $now = current_time('timestamp');
 		$start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
-		$start = new Carbon(date('Y-m-d H:i:s', $start), wp_timezone());
+		$endOfDay = Utils::getEndOfDayTimestamp($start);
 		$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
 		if (
 			$this->isBookingArchived($postId)
-			&& !(in_array($status, ['checked-in', 'checked-out']) || $start->endOfDay()->gt(new Carbon('now')))
+			&& !(in_array($status, ['checked-in', 'checked-out']) || $endOfDay > $now)
 		) {
 			return true;
 		} else {
