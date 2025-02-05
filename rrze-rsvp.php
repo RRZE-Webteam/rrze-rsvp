@@ -150,7 +150,7 @@ function loaded()
                     printf(
                         '<div class="notice notice-error"><p>' .
                             /* translators: 1: The plugin name, 2: The error string. */
-                            esc_html__('Plugins: %1$s: %2$s', 'rrze-ac') .
+                            esc_html__('Plugins: %1$s: %2$s', 'rrze-rsvp') .
                             '</p></div>',
                         $pluginName,
                         $error
