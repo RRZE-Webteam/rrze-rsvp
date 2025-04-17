@@ -608,15 +608,16 @@ class Actions
 			$canDelete = Functions::canDeleteBooking($postId);
 
 			if ($trash || $delete) {
-				if (!$canDelete) {
-					$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
-				}
-			} elseif (
-				$isArchive
-				|| ($requestSeat != $seat)
-			) {
-				$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
-			}
+                if (!$canDelete) {
+                    $errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
+                }
+            }
+//			} elseif (
+//				$isArchive
+//				|| ($requestSeat != $seat)
+//			) {
+//				$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
+//			}
 		}
 
 		if ($errorMessage) {

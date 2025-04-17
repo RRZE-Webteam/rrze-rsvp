@@ -413,6 +413,10 @@ class Functions
         $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
         $endOfDay = Utils::getEndOfDayTimestamp($start);
         $status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
+        if ( $status === 'cancelled' ) {
+            return true;
+        }
+
         if (
             self::isBookingArchived($postId)
             && !(in_array($status, ['checked-in', 'checked-out']) || $endOfDay > $now)
