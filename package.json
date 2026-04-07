@@ -4,13 +4,8 @@
     "main": "rrze-rsvp.php",
     "scripts": {
         "start": "webpack --mode=development --watch",
-        "build": "webpack --mode=production && gulp bundle",
-        "clean": "rm -rf build/",
-        "major": "gulp major",
-        "minor": "gulp minor",
-        "patch": "gulp patch",
-        "prerelease": "gulp prerelease",
-        "bundle": "gulp bundle"
+        "build": "webpack --mode=production",
+        "clean": "rm -rf build/"
     },
     "repository": {
         "type": "git",
@@ -33,25 +28,21 @@
     },
     "homepage": "https://github.com/RRZE-Webteam/rrze-rsvp#readme",
     "devDependencies": {
-        "@babel/core": "^7.26",
-        "@babel/preset-env": "^7.26",
-        "autoprefixer": "^10.4.21",
-        "babel-loader": "^10.0.0",
+        "@babel/core": "^7.29",
+        "@babel/preset-env": "^7.29",
+        "autoprefixer": "^10.4.27",
+        "babel-loader": "^10.1.1",
         "clean-webpack-plugin": "^4.0.0",
-        "css-loader": "^7.1.2",
-        "css-minimizer-webpack-plugin": "^7.0.2",
-        "gulp": "^5.0.0",
-        "gulp-bump": "^3.2.0",
-        "gulp-touch-cmd": "^0.0.1",
-        "gulp-zip": "^6.1.0",
-        "mini-css-extract-plugin": "^2.9.2",
-        "postcss-loader": "^8.1.1",
-        "sass": "^1.86.3",
-        "sass-loader": "^16.0.5",
-        "semver": "^7.7.1",
+        "css-loader": "^7.1.4",
+        "css-minimizer-webpack-plugin": "^8.0.0",
+        "mini-css-extract-plugin": "^2.10.2",
+        "postcss-loader": "^8.2.1",
+        "sass": "^1.99.0",
+        "sass-loader": "^16.0.7",
+        "semver": "^7.7.4",
         "style-loader": "^4.0.0",
-        "terser-webpack-plugin": "^5.3.14",
-        "webpack": "^5.99.5",
-        "webpack-cli": "^6.0.1"
+        "terser-webpack-plugin": "^5.4.0",
+        "webpack": "^5.105.4",
+        "webpack-cli": "^7.0.2"
     }
 }
