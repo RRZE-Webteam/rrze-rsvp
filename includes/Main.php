@@ -85,6 +85,26 @@ class Main
         add_filter('rrzecache_skip_cache', [$this, 'skipCache']);
     }
 
+    /**
+     * Select and render the plugin template for the current front-end request.
+     *
+     * This callback runs late on `template_redirect`, after WordPress has
+     * resolved the queried post. Templates are selected in this order:
+     *
+     * 1. Authentication page for a valid `require-auth` request when neither
+     *    IdM nor LDAP reports an authenticated user.
+     * 2. Booking form for a valid RSVP availability request.
+     * 3. Single-room template for room posts.
+     * 4. Single-seat template for seat posts.
+     *
+     * If no post or readable plugin template can be resolved, control returns
+     * to WordPress so the active theme can handle the request. An included
+     * template executes in this method's local scope and is responsible for
+     * rendering the complete response. Execution then stops to prevent the
+     * theme's template loader from producing a second response.
+     *
+     * @return void
+     */
     public function includeSingleTemplate()
     {
         global $post;
