@@ -6,50 +6,42 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Auth\{IdM, LDAP};
 
-$idmAuthenticator = new IdM;
-$ldapAuthenticator = new LDAP;
+$idm = new IdM;
+$ldapInstance = new LDAP;
+$template = new Template;
 $settings = new Settings(plugin()->getFile());
 
-$emailErrorHtml = '';
-$ldapLoginErrorHtml = '';
-$idmLoginLinkHtml = '';
-$authenticationSeparatorHtml = '';
-$pageWrapperOpeningHtml = '';
-$pageWrapperClosingHtml = '';
-$pageTitle = __('Authentication Required', 'rrze-rsvp');
-
-$emailErrorCode = filter_input(INPUT_GET, 'email_error', FILTER_VALIDATE_INT);
-if ($emailErrorCode) {
-    $emailErrorHtml = '<p class="error-message">' . __('Please login to the account you have used to book this seat.', 'rrze-rsvp') . '</p><br><br>';
-}
+$email_error = filter_input(INPUT_GET, 'email_error', FILTER_VALIDATE_INT);
+$email_error = ($email_error ? '<p class="error-message">' . __('Please login to the account you have used to book this seat.', 'rrze-rsvp') . '</p><br><br>' : '');
 
 $roomId = isset($_GET['room_id']) ? absint($_GET['room_id']) : 0;
 if (!$roomId && isset($_GET['id'])) {
     // get room ID from booking via seat
-    $bookingId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-    $seatId = get_post_meta($bookingId, 'rrze-rsvp-booking-seat', true);
-    $roomId = get_post_meta($seatId, 'rrze-rsvp-seat-room', true);
+    $bookingID = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+    $seatID = get_post_meta($bookingID, 'rrze-rsvp-booking-seat', true);
+    $roomId = get_post_meta($seatID, 'rrze-rsvp-seat-room', true);
 }
 
-$isSsoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
-$isLdapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
-$isLdapLoginAvailable = $isLdapRequired && (bool) $settings->getOption('ldap', 'server');
+$ssoRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-sso-required', true));
+$ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($roomId, 'rrze-rsvp-room-ldap-required', true));
+$ldapRequired = $ldapRequired && $settings->getOption('ldap', 'server') ? true : false;
 
-if ($isLdapLoginAvailable && isset($_POST['submit_ldap'])) {
-    $ldapAuthenticator->login();
-    if ($ldapAuthenticator->isAuthenticated()) {
-        $queryString = Functions::getQueryStr([], ['require-auth']);
-        $redirectUrl = trailingslashit(get_permalink()) . ($queryString ? '?' . $queryString : '');
+$loginDenied = '';
+if ($ldapRequired && isset($_POST['submit_ldap'])) {
+    $ldapInstance->login();
+    if ($ldapInstance->isAuthenticated()) {
+        $queryStr = Functions::getQueryStr([], ['require-auth']);
+        $redirectUrl = trailingslashit(get_permalink()) . ($queryStr ? '?' . $queryStr : '');
         wp_redirect($redirectUrl);
         exit;
     } else {
-        $ldapLoginErrorHtml = '<br><p class="error-message">' . __('Login denied', 'rrze-rsvp') . '</p>';
+        $loginDenied = '<br><p class="error-message">' . __('Login denied', 'rrze-rsvp') . '</p>';
     }
 }
 
-if ($isSsoRequired && $idmAuthenticator->simplesamlAuth) {
-    $idmLoginUrl = $idmAuthenticator->getLoginURL();
-    $idmLoginLinkHtml = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $idmLoginUrl);
+if ($ssoRequired && $idm->simplesamlAuth) {
+    $loginUrl = $idm->getLoginURL();
+    $idmLogin = sprintf(__('<a href="%s">Please login with your IdM username</a>.', 'rrze-rsvp'), $loginUrl);
 }
 
 get_header();
@@ -59,7 +51,7 @@ get_header();
  */
 if (Helper::isFauTheme()) {
     get_template_part('template-parts/hero', 'small');
-    $pageWrapperOpeningHtml = '<div id="content">
+    $divOpen = '<div id="content">
         <div class="container">
             <div class="row">
                 <div class="col-xs-12">
@@ -67,7 +59,7 @@ if (Helper::isFauTheme()) {
                         <h1 class="screen-reader-text">' . get_the_title() . '</h1>
                         <div class="inline-box">
                             <div class="content-inline">';
-    $pageWrapperClosingHtml = '</div>
+    $divClose = '</div>
                         </div>
                     </main>
                 </div>
@@ -75,12 +67,12 @@ if (Helper::isFauTheme()) {
         </div>
     </div>';
 } else {
-    $pageWrapperOpeningHtml = '<div id="content">
+    $divOpen = '<div id="content">
         <div class="container">
             <div class="row">
                 <div class="col-xs-12">
                 <h1 class="entry-title">' . get_the_title() . '</h1>';
-    $pageWrapperClosingHtml = '</div>
+    $divClose = '</div>
             </div>
         </div>
     </div>';
@@ -90,24 +82,26 @@ if (Helper::isFauTheme()) {
 /*
  * Eigentlicher Content
  */
-echo $pageWrapperOpeningHtml;
+$title = __('Authentication Required', 'rrze-rsvp');
+echo $divOpen;
 
 echo <<<DIVEND
 <div class="rrze-rsvp-booking-reply rrze-rsvp">
     <div class="container">    
-        <h2>$pageTitle</h2>
-        $emailErrorHtml
+        <h2>$title</h2>
+        $email_error
 DIVEND;
 
-if ($idmLoginLinkHtml !== '') {
-    echo "<p>$idmLoginLinkHtml</p>";
-    $authenticationSeparatorHtml = '<br><strong>' . __('Oder', 'rrze-rsvp') . '</strong><br>&nbsp;<br>';
+$sOr = '';
+if ($ssoRequired) {
+    echo "<p>$idmLogin</p>";
+    $sOr = '<br><strong>' . __('Oder', 'rrze-rsvp') . '</strong><br>&nbsp;<br>';
 }
 
-if ($isLdapLoginAvailable) {
-    $ldapLoginHeadingHtml = $authenticationSeparatorHtml . __('Please login with your UB-AD username', 'rrze-rsvp') . ':' . $ldapLoginErrorHtml;
+if ($ldapRequired) {
+    $headline = $sOr . __('Please login with your UB-AD username', 'rrze-rsvp') . ':' . $loginDenied;
     echo <<<FORMEND
-    $ldapLoginHeadingHtml
+    $headline
         <form action="#" method="POST">
             <label for="username">Username: </label><input id="username" type="text" name="username" value="" />
             <label for="password">Password: </label><input id="password" type="password" name="password"  value="" />
@@ -116,7 +110,7 @@ if ($isLdapLoginAvailable) {
 FORMEND;
 }
 
-echo $pageWrapperClosingHtml;
+echo $divClose;
 
 wp_enqueue_style('rrze-rsvp-shortcode');
 
