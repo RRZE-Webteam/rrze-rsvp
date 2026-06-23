@@ -38,46 +38,20 @@ class Metaboxes
     }
 
     /*
-     * Set Timeslot weekday, start time and end time to disabled if there are bookings for this timeslot.
+     * Set Timeslot weekday, start time and end time to disabled if protected bookings exist for this timeslot.
      * Valid from/to can still be modified.
      * @param  object $field_args Current field args
      * @param  object $field      Current field object
      */
     public function cbTimeslotAttributes($args, $field)
     {
-        $seats = Functions::getAllRoomSeats($field->object_id);
-        $bookings = get_posts([
-            'post_type' => 'booking',
-            'post_statue' => 'publish',
-            'nopaging' => true,
-            'orderby' => 'title',
-            'order' => 'ASC',
-            'meta_key' => 'rrze-rsvp-booking-seat',
-            'meta_value' => $seats,
-            'meta_compare' => 'IN',
-        ]);
+        $bookings = Functions::getTimeslotBlockingBookings((int) $field->object_id);
         $fieldKey = str_replace(array('+', '-'), '', filter_var($args['_name'], FILTER_SANITIZE_NUMBER_INT));
         $timeslots = get_post_meta($field->object_id, 'rrze-rsvp-room-timeslots', true);
-        $weekdays = !empty($timeslots[$fieldKey]['rrze-rsvp-room-weekday']) ? $timeslots[$fieldKey]['rrze-rsvp-room-weekday'] : [];
-        $starttime = !empty($timeslots[$fieldKey]['rrze-rsvp-room-starttime']) ? $timeslots[$fieldKey]['rrze-rsvp-room-starttime'] : '';
-        $endtime = !empty($timeslots[$fieldKey]['rrze-rsvp-room-endtime']) ? $timeslots[$fieldKey]['rrze-rsvp-room-endtime'] : '';
-        $validfrom = (isset($timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from']) && $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from'] !== false) ? $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-from'] : 0;
-        $validto = (isset($timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to']) && $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to'] !== false) ? $timeslots[$fieldKey]['rrze-rsvp-room-timeslot-valid-to'] : 9999999999;
-        foreach ($bookings as $booking) {
-            $bookingMeta = get_post_meta($booking->ID);
-            if (!isset($bookingMeta['rrze-rsvp-booking-start']) || !isset($bookingMeta['rrze-rsvp-booking-end'])) {
-                continue;
-            }
+        $timeslot = is_array($timeslots) && isset($timeslots[$fieldKey]) ? $timeslots[$fieldKey] : [];
 
-            $startTimestamp = $bookingMeta['rrze-rsvp-booking-start'][0];
-            $endTimestamp = $bookingMeta['rrze-rsvp-booking-end'][0];
-            if (
-                date('H:i', $startTimestamp) == $starttime
-                && date('H:i', $endTimestamp) == $endtime
-                && in_array(date('N', $startTimestamp), $weekdays)
-                && $startTimestamp > $validfrom
-                && $startTimestamp < $validto
-            ) {
+        foreach ($bookings as $booking) {
+            if (Functions::timeslotCoversBooking($timeslot, $booking['start'], $booking['end'])) {
                 $field->args['attributes']['disabled'] = 'disabled';
                 break;
             }
@@ -575,7 +549,7 @@ class Metaboxes
     {
         $seats = get_posts([
             'post_type' => 'seat',
-            'post_statue' => 'publish',
+            'post_status' => 'publish',
             'nopaging' => true,
             'orderby' => 'title',
             'order' => 'ASC',
@@ -597,7 +571,7 @@ class Metaboxes
     {
         $posts = get_posts([
             'post_type' => $postType,
-            'post_statue' => 'publish',
+            'post_status' => 'publish',
             'nopaging' => true,
             'orderby' => 'title',
             'order' => 'ASC',

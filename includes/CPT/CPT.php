@@ -168,7 +168,7 @@ class CPT extends Main
 
         $rooms = get_posts([
             'post_type' => 'room',
-            'post_statue' => 'publish',
+            'post_status' => 'publish',
             'nopaging' => true,
             'orderby' => 'title',
             'order' => 'ASC',
