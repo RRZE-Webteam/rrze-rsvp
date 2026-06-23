@@ -8,6 +8,21 @@ use DateTime;
 
 class Functions
 {
+    private static array $roomBookingsByStatusCache = [];
+
+    private const CANCELLABLE_BOOKING_STATUSES = [
+        'booked',
+        'customer-confirmed',
+        'confirmed',
+    ];
+
+    private const TIMESLOT_BLOCKING_BOOKING_STATUSES = [
+        'booked',
+        'customer-confirmed',
+        'confirmed',
+        'checked-in',
+        'checked-out',
+    ];
 
     public static function formatDateGMT($timestamp)
     {
@@ -393,6 +408,175 @@ class Functions
         return ($end < $now);
     }
 
+    public static function canCancelBookingStatus(string $status): bool
+    {
+        return in_array($status, self::CANCELLABLE_BOOKING_STATUSES, true);
+    }
+
+    private static function getRoomBookingsByStatuses(int $roomId, array $statuses): array
+    {
+        $statuses = array_values(array_unique(array_map('strval', $statuses)));
+        sort($statuses);
+        $cacheKey = $roomId . ':' . implode(',', $statuses);
+
+        if (isset(self::$roomBookingsByStatusCache[$cacheKey])) {
+            return self::$roomBookingsByStatusCache[$cacheKey];
+        }
+
+        $seats = self::getAllRoomSeats($roomId);
+        if (empty($seats) || empty($statuses)) {
+            return self::$roomBookingsByStatusCache[$cacheKey] = [];
+        }
+
+        $bookingIds = get_posts([
+            'fields' => 'ids',
+            'post_type' => 'booking',
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'no_found_rows' => true,
+            'orderby' => 'ID',
+            'order' => 'ASC',
+            'meta_query' => [
+                'relation' => 'AND',
+                [
+                    'key' => 'rrze-rsvp-booking-seat',
+                    'value' => $seats,
+                    'compare' => 'IN',
+                ],
+                [
+                    'key' => 'rrze-rsvp-booking-status',
+                    'value' => $statuses,
+                    'compare' => 'IN',
+                ],
+            ],
+        ]);
+
+        if ($bookingIds) {
+            update_meta_cache('post', $bookingIds);
+        }
+
+        $bookings = [];
+        foreach ($bookingIds as $bookingId) {
+            $start = absint(get_post_meta($bookingId, 'rrze-rsvp-booking-start', true));
+            $end = absint(get_post_meta($bookingId, 'rrze-rsvp-booking-end', true));
+            $status = (string) get_post_meta($bookingId, 'rrze-rsvp-booking-status', true);
+
+            if (!$start || !$end || !in_array($status, $statuses, true)) {
+                continue;
+            }
+
+            $bookings[] = [
+                'id' => (int) $bookingId,
+                'start' => $start,
+                'end' => $end,
+                'status' => $status,
+            ];
+        }
+
+        return self::$roomBookingsByStatusCache[$cacheKey] = $bookings;
+    }
+
+    public static function getTimeslotBlockingBookings(int $roomId): array
+    {
+        return self::getRoomBookingsByStatuses($roomId, self::TIMESLOT_BLOCKING_BOOKING_STATUSES);
+    }
+
+    public static function timeslotCoversBooking(array $timeslot, int $bookingStart, int $bookingEnd): bool
+    {
+        if ($bookingStart <= 0 || $bookingEnd <= 0) {
+            return false;
+        }
+
+        $weekdays = array_map('strval', (array) ($timeslot['rrze-rsvp-room-weekday'] ?? []));
+        $startTime = (string) ($timeslot['rrze-rsvp-room-starttime'] ?? '');
+        $endTime = (string) ($timeslot['rrze-rsvp-room-endtime'] ?? '');
+        $validFrom = self::normalizeTimeslotDate($timeslot['rrze-rsvp-room-timeslot-valid-from'] ?? '', false);
+        $validTo = self::normalizeTimeslotDate($timeslot['rrze-rsvp-room-timeslot-valid-to'] ?? '', true);
+
+        return date('H:i', $bookingStart) === $startTime
+            && date('H:i', $bookingEnd) === $endTime
+            && in_array(date('N', $bookingStart), $weekdays, true)
+            && $bookingStart >= $validFrom
+            && $bookingEnd <= $validTo;
+    }
+
+    public static function getBookingsNotCoveredByTimeslots(
+        array $timeslots,
+        array $bookings,
+        bool $checkValidity = true
+    ): array
+    {
+        $uncoveredBookings = [];
+
+        foreach ($bookings as $booking) {
+            $covered = false;
+
+            foreach ($timeslots as $timeslot) {
+                if (
+                    is_array($timeslot)
+                    && (
+                        $checkValidity
+                            ? self::timeslotCoversBooking(
+                                $timeslot,
+                                (int) ($booking['start'] ?? 0),
+                                (int) ($booking['end'] ?? 0)
+                            )
+                            : self::timeslotScheduleCoversBooking(
+                                $timeslot,
+                                (int) ($booking['start'] ?? 0),
+                                (int) ($booking['end'] ?? 0)
+                            )
+                    )
+                ) {
+                    $covered = true;
+                    break;
+                }
+            }
+
+            if (!$covered) {
+                $uncoveredBookings[] = $booking;
+            }
+        }
+
+        return $uncoveredBookings;
+    }
+
+    private static function timeslotScheduleCoversBooking(
+        array $timeslot,
+        int $bookingStart,
+        int $bookingEnd
+    ): bool {
+        if ($bookingStart <= 0 || $bookingEnd <= 0) {
+            return false;
+        }
+
+        $weekdays = array_map('strval', (array) ($timeslot['rrze-rsvp-room-weekday'] ?? []));
+
+        return date('H:i', $bookingStart) === (string) ($timeslot['rrze-rsvp-room-starttime'] ?? '')
+            && date('H:i', $bookingEnd) === (string) ($timeslot['rrze-rsvp-room-endtime'] ?? '')
+            && in_array(date('N', $bookingStart), $weekdays, true);
+    }
+
+    private static function normalizeTimeslotDate($value, bool $endOfDay): int
+    {
+        if ($value === '' || $value === false || $value === null) {
+            return $endOfDay ? PHP_INT_MAX : 0;
+        }
+
+        if (is_numeric($value)) {
+            $timestamp = (int) $value;
+        } else {
+            $date = DateTime::createFromFormat('!d.m.Y', (string) $value);
+            $timestamp = $date ? $date->getTimestamp() : (int) strtotime((string) $value);
+        }
+
+        if (!$timestamp) {
+            return $endOfDay ? PHP_INT_MAX : 0;
+        }
+
+        return $endOfDay ? strtotime('+23 hours, +59 minutes, +59 seconds', $timestamp) : $timestamp;
+    }
+
     public static function canDeletePost(int $postId, string $postType): bool
     {
         switch ($postType) {
@@ -409,17 +593,23 @@ class Functions
 
     public static function canDeleteBooking(int $postId): bool
     {
-        $now = current_time('timestamp');
-        $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
-        $endOfDay = Utils::getEndOfDayTimestamp($start);
+        $post = get_post($postId);
+        if (!$post || $post->post_type !== 'booking') {
+            return false;
+        }
+
         $status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
-        if ( $status === 'cancelled' ) {
+        if ($status === 'cancelled') {
             return true;
         }
 
+        $now = current_time('timestamp');
+        $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
+        $endOfDay = Utils::getEndOfDayTimestamp($start);
+
         if (
             self::isBookingArchived($postId)
-            && !(in_array($status, ['checked-in', 'checked-out']) || $endOfDay > $now)
+            && !(in_array($status, ['checked-in', 'checked-out'], true) || $endOfDay > $now)
         ) {
             return true;
         } else {

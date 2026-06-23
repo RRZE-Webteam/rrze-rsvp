@@ -6,19 +6,23 @@
 jQuery(document).ready(function ($) {
     var DATE_FORMAT = rrze_rsvp_admin.dateformat,
         TEXT_CANCEL = rrze_rsvp_admin.text_cancel,
+        TEXT_DELETE_PERMANENTLY =
+            rrze_rsvp_admin.text_delete_permanently,
         TEXT_CANCELLED = rrze_rsvp_admin.text_cancelled,
         TEXT_CONFIRMED = rrze_rsvp_admin.text_confirmed,
+        BOOKING_ACTION_NONCE = rrze_rsvp_admin.booking_action_nonce,
         API_AJAXURL = rrze_rsvp_admin.ajaxurl;
 
     function bookingAction(type, button) {
-        var id = button.attr("data-id"),
-            href = button.attr("href");
+        var id = button.attr("data-id");
 
         jQuery
             .ajax({
                 type: "POST",
                 url: API_AJAXURL,
+                dataType: "json",
                 data: {
+                    _ajax_nonce: BOOKING_ACTION_NONCE,
                     action: "booking_action",
                     id: id,
                     type: type,
@@ -27,28 +31,22 @@ jQuery(document).ready(function ($) {
             .fail(function (jqXHR) {
                 console.error("AJAX request failed");
             })
-            .done(function (data) {
-                data = JSON.parse(data);
-                jQuery
-                    .ajax({
-                        type: "GET",
-                        url: href,
-                    })
-                    .fail(function (jqXHR) {
-                        console.error("AJAX request failed");
-                    })
-                    .done(function (data) {
-                        if (type == "confirm") {
-                            button
-                                .addClass("rrze-rsvp-confirmed")
-                                .attr("disabled", "disabled")
-                                .html(TEXT_CONFIRMED);
-                        } else {
-                            button
-                                .attr("disabled", "disabled")
-                                .html(TEXT_CANCELLED);
-                        }
-                    });
+            .done(function (response) {
+                if (!response.result) {
+                    console.error("Booking action failed");
+                    return;
+                }
+
+                if (type == "confirm") {
+                    button
+                        .addClass("rrze-rsvp-confirmed")
+                        .attr("disabled", "disabled")
+                        .html(TEXT_CONFIRMED);
+                } else {
+                    button
+                        .attr("disabled", "disabled")
+                        .html(TEXT_CANCELLED);
+                }
             });
     }
 
@@ -64,6 +62,17 @@ jQuery(document).ready(function ($) {
             bookingAction("cancel", jQuery(this));
         }
         return false;
+    });
+
+    $("body.post-type-booking form#posts-filter").on("submit", function (e) {
+        var action = $("#bulk-action-selector-top").val();
+        if (action === "-1") {
+            action = $("#bulk-action-selector-bottom").val();
+        }
+
+        if (action === "delete_booking" && !confirm(TEXT_DELETE_PERMANENTLY)) {
+            e.preventDefault();
+        }
     });
 
     /*

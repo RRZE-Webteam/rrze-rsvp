@@ -47,50 +47,60 @@ class Actions
 
 	public function ajaxBookingAction()
 	{
-		$bookingId = absint($_POST['id']);
-		$action = sanitize_text_field($_POST['type']);
+		check_ajax_referer('rrze-rsvp-booking-action');
+
+		$bookingId = isset($_POST['id']) ? absint($_POST['id']) : 0;
+		$action = isset($_POST['type']) ? sanitize_key($_POST['type']) : '';
+		if (!in_array($action, ['confirm', 'cancel'], true)) {
+			wp_send_json([
+				'result' => false,
+				'message' => __('Action not available', 'rrze-rsvp'),
+			], 400);
+		}
 
 		$post = get_post($bookingId);
-		if ($post->post_status != 'publish') {
-			$this->ajaxResult(['result' => false]);
+		if (!$post || $post->post_type !== 'booking' || $post->post_status !== 'publish') {
+			wp_send_json([
+				'result' => false,
+				'message' => __('Booking not found.', 'rrze-rsvp'),
+			], 404);
+		}
+
+		if (!current_user_can('edit_post', $bookingId)) {
+			wp_send_json([
+				'result' => false,
+				'message' => __('Sorry, you are not allowed to edit this item.'),
+			], 403);
 		}
 
 		$booking = Functions::getBooking($bookingId);
 		if (!$booking) {
-			$this->ajaxResult(['result' => false]);
+			wp_send_json([
+				'result' => false,
+				'message' => __('Booking not found.', 'rrze-rsvp'),
+			], 404);
 		}
 
-		$autoConfirmation = Functions::getBoolValueFromAtt(get_post_meta($booking['room'], 'rrze-rsvp-room-auto-confirmation', true));
-		$adminConfirmationRequired = $autoConfirmation ? false : true; // Verwirrende Post-Meta-Bezeichnung vereinfacht
 		$status = get_post_meta($bookingId, 'rrze-rsvp-booking-status', true);
 
-		if (in_array($status, ['booked', 'customer-confirmed']) && $action == 'confirm') {
+		if (in_array($status, ['booked', 'customer-confirmed'], true) && $action === 'confirm') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'confirmed');
-			$bookingConfirmed = true;
 			$this->email->doEmail('adminConfirmed', 'customer', $bookingId);
-		} elseif ($status == 'booked' && $action == 'custom-confirm') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'customer-confirmed');
-			$bookingConfirmed = true;
-			$this->email->doEmail('customerConfirmed', 'customer', $bookingId, 'customer-confirmed');
-			if ($adminConfirmationRequired) {
-				$this->email->doEmail('customerConfirmed', 'admin', $bookingId, 'customer-confirmed');
-			}
-		} elseif (in_array($status, ['booked', 'confirmed']) && $action == 'cancel') {
+		} elseif (Functions::canCancelBookingStatus($status) && $action === 'cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 			$this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled');
-		} elseif (in_array($status, ['booked', 'customer-confirmed', 'confirmed', 'checked-out']) && $action == 'checkin') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-in');
-		} elseif ($booking['status'] == 'checked-in' && $action == 'checkout') {
-			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-out');
 		} else {
-			$this->ajaxResult(['result' => false]);
+			wp_send_json([
+				'result' => false,
+				'message' => __('Action not available', 'rrze-rsvp'),
+			], 400);
 		}
 
 		if (CORONA_MODE) {
 			do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 		}
 
-		$this->ajaxResult(['result' => true]);
+		wp_send_json(['result' => true]);
 	}
 
 	public function handleActions()
@@ -100,7 +110,12 @@ class Actions
 			$action = sanitize_text_field($_GET['action']);
 
 			$post = get_post($bookingId);
-			if ($post->post_status != 'publish') {
+			if (
+				!$post
+				|| $post->post_type !== 'booking'
+				|| $post->post_status !== 'publish'
+				|| !current_user_can('edit_post', $bookingId)
+			) {
 				return;
 			}
 
@@ -127,7 +142,7 @@ class Actions
 				if ($adminConfirmationRequired) {
 					$this->email->doEmail('customerConfirmed', 'admin', $bookingId, 'customer-confirmed');
 				}
-			} elseif (in_array($status, ['booked', 'confirmed']) && $action == 'cancel') {
+			} elseif (Functions::canCancelBookingStatus($status) && $action == 'cancel') {
 				update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
 				$this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled');
 				// deactivate restore
@@ -284,11 +299,14 @@ class Actions
 	{
 		$actions = [];
 		$actions['cancel_booking'] = _x('Cancel', 'Booking', 'rrze-rsvp');
-		// if (EMPTY_TRASH_DAYS) {
-		// 	$actions['trash_booking'] = _x('Delete', 'Booking', 'rrze-rsvp');
-		// } else {
-		// 	$actions['delete_booking'] = __('Delete Permanently');
-		// }
+		$postType = get_post_type_object('booking');
+		if ($postType && current_user_can($postType->cap->delete_posts)) {
+			if (EMPTY_TRASH_DAYS) {
+				$actions['trash_booking'] = _x('Delete', 'Booking', 'rrze-rsvp');
+			} else {
+				$actions['delete_booking'] = __('Delete Permanently');
+			}
+		}
 		return $actions;
 	}
 
@@ -317,11 +335,16 @@ class Actions
 			case 'cancel_booking':
 				$cancelled = 0;
 				$locked  = 0;
+				$skipped = 0;
 				foreach ((array) $postIds as $key => $postId) {
 					$post = get_post($postId);
-					if ($post->post_status != 'publish') {
+					if (!$post || $post->post_type !== 'booking' || $post->post_status !== 'publish') {
+						$skipped++;
 						unset($postIds[$key]);
 						continue;
+					}
+					if (!current_user_can('edit_post', $postId)) {
+						wp_die(__('Sorry, you are not allowed to edit this item.'));
 					}
 					$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
 					if (wp_check_post_lock($postId)) {
@@ -329,7 +352,10 @@ class Actions
 						unset($postIds[$key]);
 						continue;
 					}
-					if (!Functions::isBookingArchived($postId) && in_array($status, ['booked', 'confirmed'])) {
+					if (
+						!Functions::isBookingArchived($postId)
+						&& Functions::canCancelBookingStatus($status)
+					) {
 						update_post_meta($postId, 'rrze-rsvp-booking-status', 'cancelled');
 						$this->email->doEmail('bookingCancelled', 'customer', $postId);
 						if (CORONA_MODE) {
@@ -337,6 +363,7 @@ class Actions
 						}
 						$cancelled++;
 					} else {
+						$skipped++;
 						unset($postIds[$key]);
 					}
 				}
@@ -345,6 +372,7 @@ class Actions
 						'booking_cancelled' => $cancelled,
 						'booking_ids' => join(',', $postIds),
 						'booking_locked'  => $locked,
+						'booking_skipped' => $skipped,
 					],
 					$redirectTo
 				);
@@ -352,9 +380,11 @@ class Actions
 			case 'trash_booking':
 				$trashed = 0;
 				$locked  = 0;
+				$skipped = 0;
 				foreach ((array) $postIds as $key => $postId) {
 					$post = get_post($postId);
-					if ($post->post_status != 'publish') {
+					if (!$post || $post->post_type !== 'booking' || $post->post_status !== 'publish') {
+						$skipped++;
 						unset($postIds[$key]);
 						continue;
 					}
@@ -372,6 +402,7 @@ class Actions
 						}
 						$trashed++;
 					} else {
+						$skipped++;
 						unset($postIds[$key]);
 					}
 				}
@@ -380,26 +411,37 @@ class Actions
 						'booking_trashed' => $trashed,
 						'booking_ids' => join(',', $postIds),
 						'booking_locked'  => $locked,
+						'booking_skipped' => $skipped,
 					],
 					$redirectTo
 				);
 				break;
 			case 'delete_booking':
 				$deleted = 0;
+				$locked = 0;
+				$skipped = 0;
 				foreach ((array) $postIds as $postId) {
 					if (Functions::canDeleteBooking($postId)) {
 						if (!current_user_can('delete_post', $postId)) {
 							wp_die(__('Sorry, you are not allowed to delete this item.'));
 						}
-						if (!wp_delete_post($postId)) {
+						if (wp_check_post_lock($postId)) {
+							$locked++;
+							continue;
+						}
+						if (!wp_delete_post($postId, true)) {
 							wp_die(__('Error in deleting the item.'));
 						}
 						$deleted++;
+					} else {
+						$skipped++;
 					}
 				}
 				$redirectTo = add_query_arg(
 					[
-						'booking_deleted' => $deleted
+						'booking_deleted' => $deleted,
+						'booking_locked' => $locked,
+						'booking_skipped' => $skipped,
 					],
 					$redirectTo
 				);
@@ -482,21 +524,33 @@ class Actions
 
 	public function bookingBulkActionsHandlerSubmitted()
 	{
-		if (!isset($_REQUEST['booking_cancelled']) && !isset($_REQUEST['booking_trashed']) && !isset($_REQUEST['booking_deleted'])) {
+		if (
+			!isset($_REQUEST['booking_cancelled'])
+			&& !isset($_REQUEST['booking_trashed'])
+			&& !isset($_REQUEST['booking_deleted'])
+			&& !isset($_REQUEST['booking_skipped'])
+		) {
 			return;
 		}
 		$bulkCounts = [
 			'cancelled' => isset($_REQUEST['booking_cancelled']) ? absint($_REQUEST['booking_cancelled']) : 0,
 			'trashed' => isset($_REQUEST['booking_trashed']) ? absint($_REQUEST['booking_trashed']) : 0,
 			'deleted' => isset($_REQUEST['booking_deleted']) ? absint($_REQUEST['booking_deleted']) : 0,
-			'locked' => isset($_REQUEST['booking_locked']) ? absint($_REQUEST['booking_locked']) : 0
+			'locked' => isset($_REQUEST['booking_locked']) ? absint($_REQUEST['booking_locked']) : 0,
+			'skipped' => isset($_REQUEST['booking_skipped']) ? absint($_REQUEST['booking_skipped']) : 0,
 		];
 		$bulkMessages = [
-			'cancelled' => _n('%s post cancelled.', '%s post cancelled.', $bulkCounts['cancelled']),
+			'cancelled' => _n('%s post cancelled.', '%s posts cancelled.', $bulkCounts['cancelled'], 'rrze-rsvp'),
 			'trashed' => _n('%s post moved to the Trash.', '%s posts moved to the Trash.', $bulkCounts['trashed']),
 			'deleted' => _n('%s post permanently deleted.', '%s posts permanently deleted.', $bulkCounts['deleted']),
 			'locked' => ($bulkCounts['locked'] === 1) ? __('1 post not updated, somebody is editing it.') :
-				_n('%s post not updated, somebody is editing it.', '%s posts not updated, somebody is editing them.', $bulkCounts['locked'])
+				_n('%s post not updated, somebody is editing it.', '%s posts not updated, somebody is editing them.', $bulkCounts['locked']),
+			'skipped' => _n(
+				'%s post skipped because it is not eligible for this action.',
+				'%s posts skipped because they are not eligible for this action.',
+				$bulkCounts['skipped'],
+				'rrze-rsvp'
+			),
 		];
 		$messages = [];
 		foreach ($bulkCounts as $message => $count) {
@@ -517,7 +571,7 @@ class Actions
 					'transient-data-nonce' => wp_create_nonce('transient-data-' . $transient),
 					'transient-data' => $transient
 				],
-				remove_query_arg(['booking_cancelled', 'booking_locked', 'booking_trashed', 'booking_deleted', 'booking_ids'], wp_get_referer())
+				remove_query_arg(['booking_cancelled', 'booking_locked', 'booking_skipped', 'booking_trashed', 'booking_deleted', 'booking_ids'], wp_get_referer())
 			);
 			wp_redirect($redirectUrl);
 			exit;
@@ -746,19 +800,63 @@ class Actions
 
 		if ($post_data['post_type'] == 'room') {
 			$oldTimeslots = get_post_meta($post_id, 'rrze-rsvp-room-timeslots', true);
-			$newTimeslots = isset($_POST['rrze-rsvp-room-timeslots']) ? $_POST['rrze-rsvp-room-timeslots'] : [];
+			$newTimeslots = isset($_POST['rrze-rsvp-room-timeslots']) && is_array($_POST['rrze-rsvp-room-timeslots'])
+				? wp_unslash($_POST['rrze-rsvp-room-timeslots'])
+				: [];
+			$timeslotErrors = [];
 
 			if (!empty($newTimeslots)) {
 				foreach ($newTimeslots as $k => $newTimeslot) {
-					if ($newTimeslot['rrze-rsvp-room-starttime'] > $newTimeslot['rrze-rsvp-room-endtime']) {
-						$errorTimeslots['invalid'][] = $k + 1;
+					if (!is_array($newTimeslot)) {
+						$timeslotErrors['invalid'][] = $k + 1;
+						continue;
+					}
+
+					$startTime = $newTimeslot['rrze-rsvp-room-starttime'] ?? '';
+					$endTime = $newTimeslot['rrze-rsvp-room-endtime'] ?? '';
+					if ($startTime > $endTime) {
+						$timeslotErrors['invalid'][] = $k + 1;
 					}
 				}
-				if (isset($errorTimeslots['invalid'])) {
-					$_POST['rrze-rsvp-room-timeslots'] = $oldTimeslots;
-					$sTimeslots = implode(' and ', $errorTimeslots['invalid']);
-					$errorMessage = sprintf(_n('Unable to save post: End time must be greater than start time in timeslot no. %s.', 'Unable to save post: End time must be greater than start time in timeslots no. %s.', count($errorTimeslots['invalid']), 'rrze-rsvp'), $sTimeslots);
+			}
+
+			if (array_key_exists('rrze-rsvp-room-timeslots', $_POST)) {
+				$blockingBookings = Functions::getTimeslotBlockingBookings($post_id);
+				$uncoveredBookings = Functions::getBookingsNotCoveredByTimeslots(
+					$newTimeslots,
+					$blockingBookings,
+					false
+				);
+				if ($uncoveredBookings) {
+					$timeslotErrors['booked'] = count($uncoveredBookings);
 				}
+			}
+
+			if (isset($timeslotErrors['invalid'])) {
+				$sTimeslots = implode(' and ', $timeslotErrors['invalid']);
+				$errorMessage = sprintf(
+					_n(
+						'Unable to save post: End time must be greater than start time in timeslot no. %s.',
+						'Unable to save post: End time must be greater than start time in timeslots no. %s.',
+						count($timeslotErrors['invalid']),
+						'rrze-rsvp'
+					),
+					$sTimeslots
+				);
+			}
+
+			if (!empty($timeslotErrors['booked'])) {
+				$bookedMessage = _n(
+					'Unable to save post: The changes would remove the time slot used by a protected booking.',
+					'Unable to save post: The changes would remove time slots used by protected bookings.',
+					$timeslotErrors['booked'],
+					'rrze-rsvp'
+				);
+				$errorMessage = $errorMessage ? $errorMessage . ' ' . $bookedMessage : $bookedMessage;
+			}
+
+			if ($errorMessage) {
+				$_POST['rrze-rsvp-room-timeslots'] = $oldTimeslots;
 			}
 		}
 
@@ -928,8 +1026,9 @@ class Actions
 			if ($adminConfirmationRequired) {
 				$this->email->doEmail('customerConfirmed', 'admin', $bookingId, 'customer-confirmed');
 			}
-		} elseif (($bookingBooked || $bookingCustomerConfirmed) && $action == 'cancel') {
+		} elseif (Functions::canCancelBookingStatus($booking['status']) && $action == 'cancel') {
 			update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'cancelled');
+			$bookingConfirmed = false;
 			$bookingCancelled = true;
 			$this->email->doEmail('bookingCancelled', 'customer', $bookingId, 'cancelled');
 		} elseif (($bookingBooked || $bookingCustomerConfirmed || $bookingConfirmed || $bookingCheckedOut) && $action == 'checkin') {
@@ -1146,12 +1245,6 @@ class Actions
 		if (CORONA_MODE) {
 			do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
 		}
-	}
-
-	protected function ajaxResult(array $returnAry)
-	{
-		echo json_encode($returnAry);
-		exit;
 	}
 
 	protected function isBookingArchived(int $postId): bool

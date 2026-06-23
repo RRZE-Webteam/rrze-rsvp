@@ -1,6 +1,6 @@
 {
     "name": "rrze/rrze-rsvp",
-    "version": "2.11.6",
+    "version": "2.11.8",
     "require": {
         "cmb2/cmb2": "^2.11.0",
         "tecnickcom/tcpdf": "^6.8.2"
@@ -16,6 +16,9 @@
             "vendor/tecnickcom/tcpdf/tcpdf.php",
             "vendor/tecnickcom/tcpdf/tcpdf_barcodes_2d.php"
         ]
+    },
+    "scripts": {
+        "test": "php tests/booking-lifecycle.php"
     },
     "extra": {
         "installer-paths": {

@@ -185,9 +185,11 @@ class Main
         wp_localize_script('rrze-rsvp-admin', 'rrze_rsvp_admin', array(
             'dateformat' => get_option('date_format'),
             'text_cancel' => __('Do you want to cancel?', 'rrze-rsvp'),
+            'text_delete_permanently' => __('Are you sure you want to permanently delete the selected bookings? This cannot be undone.', 'rrze-rsvp'),
             'text_cancelled' => _x('Cancelled', 'Booking', 'rrze-rsvp'),
             'text_confirmed' => _x('Confirmed', 'Booking', 'rrze-rsvp'),
             'ajaxurl' => admin_url('admin-ajax.php'),
+            'booking_action_nonce' => wp_create_nonce('rrze-rsvp-booking-action'),
             // Strings für CPT Booking Backend
             'alert_no_seat_date' => __('Please select a seat first.', 'rrze-rsvp')
         ));

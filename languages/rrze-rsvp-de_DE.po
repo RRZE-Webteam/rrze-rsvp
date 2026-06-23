@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: rrze-rsvp\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rrze-rsvp\n"
 "POT-Creation-Date: 2022-07-06T14:33:41+00:00\n"
-"PO-Revision-Date: 2022-10-12 13:42+0000\n"
+"PO-Revision-Date: 2026-06-23 00:00+0200\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -2243,3 +2243,44 @@ msgstr "Ihre Reservierung:"
 #: includes/Metaboxes.php:490
 msgid "ZIP"
 msgstr "PLZ"
+
+#: includes/Main.php:188
+msgid ""
+"Are you sure you want to permanently delete the selected bookings? This "
+"cannot be undone."
+msgstr ""
+"Möchten Sie die ausgewählten Buchungen wirklich dauerhaft löschen? Dies "
+"kann nicht rückgängig gemacht werden."
+
+#: includes/Actions.php:57 includes/Actions.php:66
+msgid "Booking not found."
+msgstr "Buchung wurde nicht gefunden."
+
+#: includes/Actions.php:541
+msgid "%s post skipped because it is not eligible for this action."
+msgid_plural "%s posts skipped because they are not eligible for this action."
+msgstr[0] ""
+"%s Beitrag wurde übersprungen, weil er für diese Aktion nicht geeignet ist."
+msgstr[1] ""
+"%s Beiträge wurden übersprungen, weil sie für diese Aktion nicht geeignet "
+"sind."
+
+#: includes/Actions.php:543
+msgid "%s post cancelled."
+msgid_plural "%s posts cancelled."
+msgstr[0] "%s Beitrag wurde storniert."
+msgstr[1] "%s Beiträge wurden storniert."
+
+#: includes/Actions.php:828
+msgid ""
+"Unable to save post: The changes would remove the time slot used by a "
+"protected booking."
+msgid_plural ""
+"Unable to save post: The changes would remove time slots used by protected "
+"bookings."
+msgstr[0] ""
+"Der Beitrag kann nicht gespeichert werden: Die Änderungen würden das von "
+"einer geschützten Buchung verwendete Zeitfenster entfernen."
+msgstr[1] ""
+"Der Beitrag kann nicht gespeichert werden: Die Änderungen würden "
+"Zeitfenster entfernen, die von geschützten Buchungen verwendet werden."
