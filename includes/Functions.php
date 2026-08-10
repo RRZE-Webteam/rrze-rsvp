@@ -603,18 +603,7 @@ class Functions
             return true;
         }
 
-        $now = current_time('timestamp');
-        $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
-        $endOfDay = Utils::getEndOfDayTimestamp($start);
-
-        if (
-            self::isBookingArchived($postId)
-            && !(in_array($status, ['checked-in', 'checked-out'], true) || $endOfDay > $now)
-        ) {
-            return true;
-        } else {
-            return false;
-        }
+        return self::isBookingArchived($postId);
     }
 
     public static function canDeleteSeat(int $postId): bool

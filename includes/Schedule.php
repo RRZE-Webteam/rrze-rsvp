@@ -306,8 +306,6 @@ class Schedule
      */
     protected function checkOutNotCheckedOutBookings()
     {
-        $timeStamp = current_time('timestamp');
-
         $args = [
             'fields' => 'ids',
             'post_type' => ['booking'],
@@ -320,12 +318,6 @@ class Schedule
                     'value' => ['checked-in'],
                     'compare' => 'IN',
                 ],
-                'booking_start_clause' => [
-                    'key' => 'rrze-rsvp-booking-end',
-                    'value' => $timeStamp,
-                    'compare' => '<',
-                    'type' => 'numeric',
-                ],
             ],
         ];
 
@@ -334,9 +326,14 @@ class Schedule
         if ($query->have_posts()) {
             while ($query->have_posts()) {
                 $query->the_post();
-                update_post_meta(get_the_ID(), 'rrze-rsvp-booking-status', 'checked-out');
+                $bookingId = get_the_ID();
+                if (!Functions::isBookingArchived($bookingId)) {
+                    continue;
+                }
+
+                update_post_meta($bookingId, 'rrze-rsvp-booking-status', 'checked-out');
                 if (CORONA_MODE) {
-                    do_action('rrze-rsvp-tracking', get_current_blog_id(), get_the_ID());
+                    do_action('rrze-rsvp-tracking', get_current_blog_id(), $bookingId);
                 }
             }
             wp_reset_postdata();

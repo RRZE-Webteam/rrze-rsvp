@@ -10,6 +10,39 @@ define('ABSPATH', dirname(__DIR__) . '/');
 $testGetPostsCalls = [];
 $testPostMeta = [];
 $testPosts = [];
+$testQueryArgs = [];
+$testQueryIds = [];
+$testUpdatedMeta = [];
+$testCurrentPostId = 0;
+
+define('CORONA_MODE', false);
+
+class WP_Query
+{
+    private array $postIds;
+    private int $index = 0;
+
+    public function __construct(array $args)
+    {
+        global $testQueryArgs, $testQueryIds;
+
+        $testQueryArgs[] = $args;
+        $this->postIds = $testQueryIds;
+    }
+
+    public function have_posts(): bool
+    {
+        return $this->index < count($this->postIds);
+    }
+
+    public function the_post(): void
+    {
+        global $testCurrentPostId;
+
+        $testCurrentPostId = $this->postIds[$this->index];
+        $this->index++;
+    }
+}
 
 function absint($value): int
 {
@@ -51,6 +84,26 @@ function get_post($postId)
     return $testPosts[$postId] ?? null;
 }
 
+function get_the_ID(): int
+{
+    global $testCurrentPostId;
+
+    return $testCurrentPostId;
+}
+
+function update_post_meta($postId, $key, $value): bool
+{
+    global $testPostMeta, $testUpdatedMeta;
+
+    $testPostMeta[$postId][$key] = $value;
+    $testUpdatedMeta[$postId][$key] = $value;
+    return true;
+}
+
+function wp_reset_postdata(): void
+{
+}
+
 function update_meta_cache($metaType, array $objectIds): bool
 {
     return true;
@@ -61,11 +114,19 @@ function current_time($type)
     return mktime(12, 0, 0, 6, 23, 2026);
 }
 
+function wp_timezone(): DateTimeZone
+{
+    return new DateTimeZone('UTC');
+}
+
+require_once dirname(__DIR__) . '/includes/Utils.php';
 require_once dirname(__DIR__) . '/includes/Functions.php';
 require_once dirname(__DIR__) . '/includes/Metaboxes.php';
+require_once dirname(__DIR__) . '/includes/Schedule.php';
 
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Metaboxes;
+use RRZE\RSVP\Schedule;
 
 function assertSameValue(mixed $expected, mixed $actual, string $message): void
 {
@@ -235,6 +296,87 @@ $testPostMeta[998] = [
 assertTrue(
     Functions::canDeleteBooking(998),
     'Cancelled legacy or trashed bookings must remain eligible for permanent deletion.'
+);
+
+$testPosts[997] = (object) [
+    'post_type' => 'booking',
+    'post_status' => 'publish',
+];
+$testPostMeta[997] = [
+    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
+    'rrze-rsvp-booking-end' => mktime(13, 0, 0, 6, 23, 2026),
+    'rrze-rsvp-booking-status' => 'checked-in',
+];
+assertFalse(
+    Functions::canDeleteBooking(997),
+    'An active checked-in booking must not be deletable.'
+);
+
+$testPosts[996] = (object) [
+    'post_type' => 'booking',
+    'post_status' => 'publish',
+];
+$testPostMeta[996] = [
+    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
+    'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 23, 2026),
+    'rrze-rsvp-booking-status' => 'checked-in',
+];
+assertTrue(
+    Functions::canDeleteBooking(996),
+    'A checked-in booking must become deletable after its timeslot has ended.'
+);
+
+$testPosts[995] = (object) [
+    'post_type' => 'booking',
+    'post_status' => 'publish',
+];
+$testPostMeta[995] = [
+    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 22, 2026),
+    'rrze-rsvp-booking-status' => 'checked-in',
+];
+assertTrue(
+    Functions::canDeleteBooking(995),
+    'A stale checked-in booking without end metadata must use the end-of-day fallback.'
+);
+
+$testPosts[994] = (object) [
+    'post_type' => 'booking',
+    'post_status' => 'publish',
+];
+$testPostMeta[994] = [
+    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 22, 2026),
+    'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 22, 2026),
+    'rrze-rsvp-booking-status' => 'checked-out',
+];
+assertTrue(
+    Functions::canDeleteBooking(994),
+    'A checked-out booking must remain deletable after its timeslot has ended.'
+);
+
+$testQueryIds = [997, 996, 995];
+$schedule = (new ReflectionClass(Schedule::class))->newInstanceWithoutConstructor();
+$checkOutMethod = new ReflectionMethod(Schedule::class, 'checkOutNotCheckedOutBookings');
+$checkOutMethod->invoke($schedule);
+
+$checkoutQuery = $testQueryArgs[0] ?? [];
+assertSameValue(
+    2,
+    count($checkoutQuery['meta_query'] ?? []),
+    'The checkout query must not exclude checked-in bookings with missing end metadata.'
+);
+assertFalse(
+    isset($testUpdatedMeta[997]['rrze-rsvp-booking-status']),
+    'The checkout job must leave an active booking checked in.'
+);
+assertSameValue(
+    'checked-out',
+    $testUpdatedMeta[996]['rrze-rsvp-booking-status'] ?? null,
+    'The checkout job must check out a booking after its timeslot ends.'
+);
+assertSameValue(
+    'checked-out',
+    $testUpdatedMeta[995]['rrze-rsvp-booking-status'] ?? null,
+    'The checkout job must check out a stale booking that has no end metadata.'
 );
 
 echo "Booking lifecycle tests passed.\n";
