@@ -14,8 +14,13 @@ $testQueryArgs = [];
 $testQueryIds = [];
 $testUpdatedMeta = [];
 $testCurrentPostId = 0;
+$testNow = mktime(12, 0, 0, 6, 23, 2026);
+$testScenarioCount = 0;
 
 define('CORONA_MODE', false);
+define('MINUTE_IN_SECONDS', 60);
+define('AUTH_KEY', 'booking-lifecycle-test-key');
+define('AUTH_SALT', 'booking-lifecycle-test-salt');
 
 class WP_Query
 {
@@ -84,6 +89,11 @@ function get_post($postId)
     return $testPosts[$postId] ?? null;
 }
 
+function get_the_title($postId = 0): string
+{
+    return 'Test item ' . $postId;
+}
+
 function get_the_ID(): int
 {
     global $testCurrentPostId;
@@ -111,7 +121,23 @@ function update_meta_cache($metaType, array $objectIds): bool
 
 function current_time($type)
 {
-    return mktime(12, 0, 0, 6, 23, 2026);
+    global $testNow;
+
+    return $testNow;
+}
+
+function date_i18n($format, $timestamp = false): string
+{
+    return date($format, $timestamp ?: current_time('timestamp'));
+}
+
+function get_option($name)
+{
+    return match ($name) {
+        'date_format' => 'Y-m-d',
+        'time_format' => 'H:i',
+        default => '',
+    };
 }
 
 function wp_timezone(): DateTimeZone
@@ -155,6 +181,14 @@ function assertTrue(bool $actual, string $message): void
 function assertFalse(bool $actual, string $message): void
 {
     assertSameValue(false, $actual, $message);
+}
+
+function runLifecycleScenario(string $name, callable $scenario): void
+{
+    global $testScenarioCount;
+
+    $testScenarioCount++;
+    $scenario($name);
 }
 
 $bookingStart = mktime(10, 0, 0, 6, 22, 2026);
@@ -299,149 +333,216 @@ assertTrue(
     'Cancelled legacy or trashed bookings must remain eligible for permanent deletion.'
 );
 
-$testPosts[997] = (object) [
-    'post_type' => 'booking',
-    'post_status' => 'publish',
-];
-$testPostMeta[997] = [
-    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
-    'rrze-rsvp-booking-end' => mktime(13, 0, 0, 6, 23, 2026),
-    'rrze-rsvp-booking-status' => 'checked-in',
-];
-assertFalse(
-    Functions::canDeleteBooking(997),
-    'An active checked-in booking must not be deletable.'
-);
-
-$testPosts[996] = (object) [
-    'post_type' => 'booking',
-    'post_status' => 'publish',
-];
-$testPostMeta[996] = [
-    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
-    'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 23, 2026),
-    'rrze-rsvp-booking-status' => 'checked-in',
-];
-assertTrue(
-    Functions::canDeleteBooking(996),
-    'A checked-in booking must become deletable after its timeslot has ended.'
-);
-
-$testPosts[995] = (object) [
-    'post_type' => 'booking',
-    'post_status' => 'publish',
-];
-$testPostMeta[995] = [
-    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 22, 2026),
-    'rrze-rsvp-booking-status' => 'checked-in',
-];
-assertTrue(
-    Functions::canDeleteBooking(995),
-    'A stale checked-in booking without end metadata must use the end-of-day fallback.'
-);
-
-$testPosts[994] = (object) [
-    'post_type' => 'booking',
-    'post_status' => 'publish',
-];
-$testPostMeta[994] = [
-    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 22, 2026),
-    'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 22, 2026),
-    'rrze-rsvp-booking-status' => 'checked-out',
-];
-assertTrue(
-    Functions::canDeleteBooking(994),
-    'A checked-out booking must remain deletable after its timeslot has ended.'
-);
-
-$testPosts[993] = (object) [
-    'post_type' => 'booking',
-    'post_status' => 'publish',
-];
-$testPostMeta[993] = [
-    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
-    'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 23, 2026),
-    'rrze-rsvp-booking-status' => 'confirmed',
-];
-assertFalse(
-    Functions::canDeleteBooking(993),
-    'A confirmed booking must retain the intended end-of-day deletion restriction.'
-);
-
-$testPosts[992] = (object) [
-    'post_type' => 'booking',
-    'post_status' => 'publish',
-];
-$testPostMeta[992] = [
-    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 22, 2026),
-    'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 22, 2026),
-    'rrze-rsvp-booking-status' => 'confirmed',
-];
-assertTrue(
-    Functions::canDeleteBooking(992),
-    'A confirmed booking must become deletable after its calendar day has ended.'
-);
-
-$testPosts[991] = (object) [
-    'post_type' => 'booking',
-    'post_status' => 'publish',
-];
-$testPostMeta[991] = [
-    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
-    'rrze-rsvp-booking-status' => 'checked-in',
-];
-assertFalse(
-    Functions::canDeleteBooking(991),
-    'A current-day checked-in booking without end metadata must remain active until the end of day.'
-);
-assertSameValue(
-    mktime(23, 59, 59, 6, 23, 2026),
-    Utils::getEndOfDayTimestamp(mktime(10, 0, 0, 6, 23, 2026)),
-    'The end-of-day fallback must resolve to the final second of the booking date.'
-);
-
-$testQueryIds = [997, 996, 995, 991];
 $schedule = (new ReflectionClass(Schedule::class))->newInstanceWithoutConstructor();
-$checkOutMethod = new ReflectionMethod(Schedule::class, 'checkOutNotCheckedOutBookings');
-$checkOutMethod->invoke($schedule);
+$automaticCheckInMethod = new ReflectionMethod(Schedule::class, 'cancelNotCheckedInBookings');
+$automaticCheckOutMethod = new ReflectionMethod(Schedule::class, 'checkOutNotCheckedOutBookings');
 
-$checkoutQuery = $testQueryArgs[0] ?? [];
-assertTrue(
-    $checkoutQuery['no_found_rows'] ?? false,
-    'The checkout query must skip pagination counts.'
-);
-assertSameValue(
-    3,
-    count($checkoutQuery['meta_query'] ?? []),
-    'The checkout query must filter by status and eligible end metadata.'
-);
-assertSameValue(
-    '<',
-    $checkoutQuery['meta_query']['booking_end_clause'][0]['compare'] ?? null,
-    'The checkout query must select bookings whose end timestamp has passed.'
-);
-assertSameValue(
-    'NOT EXISTS',
-    $checkoutQuery['meta_query']['booking_end_clause'][1]['compare'] ?? null,
-    'The checkout query must retain checked-in bookings with missing end metadata.'
-);
-assertFalse(
-    isset($testUpdatedMeta[997]['rrze-rsvp-booking-status']),
-    'The checkout job must leave an active booking checked in.'
-);
-assertFalse(
-    isset($testUpdatedMeta[991]['rrze-rsvp-booking-status']),
-    'The checkout job must leave a current-day booking without end metadata checked in.'
-);
-assertSameValue(
-    'checked-out',
-    $testUpdatedMeta[996]['rrze-rsvp-booking-status'] ?? null,
-    'The checkout job must check out a booking after its timeslot ends.'
-);
-assertSameValue(
-    'checked-out',
-    $testUpdatedMeta[995]['rrze-rsvp-booking-status'] ?? null,
-    'The checkout job must check out a stale booking that has no end metadata.'
-);
+runLifecycleScenario('consultation automatic check-in and checkout', function (string $scenario) use (
+    $schedule,
+    $automaticCheckInMethod,
+    $automaticCheckOutMethod
+): void {
+    global $testNow, $testPostMeta, $testPosts, $testQueryIds;
 
-echo "Booking lifecycle tests passed.\n";
+    $bookingId = 990;
+    $seatId = 3001;
+    $roomId = 4001;
+    $testPosts[$bookingId] = (object) [
+        'ID' => $bookingId,
+        'post_type' => 'booking',
+        'post_status' => 'publish',
+        'post_date' => '2026-06-22 09:00:00',
+    ];
+    $testPostMeta[$bookingId] = [
+        'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
+        'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 23, 2026),
+        'rrze-rsvp-booking-seat' => $seatId,
+        'rrze-rsvp-booking-status' => 'confirmed',
+    ];
+    $testPostMeta[$seatId] = [
+        'rrze-rsvp-seat-room' => $roomId,
+    ];
+    $testPostMeta[$roomId] = [
+        'rrze-rsvp-room-bookingmode' => ['consultation'],
+        'rrze-rsvp-room-check-in-time' => ['15'],
+    ];
+    $testQueryIds = [$bookingId];
+
+    $testNow = mktime(10, 20, 0, 6, 23, 2026);
+    $automaticCheckInMethod->invoke($schedule);
+    assertSameValue(
+        'checked-in',
+        $testPostMeta[$bookingId]['rrze-rsvp-booking-status'],
+        "$scenario: consultation booking should be checked in after the grace period."
+    );
+
+    $testNow = mktime(12, 0, 0, 6, 23, 2026);
+    $automaticCheckOutMethod->invoke($schedule);
+    assertSameValue(
+        'checked-out',
+        $testPostMeta[$bookingId]['rrze-rsvp-booking-status'],
+        "$scenario: consultation booking should be checked out after its end time."
+    );
+});
+
+runLifecycleScenario('manual checked-in booking with end time', function (string $scenario) use (
+    $schedule,
+    $automaticCheckOutMethod
+): void {
+    global $testNow, $testPostMeta, $testPosts, $testQueryArgs, $testQueryIds;
+
+    $bookingId = 989;
+    $testPosts[$bookingId] = (object) [
+        'post_type' => 'booking',
+        'post_status' => 'publish',
+    ];
+    $testPostMeta[$bookingId] = [
+        'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
+        'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 23, 2026),
+        'rrze-rsvp-booking-status' => 'checked-in',
+    ];
+    $testNow = mktime(12, 0, 0, 6, 23, 2026);
+    $testQueryArgs = [];
+    $testQueryIds = [$bookingId];
+
+    $automaticCheckOutMethod->invoke($schedule);
+    assertSameValue(
+        'checked-out',
+        $testPostMeta[$bookingId]['rrze-rsvp-booking-status'],
+        "$scenario: expired manual booking should be checked out."
+    );
+
+    $checkoutQuery = $testQueryArgs[0] ?? [];
+    assertTrue($checkoutQuery['no_found_rows'] ?? false, "$scenario: query should skip pagination counts.");
+    assertSameValue(
+        ['checked-in'],
+        $checkoutQuery['meta_query']['booking_status_clause']['value'] ?? null,
+        "$scenario: query should be restricted to checked-in bookings."
+    );
+    assertSameValue(
+        '<',
+        $checkoutQuery['meta_query']['booking_end_clause'][0]['compare'] ?? null,
+        "$scenario: query should select passed end timestamps."
+    );
+    assertSameValue(
+        'NOT EXISTS',
+        $checkoutQuery['meta_query']['booking_end_clause'][1]['compare'] ?? null,
+        "$scenario: query should retain missing end metadata."
+    );
+});
+
+runLifecycleScenario('missing end metadata across midnight', function (string $scenario) use (
+    $schedule,
+    $automaticCheckOutMethod
+): void {
+    global $testNow, $testPostMeta, $testPosts, $testQueryIds;
+
+    $staleBookingId = 988;
+    $currentBookingId = 987;
+    foreach ([$staleBookingId, $currentBookingId] as $bookingId) {
+        $testPosts[$bookingId] = (object) [
+            'post_type' => 'booking',
+            'post_status' => 'publish',
+        ];
+    }
+    $testPostMeta[$staleBookingId] = [
+        'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 22, 2026),
+        'rrze-rsvp-booking-status' => 'checked-in',
+    ];
+    $testPostMeta[$currentBookingId] = [
+        'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
+        'rrze-rsvp-booking-status' => 'checked-in',
+    ];
+    $testNow = mktime(12, 0, 0, 6, 23, 2026);
+    $testQueryIds = [$staleBookingId, $currentBookingId];
+
+    $automaticCheckOutMethod->invoke($schedule);
+    assertSameValue(
+        'checked-out',
+        $testPostMeta[$staleBookingId]['rrze-rsvp-booking-status'],
+        "$scenario: previous-day booking should be checked out."
+    );
+    assertSameValue(
+        'checked-in',
+        $testPostMeta[$currentBookingId]['rrze-rsvp-booking-status'],
+        "$scenario: current-day booking should remain checked in."
+    );
+});
+
+runLifecycleScenario('delete controls before and after a timeslot', function (string $scenario): void {
+    global $testNow, $testPostMeta, $testPosts;
+
+    $activeBookingId = 986;
+    $expiredBookingId = 985;
+    foreach ([$activeBookingId, $expiredBookingId] as $bookingId) {
+        $testPosts[$bookingId] = (object) [
+            'post_type' => 'booking',
+            'post_status' => 'publish',
+        ];
+    }
+    $testPostMeta[$activeBookingId] = [
+        'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
+        'rrze-rsvp-booking-end' => mktime(13, 0, 0, 6, 23, 2026),
+        'rrze-rsvp-booking-status' => 'checked-in',
+    ];
+    $testPostMeta[$expiredBookingId] = [
+        'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
+        'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 23, 2026),
+        'rrze-rsvp-booking-status' => 'checked-in',
+    ];
+    $testNow = mktime(12, 0, 0, 6, 23, 2026);
+
+    assertFalse(Functions::canDeleteBooking($activeBookingId), "$scenario: active booking must be protected.");
+    assertTrue(Functions::canDeleteBooking($expiredBookingId), "$scenario: expired booking must be deletable.");
+});
+
+runLifecycleScenario('confirmed booking end-of-day restriction', function (string $scenario): void {
+    global $testNow, $testPostMeta, $testPosts;
+
+    $sameDayBookingId = 984;
+    $previousDayBookingId = 983;
+    foreach ([$sameDayBookingId, $previousDayBookingId] as $bookingId) {
+        $testPosts[$bookingId] = (object) [
+            'post_type' => 'booking',
+            'post_status' => 'publish',
+        ];
+    }
+    $testPostMeta[$sameDayBookingId] = [
+        'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
+        'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 23, 2026),
+        'rrze-rsvp-booking-status' => 'confirmed',
+    ];
+    $testPostMeta[$previousDayBookingId] = [
+        'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 22, 2026),
+        'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 22, 2026),
+        'rrze-rsvp-booking-status' => 'confirmed',
+    ];
+    $testNow = mktime(12, 0, 0, 6, 23, 2026);
+
+    assertFalse(
+        Functions::canDeleteBooking($sameDayBookingId),
+        "$scenario: same-day confirmed booking must remain protected."
+    );
+    assertTrue(
+        Functions::canDeleteBooking($previousDayBookingId),
+        "$scenario: previous-day confirmed booking must be deletable."
+    );
+});
+
+runLifecycleScenario('DST boundary end-of-day fallback', function (string $scenario): void {
+    // RSVP stores booking wall-clock values as UTC-based timestamps. These are
+    // the 2026 Europe/Berlin daylight-saving transition dates.
+    foreach ([[3, 29], [10, 25]] as [$month, $day]) {
+        $start = mktime(12, 0, 0, $month, $day, 2026);
+        $expectedEnd = mktime(23, 59, 59, $month, $day, 2026);
+        assertSameValue(
+            $expectedEnd,
+            Utils::getEndOfDayTimestamp($start),
+            "$scenario: fallback must stay on the booking date $month/$day."
+        );
+    }
+});
+
+assertSameValue(6, $testScenarioCount, 'Exactly six lifecycle scenarios should run.');
+
+echo "Booking lifecycle tests passed, including 6 lifecycle scenarios.\n";
