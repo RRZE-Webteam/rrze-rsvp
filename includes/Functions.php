@@ -603,7 +603,16 @@ class Functions
             return true;
         }
 
-        return self::isBookingArchived($postId);
+        if (!self::isBookingArchived($postId)) {
+            return false;
+        }
+
+        if (in_array($status, ['checked-in', 'checked-out'], true)) {
+            return true;
+        }
+
+        $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
+        return Utils::getEndOfDayTimestamp($start) <= current_time('timestamp');
     }
 
     public static function canDeleteSeat(int $postId): bool

@@ -127,6 +127,7 @@ require_once dirname(__DIR__) . '/includes/Schedule.php';
 use RRZE\RSVP\Functions;
 use RRZE\RSVP\Metaboxes;
 use RRZE\RSVP\Schedule;
+use RRZE\RSVP\Utils;
 
 function assertSameValue(mixed $expected, mixed $actual, string $message): void
 {
@@ -353,7 +354,53 @@ assertTrue(
     'A checked-out booking must remain deletable after its timeslot has ended.'
 );
 
-$testQueryIds = [997, 996, 995];
+$testPosts[993] = (object) [
+    'post_type' => 'booking',
+    'post_status' => 'publish',
+];
+$testPostMeta[993] = [
+    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
+    'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 23, 2026),
+    'rrze-rsvp-booking-status' => 'confirmed',
+];
+assertFalse(
+    Functions::canDeleteBooking(993),
+    'A confirmed booking must retain the intended end-of-day deletion restriction.'
+);
+
+$testPosts[992] = (object) [
+    'post_type' => 'booking',
+    'post_status' => 'publish',
+];
+$testPostMeta[992] = [
+    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 22, 2026),
+    'rrze-rsvp-booking-end' => mktime(11, 0, 0, 6, 22, 2026),
+    'rrze-rsvp-booking-status' => 'confirmed',
+];
+assertTrue(
+    Functions::canDeleteBooking(992),
+    'A confirmed booking must become deletable after its calendar day has ended.'
+);
+
+$testPosts[991] = (object) [
+    'post_type' => 'booking',
+    'post_status' => 'publish',
+];
+$testPostMeta[991] = [
+    'rrze-rsvp-booking-start' => mktime(10, 0, 0, 6, 23, 2026),
+    'rrze-rsvp-booking-status' => 'checked-in',
+];
+assertFalse(
+    Functions::canDeleteBooking(991),
+    'A current-day checked-in booking without end metadata must remain active until the end of day.'
+);
+assertSameValue(
+    mktime(23, 59, 59, 6, 23, 2026),
+    Utils::getEndOfDayTimestamp(mktime(10, 0, 0, 6, 23, 2026)),
+    'The end-of-day fallback must resolve to the final second of the booking date.'
+);
+
+$testQueryIds = [997, 996, 995, 991];
 $schedule = (new ReflectionClass(Schedule::class))->newInstanceWithoutConstructor();
 $checkOutMethod = new ReflectionMethod(Schedule::class, 'checkOutNotCheckedOutBookings');
 $checkOutMethod->invoke($schedule);
@@ -367,6 +414,10 @@ assertSameValue(
 assertFalse(
     isset($testUpdatedMeta[997]['rrze-rsvp-booking-status']),
     'The checkout job must leave an active booking checked in.'
+);
+assertFalse(
+    isset($testUpdatedMeta[991]['rrze-rsvp-booking-status']),
+    'The checkout job must leave a current-day booking without end metadata checked in.'
 );
 assertSameValue(
     'checked-out',
