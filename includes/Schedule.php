@@ -306,17 +306,33 @@ class Schedule
      */
     protected function checkOutNotCheckedOutBookings()
     {
+        $timeStamp = current_time('timestamp');
+
         $args = [
             'fields' => 'ids',
             'post_type' => ['booking'],
             'post_status' => 'publish',
             'nopaging' => true,
+            'no_found_rows' => true,
             'meta_query' => [
                 'relation' => 'AND',
                 'booking_status_clause' => [
                     'key' => 'rrze-rsvp-booking-status',
                     'value' => ['checked-in'],
                     'compare' => 'IN',
+                ],
+                'booking_end_clause' => [
+                    'relation' => 'OR',
+                    [
+                        'key' => 'rrze-rsvp-booking-end',
+                        'value' => $timeStamp,
+                        'compare' => '<',
+                        'type' => 'numeric',
+                    ],
+                    [
+                        'key' => 'rrze-rsvp-booking-end',
+                        'compare' => 'NOT EXISTS',
+                    ],
                 ],
             ],
         ];

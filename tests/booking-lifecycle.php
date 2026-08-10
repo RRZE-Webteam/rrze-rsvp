@@ -406,10 +406,24 @@ $checkOutMethod = new ReflectionMethod(Schedule::class, 'checkOutNotCheckedOutBo
 $checkOutMethod->invoke($schedule);
 
 $checkoutQuery = $testQueryArgs[0] ?? [];
+assertTrue(
+    $checkoutQuery['no_found_rows'] ?? false,
+    'The checkout query must skip pagination counts.'
+);
 assertSameValue(
-    2,
+    3,
     count($checkoutQuery['meta_query'] ?? []),
-    'The checkout query must not exclude checked-in bookings with missing end metadata.'
+    'The checkout query must filter by status and eligible end metadata.'
+);
+assertSameValue(
+    '<',
+    $checkoutQuery['meta_query']['booking_end_clause'][0]['compare'] ?? null,
+    'The checkout query must select bookings whose end timestamp has passed.'
+);
+assertSameValue(
+    'NOT EXISTS',
+    $checkoutQuery['meta_query']['booking_end_clause'][1]['compare'] ?? null,
+    'The checkout query must retain checked-in bookings with missing end metadata.'
 );
 assertFalse(
     isset($testUpdatedMeta[997]['rrze-rsvp-booking-status']),
