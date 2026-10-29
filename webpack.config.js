@@ -26,6 +26,7 @@ module.exports = (env, argv) => {
             "course-admin": path.join(__dirname, "src", "course-admin"),
             "course-block": path.join(__dirname, "src", "course-block"),
             "course-frontend": path.join(__dirname, "src", "course-frontend"),
+            "room-availability": path.join(__dirname, "src", "room-availability"),
         },
         output: {
             path: path.resolve(__dirname, "build"),

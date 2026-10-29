@@ -11,6 +11,15 @@ global $post;
 $roomId = $post->ID;
 $meta = get_post_meta($roomId);
 
+// Prepare the availability list before the header so its CSS loads normally.
+$daysInAdvance = get_post_meta($roomId, 'rrze-rsvp-room-days-in-advance', true);
+$daysInAdvance = $daysInAdvance === '' ? 10 : max(0, (int) $daysInAdvance);
+$roomAvailability = '';
+if (($_GET['format'] ?? '') !== 'embedded' && $options->general_single_room_availability_table !== 'no'
+    && get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true) !== 'check-only') {
+    $roomAvailability = RoomAvailability::render($roomId, $daysInAdvance, $options->general_single_room_availability_table === 'yes_link');
+}
+
 // Schedule
 $scheduleData = Functions::getRoomSchedule($roomId);
 $schedule = '';
@@ -75,10 +84,6 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
                 echo $schedule;
                 break;
             case 'availability':
-                $daysInAdvance = get_post_meta($roomId, 'rrze-rsvp-room-days-in-advance', true);
-                if (empty($daysInAdvance)) {
-                    $daysInAdvance = '10';
-                }
                 echo do_shortcode('[rsvp-availability room=' . $roomId . ' days=' . $daysInAdvance . ']');
                 break;
             case 'occupancy':
@@ -179,17 +184,6 @@ while (have_posts()) : the_post();
 
     if (isset($meta['rrze-rsvp-room-timeslots']) && !empty($meta['rrze-rsvp-room-timeslots'])) {
 
-        if ($options->general_single_room_availability_table != 'no') {
-            $booking_link = '';
-            if ($options->general_single_room_availability_table == 'yes_link') {
-                $booking_link = 'booking_link=true';
-            }
-        }
-        $daysInAdvance = get_post_meta($roomId, 'rrze-rsvp-room-days-in-advance', true);
-        if (empty($daysInAdvance)) {
-            $daysInAdvance = '10';
-        }
-
         if (shortcode_exists('collapsibles')) {
             $shortcode = '[collapsibles expand-all-link="true"]'
                 . '[collapse title="' . __('Schedule', 'rrze-rsvp') . '" name="schedule" load="open"]'
@@ -202,7 +196,7 @@ while (have_posts()) : the_post();
                 $bookingmode = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true);
                 if ($bookingmode != 'check-only') {
                     $shortcode .= '[collapse title="' . __('Availability', 'rrze-rsvp') . '" name="availability"]'
-                        . do_shortcode('[rsvp-availability room=' . $roomId . ' days=' . $daysInAdvance . ' ' . $booking_link . ']')
+                        . $roomAvailability
                         . '[/collapse]';
                 }
             }
@@ -219,7 +213,7 @@ while (have_posts()) : the_post();
                 if ($bookingmode != 'check-only') {
 
                     $timetables .= '<h3>' . __('Availability', 'rrze-rsvp') . '</h3>'
-                        . do_shortcode('[rsvp-availability room=' . $roomId . ' days=' . $daysInAdvance . ' ' . $booking_link . ']');
+                        . $roomAvailability;
                 }
             }
         }

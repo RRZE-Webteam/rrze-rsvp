@@ -3488,3 +3488,55 @@ msgstr "Diese E-Mail-Domain ist für den Kurs nicht zugelassen. Bitte verwenden 
 #, php-format
 msgid "Registration is only possible with an email address ending in: %s. This also applies when signing in with SSO."
 msgstr "Für die Anmeldung benötigen Sie eine E-Mail-Adresse mit einer dieser Endungen: %s. Das gilt auch bei einer Anmeldung mit SSO."
+
+#: includes/RoomAvailability.php
+msgid "Choose a date and book an available seat. Your booking details are entered in the next step."
+msgstr "Wählen Sie einen Termin und buchen Sie einen freien Platz. Ihre Angaben zur Buchung erfassen Sie im nächsten Schritt."
+
+#. translators: %s: Number of available time slots within a month.
+#: includes/RoomAvailability.php
+#, php-format
+msgid "%s available time slot"
+msgid_plural "%s available time slots"
+msgstr[0] "%s freier Termin"
+msgstr[1] "%s freie Termine"
+
+#. translators: %s: Number of available seats for this time slot.
+#: includes/RoomAvailability.php
+#, php-format
+msgid "%s seat available"
+msgid_plural "%s seats available"
+msgstr[0] "%s Platz frei"
+msgstr[1] "%s Plätze frei"
+
+#. translators: %s: Public seat name.
+#: includes/RoomAvailability.php
+#, php-format
+msgid "Book seat %s"
+msgstr "Platz %s buchen"
+
+#: includes/RoomAvailability.php
+msgid "Choose a seat"
+msgstr "Platz auswählen"
+
+#: includes/RoomAvailability.php
+msgid "Show seats"
+msgstr "Plätze anzeigen"
+
+#: includes/RoomAvailability.php
+msgid "Search seats"
+msgstr "Platz suchen"
+
+#: includes/RoomAvailability.php
+msgid "Close seat selection"
+msgstr "Platzauswahl schließen"
+
+#: includes/RoomAvailability.php
+msgid "No seats match your search."
+msgstr "Keine Plätze für diesen Suchbegriff gefunden."
+
+#. translators: 1: Number of matching seats, 2: Total available seats.
+#: includes/RoomAvailability.php
+#, php-format
+msgid "%1$s of %2$s seats"
+msgstr "%1$s von %2$s Plätzen"
