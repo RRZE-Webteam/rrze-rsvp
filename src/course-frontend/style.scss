@@ -29,9 +29,9 @@
         input { display: block; box-sizing: border-box; width: 100%; max-width: 32rem; padding: .6rem; margin-top: .3rem; }
     }
     .rrze-rsvp-course-consent { display: flex; align-items: flex-start; gap: .6rem; line-height: 1.5; }
-    input[type=radio], input[type=checkbox] { width: 1.2rem; height: 1.2rem; min-width: 1.2rem; }
+    // Preserve the theme's control size so its checked indicators stay centered.
+    input[type=radio], input[type=checkbox] { flex-shrink: 0; }
     input:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--rsvp-course-accent); outline-offset: 3px; }
-    .rrze-rsvp-course-submit { min-height: 44px; padding: .75rem 1rem; cursor: pointer; }
     .rrze-rsvp-course-submit:disabled { cursor: default; opacity: .7; }
     .rrze-rsvp-course-hint { font-size: .9em; }
     .rrze-rsvp-course-result:not(:empty), .rrze-rsvp-course-notice {

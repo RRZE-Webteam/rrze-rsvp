@@ -272,6 +272,9 @@ class Frontend
         }
         $this->noCache();
         wp_enqueue_script('rrze-rsvp-course-frontend');
+        // Core button styles may be loaded separately from the block library.
+        wp_enqueue_style('wp-block-buttons');
+        wp_enqueue_style('wp-block-button');
         wp_enqueue_style('rrze-rsvp-course-frontend');
         wp_localize_script('rrze-rsvp-course-frontend', 'rrzeRsvpCourses', [
             'restUrl' => esc_url_raw(rest_url(self::REST_NAMESPACE . '/')),
@@ -333,7 +336,11 @@ class Frontend
                         <p><?php echo esc_html($course['settings']['auto_confirm']
                             ? __('Participation is confirmed automatically once your identity has been verified.', 'rrze-rsvp')
                             : __('The course organizer will review and confirm your registration.', 'rrze-rsvp')); ?></p>
-                        <button class="rrze-rsvp-course-submit" type="submit" disabled><?php esc_html_e('Register for this date', 'rrze-rsvp'); ?></button>
+                        <div class="wp-block-buttons is-layout-flex">
+                            <div class="wp-block-button">
+                                <button class="wp-block-button__link wp-element-button rrze-rsvp-course-submit" type="submit" disabled><?php esc_html_e('Register for this date', 'rrze-rsvp'); ?></button>
+                            </div>
+                        </div>
                         <noscript><p><?php esc_html_e('Please enable JavaScript to use the course registration form.', 'rrze-rsvp'); ?></p></noscript>
                     <?php endif; ?>
                     <div class="rrze-rsvp-course-result" role="status" aria-live="polite" tabindex="-1"></div>
