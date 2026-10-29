@@ -95,7 +95,7 @@ div.cmb2-id-rrze-rsvp-booking-start {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 18px 24px;
-		padding: 20px;
+		padding: 20px 0;
 	}
 
 	&.closed > .inside {
@@ -108,7 +108,7 @@ div.cmb2-id-rrze-rsvp-booking-start {
 
 	.cmb-row,
 	.cmb-th,
-	.cmb-td {
+	.cmb-td:not(.inside) {
 		float: none;
 		width: auto;
 		padding: 0;
@@ -192,7 +192,7 @@ div.cmb2-id-rrze-rsvp-booking-start {
 	@media (max-width: 600px) {
 		> .inside {
 			grid-template-columns: minmax(0, 1fr);
-			padding: 14px;
+			padding: 14px 0;
 		}
 	}
 }
