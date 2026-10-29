@@ -65,6 +65,13 @@ class CPT extends Main
         $seats->seats_taxonomies();
     }
 
+    /**
+     * Add translated management pages beneath the RSVP admin menu.
+     *
+     * Keep the booking submenu descriptive while its parent uses the plugin name.
+     *
+     * @return void
+     */
     public function bookingMenu()
     {
         $cpts = array_keys(Capabilities::getCurrentCptArgs());
@@ -75,7 +82,7 @@ class CPT extends Main
             add_submenu_page(
                 'edit.php?post_type=booking',      // parent slug
                 $cpt_obj->labels->name,            // page title
-                $cpt_obj->labels->menu_name,       // menu title
+                $cpt === 'booking' ? $cpt_obj->labels->name : $cpt_obj->labels->menu_name, // menu title
                 $cpt_obj->cap->edit_posts,         // capability
                 'edit.php?post_type=' . $cpt       // menu slug
             );

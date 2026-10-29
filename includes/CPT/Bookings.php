@@ -50,13 +50,17 @@ class Bookings
 
 
 
-    // Register Custom Post Type
+    /**
+     * Register bookings with a language-independent RSVP admin menu name.
+     *
+     * @return void
+     */
     public function booking_post_type()
     {
         $labels = [
             'name'                      => _x('Bookings', 'Post type general name', 'rrze-rsvp'),
             'singular_name'             => _x('Booking', 'Post type singular name', 'rrze-rsvp'),
-            'menu_name'                 => _x('Bookings', 'Admin Menu text', 'rrze-rsvp'),
+            'menu_name'                 => 'RSVP', // Plugin name must remain identical in every language.
             'name_admin_bar'            => _x('Booking', 'Add New on Toolbar', 'rrze-rsvp'),
             'add_new'                   => __('Add New', 'rrze-rsvp'),
             'add_new_item'              => __('Add New Booking', 'rrze-rsvp'),
