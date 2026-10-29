@@ -392,30 +392,13 @@ class Metaboxes
             'classes' => ['hide-check-only'],
         ));
 
-        // https://github.com/RRZE-Webteam/rrze-rsvp/issues/311
-        $aArgs = [
-            'name' => __('Additional ICS email', 'rrze-rsvp'),
-            'desc' => __('A copy of the confirmed booking will be sent to the specified email address with a calendar file (.ics) as an attachment.', 'rrze-rsvp'),
+        $cmb_general->add_field(array(
+            'name' => __('Email address for calendar copies (optional)', 'rrze-rsvp'),
+            'desc' => __('This address receives booking confirmations and cancellations with a calendar file (.ics). Leave empty if no additional copy is needed.', 'rrze-rsvp'),
             'id' => 'rrze-rsvp-room-send-to-email',
-        ];
-
-        if (is_plugin_active('fau-person/fau-person.php')) {
-
-            $aContactSelect = Functions::getAdditionalEmail();
-
-            if (!empty($aContactSelect)) {
-                $aArgs['type'] = 'select';
-                $aArgs['options'] = $aContactSelect;
-                $aArgs['default'] = '0';
-            } else {
-                $aArgs['type'] = 'text_email';
-                $aArgs['default'] = '';
-            }
-        } else {
-            $aArgs['type'] = 'text_email';
-            $aArgs['default'] = '';
-        }
-        $cmb_general->add_field($aArgs);
+            'type' => 'text_email',
+            'default' => '',
+        ));
 
         $this->addRoomDetailsSection(
             $cmb_general,

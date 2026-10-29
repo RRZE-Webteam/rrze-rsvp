@@ -98,13 +98,13 @@ msgstr ""
 msgid "A booking has been cancelled by the customer."
 msgstr "Eine Reservierung wurde durch den Bucher storniert."
 
-#: includes/Metaboxes.php:412
+#: includes/Metaboxes.php:397
 msgid ""
-"A copy of the confirmed booking will be sent to the specified email address "
-"with a calendar file (.ics) as an attachment."
+"This address receives booking confirmations and cancellations with a calendar "
+"file (.ics). Leave empty if no additional copy is needed."
 msgstr ""
-"Eine Kopie der bestätigten Buchung wird mit einer Kalenderdatei (.ics) als "
-"Anhang an die angegebene E-Mail-Adresse gesendet."
+"Diese Adresse erhält Buchungsbestätigungen und Stornierungen mit Kalenderdatei "
+"(.ics). Leer lassen, wenn keine zusätzliche Kopie gewünscht ist."
 
 #: includes/Email.php:181
 msgid "A customer has checked out from a seat:"
@@ -184,9 +184,9 @@ msgstr "Raum erstellen"
 msgid "Add New Seat"
 msgstr "Platz erstellen"
 
-#: includes/Metaboxes.php:411
-msgid "Additional ICS email"
-msgstr "Zusätzliche Kalender-Mail"
+#: includes/Metaboxes.php:396
+msgid "Email address for calendar copies (optional)"
+msgstr "E-Mail-Adresse für Kalenderkopien (optional)"
 
 #: includes/Metaboxes.php:480
 msgid "Additional information"
