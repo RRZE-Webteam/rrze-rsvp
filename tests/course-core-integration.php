@@ -14,6 +14,7 @@ require_once dirname(__DIR__) . '/rrze-rsvp.php';
 \RRZE\RSVP\plugin()->loaded();
 
 use RRZE\RSVP\Courses\BookingService;
+use RRZE\RSVP\Courses\Frontend;
 use RRZE\RSVP\Courses\Model;
 use RRZE\RSVP\Courses\PostTypes;
 use RRZE\RSVP\Courses\Repository;
@@ -136,6 +137,75 @@ function courseTestFixture(BookingService $service, int $capacity = 20): array
 function courseTestPerson(string $identity): array
 {
     return ['firstname' => 'Core', 'lastname' => 'Test', 'email' => $identity . '@example.invalid', 'consent' => true, 'locale' => 'de_DE'];
+}
+
+/**
+ * Exercise optional domain restrictions through persistence, booking and the SSO adapter.
+ *
+ * @param BookingService $service Actual transactional booking service.
+ * @param Repository $repository Actual course/booking readers.
+ * @return void
+ */
+function courseTestEmailDomains(BookingService $service, Repository $repository): void
+{
+    global $courseTestEvents;
+    $fixture = courseTestFixture($service, 6);
+    $courseId = $fixture['course_id'];
+    $dateId = $fixture['occurrence_id'];
+    $saved = courseTestSuccess($service->saveCourseSettings($courseId, ['allowed_email_domains' => "@EXAMPLE.invalid, @second.invalid\nexample.invalid"]));
+    courseTestAssert($saved['settings']['allowed_email_domains'] === ['example.invalid', 'second.invalid'], 'Settings persist a normalized, deduplicated domain list.');
+    $invalid = $service->saveCourseSettings($courseId, ['allowed_email_domains' => 'example.invalid, *.second.invalid']);
+    courseTestAssert(is_wp_error($invalid) && $invalid->get_error_code() === 'course_invalid_email_domains'
+        && $repository->getCourse($courseId)['settings'] === $saved['settings'], 'Invalid input must preserve all previously saved settings.');
+
+    $frontend = new class($repository, $service) extends Frontend {
+        public array $serverIdentity = ['authenticated' => false, 'available' => false, 'participant' => []];
+
+        /** @return array Synthetic server identity; never taken from submitted form data. */
+        protected function identity(): array
+        {
+            return $this->serverIdentity;
+        }
+    };
+    $html = $frontend->render(['courseId' => $courseId]);
+    courseTestAssert(str_contains($html, '@example.invalid, @second.invalid')
+        && preg_match('/<input[^>]+name="email"[^>]+aria-describedby="([^"]+)"/', $html, $description)
+        && str_contains($html, 'id="' . $description[1] . '"'), 'Visitors see allowed domains and the email field references the notice for assistive technology.');
+    $beforeEvents = count($courseTestEvents);
+    foreach ([false, true] as $trusted) {
+        $deniedPerson = array_merge(courseTestPerson('denied'), ['email' => 'denied@other.invalid']);
+        $denied = $service->book($dateId, $deniedPerson, 'domain-denied-request-' . (int) $trusted, $trusted);
+        courseTestAssert(is_wp_error($denied) && $denied->get_error_code() === 'course_email_domain_not_allowed', 'The service must reject other domains for guests and trusted SSO alike.');
+    }
+    $frontend->serverIdentity = ['authenticated' => true, 'available' => true, 'participant' => $deniedPerson];
+    $request = new WP_REST_Request('POST');
+    $request->set_body_params(['occurrenceId' => $dateId, 'requestId' => 'domain-spoof-request-1', 'participant' => courseTestPerson('spoof')]);
+    $spoof = $frontend->book($request);
+    courseTestAssert(is_wp_error($spoof) && $spoof->get_error_code() === 'course_email_domain_not_allowed', 'An allowed submitted email cannot override a disallowed verified SSO profile.');
+    courseTestAssert($repository->getBookingsForOccurrence($dateId) === [] && count($courseTestEvents) === $beforeEvents
+        && courseTestSuccess($service->availability($dateId))['free'] === 6, 'Rejected domains create no record, hold or notification.');
+
+    $guest = courseTestSuccess($service->book($dateId, courseTestPerson('domain-guest'), 'domain-guest-request1'));
+    $guestEvent = end($courseTestEvents);
+    courseTestAssert($guest['status'] === 'booked', 'An allowed guest still has to verify ownership of the address.');
+    $ssoPerson = array_merge(courseTestPerson('domain-sso'), ['email' => 'domain-sso@SECOND.invalid']);
+    $frontend->serverIdentity['participant'] = $ssoPerson;
+    $request->set_body_params(['occurrenceId' => $dateId, 'requestId' => 'domain-sso-request-01', 'participant' => $deniedPerson]);
+    $sso = $frontend->book($request);
+    courseTestAssert($sso instanceof WP_REST_Response && $sso->get_status() === 201
+        && $sso->get_data()['status'] === 'customer-confirmed', 'An allowed SSO profile uses its own domain and the normal approval workflow.');
+
+    courseTestSuccess($service->saveCourseSettings($courseId, ['allowed_email_domains' => ['second.invalid']]));
+    $replay = courseTestSuccess($service->book($dateId, courseTestPerson('domain-guest'), 'domain-guest-request1'));
+    courseTestAssert($replay['id'] === $guest['id'] && !$replay['created'], 'Policy changes must not break retries of existing registrations.');
+    $verified = courseTestSuccess($service->verify($guest['id'], $guestEvent['tokens']['verify']));
+    courseTestAssert($verified['status'] === 'customer-confirmed', 'An existing hold retains its original conditions after domains change.');
+    $newAttempt = $service->book($dateId, courseTestPerson('domain-new'), 'domain-new-request01');
+    courseTestAssert(is_wp_error($newAttempt) && $newAttempt->get_error_code() === 'course_email_domain_not_allowed', 'New registrations must use the newly saved restriction.');
+    courseTestSuccess($service->saveCourseSettings($courseId, ['allowed_email_domains' => '']));
+    courseTestSuccess($service->book($dateId, courseTestPerson('domain-new'), 'domain-new-request01'));
+    $frontend->serverIdentity = ['authenticated' => false, 'available' => false, 'participant' => []];
+    courseTestAssert(!str_contains($frontend->render(['courseId' => $courseId]), 'email-domains'), 'Clearing the optional list removes the frontend restriction notice.');
 }
 
 /**
@@ -279,6 +349,7 @@ try {
     courseTestAssert(is_wp_error($failedPurge) && $repository->post($guest['id']) && $repository->meta($guest['id'], Model::BOOKING_DATA_META), 'A failed metadata DELETE must roll back the post deletion and retain tokens together.');
     courseTestSuccess((new ReflectionMethod(BookingService::class, 'forOccurrence'))->invoke($service, $dateId, 'purgeBookings', []));
     courseTestAssert(!$repository->post($guest['id']) && !$repository->meta($guest['id'], Model::BOOKING_DATA_META), 'Purge removes record and token/PII metadata after its retention deadline.');
+    courseTestEmailDomains($service, $repository);
     $ssoFixture = courseTestFixture($service, 1);
     courseTestSuccess($service->saveCourseSettings($ssoFixture['course_id'], ['access' => 'sso', 'auto_confirm' => true]));
     courseTestAssert(is_wp_error($service->book($ssoFixture['occurrence_id'], courseTestPerson('no-sso'), 'no-sso-request-01')), 'Required SSO cannot fall back to guest identity.');
@@ -337,7 +408,7 @@ try {
     $lateCancel = $service->cancelOccurrence($ssoFixture['occurrence_id']);
     courseTestAssert(is_wp_error($lateCancel) && $lateCancel->get_error_code() === 'course_cancellation_closed', 'Cancelling an entire date must not bypass the staff cancellation deadline.');
     courseTestAssert($repository->getBooking($sso['id'])['status'] === 'confirmed' && $repository->getOccurrence($ssoFixture['occurrence_id'])['state'] === 'open', 'Rejected late cancellation must leave historical participation unchanged.');
-    echo "Course real-database lifecycle, rollback, capacity and retention tests passed.\n";
+    echo "Course real-database lifecycle, email-domain, rollback, capacity and retention tests passed.\n";
 } finally {
     $courseTestBreakRead = '';
     $courseTestBreakWrite = false;

@@ -482,7 +482,12 @@ class BookingService
         if (!in_array($settings['access'], ['sso_or_email', 'sso'], true) || $days === false || $days < 1 || $days > 36500) {
             return $this->error('invalid_settings', __('Please check the course access and retention settings.', 'rrze-rsvp'), 422);
         }
-        $settings = ['access' => $settings['access'], 'auto_confirm' => (bool) $settings['auto_confirm'], 'retention_days' => $days];
+        $domains = Model::normalizeEmailDomains($settings['allowed_email_domains']);
+        if ($domains === null) {
+            return $this->error('invalid_email_domains', __('Please enter valid email domains, such as fau.de or uk-erlangen.de. Separate them with commas or line breaks. Do not enter full email addresses, URLs or wildcards.', 'rrze-rsvp'), 422);
+        }
+        $settings = ['access' => $settings['access'], 'auto_confirm' => (bool) $settings['auto_confirm'], 'retention_days' => $days,
+            'allowed_email_domains' => $domains];
         $this->writeMeta($course['id'], Model::COURSE_SETTINGS_META, $settings);
         return $this->repository->getCourse($course['id']);
     }
@@ -580,6 +585,11 @@ class BookingService
         }
         if ($course['settings']['access'] === 'sso' && !$trusted) {
             return $this->error('sso_required', __('Please sign in using SSO to book this course.', 'rrze-rsvp'), 403);
+        }
+        // Recheck fresh course settings inside the lock, including trusted SSO identities.
+        // Idempotent retries above only return an existing booking; they create no new hold.
+        if (!Model::allowsEmail($person['email'], $course['settings'])) {
+            return $this->error('email_domain_not_allowed', __('This email domain is not allowed for this course. Please use an email address with one of the listed domains. If you signed in with SSO, the email address in your SSO profile is used.', 'rrze-rsvp'), 403);
         }
         $counts = Model::counts($bookings, $date['capacity'], time());
         $reason = $this->availabilityReason($course, $date, $counts, time());

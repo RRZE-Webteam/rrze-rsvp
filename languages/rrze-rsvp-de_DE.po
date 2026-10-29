@@ -3466,3 +3466,25 @@ msgstr "Teilnehmende Person"
 #: includes/Courses/Admin.php
 msgid "No notes provided."
 msgstr "Keine Bemerkungen hinterlegt."
+
+#: includes/Courses/Admin.php
+msgid "Allowed email domains (optional)"
+msgstr "Erlaubte E-Mail-Domains (optional)"
+
+#: includes/Courses/Admin.php
+msgid "Leave empty to allow all email domains. Enter one domain per line or separate them with commas, with or without @. Only exact matches are allowed; add subdomains separately. This also applies to the email address in the SSO profile and only affects new registrations."
+msgstr "Leer lassen, um alle E-Mail-Domains zu erlauben. Domains zeilenweise oder durch Kommas getrennt eingeben, mit oder ohne @. Es gelten nur exakte Übereinstimmungen; Subdomains bitte separat ergänzen. Die Einschränkung gilt auch für die E-Mail-Adresse im SSO-Profil und nur für neue Anmeldungen."
+
+#: includes/Courses/BookingService.php
+msgid "Please enter valid email domains, such as fau.de or uk-erlangen.de. Separate them with commas or line breaks. Do not enter full email addresses, URLs or wildcards."
+msgstr "Bitte geben Sie gültige E-Mail-Domains ein, z. B. fau.de oder uk-erlangen.de, getrennt durch Kommas oder Zeilenumbrüche. Vollständige E-Mail-Adressen, URLs und Platzhalter sind nicht erlaubt."
+
+#: includes/Courses/BookingService.php
+msgid "This email domain is not allowed for this course. Please use an email address with one of the listed domains. If you signed in with SSO, the email address in your SSO profile is used."
+msgstr "Diese E-Mail-Domain ist für den Kurs nicht zugelassen. Bitte verwenden Sie eine E-Mail-Adresse mit einer der angegebenen Domains. Bei einer Anmeldung mit SSO wird die E-Mail-Adresse aus Ihrem SSO-Profil verwendet."
+
+#. translators: %s: Comma-separated email domains, each prefixed with @.
+#: includes/Courses/Frontend.php
+#, php-format
+msgid "Registration is only possible with an email address ending in: %s. This also applies when signing in with SSO."
+msgstr "Für die Anmeldung benötigen Sie eine E-Mail-Adresse mit einer dieser Endungen: %s. Das gilt auch bei einer Anmeldung mit SSO."

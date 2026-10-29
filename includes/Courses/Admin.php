@@ -115,6 +115,11 @@ final class Admin
         echo '<select name="rsvp_course_settings[access]" id="rsvp-course-access">';
         echo '<option value="sso_or_email"' . selected($settings['access'], 'sso_or_email', false) . '>' . esc_html__('SSO or verified email address', 'rrze-rsvp') . '</option>';
         echo '<option value="sso"' . selected($settings['access'], 'sso', false) . '>' . esc_html__('SSO required', 'rrze-rsvp') . '</option></select></p>';
+        $domains = $settings['allowed_email_domains'] ?? [];
+        $domainInput = is_array($domains) ? implode("\n", array_filter($domains, 'is_string')) : (is_string($domains) ? $domains : '');
+        echo '<p><label for="rsvp-course-email-domains"><strong>' . esc_html__('Allowed email domains (optional)', 'rrze-rsvp') . '</strong></label><br>';
+        echo '<textarea name="rsvp_course_settings[allowed_email_domains]" id="rsvp-course-email-domains" rows="3" class="large-text" aria-describedby="rsvp-course-email-domains-help" placeholder="@fau.de&#10;@uk-erlangen.de">' . esc_textarea($domainInput) . '</textarea>';
+        echo '<span class="description" id="rsvp-course-email-domains-help">' . esc_html__('Leave empty to allow all email domains. Enter one domain per line or separate them with commas, with or without @. Only exact matches are allowed; add subdomains separately. This also applies to the email address in the SSO profile and only affects new registrations.', 'rrze-rsvp') . '</span></p>';
         echo '<p><label><input type="checkbox" name="rsvp_course_settings[auto_confirm]" value="1"' . checked(!empty($settings['auto_confirm']), true, false) . '> <strong>' . esc_html__('Confirm participation automatically', 'rrze-rsvp') . '</strong></label>';
         echo '<br><span class="description">' . esc_html__('Otherwise, responsible staff approve each verified registration. Pending registrations already reserve a place.', 'rrze-rsvp') . '</span></p>';
         echo '<p><label for="rsvp-course-retention"><strong>' . esc_html__('Keep bookings after the course date (days)', 'rrze-rsvp') . '</strong></label><br>';
@@ -143,6 +148,8 @@ final class Admin
             'access' => sanitize_key(is_scalar($raw['access'] ?? '') ? (string) ($raw['access'] ?? '') : ''),
             'auto_confirm' => !empty($raw['auto_confirm']),
             'retention_days' => is_scalar($raw['retention_days'] ?? '') ? (string) ($raw['retention_days'] ?? '') : '',
+            // Preserve invalid input for validation instead of silently weakening the restriction.
+            'allowed_email_domains' => array_key_exists('allowed_email_domains', $raw) ? $raw['allowed_email_domains'] : '',
         ];
         $result = $this->service->saveCourseSettings($postId, $settings);
         if (is_wp_error($result)) {

@@ -7,7 +7,7 @@ All classes below use `RRZE\RSVP\Courses`. Root owns existing RSVP classes and b
 `Model::COURSE_TYPE = rsvp_course`, `Model::DATE_TYPE = rsvp_course_date` (internal child post, `post_parent` is course ID), `Model::BOOKING_DATE_META = rrze-rsvp-booking-course-date`, `Model::BOOKING_COURSE_META = rrze-rsvp-booking-course`, `Model::COURSE_SETTINGS_META = rrze-rsvp-course-settings`, `Model::OCCURRENCE_META = rrze-rsvp-course-occurrence`, `Model::BOOKING_DATA_META = rrze-rsvp-course-booking-data`.
 
 `new Repository()`:
-- `getCourse(int): array|WP_Error`: id, title, description, post_status, settings {access: sso_or_email|sso, auto_confirm: bool, retention_days: int}, published_at (UTC).
+- `getCourse(int): array|WP_Error`: id, title, description, post_status, settings {access: sso_or_email|sso, auto_confirm: bool, retention_days: int, allowed_email_domains: string[]}, published_at (UTC).
 - `getOccurrence(int): array|WP_Error`: id, course_id, start, end, room_id, location (display snapshot), capacity, registration_start (0 means course publication), registration_end (0 means start), state (open|cancelled), post_status. All times are true UTC epoch seconds.
 - `getOccurrences(int $courseId, bool $futureOnly = false): array`: occurrence DTOs ordered by start, then ID.
 - `getBooking(int): array|WP_Error`: private admin DTO, id, type=course, course_id, occurrence_id, status, start/end (UTC), course_title, location, room_id, guest_firstname/lastname/email, notes, created_at, expires_at, cancel_reason, settings snapshot, ics_uid, locale, post_status, booking_date_timestamp (alias of created_at). Never return this DTO from a public REST endpoint.
@@ -20,7 +20,7 @@ Course participant names/email use existing encrypted booking metadata. The stan
 `new BookingService(?Repository $repository = null)`; every command returns `array|WP_Error` with codes `course_*` and error data containing HTTP `status`. `supportsTransactions(): bool` checks InnoDB for current-site posts and postmeta.
 
 - `availability(int $occurrenceId): array|WP_Error`: occurrence_id, course_id, capacity, confirmed, pending, held (confirmed + pending), free, bookable, reason (available|full|closed|cancelled|unpublished|unsupported), start, end, location. Read-only; expired verification holds do not count even without cron.
-- `saveCourseSettings(int $courseId, array $settings): array|WP_Error`: validates and saves only access, auto_confirm, retention_days. Requires edit_post(course).
+- `saveCourseSettings(int $courseId, array $settings): array|WP_Error`: validates and saves only access, auto_confirm, retention_days, allowed_email_domains. Requires edit_post(course). Domain input accepts an array or text separated by whitespace, commas or semicolons, with optional leading `@`; persistence uses unique lowercase ASCII hostnames (punycode supported). Empty/missing defaults to no restriction. Invalid entries reject the entire update with `course_invalid_email_domains`.
 - `saveOccurrence(int $courseId, array $data, int $occurrenceId=0): array|WP_Error`: full occurrence fields above, except state may only be set via cancelOccurrence. Requires edit_post(course). Start/end/location/room_id protected while active bookings exist, capacity cannot fall below held, range end>start, date times valid and registration end<=start. New default capacity20, open, registration bounds0. Referenced room must exist and be published; location is its title plus address, otherwise nonempty free text.
 - `book(int $occurrenceId, array $participant, string $requestId, bool $trustedIdentity=false): array|WP_Error`: participant firstname,lastname,email,notes optional, locale optional, consent=true required. Trusted identity is set ONLY by server-side SSO adapter. Request IDs 16–128 ASCII alphanumeric/hyphen/underscore; persist client request ID for retry. Return public result {id,status,course_id,occurrence_id,expires_at,created:bool}. Replay returns same result without a new notification. Active email duplicate uses lowercased trimmed address. Guest starts booked, expires min(time()+3600,start). Trusted starts confirmed or customer-confirmed based on snapshotted auto_confirm. Required SSO rejects untrusted identity.
 - `verify(int $bookingId,string $token): array|WP_Error`: purpose-scoped token; booked -> confirmed/customer-confirmed, repeated valid verification is a no-op; expiry cannot reacquire a seat.
@@ -35,6 +35,8 @@ Course participant names/email use existing encrypted booking metadata. The stan
 - `isWriting(): bool`: true only while this service is doing guarded core writes; root can let service writes pass metadata/delete protections.
 
 A read-only public availability response must never contain attendee details or tokens. All administrative capability checks remain required at UI endpoints as well as service boundaries.
+
+An optional `allowed_email_domains` list applies to every new registration, including the server-provided SSO profile address. The service checks exact domain equality under the course/date lock before creating a booking or notification; subdomains need separate entries. Other domains return `course_email_domain_not_allowed` (403). Existing bookings, verification links and idempotent retries retain their original conditions after the list changes. Malformed stored lists fail closed. Guest email verification is still required for an allowed domain.
 
 ## Notifications and tokens
 
@@ -61,7 +63,7 @@ Course pages and action pages bypass caching. E-mail links show a GET confirmati
 
 1. Open **RSVP → Kurse**, enter title/description and save a draft.
 2. Add concrete dates with start/end, location and capacity. Each date has its own save button and stable ID. Times use the website timezone.
-3. Choose SSO access or verified guest email, automatic or manual approval, and retention days. Save/publish the course.
+3. Choose SSO access or verified guest email, automatic or manual approval, and retention days. Optionally enter allowed email domains under **Erlaubte E-Mail-Domains**, such as `@fau.de` and `@uk-erlangen.de` on separate lines. Leave the list empty to permit all domains. This restriction applies to new registrations, including SSO; subdomains must be added explicitly. Save/publish the course.
 4. Insert the **Kursbuchung / Course booking** block in a page and select the course. Each date is booked independently.
 5. Manage registrations from the date's link or the course/date filters in **RSVP → Buchungen**. New registrations are created through the public form.
 

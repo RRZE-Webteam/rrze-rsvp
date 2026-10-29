@@ -39,5 +39,22 @@ courseAssert(!Model::holdsPlace(['status' => 'confirmed', 'post_status' => 'tras
 courseAssert(Model::verifiedStatus(['auto_confirm' => false]) === 'customer-confirmed', 'Manual approvals require a distinct state.');
 courseAssert(Model::verifiedStatus(['auto_confirm' => true]) === 'confirmed', 'Automatic approval follows identity verification.');
 courseAssert(Model::normalizeEmail(' Person@Example.ORG ') === 'person@example.org', 'Duplicate matching normalizes case and whitespace.');
+courseAssert(Model::normalizeEmailDomains(" @FAU.de, uk-erlangen.de;\n@fau.de\r\n") === ['fau.de', 'uk-erlangen.de'], 'Domain input accepts separators and optional @, normalizes case and removes duplicates.');
+courseAssert(Model::normalizeEmailDomains([' @FAU.de ', 'xn--bcher-kva.example']) === ['fau.de', 'xn--bcher-kva.example'], 'Arrays and ASCII punycode domains are supported.');
+foreach (['', " \r\n", []] as $emptyDomains) {
+    courseAssert(Model::normalizeEmailDomains($emptyDomains) === [], 'Empty input disables the optional restriction.');
+}
+foreach (['fau.de, bad', '*.fau.de', 'person@fau.de', 'https://fau.de', '@@fau.de', 'fau.de.', 'fau..de', '-fau.de', 'fau_.de', str_repeat('a', 64) . '.de', ['fau.de', []], [''], null, false] as $invalidDomains) {
+    courseAssert(Model::normalizeEmailDomains($invalidDomains) === null, 'Invalid entries must reject the complete configuration instead of weakening it.');
+}
+$domainSettings = array_merge(Model::defaults(), ['allowed_email_domains' => ['fau.de', 'uk-erlangen.de']]);
+foreach ([' Person@FAU.DE ', 'person+course@uk-erlangen.de'] as $allowedEmail) {
+    courseAssert(Model::allowsEmail($allowedEmail, $domainSettings), 'Every explicitly allowed domain is accepted regardless of case.');
+}
+foreach (['person@sub.fau.de', 'person@fau.de.example.org', 'person@notfau.de', 'person@example.org', 'person@@fau.de', '@fau.de', 'fau.de'] as $deniedEmail) {
+    courseAssert(!Model::allowsEmail($deniedEmail, $domainSettings), 'Exact matching must reject other domains, subdomains, suffix tricks and malformed addresses.');
+}
+courseAssert(Model::allowsEmail('person@example.org', Model::defaults()) && Model::allowsEmail('person@example.org', []), 'New unrestricted courses and old courses without the setting remain open.');
+courseAssert(!Model::allowsEmail('person@fau.de', ['allowed_email_domains' => null]), 'Malformed persisted settings must fail closed.');
 courseAssert(Model::counts($bookings, 1, $now)['free'] === 0, 'Availability never displays negative capacity.');
-echo "Course core state/count tests passed.\n";
+echo "Course core state/count and email-domain tests passed.\n";

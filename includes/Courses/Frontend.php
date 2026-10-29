@@ -284,6 +284,7 @@ class Frontend
         $identity = $this->identity();
         $requiresSso = $course['settings']['access'] === 'sso';
         $formAllowed = !$requiresSso || $identity['authenticated'];
+        $allowedDomains = Model::normalizeEmailDomains($course['settings']['allowed_email_domains'] ?? []) ?? [];
         $uid = wp_unique_id('rsvp-course-');
         $dates = [];
         foreach ($this->repository->getOccurrences($course['id'], true) as $date) {
@@ -303,6 +304,12 @@ class Frontend
                 <p><?php esc_html_e('No upcoming course dates are currently available.', 'rrze-rsvp'); ?></p>
             <?php else : ?>
                 <p><?php esc_html_e('Each date is booked separately. One registration reserves one place.', 'rrze-rsvp'); ?></p>
+                <?php if ($allowedDomains) : ?>
+                    <p class="rrze-rsvp-course-notice" id="<?php echo esc_attr($uid); ?>email-domains"><?php
+                        /* translators: %s: Comma-separated email domains, each prefixed with @. */
+                        echo esc_html(sprintf(__('Registration is only possible with an email address ending in: %s. This also applies when signing in with SSO.', 'rrze-rsvp'), '@' . implode(', @', $allowedDomains)));
+                    ?></p>
+                <?php endif; ?>
                 <?php if ($requiresSso && !$identity['authenticated']) : ?>
                     <?php if ($identity['available']) : ?>
                         <p><a class="rrze-rsvp-course-login" href="<?php echo esc_url($this->loginUrl()); ?>"><?php esc_html_e('Sign in with SSO', 'rrze-rsvp'); ?></a></p>
@@ -333,7 +340,7 @@ class Frontend
                                 <?php endif; ?>
                                 <label for="<?php echo esc_attr($uid); ?>firstname"><?php esc_html_e('First name', 'rrze-rsvp'); ?><input id="<?php echo esc_attr($uid); ?>firstname" name="firstname" type="text" autocomplete="given-name" maxlength="254" required></label>
                                 <label for="<?php echo esc_attr($uid); ?>lastname"><?php esc_html_e('Last name', 'rrze-rsvp'); ?><input id="<?php echo esc_attr($uid); ?>lastname" name="lastname" type="text" autocomplete="family-name" maxlength="254" required></label>
-                                <label for="<?php echo esc_attr($uid); ?>email"><?php esc_html_e('Email address', 'rrze-rsvp'); ?><input id="<?php echo esc_attr($uid); ?>email" name="email" type="email" autocomplete="email" maxlength="254" required></label>
+                                <label for="<?php echo esc_attr($uid); ?>email"><?php esc_html_e('Email address', 'rrze-rsvp'); ?><input id="<?php echo esc_attr($uid); ?>email" name="email" type="email" autocomplete="email" maxlength="254" required<?php if ($allowedDomains) : ?> aria-describedby="<?php echo esc_attr($uid); ?>email-domains"<?php endif; ?>></label>
                             </fieldset>
                             <p class="rrze-rsvp-course-hint"><?php esc_html_e('After registering, you will receive an email with a confirmation link. Confirm your email address within 60 minutes. If the course starts sooner, the deadline is the course start time. We will hold your place until then.', 'rrze-rsvp'); ?></p>
                         <?php endif; ?>
