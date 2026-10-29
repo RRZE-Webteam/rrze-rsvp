@@ -48,8 +48,7 @@
     }
 }
 
-.rsvp-course-row-actions,
-.rsvp-course-booking-actions {
+.rsvp-course-row-actions {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -69,18 +68,294 @@
     margin: 16px 0 24px;
 }
 
-.rsvp-course-booking-details {
-    display: grid;
-    grid-template-columns: minmax(100px, 160px) 1fr;
-    gap: 12px 20px;
+.rsvp-course-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 5px 10px;
+    border: 1px solid #dcdcde;
+    border-radius: 20px;
+    background: #f0f0f1;
+    color: #50575e;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: left;
+
+    .dashicons {
+        flex: 0 0 16px;
+        width: 16px;
+        height: 16px;
+        font-size: 16px;
+    }
+
+    &--confirmed {
+        border-color: #b8dcc8;
+        background: #edf7f0;
+        color: #18633b;
+    }
+
+    &--customer-confirmed {
+        border-color: #e8d59d;
+        background: #fcf6e5;
+        color: #795400;
+    }
+
+    &--booked {
+        border-color: #c2d8ee;
+        background: #eff6fc;
+        color: #185a89;
+    }
+}
+
+.rsvp-course-status-reason {
+    margin: 8px 0 0;
+    color: #646970;
+    font-size: 12px;
+}
+
+// Keep these rules more specific than the legacy status-column button styles.
+[data-course-booking-status] {
+    text-align: left;
+
+    .rsvp-course-booking-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        margin: 12px 0 0;
+
+        &:empty {
+            display: none;
+        }
+    }
+
+    .button.rsvp-course-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 7px;
+        min-width: 0;
+        max-width: 100%;
+        min-height: 32px;
+        margin: 0;
+        padding: 6px 10px;
+        border: 1px solid #c3c4c7;
+        border-radius: 6px;
+        background: #fff;
+        box-shadow: none;
+        color: #2c3338;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 1.4;
+        text-align: left;
+        white-space: normal;
+
+        .dashicons {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 16px;
+            width: 16px;
+            height: 16px;
+            font-size: 16px;
+            // WordPress buttons otherwise apply line-height: 1.9 to Dashicons.
+            line-height: 1;
+        }
+
+        &:hover {
+            border-color: #8c8f94;
+            background: #f6f7f7;
+            color: #1d2327;
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+            outline-offset: 2px;
+        }
+
+        &--primary {
+            border-color: var(--wp-admin-theme-color, #2271b1);
+            background: var(--wp-admin-theme-color, #2271b1);
+            color: #fff;
+
+            &:hover {
+                border-color: var(--wp-admin-theme-color-darker-10, #135e96);
+                background: var(--wp-admin-theme-color-darker-10, #135e96);
+                color: #fff;
+            }
+        }
+
+        &--danger {
+            border-color: #e5c3c3;
+            background: #fff;
+            color: #a32929;
+
+            &:hover {
+                border-color: #b32d2e;
+                background: #fcf0f1;
+                color: #8a2424;
+            }
+        }
+
+        &:disabled {
+            cursor: wait;
+        }
+    }
+}
+
+// Course bookings have no publish sidebar; use that space for their summary.
+body.post-type-booking #poststuff #post-body.columns-2:has(#rsvp-course-booking):has(#side-sortables:empty) {
+    margin-right: 0;
+
+    #postbox-container-1 {
+        display: none;
+    }
+}
+
+#rsvp-course-booking {
+    border-color: #dcdcde;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+
+    > .inside {
+        margin: 0;
+        padding: 0;
+    }
+
+    > .postbox-header {
+        border-bottom-color: #e8eaed;
+    }
+}
+
+.rsvp-course-booking {
+    color: #1d2327;
+
+    h3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 20px;
+        font-size: 14px;
+    }
+
+    .rsvp-course-booking-title {
+        margin: 0 0 24px;
+        font-size: 23px;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+
+    .dashicons {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        text-decoration: none;
+    }
 
     dt {
+        margin: 0 0 6px;
+        color: #646970;
+        font-size: 12px;
         font-weight: 600;
     }
 
     dd {
         margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
         overflow-wrap: anywhere;
+    }
+
+    a {
+        text-underline-offset: 3px;
+    }
+}
+
+.rsvp-course-booking-header {
+    padding: 24px 28px;
+    border-bottom: 1px solid #e8eaed;
+}
+
+.rsvp-course-booking-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    color: #646970;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.rsvp-course-booking-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px 24px;
+    margin: 0;
+}
+
+.rsvp-course-booking-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 30%);
+}
+
+.rsvp-course-booking-participant {
+    min-width: 0;
+    padding: 28px;
+}
+
+.rsvp-course-booking-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin: 0;
+}
+
+.rsvp-course-booking-notes {
+    grid-column: 1 / -1;
+    padding-top: 20px;
+    border-top: 1px solid #e8eaed;
+}
+
+.rsvp-course-booking-empty {
+    color: #646970;
+}
+
+.rsvp-course-booking-sidebar {
+    min-width: 0;
+    padding: 28px;
+    border-left: 1px solid #e8eaed;
+    background: #f8f9fa;
+
+    .rsvp-course-booking-actions {
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .button.rsvp-course-action {
+        width: 100%;
+        min-height: 38px;
+        font-size: 13px;
+    }
+}
+
+.rsvp-course-booking-footer {
+    padding: 18px 28px;
+    border-top: 1px solid #e8eaed;
+
+    a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        text-decoration: none;
+
+        > span:last-child {
+            text-decoration: underline;
+        }
     }
 }
 
@@ -90,7 +365,21 @@
     }
 
     .rsvp-course-fields,
+    .rsvp-course-booking-summary,
+    .rsvp-course-booking-body,
     .rsvp-course-booking-details {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .rsvp-course-booking-header,
+    .rsvp-course-booking-participant,
+    .rsvp-course-booking-sidebar,
+    .rsvp-course-booking-footer {
+        padding: 20px;
+    }
+
+    .rsvp-course-booking-sidebar {
+        border-left: 0;
+        border-top: 1px solid #e8eaed;
     }
 }

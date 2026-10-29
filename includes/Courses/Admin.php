@@ -514,10 +514,13 @@ final class Admin
     {
         $expired = $booking['status'] === 'booked' && $booking['expires_at'] <= time();
         $labels = ['booked' => __('Waiting for email verification', 'rrze-rsvp'), 'customer-confirmed' => __('Awaiting approval', 'rrze-rsvp'), 'confirmed' => __('Confirmed', 'rrze-rsvp'), 'cancelled' => __('Cancelled', 'rrze-rsvp')];
-        $html = '<strong>' . esc_html($expired ? __('Expired', 'rrze-rsvp') : ($labels[$booking['status']] ?? $booking['status'])) . '</strong>';
+        $status = $expired ? 'expired' : $booking['status'];
+        $icons = ['booked' => 'email', 'customer-confirmed' => 'clock', 'confirmed' => 'yes-alt', 'cancelled' => 'no-alt', 'expired' => 'clock'];
+        $html = '<span class="rsvp-course-status rsvp-course-status--' . esc_attr($status) . '"><span class="dashicons dashicons-' . esc_attr($icons[$status] ?? 'info-outline') . '" aria-hidden="true"></span>';
+        $html .= '<span>' . esc_html($expired ? __('Expired', 'rrze-rsvp') : ($labels[$booking['status']] ?? $booking['status'])) . '</span></span>';
         if ($booking['cancel_reason']) {
             $reasons = ['rejected' => __('Registration rejected', 'rrze-rsvp'), 'customer' => __('Cancelled by participant', 'rrze-rsvp'), 'admin' => __('Cancelled by staff', 'rrze-rsvp'), 'expired' => __('Email verification expired', 'rrze-rsvp'), 'occurrence_cancelled' => __('Course date cancelled', 'rrze-rsvp')];
-            $html .= '<br><span>' . esc_html($reasons[$booking['cancel_reason']] ?? __('Course date cancelled', 'rrze-rsvp')) . '</span>';
+            $html .= '<p class="rsvp-course-status-reason">' . esc_html($reasons[$booking['cancel_reason']] ?? __('Course date cancelled', 'rrze-rsvp')) . '</p>';
         }
         $mailError = get_post_meta($booking['id'], 'rrze-rsvp-course-mail-error', true);
         if ($mailError) {
@@ -527,27 +530,37 @@ final class Admin
             $buttons = [];
             if (!$expired && $booking['status'] === 'customer-confirmed' && time() < $booking['start']) {
                 $buttons['approve_booking'] = __('Approve registration', 'rrze-rsvp');
+            }
+            if (!$expired && ($booking['status'] === 'cancelled' || $booking['end'] > time())) {
+                $buttons['resend_booking'] = __('Resend email', 'rrze-rsvp');
+            }
+            if (!$expired && $booking['status'] === 'customer-confirmed' && time() < $booking['start']) {
                 $buttons['reject_booking'] = __('Reject registration', 'rrze-rsvp');
             }
             if (!$expired && in_array($booking['status'], Model::ACTIVE_STATUSES, true) && time() < $booking['end']) {
                 $buttons['cancel_booking'] = __('Cancel registration', 'rrze-rsvp');
             }
-            if (!$expired && ($booking['status'] === 'cancelled' || $booking['end'] > time())) {
-                $buttons['resend_booking'] = __('Resend email', 'rrze-rsvp');
-            }
-            $html .= '<p class="rsvp-course-booking-actions">';
+            $actionStyles = [
+                'approve_booking' => ['primary', 'yes'],
+                'reject_booking' => ['danger', 'dismiss'],
+                'cancel_booking' => ['danger', 'no-alt'],
+                'resend_booking' => ['secondary', 'email-alt'],
+            ];
+            $html .= '<div class="rsvp-course-booking-actions">';
             foreach ($buttons as $operation => $label) {
                 $form = $this->queueForm($operation, $booking['course_id'], $booking['id']);
                 $confirm = in_array($operation, ['cancel_booking', 'reject_booking'], true) ? ' data-course-confirm="' . esc_attr__('Cancel this registration and release its place?', 'rrze-rsvp') . '"' : '';
-                $html .= '<button type="submit" class="button button-small" form="' . esc_attr($form) . '"' . $confirm . '>' . esc_html($label) . '</button> ';
+                [$variant, $icon] = $actionStyles[$operation];
+                $html .= '<button type="submit" class="button rsvp-course-action rsvp-course-action--' . esc_attr($variant) . '" form="' . esc_attr($form) . '"' . $confirm . '>';
+                $html .= '<span class="dashicons dashicons-' . esc_attr($icon) . '" aria-hidden="true"></span><span>' . esc_html($label) . '</span></button>';
             }
-            $html .= '</p>';
+            $html .= '</div>';
         }
         return $html . '<div class="rsvp-course-feedback" role="status" aria-live="polite"></div>';
     }
 
     /**
-     * Show course booking information without a native post-update route.
+     * Group read-only course, participant and status details in a booking summary.
      *
      * @param WP_Post $post Booking post.
      * @return void
@@ -558,20 +571,32 @@ final class Admin
         if (is_wp_error($booking)) {
             return;
         }
-        $rows = [
-            __('Course', 'rrze-rsvp') => $booking['course_title'],
-            __('Date', 'rrze-rsvp') => wp_date(get_option('date_format') . ' ' . get_option('time_format'), $booking['start']) . ' – ' . wp_date(get_option('date_format') . ' ' . get_option('time_format'), $booking['end']),
-            __('Location', 'rrze-rsvp') => $booking['location'],
-            __('Name', 'rrze-rsvp') => $booking['guest_firstname'] . ' ' . $booking['guest_lastname'],
-            __('Email', 'rrze-rsvp') => $booking['guest_email'],
-            __('Notes', 'rrze-rsvp') => $booking['notes'],
-        ];
-        echo '<dl class="rsvp-course-booking-details">';
-        foreach ($rows as $label => $value) {
-            echo '<dt>' . esc_html($label) . '</dt><dd>' . nl2br(esc_html($value)) . '</dd>';
+        $date = wp_date(get_option('date_format'), $booking['start']);
+        if (wp_date('Y-m-d', $booking['start']) !== wp_date('Y-m-d', $booking['end'])) {
+            $date .= ' – ' . wp_date(get_option('date_format'), $booking['end']);
         }
-        echo '</dl><div data-course-booking-status="' . esc_attr($booking['id']) . '">' . $this->bookingStatus($booking) . '</div>';
-        echo '<p><a href="' . esc_url(add_query_arg(['post_type' => 'booking', 'rsvp_course_id' => $booking['course_id'], 'rsvp_occurrence_id' => $booking['occurrence_id']], admin_url('edit.php'))) . '">' . esc_html__('Back to registrations for this date', 'rrze-rsvp') . '</a></p>';
+        $summary = [
+            __('Date', 'rrze-rsvp') => $date,
+            __('Time', 'rrze-rsvp') => wp_date(get_option('time_format'), $booking['start']) . ' – ' . wp_date(get_option('time_format'), $booking['end']),
+            __('Location', 'rrze-rsvp') => $booking['location'] ?: '—',
+        ];
+        echo '<div class="rsvp-course-booking">';
+        echo '<header class="rsvp-course-booking-header"><p class="rsvp-course-booking-eyebrow"><span class="dashicons dashicons-welcome-learn-more" aria-hidden="true"></span>' . esc_html__('Course', 'rrze-rsvp') . '</p>';
+        echo '<h3 class="rsvp-course-booking-title">' . esc_html($booking['course_title']) . '</h3>';
+        echo '<dl class="rsvp-course-booking-summary">';
+        foreach ($summary as $label => $value) {
+            echo '<div><dt>' . esc_html($label) . '</dt><dd>' . esc_html($value) . '</dd></div>';
+        }
+        echo '</dl></header><div class="rsvp-course-booking-body">';
+        echo '<section class="rsvp-course-booking-participant" aria-labelledby="rsvp-course-participant-heading"><h3 id="rsvp-course-participant-heading"><span class="dashicons dashicons-admin-users" aria-hidden="true"></span>' . esc_html__('Participant', 'rrze-rsvp') . '</h3>';
+        echo '<dl class="rsvp-course-booking-details"><div><dt>' . esc_html__('Name', 'rrze-rsvp') . '</dt><dd>' . esc_html(trim($booking['guest_firstname'] . ' ' . $booking['guest_lastname'])) . '</dd></div>';
+        echo '<div><dt>' . esc_html__('Email', 'rrze-rsvp') . '</dt><dd><a href="' . esc_url('mailto:' . $booking['guest_email']) . '">' . esc_html($booking['guest_email']) . '</a></dd></div>';
+        echo '<div class="rsvp-course-booking-notes"><dt>' . esc_html__('Notes', 'rrze-rsvp') . '</dt><dd>';
+        echo trim($booking['notes']) !== '' ? nl2br(esc_html($booking['notes'])) : '<span class="rsvp-course-booking-empty">' . esc_html__('No notes provided.', 'rrze-rsvp') . '</span>';
+        echo '</dd></div></dl></section>';
+        echo '<section class="rsvp-course-booking-sidebar" aria-labelledby="rsvp-course-status-heading"><h3 id="rsvp-course-status-heading">' . esc_html__('Status', 'rrze-rsvp') . '</h3>';
+        echo '<div data-course-booking-status="' . esc_attr($booking['id']) . '">' . $this->bookingStatus($booking) . '</div></section></div>';
+        echo '<footer class="rsvp-course-booking-footer"><a href="' . esc_url(add_query_arg(['post_type' => 'booking', 'rsvp_course_id' => $booking['course_id'], 'rsvp_occurrence_id' => $booking['occurrence_id']], admin_url('edit.php'))) . '"><span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span><span>' . esc_html__('Back to registrations for this date', 'rrze-rsvp') . '</span></a></footer></div>';
     }
 
     /**

@@ -3458,3 +3458,11 @@ msgstr "Die Kursbenachrichtigung wird gerade verarbeitet. Verwenden Sie „E-Mai
 #: includes/Courses/Frontend.php
 msgid "Your registration has been received."
 msgstr "Ihre Anmeldung ist eingegangen."
+
+#: includes/Courses/Admin.php
+msgid "Participant"
+msgstr "Teilnehmende Person"
+
+#: includes/Courses/Admin.php
+msgid "No notes provided."
+msgstr "Keine Bemerkungen hinterlegt."
