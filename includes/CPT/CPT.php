@@ -18,6 +18,11 @@ class CPT extends Main
         //
     }
 
+    /**
+     * Register post types and their administration and display hooks.
+     *
+     * @return void
+     */
     public function onLoaded()
     {
         $bookings = new Bookings;
@@ -36,8 +41,6 @@ class CPT extends Main
         // Prüfung: gibt es Buchung zu Raum oder Platz 
         // add_action('add_meta_boxes', [$this, 'customSubmitdiv']);
 
-
-        add_action('add_meta_boxes', [$this, 'shortcodeHelper']);
 
         if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
             add_filter(
@@ -244,24 +247,6 @@ class CPT extends Main
             </div>
         </div>
         <?php
-    }
-
-    public function shortcodeHelper()
-    {
-        add_meta_box('rrze-rsvp-room-shortcode-helper', esc_html__('Shortcodes', 'rrze-rsvp'), [$this, 'shortcodeHelperCallback'], 'room', 'side', 'high');
-    }
-
-    public function shortcodeHelperCallback()
-    {
-        printf('<p class="description">%s</p>', __('You can display a booking form or a table with the available time slots for this room by adding one of the following shortcodes to any page:', 'rrze-rsvp'));
-        printf('<h3 style="margin-bottom: 0">%s</h3>', __('Booking Form', 'rrze-rsvp'));
-        printf('<p><code>[rsvp-booking room="%s"]</code></p>', get_the_ID());
-        printf('<p>%s</p>', __('Add <code>days="20"</code> to overwrite the number of days you can book a seat in advance.', 'rrze-rsvp'));
-//        printf('<p>%s</p>', __('Add <code>sso="false"</code> overwrite to SSO settings for this room.', 'rrze-rsvp'));
-        printf('<h3 style="margin-bottom: 0">%s</h3>', __('Availability Table', 'rrze-rsvp'));
-        printf('<p><code>[rsvp-availability room="%s"]</code></p>', get_the_ID());
-        printf('<p>%s</p>', __('Add <code>booking_link="true"</code> to link the available timeslots to the pre-filled booking form.', 'rrze-rsvp'));
-        printf('<p>%s</p>', __('Add <code>days="20"</code> to overwrite the default number of days.', 'rrze-rsvp'));
     }
 
     public function archiveShowAllRooms($query) {

@@ -528,7 +528,7 @@ class Metaboxes
             'title' => __('Public Displays', 'rrze-rsvp'),
             'object_types' => array('room'), // Post type
             'context' => 'side',
-            'priority' => 'high',
+            'priority' => 'low', // Follow the room image registered earlier by WordPress.
             'show_names' => false, // Show field names on the left
             // 'cmb_styles' => false, // false to disable the CMB stylesheet
             'closed' => true, // Keep the metabox closed by default
