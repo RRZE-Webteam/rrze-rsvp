@@ -197,4 +197,171 @@ div.cmb2-id-rrze-rsvp-booking-start {
 	}
 }
 
+// Keep the calendar beside its selected dates, with the original text list below.
+#rrze-rsvp-room-timeslots_meta .rsvp-closed-days-field {
+	> .cmb-th,
+	> .cmb-td {
+		float: none;
+		width: auto;
+		max-width: 100%;
+	}
 
+	> .cmb-th {
+		padding-bottom: 0;
+	}
+
+	[hidden] {
+		display: none !important;
+	}
+
+	textarea {
+		width: 100%;
+		max-width: 100%;
+	}
+}
+
+.rsvp-closed-days {
+	h4 {
+		margin: 0;
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	.description {
+		margin: 0 0 16px;
+	}
+}
+
+.rsvp-closed-days-layout {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 24px;
+	margin-bottom: 20px;
+}
+
+.rsvp-closed-calendar {
+	flex: 1 1 260px;
+	max-width: 360px;
+	min-width: 0;
+	padding: 14px;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	box-sizing: border-box;
+
+	.rsvp-closed-calendar-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		margin-bottom: 12px;
+
+		button {
+			font-size: 22px;
+			line-height: 1;
+			min-width: 32px;
+		}
+	}
+
+	.rsvp-closed-calendar-grid {
+		width: 100%;
+		table-layout: fixed;
+		border-spacing: 3px;
+		margin-bottom: 10px;
+
+		th {
+			width: calc(100% / 7);
+			font-size: 12px;
+			font-weight: 500;
+			text-align: center;
+			padding: 0 0 6px;
+		}
+
+		td {
+			padding: 0;
+		}
+
+		button {
+			width: 100%;
+			min-height: 34px;
+			padding: 3px;
+			border: 1px solid transparent;
+			border-radius: 3px;
+			background: #f6f7f7;
+			color: #1d2327;
+			font: inherit;
+			cursor: pointer;
+
+			&[aria-current="date"] {
+				border-color: #2271b1;
+			}
+
+			&[aria-pressed="true"] {
+				background: #2271b1;
+				color: #fff;
+				font-weight: 600;
+			}
+
+			&:hover {
+				border-color: #135e96;
+			}
+
+			&:focus-visible {
+				outline: 2px solid #1d2327;
+				outline-offset: 1px;
+			}
+		}
+	}
+}
+
+.rsvp-closed-days-overview {
+	flex: 1 1 190px;
+	min-width: 0;
+}
+
+.rsvp-closed-days-list {
+	display: flex;
+	flex-wrap: wrap;
+	align-content: flex-start;
+	gap: 8px;
+	max-height: 300px;
+	overflow: auto;
+	margin: 12px 0 0;
+	padding: 3px;
+
+	li {
+		margin: 0;
+	}
+
+	button {
+		display: inline-flex;
+		align-items: center;
+		gap: 12px;
+		min-height: 34px;
+		padding: 5px 10px;
+		border: 1px solid #c3c4c7;
+		border-radius: 4px;
+		background: #f0f6fc;
+		color: #135e96;
+		font: inherit;
+		cursor: pointer;
+
+		&:hover,
+		&:focus-visible {
+			border-color: #2271b1;
+			outline: 1px solid #2271b1;
+		}
+	}
+}
+
+.rsvp-closed-days-text-label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+.rsvp-closed-days-warning {
+	border-left: 3px solid #dba617;
+	padding: 10px 12px;
+	background: #fcf9e8;
+}

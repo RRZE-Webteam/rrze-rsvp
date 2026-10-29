@@ -2344,3 +2344,35 @@ msgstr "Weiteren Termin hinzufügen"
 
 msgid "Remove time slot"
 msgstr "Termin entfernen"
+
+msgid "Closed days calendar"
+msgstr "Kalender für Schließtage"
+
+msgid "Select closed days in the calendar. Highlighted days are closed; click again to remove them."
+msgstr "Wähle Schließtage im Kalender. Markierte Tage sind geschlossen; erneutes Anklicken entfernt die Markierung."
+
+msgid "Previous month"
+msgstr "Vorheriger Monat"
+
+msgid "Next month"
+msgstr "Nächster Monat"
+
+msgid "Current month"
+msgstr "Aktueller Monat"
+
+msgid "Selected closed days"
+msgstr "Ausgewählte Schließtage"
+
+msgid "No closed days selected."
+msgstr "Keine Schließtage ausgewählt."
+
+#. translators: %s: Localized calendar date.
+#, php-format
+msgid "Remove closed day: %s"
+msgstr "Schließtag entfernen: %s"
+
+msgid "Date list (YYYY-MM-DD)"
+msgstr "Datumsliste (JJJJ-MM-TT)"
+
+msgid "Some lines cannot be displayed in the calendar. Enter one valid date per line (YYYY-MM-DD), without spaces. Your text is retained."
+msgstr "Einige Zeilen können im Kalender nicht angezeigt werden. Gib pro Zeile ein gültiges Datum (JJJJ-MM-TT) ohne Leerzeichen ein. Dein Text bleibt erhalten."

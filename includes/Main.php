@@ -216,6 +216,7 @@ class Main
             'ajaxurl' => admin_url('admin-ajax.php'),
             'booking_action_nonce' => wp_create_nonce('rrze-rsvp-booking-action'),
             'timeslots' => $post_type === 'room' ? $this->getTimeslotEditorLabels() : null,
+            'closedDays' => $post_type === 'room' ? $this->getClosedDaysEditorLabels() : null,
             // Strings für CPT Booking Backend
             'alert_no_seat_date' => __('Please select a seat first.', 'rrze-rsvp')
         ));
@@ -278,6 +279,30 @@ class Main
             'dateOrder' => __('The end date must not be before the start date.', 'rrze-rsvp'),
             'timeRequired' => __('Please enter start and end times in HH:MM format.', 'rrze-rsvp'),
             'timeOrder' => __('The end time must be after the start time on the same day.', 'rrze-rsvp'),
+        ];
+    }
+
+    /**
+     * Supply calendar labels and site-local date conventions for closed days.
+     *
+     * @return array Translated controls and WordPress calendar settings.
+     */
+    protected function getClosedDaysEditorLabels(): array
+    {
+        return [
+            'today' => current_time('Y-m-d'),
+            'firstDay' => max(0, min(6, (int) get_option('start_of_week', 1))),
+            'calendar' => __('Closed days calendar', 'rrze-rsvp'),
+            'help' => __('Select closed days in the calendar. Highlighted days are closed; click again to remove them.', 'rrze-rsvp'),
+            'previous' => __('Previous month', 'rrze-rsvp'),
+            'next' => __('Next month', 'rrze-rsvp'),
+            'currentMonth' => __('Current month', 'rrze-rsvp'),
+            'selected' => __('Selected closed days', 'rrze-rsvp'),
+            'empty' => __('No closed days selected.', 'rrze-rsvp'),
+            /* translators: %s: Localized calendar date. */
+            'remove' => __('Remove closed day: %s', 'rrze-rsvp'),
+            'textList' => __('Date list (YYYY-MM-DD)', 'rrze-rsvp'),
+            'invalid' => __('Some lines cannot be displayed in the calendar. Enter one valid date per line (YYYY-MM-DD), without spaces. Your text is retained.', 'rrze-rsvp'),
         ];
     }
 
