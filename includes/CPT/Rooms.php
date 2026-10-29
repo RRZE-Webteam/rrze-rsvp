@@ -16,14 +16,48 @@ class Rooms{
         //
     }
 
+    /**
+     * Register room post type, editor, and list table hooks.
+     *
+     * @return void
+     */
     public function onLoaded(){
         add_action('init', [$this, 'room_post_type']);
+
+        add_filter('tiny_mce_before_init', [$this, 'filterRoomEditorSettings'], 10, 2);
 
         add_filter('manage_room_posts_columns', [$this, 'columns']);
         add_action('manage_room_posts_custom_column', [$this, 'customColumn'], 10, 2);
         add_filter('manage_edit-room_sortable_columns', [$this, 'sortableColumns']);
 
         add_filter('months_dropdown_results', [$this, 'removeMonthsDropdown'], 10, 2);
+    }
+
+    /**
+     * Keep theme viewport heights from making the room editor grow indefinitely.
+     *
+     * A theme's body min-height of 100vh refers to the editor iframe's height.
+     * WordPress autoresize adds the body spacing to that height on each pass,
+     * creating a feedback loop even when the editor is empty. Reset only the
+     * room content editor's minimum height so it can resize to its actual content.
+     * Existing editor styles and editors on other screens remain unchanged.
+     *
+     * @param array $settings TinyMCE initialization settings.
+     * @param string $editorId ID of the editor being initialized.
+     * @return array Filtered TinyMCE initialization settings.
+     */
+    public function filterRoomEditorSettings(array $settings, string $editorId): array
+    {
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+
+        if ($editorId !== 'content' || !$screen || $screen->base !== 'post' || $screen->post_type !== 'room') {
+            return $settings;
+        }
+
+        $settings['content_style'] = ($settings['content_style'] ?? '')
+            . ' body#tinymce.wp-editor { min-height: 0; }';
+
+        return $settings;
     }
 
 
