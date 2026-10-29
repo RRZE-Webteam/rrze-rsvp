@@ -105,6 +105,22 @@ namespace {
     expect(str_contains($times->invoke($picker, 7, '', false, []), 'Select an available day'), 'No selected date produces helpful guidance.');
     expect(str_contains($times->invoke($picker, 7, '2026-10-31', false, []), 'No times are available'), 'An empty selected day has a contextual message.');
 
+    $dense = [];
+    for ($index = 0; $index < 96; $index++) {
+        $startTime = (new DateTimeImmutable('2026-10-30 06:00'))->modify('+' . ($index * 10) . ' minutes');
+        $dense[$startTime->format('H:i') . '-' . $startTime->modify('+10 minutes')->format('H:i')] = [1];
+    }
+    $denseHtml = $times->invoke($picker, 7, '2026-10-30', '21:50', ['2026-10-30' => $dense]);
+    $denseMarkup = markup($denseHtml);
+    expect($denseMarkup->query('//input[@name="rsvp_time"]')->length === 96, 'Long days retain every available interval.');
+    expect($denseMarkup->query('//input[@checked]')->item(0)->getAttribute('value') === '21:50', 'A late preselected time remains selected.');
+    expect($denseMarkup->query('//div[contains(@class,"rsvp-time-options-scroll") and @tabindex="0" and @aria-describedby]')->length === 1, 'Large lists provide a keyboard-accessible scrolling group with guidance.');
+    expect(str_contains($denseHtml, '96 available time slots.'), 'The hint reports available intervals.');
+    $shortDay = array_slice($dense, 0, 12, true);
+    $shortDay['23:00-23:10'] = [];
+    $shortHtml = $times->invoke($picker, 7, '2026-10-30', false, ['2026-10-30' => $shortDay]);
+    expect(!str_contains($shortHtml, 'rsvp-time-options-scroll'), 'Twelve available intervals need no scrolling group; empty intervals do not count.');
+
     $seats = $reflection->getMethod('buildSeatSelect');
     $many = ['2026-10-30' => ['09:00-09:30' => range(1, 80)]];
     $html = $seats->invoke($picker, 7, '2026-10-30', '09:00', 80, $many);

@@ -1,4 +1,5 @@
 import { latestRequest } from './latest-request';
+import { revealTimeChoice } from './time-options';
 
 /**
  * Read calendar HTML or dependent form controls from the existing WP endpoints.
@@ -129,10 +130,17 @@ function initializePicker(picker) {
 
     /** @returns {void} Request the options belonging to the current date, time and seat. */
     function updateOptions() {
-        load({ action: 'UpdateForm', room: form.elements.rsvp_room.value, date: value('rsvp_date'), time: value('rsvp_time'), seat: value('rsvp_seat') },
+        const date = value('rsvp_date');
+        load({ action: 'UpdateForm', room: form.elements.rsvp_room.value, date, time: value('rsvp_time'), seat: value('rsvp_seat') },
             /** @param {Object} result Server-rendered dependent controls. @returns {void} */
             function applyOptions(result) {
-                timeHost.querySelector('.rsvp-time-select').outerHTML = result.time;
+                const previous = timeHost.querySelector('.rsvp-time-select');
+                const scrollTop = previous.dataset.date === date
+                    ? previous.querySelector('.rsvp-time-options-scroll')?.scrollTop || 0 : 0;
+                previous.outerHTML = result.time;
+                const viewport = timeHost.querySelector('.rsvp-time-options-scroll');
+                if (viewport) viewport.scrollTop = scrollTop;
+                revealTimeChoice(selected('rsvp_time'));
                 if (seatHost) seatHost.querySelector('.rsvp-seat-options').innerHTML = result.seat;
             });
     }
@@ -180,9 +188,16 @@ function initializePicker(picker) {
         }
     }
 
+    /** @param {FocusEvent} event Focus entering a time choice. @returns {void} */
+    function revealFocusedTime(event) {
+        if (event.target.name === 'rsvp_time') revealTimeChoice(event.target);
+    }
+
     picker.addEventListener('change', changeSelection);
     picker.addEventListener('click', clickPicker);
+    picker.addEventListener('focusin', revealFocusedTime);
     form.addEventListener('submit', guardSubmission);
+    revealTimeChoice(selected('rsvp_time'));
     updateSummary();
 }
 

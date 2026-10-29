@@ -1257,12 +1257,14 @@ class Bookings extends Shortcodes
             return '<div class="rsvp-time-select"><p class="rsvp-picker-empty">' . esc_html__('Select an available day in the calendar to see its times.', 'rrze-rsvp') . '</p></div>';
         }
         $dateObject = new \DateTimeImmutable($date, wp_timezone());
-        $output = '<div class="rsvp-time-select"><p class="rsvp-picker-date">' . esc_html(wp_date('l, j. F', $dateObject->getTimestamp())) . '</p>';
+        $output = '<div class="rsvp-time-select" data-date="' . esc_attr($date) . '"><p class="rsvp-picker-date">' . esc_html(wp_date('l, j. F', $dateObject->getTimestamp())) . '</p>';
         $choices = '';
+        $count = 0;
         foreach ($availability[$date] ?? [] as $slot => $seats) {
             if (!$seats) {
                 continue;
             }
+            $count++;
             $value = explode('-', $slot)[0];
             $label = str_replace('-', ' – ', $slot);
             $id = 'rsvp_time_' . $roomID . '_' . sanitize_title($value);
@@ -1270,7 +1272,19 @@ class Bookings extends Shortcodes
                 . ' data-label="' . esc_attr($label) . '"' . checked($time, $value, false) . ' required>'
                 . '<label for="' . esc_attr($id) . '">' . esc_html($label) . '</label></span>';
         }
-        return $output . ($choices ? '<div class="rsvp-picker-options">' . $choices . '</div>' : '<p class="rsvp-picker-empty">' . esc_html__('No times are available on this day. Please choose another day.', 'rrze-rsvp') . '</p>') . '</div>';
+        if (!$choices) {
+            return $output . '<p class="rsvp-picker-empty">' . esc_html__('No times are available on this day. Please choose another day.', 'rrze-rsvp') . '</p></div>';
+        }
+        $scrollable = $count > 12;
+        $hintId = 'rsvp_time_hint_' . $roomID;
+        if ($scrollable) {
+            /* translators: %d: Number of available time slots on the selected day. */
+            $output .= '<p class="rsvp-time-hint" id="' . esc_attr($hintId) . '">'
+                . esc_html(sprintf(__('%d available time slots. Scroll down to see more times.', 'rrze-rsvp'), $count)) . '</p>';
+        }
+        return $output . '<div class="rsvp-picker-options' . ($scrollable ? ' rsvp-time-options-scroll' : '') . '"'
+            . ($scrollable ? ' tabindex="0" role="group" aria-label="' . esc_attr__('Available time slots:', 'rrze-rsvp') . '" aria-describedby="' . esc_attr($hintId) . '"' : '')
+            . '>' . $choices . '</div></div>';
     }
 
     /**

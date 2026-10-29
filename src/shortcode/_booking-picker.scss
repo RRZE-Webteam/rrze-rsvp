@@ -261,6 +261,18 @@
     .rsvp-picker-empty, .rsvp-time-select, .rsvp-seat-options { color: var(--picker-muted); font-size: .95rem; line-height: 1.6; }
     .rsvp-picker-empty { margin: .5rem 0; padding: 0; }
     .rsvp-picker-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr)); gap: .5rem; }
+    .rsvp-time-hint { margin: 0 0 .75rem; color: var(--picker-muted); font-size: .8rem; line-height: 1.5; }
+    .rsvp-time-options-scroll {
+        max-height: 20rem;
+        overflow-y: auto;
+        align-content: start;
+        scrollbar-gutter: stable;
+        scroll-padding-block: .25rem;
+        padding: .25rem;
+        border: 1px solid var(--picker-border);
+        border-radius: .25rem;
+        &:focus-visible { outline: 3px solid var(--picker-accent); outline-offset: 2px; }
+    }
     .rsvp-seat-select { display: block; margin: 0; }
     .rsvp-seat-select .rsvp-picker-options { grid-template-columns: repeat(auto-fill, minmax(min(100%, 7rem), 1fr)); }
     .rsvp-seat-select select { max-width: 100%; background: #fff; color: var(--picker-ink); }

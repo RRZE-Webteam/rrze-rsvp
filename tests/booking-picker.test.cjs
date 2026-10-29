@@ -58,3 +58,56 @@ test('current failures are recoverable with a fresh request',
         assert.deepEqual(await retry, { status: 'success', data: 'Available' });
     }
 );
+
+const { revealTimeChoice } = require('../src/shortcode/time-options');
+
+/**
+ * Simulate a bounded time list independently of page scroll or server rendering.
+ * @param {number} top Tile top.
+ * @param {number} bottom Tile bottom.
+ * @returns {Object} Input and observable scrolling viewport.
+ */
+function timeChoice(top, bottom) {
+    const viewport = {
+        scrollTop: 500,
+        /** @returns {Object} Visible region on screen. */
+        getBoundingClientRect() { return { top: 100, bottom: 420 }; },
+    };
+    const tile = {
+        /** @returns {Object} Full label bounds, larger than the hidden radio input. */
+        getBoundingClientRect() { return { top, bottom }; },
+    };
+    return { viewport, input: {
+        /** @param {string} selector Component selector. @returns {Object} Matching ancestor. */
+        closest(selector) { return selector === '.rsvp-time-options-scroll' ? viewport : tile; },
+    } };
+}
+
+test('keyboard navigation reveals the entire time tile at either list edge',
+    /** @returns {void} Keep labels and focus outlines inside the scrolling region. */
+    function keyboardVisibility() {
+        const below = timeChoice(400, 444);
+        revealTimeChoice(below.input);
+        assert.equal(below.viewport.scrollTop, 528);
+        const above = timeChoice(80, 124);
+        revealTimeChoice(above.input);
+        assert.equal(above.viewport.scrollTop, 476);
+    }
+);
+
+test('visible choices retain their scroll position, and small lists are unaffected',
+    /** @returns {void} Avoid jumps after AJAX restores a selection. */
+    function preserveVisibleSelection() {
+        const visible = timeChoice(200, 244);
+        revealTimeChoice(visible.input);
+        assert.equal(visible.viewport.scrollTop, 500);
+        assert.doesNotThrow(
+            /** @returns {void} An unselected day needs no scrolling. */
+            () => revealTimeChoice(null)
+        );
+        revealTimeChoice({
+            /** @returns {null} A short list has no scrolling ancestor. */
+            closest() { return null; },
+        });
+    }
+);

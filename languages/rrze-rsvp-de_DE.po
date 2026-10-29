@@ -3588,3 +3588,8 @@ msgstr "Ihre Auswahl"
 
 msgid "Please complete your appointment selection first."
 msgstr "Bitte wählen Sie zuerst Ihren Termin vollständig aus."
+
+#. translators: %d: Number of available time slots on the selected day.
+#, php-format
+msgid "%d available time slots. Scroll down to see more times."
+msgstr "%d freie Zeitfenster. Für weitere Uhrzeiten nach unten scrollen."
