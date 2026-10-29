@@ -46,6 +46,14 @@ class Bookings extends Shortcodes
         add_shortcode('rsvp-booking', [$this, 'shortcodeBooking']);
     }
 
+    /**
+     * Render the room booking form, including its availability-driven picker.
+     *
+     * @param array $atts Shortcode attributes.
+     * @param string $content Enclosed shortcode content.
+     * @param string $tag Registered shortcode name.
+     * @return string Booking form or authentication/availability notice.
+     */
     public function shortcodeBooking($atts, $content = '', $tag = '')
     {
         global $post;
@@ -187,6 +195,9 @@ class Bookings extends Shortcodes
         }
 
         $get_date = isset($_GET['bookingdate']) ? sanitize_text_field($_GET['bookingdate']) : date('Y-m-d', current_time('timestamp'));
+        if (!$this->isCalendarDate($get_date)) {
+            $get_date = current_datetime()->format('Y-m-d');
+        }
         $get_time = isset($_GET['timeslot']) ? sanitize_text_field($_GET['timeslot']) : false;
         $get_seat = isset($_GET['seat_id']) ? absint($_GET['seat_id']) : false;
         $get_instant = (isset($_GET['instant']) && $_GET['instant'] == '1');
@@ -199,12 +210,7 @@ class Bookings extends Shortcodes
         );
 
         $output .= '<div class="rrze-rsvp">';
-        $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room" class="mode-' . $bookingMode . '">'
-            . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>';
-        // TODO:	
-        //	$output .= '<fieldset>';  
-        // FIELDSET muss noch rein oder unten <legend> raus. Wenn fieldset drin ist, ist die Ausstattungsanzeige des Sitzplatzes allerdings broken.
-        // Wahrscheinlich Problem mit dem JS?
+        $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room" class="mode-' . $bookingMode . '">';
         if ($get_instant) {
             $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
         }
@@ -239,38 +245,35 @@ class Bookings extends Shortcodes
                 . '<p>' . __('Seat', 'rrze-rsvp') . ': <strong>' . get_the_title($get_seat) . '</strong></p>'
                 . '</div>';
         } else {
-            $output .= '<div class="rsvp-datetime-container form-group clearfix">';
-            $output .= '<legend>' . __('Select date and time', 'rrze-rsvp') . '</legend>';
-            $output .=  '<div class="rsvp-date-container">';
             $get_timestamp = strtotime($get_date);
             $month          = date_i18n('n', $get_timestamp);
             $year           = date_i18n('Y', $get_timestamp);
             $start          = date_i18n('Y-m-d', current_time('timestamp'));
             $end            = date_i18n('Y-m-d', strtotime($start . ' +' . $days . ' days'));
-            $output .= $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date);
-            $output .= '</div>'; //.rsvp-date-container
-
-            $output .= '<div class="rsvp-time-container">'
-                . '<p><strong>' . __('Available time slots:', 'rrze-rsvp') . '</strong></p>';
-            if ($get_date) {
-                $output .= $this->buildTimeslotSelect($roomID, $get_date, $get_time, $availability);
-            } else {
-                $output .= '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
+            // Only show dependent selections for a bookable day in the permitted window.
+            if ($get_date < $start || $get_date > $end || !array_filter($availability[$get_date] ?? [])) {
+                $get_date = '';
+                $get_time = false;
+                $get_seat = false;
             }
-            $output .= '</div>'; //.rsvp-time-container
-
-            $output .= '</div>'; //.rsvp-datetime-container
-
+            $output .= '<fieldset class="rsvp-booking-picker">'
+                . '<legend>' . esc_html__('Select date and time', 'rrze-rsvp') . '</legend>'
+                . '<p class="rsvp-picker-intro">' . esc_html__('Choose a day, then a time that suits you.', 'rrze-rsvp') . '</p>'
+                . '<div class="rsvp-picker-layout">'
+                . '<fieldset class="rsvp-date-container"><legend><span class="rsvp-picker-step">1</span> ' . esc_html__('Date', 'rrze-rsvp') . '</legend>'
+                . $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date)
+                . '</fieldset>'
+                . '<fieldset class="rsvp-time-container"><legend><span class="rsvp-picker-step">2</span> ' . esc_html__('Time', 'rrze-rsvp') . '</legend>'
+                . $this->buildTimeslotSelect($roomID, $get_date, $get_time, $availability)
+                . '</fieldset></div>';
             if ($bookingMode != 'consultation') {
-                $output .= '<div class="rsvp-seat-container">';
-                if ($get_date && $get_time) {
-                    $output .= $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability);
-                } else {
-                    $output .= '<div class="rsvp-time-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
-                }
-                $output .= '</div>'; //.rsvp-seat-container
+                $output .= '<fieldset class="rsvp-seat-container"><legend><span class="rsvp-picker-step">3</span> ' . esc_html__('Seat', 'rrze-rsvp') . '</legend>'
+                    . '<div class="rsvp-seat-options">' . $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability) . '</div></fieldset>';
             }
-            //	$output .= '</fieldset>';
+            $output .= '<div class="rsvp-picker-summary" aria-live="polite" hidden></div>'
+                . '<div class="rsvp-picker-feedback"><span class="rsvp-picker-status" role="status"></span>'
+                . '<button type="button" class="rsvp-picker-retry" hidden>' . esc_html__('Try again', 'rrze-rsvp') . '</button></div>'
+                . '</fieldset>';
         }
 
         $output .= '<fieldset>';
@@ -1082,252 +1085,240 @@ class Bookings extends Shortcodes
         exit;
     }
 
-    /*
-     * Inspirationsquelle:
-     * https://css-tricks.com/snippets/php/build-a-calendar-table/
+    /**
+     * Render one month with real radio controls and explicit availability states.
+     *
+     * @param int $month Requested month (1–12).
+     * @param int $year Requested year.
+     * @param string $start First bookable date, Y-m-d.
+     * @param string $end Last bookable date, inclusive, Y-m-d.
+     * @param int|string $roomID Room post ID.
+     * @param string $bookingdate_selected Selected date, if still available.
+     * @return string Calendar markup, clamped to the booking window.
      */
     public function buildCalendar($month, $year, $start = '', $end = '', $roomID = '', $bookingdate_selected = '')
     {
-        //        $month = 6;
-        if ($start == '') {
-            $start = date('Y-m-d', current_time('timestamp'));
+        $today = current_datetime()->format('Y-m-d');
+        $start = $this->isCalendarDate($start) ? $start : $today;
+        $end = $this->isCalendarDate($end) ? max($start, $end) : (new \DateTimeImmutable($start))->modify('+7 days')->format('Y-m-d');
+        $period = sprintf('%04d-%02d', max(1970, min(9999, (int) $year)), max(1, min(12, (int) $month)));
+        $period = max(substr($start, 0, 7), min(substr($end, 0, 7), $period));
+        $first = new \DateTimeImmutable($period . '-01', wp_timezone());
+        $last = $first->modify('last day of this month');
+        $monthTitle = wp_date('F Y', $first->getTimestamp());
+        $availability = Functions::getRoomAvailability($roomID, max($start, $first->format('Y-m-d')), min($end, $last->format('Y-m-d')), false);
+        $calendar = '<div class="rsvp-calendar" data-period="' . esc_attr($period) . '" data-end="' . esc_attr($end) . '">'
+            . '<div class="rsvp-calendar-heading">'
+            . '<button type="button" class="rsvp-calendar-nav" data-direction="prev" aria-label="' . esc_attr__('Previous month', 'rrze-rsvp') . '"'
+            . ($period <= substr($start, 0, 7) ? ' disabled' : '') . '><span aria-hidden="true">‹</span></button>'
+            . '<h3 tabindex="-1">' . esc_html($monthTitle) . '</h3>'
+            . '<button type="button" class="rsvp-calendar-nav" data-direction="next" aria-label="' . esc_attr__('Next month', 'rrze-rsvp') . '"'
+            . ($period >= substr($end, 0, 7) ? ' disabled' : '') . '><span aria-hidden="true">›</span></button></div>'
+            . '<table class="rsvp-calendar-table"><caption class="rsvp-picker-sr">' . esc_html($monthTitle) . '</caption><thead><tr>';
+        $monday = new \DateTimeImmutable('2024-01-01', wp_timezone());
+        for ($weekday = 0; $weekday < 7; $weekday++) {
+            $timestamp = $monday->modify('+' . $weekday . ' days')->getTimestamp();
+            $calendar .= '<th scope="col"><abbr title="' . esc_attr(wp_date('l', $timestamp)) . '">' . esc_html(wp_date('D', $timestamp)) . '</abbr></th>';
         }
-        if ($end == '') {
-            $end = date('Y-m-d', strtotime($start . ' +7 days'));
+        $calendar .= '</tr></thead><tbody><tr>';
+        $offset = (int) $first->format('N') - 1;
+        for ($blank = 0; $blank < $offset; $blank++) {
+            $calendar .= '<td class="rsvp-calendar-empty"></td>';
         }
-        // Create array containing abbreviations of days of week.
-        $daysOfWeek = Functions::daysOfWeekAry(0, 1, 2);
-        // What is the first day of the month in question?
-        $firstDayOfMonth = mktime(0, 0, 0, $month, 1, $year);
-        $firstDayOfMonthDate = date('Y-m-d', $firstDayOfMonth);
-        // How many days does this month contain?
-        $numberDays = date('t', $firstDayOfMonth);
-        $lastDayOfMonth = mktime(0, 0, 0, $month, $numberDays, $year);
-        $lastDayOfMonthDate = date('Y-m-d', $lastDayOfMonth);
-        // What is the name of the month in question?
-        $monthName = date_i18n('w', $firstDayOfMonth);
-        // What is the index value (1-7) of the first day of the month in question.
-        $dayOfWeek = date('N', $firstDayOfMonth);
-        $bookingDaysStart = $start;
-        $bookingDaysEnd = $end;
-        $link_next = '<a href="#" class="cal-skip cal-next" data-direction="next">&gt;&gt;</a>';
-        $link_prev = '<a href="#" class="cal-skip cal-prev" data-direction="prev">&lt;&lt;</a>';
-        $availability = Functions::getRoomAvailability($roomID, $bookingDaysStart, $bookingDaysEnd, false);
-        // Create the table tag opener and day headers
-        $calendar = '<table class="rsvp_calendar" data-period="' . date_i18n('Y-m', $firstDayOfMonth) . '" data-end="' . $bookingDaysEnd . '">';
-        $calendar .= "<caption>";
-        if ($bookingDaysStart <= $firstDayOfMonthDate) {
-            $calendar .= $link_prev;
-        }
-        $calendar .= date_i18n('F Y', $firstDayOfMonth);
-        if ($bookingDaysEnd >= $lastDayOfMonthDate) {
-            $calendar .= $link_next;
-        }
-        //print $remainingBookingDays;
-        $calendar .= "</caption>";
-        // Create the calendar headers
-        $calendar .= "<tr>";
-        foreach ($daysOfWeek as $day) {
-            $calendar .= "<th class='header'>$day</th>";
-        }
-        $calendar .= "</tr>";
-        // Create the rest of the calendar
-        // Initiate the day counter, starting with the 1st.
-        $currentDay = 1;
-        $calendar .= "<tr>";
-        // The variable $dayOfWeek is used to ensure that the calendar display consists of exactly 7 columns.
-        if ($dayOfWeek > 1) {
-            $colspan = $dayOfWeek - 1;
-            $calendar .= "<td colspan='$colspan'>&nbsp;</td>";
-        }
-        $month = str_pad($month, 2, "0", STR_PAD_LEFT);
-        while ($currentDay <= $numberDays) {
-            // Seventh column (Saturday) reached. Start a new row.
-
-            if ($dayOfWeek > 7) {
-                $dayOfWeek = 1;
-                $calendar .= "</tr><tr>";
+        $availableDays = 0;
+        for ($day = 1; $day <= (int) $last->format('j'); $day++) {
+            if ($day > 1 && ($offset + $day - 1) % 7 === 0) {
+                $calendar .= '</tr><tr>';
             }
-            $currentDayRel = str_pad($currentDay, 2, "0", STR_PAD_LEFT);
-            $date = "$year-$month-$currentDayRel";
-            $class = '';
-            $title = '';
-            $active = true;
-            if ($date < $bookingDaysStart || $date > $bookingDaysEnd) {
-                $active = false;
-                $title = __('Not bookable (outside booking period)', 'rrze-rsvp');
-            } else {
-                $active = false;
-                $class = 'soldout';
-                $title = __('Not bookable (soldout or room blocked)', 'rrze-rsvp');
-                if ($roomID == '') {
-                } else {
-                    if (isset($availability[$date])) {
-                        foreach ($availability[$date] as $timeslot) {
-                            if (!empty($timeslot)) {
-                                $active = true;
-                                $class = 'available';
-                                $title = __('Seats available', 'rrze-rsvp');
-                            }
-                        }
-                    }
-                }
+            $date = $first->setDate((int) $first->format('Y'), (int) $first->format('m'), $day);
+            $value = $date->format('Y-m-d');
+            $active = $value >= $start && $value <= $end && array_filter($availability[$value] ?? []);
+            $state = $active ? 'available' : ($value < $start || $value > $end ? 'outside' : 'unavailable');
+            $isToday = $value === $today;
+            $description = wp_date('l, j. F Y', $date->getTimestamp());
+            $status = $active ? __('Seats available', 'rrze-rsvp') : __('No available appointments', 'rrze-rsvp');
+            if ($state === 'outside') {
+                $status = __('Not bookable (outside booking period)', 'rrze-rsvp');
             }
-
-            $input_open = '<span class="inactive">';
-            $input_close = '</span>';
+            $accessibleLabel = $description . ($isToday ? ' · ' . __('Today', 'rrze-rsvp') : '') . ' · ' . $status;
+            $calendar .= '<td class="rsvp-calendar-day is-' . $state . ($isToday ? ' is-today' : '') . '">';
             if ($active) {
-                if ($bookingdate_selected == $date || ($bookingdate_selected == false && $date == $bookingDaysStart)) {
-                    $checked = 'checked="checked"';
-                } else {
-                    $checked = '';
-                }
-                $input_open = "<input type=\"radio\" id=\"rsvp_date_$date\" value=\"$date\" name=\"rsvp_date\" $checked required><label for=\"rsvp_date_$date\">";
-                $input_close = '</label>';
+                $availableDays++;
+                $id = 'rsvp_date_' . $roomID . '_' . $value;
+                $calendar .= '<span class="rsvp-picker-choice"><input type="radio" id="' . esc_attr($id) . '" name="rsvp_date" value="' . esc_attr($value) . '"'
+                    . ' data-label="' . esc_attr($description) . '" aria-label="' . esc_attr($accessibleLabel) . '"'
+                    . checked($bookingdate_selected, $value, false) . ' required>'
+                    . '<label for="' . esc_attr($id) . '">' . $day . '</label></span>';
+            } else {
+                $calendar .= '<span class="rsvp-calendar-inactive" aria-label="' . esc_attr($accessibleLabel) . '" title="' . esc_attr($status) . '">' . $day . '</span>';
             }
-            $calendar .= "<td class='day $class' rel='$date' title='$title'>" . $input_open . $currentDay . $input_close . "</td>";
-            // Increment counters
-            $currentDay++;
-            $dayOfWeek++;
+            $calendar .= '</td>';
         }
-        // Complete the row of the last week in month, if necessary
-        if ($dayOfWeek != 8) {
-            $remainingDays = 8 - $dayOfWeek;
-            $calendar .= "<td colspan='$remainingDays'>&nbsp;</td>";
+        $trailing = (7 - ($offset + (int) $last->format('j')) % 7) % 7;
+        for ($blank = 0; $blank < $trailing; $blank++) {
+            $calendar .= '<td class="rsvp-calendar-empty"></td>';
         }
-        $calendar .= "</tr>";
-        $calendar .= "</table>";
-        return $calendar;
+        $calendar .= '</tr></tbody></table><div class="rsvp-calendar-key">'
+            . '<span><i class="is-available" aria-hidden="true"></i>' . esc_html__('Available', 'rrze-rsvp') . '</span>'
+            . '<span><i class="is-selected" aria-hidden="true">✓</i>' . esc_html__('Selected', 'rrze-rsvp') . '</span>'
+            . '<span><i class="is-today" aria-hidden="true"></i>' . esc_html__('Today', 'rrze-rsvp') . '</span></div>';
+        if (!$availableDays) {
+            $calendar .= '<p class="rsvp-picker-empty">' . esc_html__('No available appointments this month.', 'rrze-rsvp') . '</p>';
+        }
+        return $calendar . '</div>';
     }
 
+    /**
+     * Validate a calendar date without accepting DateTime's automatic rollovers.
+     *
+     * @param mixed $date Candidate date.
+     * @return bool Whether the value is a real, zero-padded Y-m-d date.
+     */
+    private function isCalendarDate($date): bool
+    {
+        if (!is_string($date) || !preg_match('/^\d{4}-\d{2}-\d{2}$/D', $date)) {
+            return false;
+        }
+        $parsed = \DateTimeImmutable::createFromFormat('!Y-m-d', $date);
+        return $parsed && $parsed->format('Y-m-d') === $date;
+    }
+
+    /**
+     * Return the adjacent month while retaining the displayed booking horizon.
+     *
+     * @return void Sends calendar HTML, or HTTP 400 for malformed navigation.
+     */
     public function ajaxUpdateCalendar()
     {
         check_ajax_referer('rsvp-ajax-nonce', 'nonce');
-        $period = explode('-', $_POST['month']);
-        $month = $period[1];
-        $year = $period[0];
-        switch ($month) {
-            case '1':
-                $modMonth = $_POST['direction'] == 'next' ? 1 : 11;
-                $modYear = $_POST['direction'] == 'next' ? 0 : -1;
-                break;
-            case '12':
-                $modMonth = $_POST['direction'] == 'next' ? -11 : -1;
-                $modYear = $_POST['direction'] == 'next' ? 1 : 0;
-                break;
-            default:
-                $modMonth = $_POST['direction'] == 'next' ? 1 : -1;
-                $modYear = 0;
-                break;
+        $period = sanitize_text_field(wp_unslash($_POST['month'] ?? ''));
+        $direction = sanitize_text_field(wp_unslash($_POST['direction'] ?? ''));
+        $end = sanitize_text_field(wp_unslash($_POST['end'] ?? ''));
+        if (!$this->isCalendarDate($period . '-01') || !$this->isCalendarDate($end) || !in_array($direction, ['prev', 'next'], true)) {
+            wp_die('', '', ['response' => 400]);
         }
-
-        $start = date_i18n('Y-m-d', current_time('timestamp'));
-        $end = sanitize_text_field($_POST['end']);
-        $roomID = (int)$_POST['room'];
-        $output = '';
-        $output .= $this->buildCalendar($month + $modMonth, $year + $modYear, $start, $end, $roomID);
-        echo $output;
+        $date = (new \DateTimeImmutable($period . '-01'))->modify($direction === 'next' ? '+1 month' : '-1 month');
+        echo $this->buildCalendar((int) $date->format('n'), (int) $date->format('Y'), current_datetime()->format('Y-m-d'), $end, absint($_POST['room'] ?? 0));
         wp_die();
     }
 
+    /**
+     * Refresh dependent controls from current availability, dropping stale choices.
+     *
+     * @return void Sends JSON with time and seat markup.
+     */
     public function ajaxUpdateForm()
     {
         check_ajax_referer('rsvp-ajax-nonce', 'nonce');
-        $roomID = ((isset($_POST['room']) && $_POST['room'] > 0) ? (int)$_POST['room'] : '');
-        $date = (isset($_POST['date']) ? sanitize_text_field($_POST['date']) : false);
-        $time = (isset($_POST['time']) ? sanitize_text_field($_POST['time']) : false);
-        $seat = (isset($_POST['seat']) ? sanitize_text_field($_POST['seat']) : false);
-        $response = [];
-        if ($date !== false) {
-            $response['time'] = '<div class="rsvp-time-select error">' . __('Please select a date.', 'rrze-rsvp') . '</div>';
-        }
-        if (!$date || !$time) {
-            $response['seat'] = '<div class="rsvp-seat-select error">' . __('Please select a date and a time slot.', 'rrze-rsvp') . '</div>';
-        }
-        $availability = Functions::getRoomAvailability($roomID, $date, $date, false);
-        $bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
-        if ($date) {
-            $response['time'] = $this->buildTimeslotSelect($roomID, $date, $time, $availability);
-            if ($time && ($bookingMode != 'consultation')) {
-                $seatSelect = $this->buildSeatSelect($roomID, $date, $time, $seat, $availability);
-                $seatInfo = ($seat) ? $this->buildSeatInfo($seat) : '';
-                $response['seat'] = $seatSelect . $seatInfo;
-            }
+        $roomID = absint($_POST['room'] ?? 0);
+        $date = sanitize_text_field(wp_unslash($_POST['date'] ?? ''));
+        $time = sanitize_text_field(wp_unslash($_POST['time'] ?? ''));
+        $seat = absint($_POST['seat'] ?? 0);
+        $date = $this->isCalendarDate($date) ? $date : '';
+        $availability = $date ? Functions::getRoomAvailability($roomID, $date, $date, false) : [];
+        $response = ['time' => $this->buildTimeslotSelect($roomID, $date, $time, $availability)];
+        if (get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true) !== 'consultation') {
+            $response['seat'] = $this->buildSeatSelect($roomID, $date, $time, $seat, $availability);
         }
         wp_send_json($response);
     }
 
+    /**
+     * Render escaped equipment details for an available, selected seat.
+     *
+     * @param int|string $seatID Seat post ID.
+     * @return string Equipment markup, or an empty string when none exists.
+     */
     public function buildSeatInfo($seatID = '')
     {
-        if ($seatID == '') {
+        if (!$seatID) {
             return '';
         }
-        $output = '';
-        $seat_name = get_the_title($seatID);
         $equipment = get_the_terms($seatID, 'rrze-rsvp-equipment');
-        if ($equipment !== false) {
-            $output .= '<div class="rsvp-item-info">';
-            $output .= '<div class="rsvp-item-equipment"><h5>' . sprintf(__('Seat %s', 'rrze-rsvp'), $seat_name) . '</h5>';
-            foreach ($equipment as $e) {
-                $e_arr[] = $e->name;
-            }
-            $output .= '<p><strong>' . __('Equipment', 'rrze-rsvp') . '</strong>: ' . implode(', ', $e_arr) . '</p>';
-            $output .= '</div>';
-            $output .= '</div>';
+        if (!$equipment || is_wp_error($equipment)) {
+            return '';
         }
-        return $output;
+        return '<div class="rsvp-item-info"><strong>' . esc_html__('Equipment', 'rrze-rsvp') . '</strong>: '
+            . esc_html(implode(', ', wp_list_pluck($equipment, 'name'))) . '</div>';
     }
 
+    /**
+     * Render bookable time choices for a single day, excluding empty seat lists.
+     *
+     * @param int $roomID Room post ID used to namespace input IDs.
+     * @param string $date Selected calendar date.
+     * @param string|false $time Selected start time.
+     * @param array|false $availability Availability grouped by date and interval.
+     * @return string Date heading and time controls, or a contextual empty state.
+     */
     private function buildTimeslotSelect($roomID, $date, $time = false, $availability = false)
     {
-        $slots = [];
-        $timeSelects = '';
-        if (!empty($availability) && isset($availability[$date])) {
-            $slots = array_keys($availability[$date]);
-            foreach ($slots as $slot) {
-                $slot_value = explode('-', $slot)[0];
-                $id = 'rsvp_time_' . sanitize_title($slot_value);
-                $checked = checked($time !== false && $time == $slot_value, true, false);
-                $timeSelects .= "<div class='form-group'><input type='radio' id='$id' value='$slot_value' name='rsvp_time' " . $checked . " required><label for='$id'>$slot</label></div>";
+        if (!$date) {
+            return '<div class="rsvp-time-select"><p class="rsvp-picker-empty">' . esc_html__('Select an available day in the calendar to see its times.', 'rrze-rsvp') . '</p></div>';
+        }
+        $dateObject = new \DateTimeImmutable($date, wp_timezone());
+        $output = '<div class="rsvp-time-select"><p class="rsvp-picker-date">' . esc_html(wp_date('l, j. F', $dateObject->getTimestamp())) . '</p>';
+        $choices = '';
+        foreach ($availability[$date] ?? [] as $slot => $seats) {
+            if (!$seats) {
+                continue;
             }
+            $value = explode('-', $slot)[0];
+            $label = str_replace('-', ' – ', $slot);
+            $id = 'rsvp_time_' . $roomID . '_' . sanitize_title($value);
+            $choices .= '<span class="rsvp-picker-choice"><input type="radio" id="' . esc_attr($id) . '" value="' . esc_attr($value) . '" name="rsvp_time"'
+                . ' data-label="' . esc_attr($label) . '"' . checked($time, $value, false) . ' required>'
+                . '<label for="' . esc_attr($id) . '">' . esc_html($label) . '</label></span>';
         }
-        if ($timeSelects == '') {
-            $timeSelects .= __('No time slots available.', 'rrze-rsvp');
-        }
-        return '<div class="rsvp-time-select">' . $timeSelects . '</div>';
+        return $output . ($choices ? '<div class="rsvp-picker-options">' . $choices . '</div>' : '<p class="rsvp-picker-empty">' . esc_html__('No times are available on this day. Please choose another day.', 'rrze-rsvp') . '</p>') . '</div>';
     }
 
+    /**
+     * Render available seats as tiles, using a compact native select for large rooms.
+     *
+     * @param int $roomID Room post ID used to namespace input IDs.
+     * @param string $date Selected date.
+     * @param string|false $time Selected start time.
+     * @param int|false $seat_id Selected seat ID.
+     * @param array $availability Availability grouped by date and interval.
+     * @return string Seat controls and equipment, or a selection hint.
+     */
     private function buildSeatSelect($roomID, $date, $time, $seat_id, $availability)
     {
-        foreach ($availability as $xdate => $xtime) {
-            foreach ($xtime as $k => $v) {
-                $k_new = explode('-', $k)[0];
-                $availability[$xdate][$k_new] = $v;
-                unset($availability[$xdate][$k]);
+        $seats = [];
+        foreach ($availability[$date] ?? [] as $interval => $ids) {
+            if (explode('-', $interval)[0] === (string) $time) {
+                $seats = $ids;
+                break;
             }
         }
-        $seats = (isset($availability[$date][$time])) ? $availability[$date][$time] : [];
-
-        // sort by title naturally
-        $seatSortedByTitle = [];
+        if (!$seats) {
+            return '<p class="rsvp-picker-empty">' . esc_html__('Choose a day and time to see available seats.', 'rrze-rsvp') . '</p>';
+        }
+        $titles = [];
         foreach ($seats as $seatID) {
-            $seatSortedByTitle[$seatID] = get_the_title($seatID);
+            $titles[$seatID] = get_the_title($seatID);
         }
-        natsort($seatSortedByTitle);
-
-        $seatSelects = '';
-        foreach ($seatSortedByTitle as $seat => $title) {
-            $seatname = $title;
-            $id = 'rsvp_seat_' . sanitize_title($seat);
-            $checked = checked($seat_id !== false && $seat == $seat_id, true, false);
-            $seatSelects .= "<div class='form-group'>"
-                . "<input type='radio' id='$id' value='$seat' name='rsvp_seat' $checked required>"
-                . "<label for='$id'>$seatname</label>"
-                . "</div>";
+        natsort($titles);
+        $output = '<div class="rsvp-seat-select">';
+        if (count($titles) > 8) {
+            $id = 'rsvp_seat_select_' . $roomID;
+            $output .= '<label class="rsvp-picker-sr" for="' . esc_attr($id) . '">' . esc_html__('Select a seat', 'rrze-rsvp') . '</label>'
+                . '<select id="' . esc_attr($id) . '" name="rsvp_seat" required><option value="">' . esc_html__('Select a seat', 'rrze-rsvp') . '</option>';
+            foreach ($titles as $seat => $title) {
+                $output .= '<option value="' . esc_attr($seat) . '"' . selected($seat_id, $seat, false) . '>' . esc_html($title) . '</option>';
+            }
+            $output .= '</select>';
+        } else {
+            $output .= '<div class="rsvp-picker-options">';
+            foreach ($titles as $seat => $title) {
+                $id = 'rsvp_seat_' . $roomID . '_' . $seat;
+                $output .= '<span class="rsvp-picker-choice"><input type="radio" id="' . esc_attr($id) . '" value="' . esc_attr($seat) . '" name="rsvp_seat"'
+                    . ' data-label="' . esc_attr($title) . '"' . checked($seat_id, $seat, false) . ' required>'
+                    . '<label for="' . esc_attr($id) . '">' . esc_html($title) . '</label></span>';
+            }
+            $output .= '</div>';
         }
-        if ($seatSelects == '') {
-            $seatSelects = __('Please select a date and a time slot.', 'rrze-rsvp');
-        }
-        return '<h4>' . __('Available seats:', 'rrze-rsvp') . '</h4><div class="rsvp-seat-select">' . $seatSelects . '</div>';
+        return $output . '</div>' . (isset($titles[$seat_id]) ? $this->buildSeatInfo($seat_id) : '');
     }
 }

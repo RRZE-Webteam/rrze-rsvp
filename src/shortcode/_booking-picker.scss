@@ -1,0 +1,280 @@
+// Scope the complete component so theme table, label and pseudo-element rules
+// cannot change its alignment. Form fields outside the picker retain theme styles.
+.rrze-rsvp form#rsvp_by_room fieldset.rsvp-booking-picker {
+    --picker-ink: #16345b;
+    --picker-muted: #526176;
+    --picker-border: #d6dfe8;
+    --picker-accent: #04316a;
+    box-sizing: border-box;
+    display: block;
+    min-width: 0;
+    margin: 0 0 2rem;
+    padding: 0;
+    border: 0;
+    color: var(--picker-ink);
+
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    > legend {
+        margin: 0 0 .5rem;
+        padding: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: inherit;
+    }
+
+    .rsvp-picker-intro {
+        margin: 0 0 1.5rem;
+        color: var(--picker-muted);
+        font-size: 1rem;
+    }
+
+    .rsvp-picker-layout {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+        gap: 1.75rem;
+        padding: 1.5rem;
+        background: #fff;
+        border: 1px solid var(--picker-border);
+        border-radius: .5rem;
+    }
+
+    .rsvp-date-container, .rsvp-time-container, .rsvp-seat-container {
+        display: block;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        overflow: visible;
+
+        > legend {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin: 0 0 1rem;
+            padding: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.5;
+            color: var(--picker-ink);
+        }
+    }
+
+    .rsvp-picker-step {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 50%;
+        background: #edf2f7;
+        font-size: .85rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .rsvp-seat-container {
+        margin-top: 1.5rem;
+        padding: 1.25rem 1.5rem;
+        border: 1px solid var(--picker-border);
+        border-radius: .5rem;
+        background: #fff;
+
+        > legend { width: auto; margin: 0; padding: 0 .4rem; }
+    }
+
+    .rsvp-calendar-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .5rem;
+        margin-bottom: .75rem;
+
+        h3 {
+            flex: 1;
+            margin: 0;
+            padding: 0;
+            font-size: 1.125rem;
+            font-weight: 700;
+            line-height: 1.4;
+            text-align: center;
+            color: var(--picker-ink);
+        }
+    }
+
+    button.rsvp-calendar-nav, button.rsvp-picker-retry {
+        appearance: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 2.75rem;
+        min-width: 0;
+        height: 2.75rem;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+        border: 1px solid var(--picker-border);
+        border-radius: .25rem;
+        background: #fff;
+        box-shadow: none;
+        color: var(--picker-accent);
+        font: inherit;
+        font-size: 1.6rem;
+        line-height: 1;
+        cursor: pointer;
+        &::before, &::after { content: none; }
+        &:hover:not(:disabled) { background: #edf2f7; border-color: var(--picker-accent); }
+        &:disabled { opacity: .35; cursor: default; }
+    }
+
+    .rsvp-calendar-table {
+        display: table;
+        float: none;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        border: 0;
+        border-collapse: separate;
+        border-spacing: .2rem;
+        table-layout: fixed;
+        background: transparent;
+        box-shadow: none;
+
+        thead { display: table-header-group; }
+        tbody { display: table-row-group; }
+        tr { display: table-row; border: 0; background: transparent; }
+        th, td {
+            display: table-cell;
+            width: auto;
+            min-width: 0;
+            height: auto;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            text-align: center;
+            vertical-align: middle;
+        }
+        th { padding: .25rem 0 .5rem; font-size: .8rem; font-weight: 600; color: var(--picker-muted); }
+        abbr { border: 0; text-decoration: none; cursor: default; }
+        .rsvp-picker-choice { width: 100%; }
+        .rsvp-picker-choice label, .rsvp-calendar-inactive {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-width: 0;
+            min-height: 2.75rem;
+            padding: .5rem 0;
+            font-size: .95rem;
+            line-height: 1.3;
+            font-variant-numeric: tabular-nums;
+        }
+        .rsvp-calendar-inactive { color: #657385; background: #f0f3f6; border: 1px solid transparent; border-radius: .25rem; }
+        .is-outside .rsvp-calendar-inactive { background: transparent; color: #74808d; }
+        .is-available label { background: #eaf5f0; border-color: #b8d9ca; color: #18563d; font-weight: 600; }
+        .is-available label::after {
+            content: '';
+            position: absolute;
+            bottom: .25rem;
+            left: calc(50% - 2px);
+            width: 4px;
+            height: 4px;
+            margin: 0;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        input:checked + label::after {
+            content: '✓';
+            top: .1rem;
+            right: .2rem;
+            bottom: auto;
+            left: auto;
+            width: auto;
+            height: auto;
+            background: none;
+            font-size: .6rem;
+        }
+        .is-today label, .is-today .rsvp-calendar-inactive { box-shadow: inset 0 -3px 0 var(--picker-accent); }
+    }
+
+    .rsvp-picker-choice {
+        display: block;
+        position: relative;
+        margin: 0;
+        min-width: 0;
+
+        input[type="radio"] {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            clip-path: inset(50%);
+            white-space: nowrap;
+            border: 0;
+        }
+        label {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-width: 0;
+            min-height: 2.75rem;
+            margin: 0;
+            padding: .65rem .8rem;
+            border: 1px solid var(--picker-border);
+            border-radius: .25rem;
+            background: #fff;
+            color: var(--picker-ink);
+            font: inherit;
+            font-size: .95rem;
+            line-height: 1.4;
+            text-align: center;
+            overflow-wrap: anywhere;
+            cursor: pointer;
+            &::before, &::after { content: none; }
+        }
+        input:hover + label { border-color: var(--picker-accent); background: #edf2f7; }
+        input:checked + label { border-color: var(--picker-accent); background: var(--picker-accent); color: #fff; font-weight: 700; }
+        input:focus-visible + label { outline: 3px solid var(--picker-accent); outline-offset: 2px; z-index: 1; }
+    }
+
+    .rsvp-calendar-key {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem 1rem;
+        margin-top: 1rem;
+        font-size: .75rem;
+        color: var(--picker-muted);
+        > span { display: inline-flex; align-items: center; gap: .35rem; }
+        i { display: inline-flex; align-items: center; justify-content: center; width: .85rem; height: .85rem; border: 1px solid var(--picker-border); border-radius: 2px; font-size: .65rem; font-style: normal; }
+        .is-available { background: #eaf5f0; border-color: #b8d9ca; }
+        .is-selected { background: var(--picker-accent); border-color: var(--picker-accent); color: #fff; }
+        .is-today { border-bottom: 3px solid var(--picker-accent); }
+    }
+
+    .rsvp-picker-date { margin: .5rem 0 1rem; padding: 0; font-size: 1rem; font-weight: 600; color: var(--picker-ink); }
+    .rsvp-picker-empty, .rsvp-time-select, .rsvp-seat-options { color: var(--picker-muted); font-size: .95rem; line-height: 1.6; }
+    .rsvp-picker-empty { margin: .5rem 0; padding: 0; }
+    .rsvp-picker-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr)); gap: .5rem; }
+    .rsvp-seat-select { display: block; margin: 0; }
+    .rsvp-seat-select .rsvp-picker-options { grid-template-columns: repeat(auto-fill, minmax(min(100%, 7rem), 1fr)); }
+    .rsvp-seat-select select { max-width: 100%; background: #fff; color: var(--picker-ink); }
+    .rsvp-item-info { margin: 1rem 0 0; padding: .75rem; background: #f5f7fa; border: 0; font-size: .9rem; }
+    .rsvp-picker-summary { margin-top: 1rem; padding: 1rem; border-left: 3px solid #287b59; background: #eaf5f0; color: #18563d; font-size: .95rem; line-height: 1.6; }
+    .rsvp-picker-feedback { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: .75rem; min-height: 1.5rem; font-size: .85rem; color: var(--picker-muted); }
+    button.rsvp-picker-retry { width: auto; height: auto; padding: .5rem .75rem; font-size: .9rem; }
+    button:focus-visible, h3:focus-visible { outline: 3px solid var(--picker-accent); outline-offset: 3px; }
+    &[aria-busy="true"] .rsvp-time-select, &[aria-busy="true"] .rsvp-seat-options { opacity: .55; }
+    .rsvp-picker-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 480px) {
+        .rsvp-picker-layout { padding: .75rem; gap: 1.5rem; }
+        .rsvp-seat-container { padding: 1rem .75rem; }
+        .rsvp-calendar-table { border-spacing: .1rem; }
+    }
+}

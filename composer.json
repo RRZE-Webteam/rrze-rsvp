@@ -20,6 +20,7 @@
     "scripts": {
         "test": [
             "php tests/booking-lifecycle.php",
+            "php tests/booking-picker.php",
             "php tests/timeslot-compatibility.php",
             "php tests/course-core.php",
             "php tests/course-notifications.php",

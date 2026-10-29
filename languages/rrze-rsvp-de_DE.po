@@ -3540,3 +3540,51 @@ msgstr "Keine Plätze für diesen Suchbegriff gefunden."
 #, php-format
 msgid "%1$s of %2$s seats"
 msgstr "%1$s von %2$s Plätzen"
+
+msgid "Choose a day, then a time that suits you."
+msgstr "Wählen Sie zuerst einen Tag und anschließend eine passende Uhrzeit."
+
+msgid "No available appointments"
+msgstr "Keine freien Termine"
+
+msgid "Today"
+msgstr "Heute"
+
+msgid "Available"
+msgstr "Verfügbar"
+
+msgid "Selected"
+msgstr "Ausgewählt"
+
+msgid "No available appointments this month."
+msgstr "In diesem Monat sind keine Termine frei."
+
+msgid "Select an available day in the calendar to see its times."
+msgstr "Wählen Sie einen verfügbaren Tag im Kalender. Hier erscheinen die freien Uhrzeiten."
+
+msgid "No times are available on this day. Please choose another day."
+msgstr "An diesem Tag sind keine Termine mehr frei. Bitte wählen Sie einen anderen Tag."
+
+msgid "Choose a day and time to see available seats."
+msgstr "Wählen Sie zuerst Datum und Uhrzeit. Anschließend können Sie Ihren Platz auswählen."
+
+msgid "Select a seat"
+msgstr "Platz auswählen"
+
+msgid "Try again"
+msgstr "Erneut versuchen"
+
+msgid "Loading availability…"
+msgstr "Verfügbarkeit wird geladen …"
+
+msgid "Availability updated."
+msgstr "Verfügbarkeit aktualisiert."
+
+msgid "Availability could not be loaded. Please try again."
+msgstr "Die Verfügbarkeit konnte nicht geladen werden. Bitte versuchen Sie es erneut."
+
+msgid "Your selection"
+msgstr "Ihre Auswahl"
+
+msgid "Please complete your appointment selection first."
+msgstr "Bitte wählen Sie zuerst Ihren Termin vollständig aus."

@@ -215,14 +215,14 @@ class Main
             'rrze-rsvp-admin',
             plugins_url('build/admin.css', plugin()->getBasename()),
             [],
-            $this->getAdminAssetVersion('admin.css')
+            $this->getAssetVersion('admin.css')
         );
 
         wp_enqueue_script(
             'rrze-rsvp-admin',
             plugins_url('build/admin.js', plugin()->getBasename()),
             ['jquery'],
-            $this->getAdminAssetVersion('admin.js')
+            $this->getAssetVersion('admin.js')
         );
 
         wp_localize_script('rrze-rsvp-admin', 'rrze_rsvp_admin', array(
@@ -257,12 +257,12 @@ class Main
     }
 
     /**
-     * Invalidate cached admin bundles whenever their compiled content is updated.
+     * Invalidate cached bundles whenever their compiled content is updated.
      *
-     * @param string $filename Admin bundle filename within the build directory.
+     * @param string $filename Bundle filename within the build directory.
      * @return string Plugin version with an asset modification timestamp.
      */
-    protected function getAdminAssetVersion(string $filename): string
+    protected function getAssetVersion(string $filename): string
     {
         $path = dirname(__DIR__) . '/build/' . $filename;
         return plugin()->getVersion() . (is_file($path) ? '.' . filemtime($path) : '');
@@ -324,23 +324,37 @@ class Main
         ];
     }
 
+    /**
+     * Register booking assets and translated labels for progressive enhancement.
+     *
+     * @return void
+     */
     public function wpEnqueueScripts()
     {
         wp_register_style(
             'rrze-rsvp-shortcode',
             plugins_url('build/shortcode.css', plugin()->getBasename()),
             [],
-            plugin()->getVersion()
+            $this->getAssetVersion('shortcode.css')
         );
         wp_register_script(
             'rrze-rsvp-shortcode',
             plugins_url('build/shortcode.js', plugin()->getBasename()),
             ['jquery'],
-            plugin()->getVersion()
+            $this->getAssetVersion('shortcode.js')
         );
-        wp_localize_script('rrze-rsvp-shortcode', 'rsvp_ajax', [
+        wp_localize_script('rrze-rsvp-shortcode', 'rsvp_booking', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('rsvp-ajax-nonce'),
+            'picker' => [
+                'loading' => __('Loading availability…', 'rrze-rsvp'),
+                'updated' => __('Availability updated.', 'rrze-rsvp'),
+                'error' => __('Availability could not be loaded. Please try again.', 'rrze-rsvp'),
+                'chooseDay' => __('Select an available day in the calendar to see its times.', 'rrze-rsvp'),
+                'chooseTime' => __('Choose a day and time to see available seats.', 'rrze-rsvp'),
+                'selection' => __('Your selection', 'rrze-rsvp'),
+                'incomplete' => __('Please complete your appointment selection first.', 'rrze-rsvp'),
+            ],
         ]);
     }
 }
