@@ -45,6 +45,11 @@ class Actions
 		add_action('wp', [$this, 'bookingReply']);
 	}
 
+	/**
+	 * Handle legacy AJAX actions without bypassing course booking rules.
+	 *
+	 * @return void
+	 */
 	public function ajaxBookingAction()
 	{
 		check_ajax_referer('rrze-rsvp-booking-action');
@@ -71,6 +76,10 @@ class Actions
 				'result' => false,
 				'message' => __('Sorry, you are not allowed to edit this item.'),
 			], 403);
+		}
+
+		if (Functions::isCourseBooking($bookingId)) {
+			wp_send_json(['result' => false, 'message' => __('Use the course booking actions for this booking.', 'rrze-rsvp')], 400);
 		}
 
 		$booking = Functions::getBooking($bookingId);
@@ -103,6 +112,11 @@ class Actions
 		wp_send_json(['result' => true]);
 	}
 
+	/**
+	 * Handle legacy room actions and reject course actions on GET requests.
+	 *
+	 * @return void
+	 */
 	public function handleActions()
 	{
 		if (isset($_GET['action']) && isset($_GET['id']) && isset($_REQUEST['_wpnonce']) && wp_verify_nonce($_REQUEST['_wpnonce'], 'status')) {
@@ -117,6 +131,10 @@ class Actions
 				|| !current_user_can('edit_post', $bookingId)
 			) {
 				return;
+			}
+
+			if (Functions::isCourseBooking($bookingId)) {
+				wp_die(esc_html__('Use the course booking actions for this booking.', 'rrze-rsvp'), '', ['response' => 400]);
 			}
 
 			$status = get_post_meta($bookingId, 'rrze-rsvp-booking-status', true);
@@ -188,6 +206,10 @@ class Actions
 	{
 		if ($post->post_type != 'booking' || $post->post_status != 'publish') {
 			return $actions;
+		}
+
+		if (Functions::isCourseBooking((int) $post->ID)) {
+			return [];
 		}
 
 		$actions = [];
@@ -329,6 +351,14 @@ class Actions
 		return $actions;
 	}
 
+	/**
+	 * Apply bulk actions, routing course cancellations through their service.
+	 *
+	 * @param string $redirectTo Destination after the action.
+	 * @param string $doaction Selected bulk action.
+	 * @param array $postIds Selected booking IDs.
+	 * @return string Updated redirect URL.
+	 */
 	public function bookingBulkActionsHandler($redirectTo, $doaction, $postIds)
 	{
 		switch ($doaction) {
@@ -345,6 +375,15 @@ class Actions
 					}
 					if (!current_user_can('edit_post', $postId)) {
 						wp_die(__('Sorry, you are not allowed to edit this item.'));
+					}
+					if (Functions::isCourseBooking((int) $postId)) {
+						$result = (new Courses\BookingService())->cancel((int) $postId);
+						if (is_wp_error($result)) {
+							$skipped++;
+						} else {
+							$cancelled++;
+						}
+						continue;
 					}
 					$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
 					if (wp_check_post_lock($postId)) {
@@ -637,8 +676,18 @@ class Actions
 		}
 	}
 
+	/**
+	 * Validate legacy booking updates without imposing seat rules on courses.
+	 *
+	 * @param int $postId Booking post ID.
+	 * @return void
+	 */
 	public function preBookingUpdate($postId)
 	{
+		if (Functions::isCourseBooking((int) $postId)) {
+			return;
+		}
+
 		$post = get_post($postId);
 		if ($post->post_type != 'booking') {
 			return;
@@ -872,8 +921,20 @@ class Actions
 		}
 	}
 
+	/**
+	 * Send legacy transition notifications; courses use post-commit events.
+	 *
+	 * @param string $newStatus New WordPress post status.
+	 * @param string $oldStatus Previous WordPress post status.
+	 * @param \WP_Post $post Updated post.
+	 * @return void
+	 */
 	public function transitionBookingStatus($newStatus, $oldStatus, $post)
 	{
+		if (Functions::isCourseBooking((int) $post->ID)) {
+			return;
+		}
+
 		if ($post->post_type != 'booking') {
 			return;
 		}
@@ -954,6 +1015,11 @@ class Actions
 	}
 
 
+	/**
+	 * Process legacy reply links, excluding the separate course token flow.
+	 *
+	 * @return void
+	 */
 	public function bookingReply()
 	{
 		global $post;
@@ -967,6 +1033,10 @@ class Actions
 
 		if (!$hash || !$bookingId || !$action) {
 			return;
+		}
+
+		if (Functions::isCourseBooking((int) $bookingId)) {
+			wp_die(esc_html__('Use the link in your course booking email.', 'rrze-rsvp'), '', ['response' => 403]);
 		}
 
 		wp_enqueue_style(

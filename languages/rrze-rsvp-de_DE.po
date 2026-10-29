@@ -2406,3 +2406,1055 @@ msgstr "Ort und Raumplan"
 
 msgid "Provide the address and a floor plan to help participants find the room."
 msgstr "Hinterlege die Adresse und einen Raumplan zur Orientierung."
+
+
+#: includes/Actions.php:82
+#: includes/Actions.php:137
+msgid "Use the course booking actions for this booking."
+msgstr "Verwenden Sie für diese Buchung die Aktionen der Kursverwaltung."
+
+
+#: includes/Actions.php:1039
+msgid "Use the link in your course booking email."
+msgstr "Verwenden Sie den Link in der E-Mail zu Ihrer Kursbuchung."
+
+
+#: includes/Courses/ActionPage.php:60
+#: includes/Courses/Admin.php:94
+#: includes/Courses/Frontend.php:59
+msgid "Course booking"
+msgstr "Kursbuchung"
+
+
+#: includes/Courses/ActionPage.php:82
+msgid "This booking link is invalid. Please use the complete link from your email."
+msgstr "Dieser Buchungslink ist ungültig. Bitte verwenden Sie den vollständigen Link aus Ihrer E-Mail."
+
+
+#: includes/Courses/ActionPage.php:92
+msgid "Your course booking has been cancelled."
+msgstr "Ihre Kursbuchung wurde storniert."
+
+
+#: includes/Courses/ActionPage.php:95
+msgid "Your email address and your participation are confirmed."
+msgstr "Ihre E-Mail-Adresse und Ihre Teilnahme sind bestätigt."
+
+
+#: includes/Courses/ActionPage.php:96
+msgid "Your email address is confirmed. Your booking is awaiting approval by the organizers."
+msgstr "Ihre E-Mail-Adresse ist bestätigt. Die Freigabe Ihrer Buchung durch die Verantwortlichen steht noch aus."
+
+
+#: includes/Courses/ActionPage.php:99
+msgid "Confirm your email address to complete this step of your course registration."
+msgstr "Bestätigen Sie Ihre E-Mail-Adresse, um diesen Schritt Ihrer Kursanmeldung abzuschließen."
+
+
+#: includes/Courses/ActionPage.php:100
+msgid "Cancel this course booking? Your reserved place will become available to other people."
+msgstr "Diese Kursbuchung stornieren? Ihr reservierter Platz wird anschließend wieder für andere Personen verfügbar."
+
+
+#: includes/Courses/ActionPage.php:101
+#: includes/Courses/Notifications.php:116
+msgid "Confirm email address"
+msgstr "E-Mail-Adresse bestätigen"
+
+
+#: includes/Courses/ActionPage.php:101
+#: includes/Courses/Notifications.php:131
+msgid "Cancel my booking"
+msgstr "Meine Buchung stornieren"
+
+
+#: includes/Courses/Admin.php:73
+msgid "Saving…"
+msgstr "Wird gespeichert …"
+
+
+#: includes/Courses/Admin.php:74
+msgid "The request could not be completed. Your entered values have been kept. Please try again."
+msgstr "Die Anfrage konnte nicht abgeschlossen werden. Ihre Eingaben wurden beibehalten. Bitte versuchen Sie es erneut."
+
+
+#: includes/Courses/Admin.php:88
+msgid "Registration and notifications"
+msgstr "Anmeldung und Benachrichtigungen"
+
+
+#: includes/Courses/Admin.php:89
+#: includes/Courses/PostTypes.php:32
+msgid "Course dates"
+msgstr "Kurstermine"
+
+
+#: includes/Courses/Admin.php:114
+msgid "Access"
+msgstr "Zugang"
+
+
+#: includes/Courses/Admin.php:116
+msgid "SSO or verified email address"
+msgstr "SSO oder bestätigte E-Mail-Adresse"
+
+
+#: includes/Courses/Admin.php:117
+msgid "SSO required"
+msgstr "SSO erforderlich"
+
+
+#: includes/Courses/Admin.php:118
+msgid "Confirm participation automatically"
+msgstr "Teilnahme automatisch bestätigen"
+
+
+#: includes/Courses/Admin.php:119
+msgid "Otherwise, responsible staff approve each verified registration. Pending registrations already reserve a place."
+msgstr "Andernfalls geben Verantwortliche jede verifizierte Anmeldung frei. Offene Anmeldungen reservieren bereits einen Platz."
+
+
+#: includes/Courses/Admin.php:120
+msgid "Keep bookings after the course date (days)"
+msgstr "Buchungen nach dem Kurstermin aufbewahren (Tage)"
+
+
+#: includes/Courses/Admin.php:122
+msgid "Includes cancellations. After this period, participant information and action links are deleted automatically."
+msgstr "Einschließlich stornierter Buchungen. Nach dieser Frist werden Teilnehmerdaten und Aktionslinks automatisch gelöscht."
+
+
+#: includes/Courses/Admin.php:123
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
+
+#: includes/Courses/Admin.php:123
+msgid "Participants receive verification, approval and cancellation messages as needed. Sender and staff notifications use the existing RSVP email settings."
+msgstr "Teilnehmende erhalten bei Bedarf Nachrichten zur Verifizierung, Freigabe und Stornierung. Absender und Benachrichtigungen an Verantwortliche verwenden die vorhandenen RSVP-E-Mail-Einstellungen."
+
+
+#: includes/Courses/Admin.php:124
+msgid "Save these settings with the course. Changes to access and confirmation apply to new registrations."
+msgstr "Speichern Sie diese Einstellungen zusammen mit dem Kurs. Änderungen an Zugang und Bestätigung gelten für neue Anmeldungen."
+
+
+#: includes/Courses/Admin.php:162
+msgid "Save the course as a draft before adding its dates."
+msgstr "Speichern Sie den Kurs als Entwurf, bevor Sie Termine hinzufügen."
+
+
+#: includes/Courses/Admin.php:165
+msgid "Each date is booked separately. Dates are saved with their own button; the course title and description use the usual Save button."
+msgstr "Jeder Termin wird einzeln gebucht. Termine werden über ihre eigene Schaltfläche gespeichert; Kurstitel und Beschreibung über die übliche Schaltfläche zum Speichern."
+
+
+#: includes/Courses/Admin.php:166
+#, php-format
+msgid "Times are entered in the website timezone: %s."
+msgstr "Zeiten werden in der Zeitzone der Website eingegeben: %s."
+
+
+#: includes/Courses/Admin.php:207
+msgid "Add course date"
+msgstr "Kurstermin hinzufügen"
+
+
+#: includes/Courses/Admin.php:209
+#, php-format
+msgid "%1$d confirmed · %2$d pending · %3$d free"
+msgstr "%1$d bestätigt · %2$d offen · %3$d frei"
+
+
+#: includes/Courses/Admin.php:212
+msgid "This course date has been cancelled."
+msgstr "Dieser Kurstermin wurde abgesagt."
+
+
+#: includes/Courses/Admin.php:214
+#: includes/Courses/Admin.php:255
+msgid "View registrations"
+msgstr "Anmeldungen anzeigen"
+
+
+#: includes/Courses/Admin.php:217
+#: includes/Courses/Admin.php:253
+msgid "Move this unused date to the Trash?"
+msgstr "Diesen ungenutzten Termin in den Papierkorb verschieben?"
+
+
+#: includes/Courses/Admin.php:217
+#: includes/Courses/Admin.php:253
+msgid "Remove date"
+msgstr "Termin entfernen"
+
+
+#: includes/Courses/Admin.php:223
+msgid "Active registrations protect the date, time and location. Capacity cannot be reduced below the number of reserved places."
+msgstr "Bei aktiven Anmeldungen sind Datum, Uhrzeit und Ort geschützt. Die Kapazität darf nicht unter die Anzahl der reservierten Plätze reduziert werden."
+
+
+#: includes/Courses/Admin.php:226
+msgid "Start"
+msgstr "Beginn"
+
+
+#: includes/Courses/Admin.php:228
+msgid "Maximum participants"
+msgstr "Maximale Teilnehmerzahl"
+
+
+#: includes/Courses/Admin.php:232
+msgid "Enter a different location"
+msgstr "Anderen Veranstaltungsort eingeben"
+
+
+#: includes/Courses/Admin.php:241
+msgid "Location when no room is selected"
+msgstr "Veranstaltungsort, wenn kein Raum ausgewählt ist"
+
+
+#: includes/Courses/Admin.php:243
+msgid "Registration opens (optional)"
+msgstr "Anmeldebeginn (optional)"
+
+
+#: includes/Courses/Admin.php:244
+msgid "Registration closes (optional)"
+msgstr "Anmeldeschluss (optional)"
+
+
+#: includes/Courses/Admin.php:245
+msgid "Without a registration period, registration opens when the course is published and closes when the date begins."
+msgstr "Ohne Anmeldezeitraum beginnt die Anmeldung mit der Veröffentlichung des Kurses und endet bei Terminbeginn."
+
+
+#: includes/Courses/Admin.php:247
+msgid "Save date"
+msgstr "Termin speichern"
+
+
+#: includes/Courses/Admin.php:247
+msgid "Add date"
+msgstr "Termin hinzufügen"
+
+
+#: includes/Courses/Admin.php:250
+msgid "Cancel this date and all its active registrations?"
+msgstr "Diesen Termin absagen und alle aktiven Anmeldungen stornieren?"
+
+
+#: includes/Courses/Admin.php:250
+msgid "Cancel date"
+msgstr "Termin absagen"
+
+
+#: includes/Courses/Admin.php:341
+msgid "This action has expired. Reload the page and try again."
+msgstr "Diese Aktion ist abgelaufen. Laden Sie die Seite neu und versuchen Sie es erneut."
+
+
+#: includes/Courses/Admin.php:345
+msgid "You are not allowed to manage this item."
+msgstr "Sie dürfen diesen Eintrag nicht verwalten."
+
+
+#: includes/Courses/Admin.php:350
+msgid "This booking does not belong to the selected course."
+msgstr "Diese Buchung gehört nicht zum ausgewählten Kurs."
+
+
+#: includes/Courses/Admin.php:369
+msgid "This date does not belong to the selected course."
+msgstr "Dieser Termin gehört nicht zum ausgewählten Kurs."
+
+
+#: includes/Courses/Admin.php:392
+#: includes/Courses/Admin.php:421
+msgid "Use POST for this action."
+msgstr "Verwenden Sie POST für diese Aktion."
+
+
+#: includes/Courses/Admin.php:401
+#: includes/Courses/Admin.php:439
+msgid "Saved."
+msgstr "Gespeichert."
+
+
+#: includes/Courses/Admin.php:454
+msgid "Room / course"
+msgstr "Raum / Kurs"
+
+
+#: includes/Courses/Admin.php:457
+msgid "Seat / location"
+msgstr "Sitzplatz / Veranstaltungsort"
+
+
+#: includes/Courses/Admin.php:514
+msgid "Waiting for email verification"
+msgstr "E-Mail-Bestätigung ausstehend"
+
+
+#: includes/Courses/Admin.php:514
+msgid "Awaiting approval"
+msgstr "Freigabe ausstehend"
+
+
+#: includes/Courses/Admin.php:514
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+
+#: includes/Courses/Admin.php:514
+msgid "Cancelled"
+msgstr "Storniert"
+
+
+#: includes/Courses/Admin.php:515
+msgid "Expired"
+msgstr "Abgelaufen"
+
+
+#: includes/Courses/Admin.php:517
+msgid "Registration rejected"
+msgstr "Anmeldung abgelehnt"
+
+
+#: includes/Courses/Admin.php:517
+msgid "Cancelled by participant"
+msgstr "Durch Teilnehmende storniert"
+
+
+#: includes/Courses/Admin.php:517
+msgid "Cancelled by staff"
+msgstr "Durch Verantwortliche storniert"
+
+
+#: includes/Courses/Admin.php:517
+msgid "Email verification expired"
+msgstr "E-Mail-Bestätigung abgelaufen"
+
+
+#: includes/Courses/Admin.php:517
+#: includes/Courses/Admin.php:518
+#: includes/Courses/Frontend.php:434
+msgid "Course date cancelled"
+msgstr "Kurstermin abgesagt"
+
+
+#: includes/Courses/Admin.php:527
+msgid "Approve registration"
+msgstr "Anmeldung freigeben"
+
+
+#: includes/Courses/Admin.php:528
+msgid "Reject registration"
+msgstr "Anmeldung ablehnen"
+
+
+#: includes/Courses/Admin.php:531
+msgid "Cancel registration"
+msgstr "Anmeldung stornieren"
+
+
+#: includes/Courses/Admin.php:534
+msgid "Resend email"
+msgstr "E-Mail erneut senden"
+
+
+#: includes/Courses/Admin.php:539
+msgid "Cancel this registration and release its place?"
+msgstr "Diese Anmeldung stornieren und den Platz freigeben?"
+
+
+#: includes/Courses/Admin.php:560
+#: includes/Courses/PostTypes.php:16
+msgid "Course"
+msgstr "Kurs"
+
+
+#: includes/Courses/Admin.php:562
+msgid "Location"
+msgstr "Veranstaltungsort"
+
+
+#: includes/Courses/Admin.php:572
+msgid "Back to registrations for this date"
+msgstr "Zurück zu den Anmeldungen für diesen Termin"
+
+
+#: includes/Courses/Admin.php:585
+msgid "View registration"
+msgstr "Anmeldung anzeigen"
+
+
+#: includes/Courses/Admin.php:606
+msgid "Filter by course"
+msgstr "Nach Kurs filtern"
+
+
+#: includes/Courses/Admin.php:607
+msgid "All courses and rooms"
+msgstr "Alle Kurse und Räume"
+
+
+#: includes/Courses/Admin.php:613
+msgid "Filter by course date"
+msgstr "Nach Kurstermin filtern"
+
+
+#: includes/Courses/Admin.php:614
+msgid "All course dates"
+msgstr "Alle Kurstermine"
+
+
+#: includes/Courses/Admin.php:666
+msgid "Course booking is unavailable because the database does not support the required transactions. Existing room reservations remain available."
+msgstr "Kursbuchungen sind nicht verfügbar, da die Datenbank die erforderlichen Transaktionen nicht unterstützt. Bestehende Raumreservierungen bleiben verfügbar."
+
+
+#: includes/Courses/Admin/Input.php:31
+msgid "Enter a valid date and time in the website timezone."
+msgstr "Geben Sie ein gültiges Datum und eine gültige Uhrzeit in der Zeitzone der Website ein."
+
+
+#: includes/Courses/Admin/Input.php:58
+msgid "Enter a valid participant limit and location."
+msgstr "Geben Sie eine gültige Teilnehmerzahl und einen Veranstaltungsort ein."
+
+
+#: includes/Courses/BookingService.php:86
+#: includes/Courses/BookingService.php:102
+#: includes/Courses/BookingService.php:185
+msgid "You cannot edit this course."
+msgstr "Sie dürfen diesen Kurs nicht bearbeiten."
+
+
+#: includes/Courses/BookingService.php:123
+msgid "Please provide your name, a valid email address and consent."
+msgstr "Bitte geben Sie Ihren Namen und eine gültige E-Mail-Adresse an und erteilen Sie Ihre Einwilligung."
+
+
+#: includes/Courses/BookingService.php:149
+#: includes/Courses/BookingService.php:199
+msgid "You cannot manage this booking."
+msgstr "Sie dürfen diese Buchung nicht verwalten."
+
+
+#: includes/Courses/BookingService.php:167
+msgid "You cannot cancel this booking."
+msgstr "Sie dürfen diese Buchung nicht stornieren."
+
+
+#: includes/Courses/BookingService.php:240
+msgid "You cannot delete this booking."
+msgstr "Sie dürfen diese Buchung nicht löschen."
+
+
+#: includes/Courses/BookingService.php:259
+msgid "You cannot delete this course date."
+msgstr "Sie dürfen diesen Kurstermin nicht löschen."
+
+
+#: includes/Courses/BookingService.php:274
+msgid "You cannot delete this course."
+msgstr "Sie dürfen diesen Kurs nicht löschen."
+
+
+#: includes/Courses/BookingService.php:290
+#: includes/Courses/BookingService.php:318
+msgid "This course date still has retained bookings."
+msgstr "Für diesen Kurstermin werden noch Buchungen aufbewahrt."
+
+
+#: includes/Courses/BookingService.php:312
+msgid "This course still has retained bookings."
+msgstr "Für diesen Kurs werden noch Buchungen aufbewahrt."
+
+
+#: includes/Courses/BookingService.php:344
+msgid "Course booking requires transactional database tables."
+msgstr "Kursbuchungen benötigen transaktionsfähige Datenbanktabellen."
+
+
+#: includes/Courses/BookingService.php:347
+msgid "A course update is already running."
+msgstr "Ein Kurs wird bereits aktualisiert."
+
+
+#: includes/Courses/BookingService.php:390
+msgid "The booking could not be saved. Please try again."
+msgstr "Die Buchung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+
+
+#: includes/Courses/BookingService.php:411
+msgid "A booking notification could not be sent. Please resend it."
+msgstr "Eine Buchungsbenachrichtigung konnte nicht gesendet werden. Bitte senden Sie sie erneut."
+
+
+#: includes/Courses/BookingService.php:459
+msgid "Please check the course access and retention settings."
+msgstr "Bitte prüfen Sie die Einstellungen für Zugang und Aufbewahrung."
+
+
+#: includes/Courses/BookingService.php:481
+msgid "Please enter valid course dates and capacity."
+msgstr "Bitte geben Sie gültige Kurstermine und eine gültige Kapazität ein."
+
+
+#: includes/Courses/BookingService.php:487
+msgid "Please check the course times, registration period and capacity."
+msgstr "Bitte prüfen Sie Kurszeiten, Anmeldezeitraum und Kapazität."
+
+
+#: includes/Courses/BookingService.php:493
+msgid "Please select a published room or enter a location."
+msgstr "Bitte wählen Sie einen veröffentlichten Raum oder geben Sie einen Veranstaltungsort ein."
+
+
+#: includes/Courses/BookingService.php:504
+msgid "Please enter the course location."
+msgstr "Bitte geben Sie den Veranstaltungsort des Kurses ein."
+
+
+#: includes/Courses/BookingService.php:509
+msgid "Capacity cannot be lower than the number of reserved places."
+msgstr "Die Kapazität darf nicht unter der Anzahl reservierter Plätze liegen."
+
+
+#: includes/Courses/BookingService.php:513
+msgid "Dates and location cannot be changed while active bookings exist."
+msgstr "Datum, Uhrzeit und Ort können bei aktiven Buchungen nicht geändert werden."
+
+
+#: includes/Courses/BookingService.php:552
+msgid "This request has already been used. Please reload the form."
+msgstr "Diese Anfrage wurde bereits verwendet. Bitte laden Sie das Formular neu."
+
+
+#: includes/Courses/BookingService.php:556
+#: includes/Courses/Frontend.php:221
+msgid "Please sign in using SSO to book this course."
+msgstr "Bitte melden Sie sich per SSO an, um diesen Kurs zu buchen."
+
+
+#: includes/Courses/BookingService.php:561
+msgid "This course date is fully booked."
+msgstr "Dieser Kurstermin ist ausgebucht."
+
+
+#: includes/Courses/BookingService.php:561
+msgid "Registration for this course date is closed."
+msgstr "Die Anmeldung für diesen Kurstermin ist geschlossen."
+
+
+#: includes/Courses/BookingService.php:565
+msgid "An active booking already exists for this email address and course date."
+msgstr "Für diese E-Mail-Adresse und diesen Kurstermin besteht bereits eine aktive Buchung."
+
+
+#: includes/Courses/BookingService.php:614
+msgid "This confirmation link is invalid."
+msgstr "Dieser Bestätigungslink ist ungültig."
+
+
+#: includes/Courses/BookingService.php:617
+msgid "This booking is no longer active. Please make a new booking."
+msgstr "Diese Buchung ist nicht mehr aktiv. Bitte melden Sie sich erneut an."
+
+
+#: includes/Courses/BookingService.php:623
+msgid "This confirmation link has expired. Please make a new booking."
+msgstr "Dieser Bestätigungslink ist abgelaufen. Bitte melden Sie sich erneut an."
+
+
+#: includes/Courses/BookingService.php:652
+msgid "Only identity-verified bookings can be approved before the course begins."
+msgstr "Nur Buchungen mit bestätigter Identität können vor Kursbeginn freigegeben werden."
+
+
+#: includes/Courses/BookingService.php:681
+msgid "This cancellation link is invalid."
+msgstr "Dieser Stornierungslink ist ungültig."
+
+
+#: includes/Courses/BookingService.php:687
+msgid "The cancellation deadline has passed."
+msgstr "Die Stornierungsfrist ist abgelaufen."
+
+
+#: includes/Courses/BookingService.php:730
+msgid "The email confirmation period has expired."
+msgstr "Die Frist zur E-Mail-Bestätigung ist abgelaufen."
+
+
+#: includes/Courses/BookingService.php:788
+msgid "This course booking is still within its retention period."
+msgstr "Diese Kursbuchung befindet sich noch innerhalb ihrer Aufbewahrungsfrist."
+
+
+#: includes/Courses/Frontend.php:60
+msgid "Display a course and its individually bookable dates."
+msgstr "Zeigt einen Kurs und seine einzeln buchbaren Termine an."
+
+
+#: includes/Courses/Frontend.php:61
+msgid "Select a course"
+msgstr "Kurs auswählen"
+
+
+#: includes/Courses/Frontend.php:62
+msgid "Loading courses…"
+msgstr "Kurse werden geladen …"
+
+
+#: includes/Courses/Frontend.php:63
+msgid "Create a course under RSVP → Courses first."
+msgstr "Legen Sie zuerst unter RSVP → Kurse einen Kurs an."
+
+
+#: includes/Courses/Frontend.php:64
+msgid "The published page displays this course, its dates and the registration form."
+msgstr "Die veröffentlichte Seite zeigt diesen Kurs, seine Termine und das Anmeldeformular."
+
+
+#: includes/Courses/Frontend.php:65
+msgid "Courses could not be loaded. Check your permissions and try again."
+msgstr "Kurse konnten nicht geladen werden. Prüfen Sie Ihre Berechtigungen und versuchen Sie es erneut."
+
+
+#: includes/Courses/Frontend.php:66
+msgid "Draft"
+msgstr "Entwurf"
+
+
+#: includes/Courses/Frontend.php:117
+msgid "You cannot manage courses."
+msgstr "Sie dürfen keine Kurse verwalten."
+
+
+#: includes/Courses/Frontend.php:134
+msgid "Please reload the page before registering."
+msgstr "Bitte laden Sie die Seite vor der Anmeldung neu."
+
+
+#: includes/Courses/Frontend.php:149
+msgid "This request must originate from this website."
+msgstr "Diese Anfrage muss von dieser Website stammen."
+
+
+#: includes/Courses/Frontend.php:215
+#: includes/Courses/Frontend.php:227
+msgid "Please check your registration details."
+msgstr "Bitte prüfen Sie Ihre Anmeldedaten."
+
+
+#: includes/Courses/Frontend.php:222
+#: includes/Courses/Frontend.php:306
+msgid "SSO is currently unavailable. Please contact the course organizer."
+msgstr "SSO ist derzeit nicht verfügbar. Bitte wenden Sie sich an die Kursverantwortlichen."
+
+
+#: includes/Courses/Frontend.php:231
+msgid "Your SSO profile does not provide a valid email address. Please contact the course organizer."
+msgstr "Ihr SSO-Profil enthält keine gültige E-Mail-Adresse. Bitte wenden Sie sich an die Kursverantwortlichen."
+
+
+#: includes/Courses/Frontend.php:271
+msgid "This course is currently unavailable."
+msgstr "Dieser Kurs ist derzeit nicht verfügbar."
+
+
+#: includes/Courses/Frontend.php:300
+msgid "No upcoming course dates are currently available."
+msgstr "Derzeit sind keine zukünftigen Kurstermine verfügbar."
+
+
+#: includes/Courses/Frontend.php:302
+msgid "Each date is booked separately. One registration reserves one place."
+msgstr "Jeder Termin wird einzeln gebucht. Eine Anmeldung reserviert einen Platz."
+
+
+#: includes/Courses/Frontend.php:304
+msgid "Sign in with SSO"
+msgstr "Mit SSO anmelden"
+
+
+#: includes/Courses/Frontend.php:304
+msgid "or register with your email address below."
+msgstr "oder melden Sie sich unten mit Ihrer E-Mail-Adresse an."
+
+
+#: includes/Courses/Frontend.php:308
+msgid "You are signed in with SSO. Your verified profile will be used for this registration."
+msgstr "Sie sind mit SSO angemeldet. Ihr verifiziertes Profil wird für diese Anmeldung verwendet."
+
+
+#: includes/Courses/Frontend.php:312
+msgid "Choose a course date"
+msgstr "Kurstermin auswählen"
+
+
+#: includes/Courses/Frontend.php:325
+msgid "Your registration details"
+msgstr "Ihre Anmeldedaten"
+
+
+#: includes/Courses/Frontend.php:328
+msgid "Email address"
+msgstr "E-Mail-Adresse"
+
+
+#: includes/Courses/Frontend.php:330
+msgid "Confirm your email address within 60 minutes, before the course starts. Your place is reserved until then."
+msgstr "Bestätigen Sie Ihre E-Mail-Adresse innerhalb von 60 Minuten, spätestens vor Kursbeginn. Bis dahin ist Ihr Platz reserviert."
+
+
+#: includes/Courses/Frontend.php:332
+msgid "I agree to the processing of my details for this course registration."
+msgstr "Ich stimme der Verarbeitung meiner Angaben für diese Kursanmeldung zu."
+
+
+#: includes/Courses/Frontend.php:332
+msgid "Privacy policy"
+msgstr "Datenschutzerklärung"
+
+
+#: includes/Courses/Frontend.php:334
+msgid "Participation is confirmed automatically once your identity has been verified."
+msgstr "Ihre Teilnahme wird automatisch bestätigt, sobald Ihre Identität verifiziert ist."
+
+
+#: includes/Courses/Frontend.php:335
+msgid "The course organizer will review and confirm your registration."
+msgstr "Die Kursverantwortlichen prüfen und bestätigen Ihre Anmeldung."
+
+
+#: includes/Courses/Frontend.php:336
+#: includes/Courses/Frontend.php:511
+msgid "Register for this date"
+msgstr "Für diesen Termin anmelden"
+
+
+#: includes/Courses/Frontend.php:337
+msgid "Please enable JavaScript to use the course registration form."
+msgstr "Bitte aktivieren Sie JavaScript, um das Anmeldeformular zu verwenden."
+
+
+#: includes/Courses/Frontend.php:410
+msgid "Your place is reserved. Please confirm your email using the link we sent within 60 minutes and before the course starts."
+msgstr "Ihr Platz ist reserviert. Bitte bestätigen Sie Ihre E-Mail-Adresse über den zugesandten Link innerhalb von 60 Minuten und vor Kursbeginn."
+
+
+#: includes/Courses/Frontend.php:411
+msgid "Your registration has been received and is awaiting confirmation by the course organizer."
+msgstr "Ihre Anmeldung ist eingegangen. Die Bestätigung durch die Kursverantwortlichen steht noch aus."
+
+
+#: includes/Courses/Frontend.php:412
+msgid "Your participation is confirmed. You will receive the details by email."
+msgstr "Ihre Teilnahme ist bestätigt. Sie erhalten die Einzelheiten per E-Mail."
+
+
+#: includes/Courses/Frontend.php:413
+msgid "Your course registration has been cancelled."
+msgstr "Ihre Kursanmeldung wurde storniert."
+
+
+#: includes/Courses/Frontend.php:415
+msgid "Your registration has been updated."
+msgstr "Ihre Anmeldung wurde aktualisiert."
+
+
+#: includes/Courses/Frontend.php:433
+msgid "Fully booked"
+msgstr "Ausgebucht"
+
+
+#: includes/Courses/Frontend.php:433
+msgid "Registration closed"
+msgstr "Anmeldung geschlossen"
+
+
+#: includes/Courses/Frontend.php:434
+#: includes/Courses/Frontend.php:438
+msgid "Currently unavailable"
+msgstr "Derzeit nicht verfügbar"
+
+
+#: includes/Courses/Frontend.php:435
+msgid "Registration is currently unavailable."
+msgstr "Eine Anmeldung ist derzeit nicht möglich."
+
+
+#: includes/Courses/Frontend.php:437
+#, php-format
+msgid "%d place available"
+msgid_plural "%d places available"
+msgstr[0] "%d Platz verfügbar"
+msgstr[1] "%d Plätze verfügbar"
+
+
+#: includes/Courses/Frontend.php:459
+msgid "Course or date not found."
+msgstr "Kurs oder Termin nicht gefunden."
+
+
+#: includes/Courses/Frontend.php:511
+msgid "Registering…"
+msgstr "Anmeldung wird gesendet …"
+
+
+#: includes/Courses/Frontend.php:512
+msgid "The request could not be completed. Please try again; an existing registration will not be duplicated."
+msgstr "Die Anfrage konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut; eine bestehende Anmeldung wird nicht doppelt angelegt."
+
+
+#: includes/Courses/Frontend.php:513
+msgid "Please choose an available course date."
+msgstr "Bitte wählen Sie einen verfügbaren Kurstermin aus."
+
+
+#: includes/Courses/Frontend.php:514
+msgid "The selected date is no longer available. Please choose another date."
+msgstr "Der ausgewählte Termin ist nicht mehr verfügbar. Bitte wählen Sie einen anderen Termin."
+
+
+#: includes/Courses/Frontend.php:515
+msgid "Availability could not be refreshed. It will be checked again when you register."
+msgstr "Die Verfügbarkeit konnte nicht aktualisiert werden. Sie wird bei Ihrer Anmeldung erneut geprüft."
+
+
+#: includes/Courses/Module.php:93
+#: includes/Courses/Module.php:94
+#: includes/Courses/PostTypes.php:15
+#: includes/Courses/PostTypes.php:17
+msgid "Courses"
+msgstr "Kurse"
+
+
+#: includes/Courses/Notifications.php:66
+msgid "The participant email could not be sent. Use Resend notification to try again."
+msgstr "Die E-Mail an die teilnehmende Person konnte nicht gesendet werden. Verwenden Sie „E-Mail erneut senden“, um es erneut zu versuchen."
+
+
+#: includes/Courses/Notifications.php:81
+msgid "The organizer notification could not be sent. Use Resend notification to try again."
+msgstr "Die Benachrichtigung an die Verantwortlichen konnte nicht gesendet werden. Verwenden Sie „E-Mail erneut senden“, um es erneut zu versuchen."
+
+
+#: includes/Courses/Notifications.php:91
+msgid "The course notification could not be prepared. Use Resend notification to try again."
+msgstr "Die Kursbenachrichtigung konnte nicht vorbereitet werden. Verwenden Sie „E-Mail erneut senden“, um es erneut zu versuchen."
+
+
+#: includes/Courses/Notifications.php:111
+#, php-format
+msgid "[RSVP] Confirm your email address: %s"
+msgstr "[RSVP] E-Mail-Adresse bestätigen: %s"
+
+
+#: includes/Courses/Notifications.php:112
+#, php-format
+msgid "Please confirm your email address by %s. Your place is reserved until that time; after the deadline you must register again."
+msgstr "Bitte bestätigen Sie Ihre E-Mail-Adresse bis %s. Ihr Platz ist bis dahin reserviert; nach Ablauf der Frist müssen Sie sich erneut anmelden."
+
+
+#: includes/Courses/Notifications.php:118
+#, php-format
+msgid "[RSVP] Awaiting approval: %s"
+msgstr "[RSVP] Freigabe ausstehend: %s"
+
+
+#: includes/Courses/Notifications.php:119
+msgid "Your email address has been verified. Your place is reserved while the organizers review your registration. You will receive another email when they confirm your participation."
+msgstr "Ihre E-Mail-Adresse wurde bestätigt. Ihr Platz ist reserviert, während die Verantwortlichen Ihre Anmeldung prüfen. Sie erhalten eine weitere E-Mail, sobald Ihre Teilnahme bestätigt ist."
+
+
+#: includes/Courses/Notifications.php:121
+#, php-format
+msgid "[RSVP] Participation confirmed: %s"
+msgstr "[RSVP] Teilnahme bestätigt: %s"
+
+
+#: includes/Courses/Notifications.php:122
+msgid "Your participation is confirmed. The attached calendar file contains your course date."
+msgstr "Ihre Teilnahme ist bestätigt. Die angehängte Kalenderdatei enthält Ihren Kurstermin."
+
+
+#: includes/Courses/Notifications.php:124
+#, php-format
+msgid "[RSVP] Course booking cancelled: %s"
+msgstr "[RSVP] Kursbuchung storniert: %s"
+
+
+#: includes/Courses/Notifications.php:135
+msgid "You may cancel your registration until the course begins."
+msgstr "Sie können Ihre Anmeldung bis Kursbeginn stornieren."
+
+
+#: includes/Courses/Notifications.php:149
+#, php-format
+msgid "[RSVP] Registration cancelled: %s"
+msgstr "[RSVP] Anmeldung storniert: %s"
+
+
+#: includes/Courses/Notifications.php:149
+#, php-format
+msgid "[RSVP] New course registration: %s"
+msgstr "[RSVP] Neue Kursanmeldung: %s"
+
+
+#: includes/Courses/Notifications.php:151
+msgid "A verified course registration is awaiting your approval."
+msgstr "Eine verifizierte Kursanmeldung wartet auf Ihre Freigabe."
+
+
+#: includes/Courses/Notifications.php:151
+msgid "A course registration has been confirmed."
+msgstr "Eine Kursanmeldung wurde bestätigt."
+
+
+#: includes/Courses/Notifications.php:153
+#, php-format
+msgid "Participant: %s"
+msgstr "Teilnehmende Person: %s"
+
+
+#: includes/Courses/Notifications.php:154
+#, php-format
+msgid "Email address: %s"
+msgstr "E-Mail-Adresse: %s"
+
+
+#: includes/Courses/Notifications.php:156
+msgid "Manage booking"
+msgstr "Buchung verwalten"
+
+
+#: includes/Courses/Notifications.php:166
+#, php-format
+msgid "Course: %s"
+msgstr "Kurs: %s"
+
+
+#: includes/Courses/Notifications.php:167
+#, php-format
+msgid "Starts: %s"
+msgstr "Beginn: %s"
+
+
+#: includes/Courses/Notifications.php:168
+#, php-format
+msgid "Ends: %s"
+msgstr "Ende: %s"
+
+
+#: includes/Courses/Notifications.php:169
+#, php-format
+msgid "Location: %s"
+msgstr "Veranstaltungsort: %s"
+
+
+#: includes/Courses/Notifications.php:190
+msgid "Your reservation expired because your email address was not confirmed in time. You can register again if places are still available."
+msgstr "Ihre Reservierung ist abgelaufen, da Ihre E-Mail-Adresse nicht rechtzeitig bestätigt wurde. Sie können sich erneut anmelden, sofern noch Plätze verfügbar sind."
+
+
+#: includes/Courses/Notifications.php:192
+msgid "The organizers could not approve your course registration. Your reserved place has been released."
+msgstr "Die Verantwortlichen konnten Ihre Kursanmeldung nicht freigeben. Ihr reservierter Platz wurde freigegeben."
+
+
+#: includes/Courses/Notifications.php:194
+msgid "The organizers have cancelled this course date. Your registration has therefore been cancelled."
+msgstr "Die Verantwortlichen haben diesen Kurstermin abgesagt. Ihre Anmeldung wurde daher storniert."
+
+
+#: includes/Courses/Notifications.php:196
+msgid "Your course registration has been cancelled at your request."
+msgstr "Ihre Kursanmeldung wurde auf Ihren Wunsch storniert."
+
+
+#: includes/Courses/Notifications.php:198
+msgid "Your course registration has been cancelled by the organizers."
+msgstr "Ihre Kursanmeldung wurde durch die Verantwortlichen storniert."
+
+
+#: includes/Courses/PostTypes.php:18
+msgid "Add course"
+msgstr "Kurs hinzufügen"
+
+
+#: includes/Courses/PostTypes.php:19
+msgid "Edit course"
+msgstr "Kurs bearbeiten"
+
+
+#: includes/Courses/PostTypes.php:20
+msgid "New course"
+msgstr "Neuer Kurs"
+
+
+#: includes/Courses/PostTypes.php:21
+msgid "Search courses"
+msgstr "Kurse suchen"
+
+
+#: includes/Courses/PostTypes.php:22
+msgid "No courses found."
+msgstr "Keine Kurse gefunden."
+
+
+#: includes/Courses/PostTypes.php:32
+msgid "Course date"
+msgstr "Kurstermin"
+
+
+#: includes/Courses/Repository.php:52
+msgid "Course not found."
+msgstr "Kurs nicht gefunden."
+
+
+#: includes/Courses/Repository.php:73
+msgid "Course date not found."
+msgstr "Kurstermin nicht gefunden."
+
+
+#: includes/Courses/Repository.php:138
+msgid "Course booking not found."
+msgstr "Kursbuchung nicht gefunden."
+
+
+#: blocks/course-booking/block.json
+msgctxt "block title"
+msgid "Course booking"
+msgstr "Kursbuchung"
+
+
+#: blocks/course-booking/block.json
+msgctxt "block description"
+msgid "Display a course and its individually bookable dates."
+msgstr "Zeigt einen Kurs und seine einzeln buchbaren Termine an."
+
+
+#: includes/Courses/Frontend.php
+msgid "A previous registration may already have been saved. Enter the same details and submit again to retrieve its result."
+msgstr "Eine frühere Anmeldung wurde möglicherweise bereits gespeichert. Geben Sie dieselben Daten ein und senden Sie das Formular erneut ab, um das Ergebnis abzurufen."
+
+#: includes/Courses/BookingService.php
+msgid "Availability could not be read. Please try again."
+msgstr "Die Verfügbarkeit konnte nicht gelesen werden. Bitte versuchen Sie es erneut."
+
+#: includes/Courses/BookingService.php
+msgid "Course maintenance could not read the stored dates."
+msgstr "Die Kursbereinigung konnte die gespeicherten Termine nicht lesen."
+
+#: includes/Courses/Notifications.php
+msgid "The course notification is busy. Use Resend notification to try again."
+msgstr "Die Kursbenachrichtigung wird gerade verarbeitet. Verwenden Sie „E-Mail erneut senden“, um es erneut zu versuchen."
+
+#: includes/Courses/Frontend.php
+msgid "Your registration has been received."
+msgstr "Ihre Anmeldung ist eingegangen."

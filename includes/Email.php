@@ -51,6 +51,10 @@ class Email
      */
     public function doEmail(string $mailContext = '', string $recipient = 'admin', int $bookingId = 0, string $status = '', string $cancelReason = '')
     {
+        // Course notifications are emitted by the course service after commit.
+        if (Functions::isCourseBooking($bookingId)) {
+            return;
+        }
         $booking = Functions::getBooking($bookingId);
         if (empty($booking) || $mailContext == '') {
             return;
@@ -434,9 +438,9 @@ class Email
      * @param string $message
      * @param string $altMessage
      * @param string $attachment
-     * @return void
+     * @return bool Whether WordPress accepted the message for delivery.
      */
-    public function send(string $to, string $subject, string $message, string $altMessage = '', string $attachment = '')
+    public function send(string $to, string $subject, string $message, string $altMessage = '', string $attachment = ''): bool
     {
         $body = $message;
         $altBody = $altMessage;
@@ -446,17 +450,27 @@ class Email
             'Content-Transfer-Encoding: 8bit'
         ];
 
-        add_action('phpmailer_init', function ($phpmailer) use ($altBody) {
+        /**
+         * Set the plain-text alternative for this message only.
+         *
+         * @param object $phpmailer WordPress mailer instance.
+         * @return void
+         */
+        $setAltBody = static function ($phpmailer) use ($altBody): void {
             $phpmailer->AltBody = $altBody;
-        });
+        };
+        add_action('phpmailer_init', $setAltBody);
 
         add_filter('wp_mail_from', [$this, 'filterEmail']);
         add_filter('wp_mail_from_name', [$this, 'filterName']);
 
-        wp_mail($to, $subject, $body, $headers, $attachment);
-
-        remove_filter('wp_mail_from_name', [$this, 'filterName']);
-        remove_filter('wp_mail_from', [$this, 'filterEmail']);
+        try {
+            return (bool) wp_mail($to, $subject, $body, $headers, $attachment);
+        } finally {
+            remove_action('phpmailer_init', $setAltBody);
+            remove_filter('wp_mail_from_name', [$this, 'filterName']);
+            remove_filter('wp_mail_from', [$this, 'filterEmail']);
+        }
     }
 
     /**

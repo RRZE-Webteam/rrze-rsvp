@@ -527,9 +527,19 @@ class Bookings extends Shortcodes
         return $selectRoom;
     }
 
+    /**
+     * Render a legacy room receipt without exposing course participants or changing SSO.
+     *
+     * @return string Legacy receipt HTML, or an empty string for an invalid/course link.
+     */
     protected function bookedNotice()
     {
         if (!isset($_GET['id']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'booked-' . $_GET['nonce'])) {
+            return '';
+        }
+
+        $bookingId = absint($_GET['id']);
+        if (Functions::isCourseBooking($bookingId)) {
             return '';
         }
 
@@ -547,7 +557,6 @@ class Bookings extends Shortcodes
             $ldap->logout($returnTo);
         }
 
-        $bookingId = absint($_GET['id']);
         $booking = Functions::getBooking($bookingId);
         if (!$booking) {
             return '';

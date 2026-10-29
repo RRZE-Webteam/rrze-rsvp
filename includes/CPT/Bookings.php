@@ -31,6 +31,7 @@ class Bookings
         $this->sRoom = 'rsvp_booking_room';
     }
 
+    /** @return void Register booking administration, filtering and mixed date sorting. */
     public function onLoaded()
     {
         add_action('init', [$this, 'booking_post_type']);
@@ -45,6 +46,7 @@ class Bookings
 
         add_filter('parse_query', [$this, 'filterBookings'], 10);
         add_action('pre_get_posts', [$this, 'searchBookings']);
+        add_filter('posts_orderby', [$this, 'orderBookingDates'], 10, 2);
     }
 
 
@@ -136,8 +138,18 @@ class Bookings
         return $columns;
     }
 
-    function getBookingValue($column, $post_id)
+    /**
+     * Render legacy booking columns; course columns have a separate renderer.
+     *
+     * @param string $column Column identifier.
+     * @param int $post_id Booking post ID.
+     * @return void
+     */
+    public function getBookingValue($column, $post_id)
     {
+        if (Functions::isCourseBooking((int) $post_id)) {
+            return;
+        }
         // $post = get_post($post_id);
         $booking = Functions::getBooking($post_id);
 
@@ -311,6 +323,12 @@ class Bookings
         wp_die();
     }
 
+    /**
+     * Render date, time and room filters using the correct timestamp convention.
+     *
+     * @param string $post_type Current list-table post type.
+     * @return void
+     */
     public function addFilters($post_type)
     {
         if ($post_type != 'booking') {
@@ -338,9 +356,16 @@ class Bookings
         foreach ($aBookingIds as $bookingId) {
             // 2. get unique dates
             $bookingStart = absint(get_post_meta($bookingId, 'rrze-rsvp-booking-start', true));
+            $bookingEnd = get_post_meta($bookingId, 'rrze-rsvp-booking-end', true);
+            if (Functions::isCourseBooking((int) $bookingId)) {
+                $aBookingDates[wp_date('Y-m-d', $bookingStart)] = wp_date(get_option('date_format'), $bookingStart);
+                $timeslot = wp_date(get_option('time_format'), $bookingStart) . ' - ' . wp_date(get_option('time_format'), (int) $bookingEnd);
+                $value = wp_date('H:i', $bookingStart) . ' - ' . wp_date('H:i', (int) $bookingEnd);
+                $aBookingTimeslots[$value] = $timeslot;
+                continue;
+            }
             $aBookingDates[date("Y-m-d", $bookingStart)] = Functions::dateFormat($bookingStart);
 
-            $bookingEnd = get_post_meta($bookingId, 'rrze-rsvp-booking-end', true);
             $bookingTimeslot = sprintf('%05s', Functions::timeFormat((int)$bookingStart)) . ' - ' . sprintf('%05s', Functions::timeFormat((int)$bookingEnd));
             $aBookingTimeslots[$bookingTimeslot] = $bookingTimeslot;
             // 3. get unique rooms via seat
@@ -366,6 +391,12 @@ class Bookings
     }
 
 
+    /**
+     * Search bookings by the title of their seat, room or directly linked course.
+     *
+     * @param string $sSearch Administrative search text.
+     * @return array Matching booking IDs.
+     */
     private function getBookingIDsBySeatRoomTitle($sSearch)
     {
         global $wpdb;
@@ -378,7 +409,14 @@ class Bookings
             $aBookingIDs[] = $aID['ID'];
         }
 
-        return $aBookingIDs;
+        $courseIds = $wpdb->get_col($wpdb->prepare(
+            "SELECT b.ID FROM {$wpdb->posts} b
+             INNER JOIN {$wpdb->postmeta} m ON m.post_id = b.ID AND m.meta_key = 'rrze-rsvp-booking-course'
+             INNER JOIN {$wpdb->posts} c ON c.ID = m.meta_value AND c.post_type = 'rsvp_course'
+             WHERE b.post_type = 'booking' AND b.post_status = 'publish' AND c.post_title LIKE %s",
+            '%' . $wpdb->esc_like($sSearch) . '%'
+        ));
+        return array_values(array_unique(array_merge($aBookingIDs, $courseIds)));
     }
 
     private function setFilterParams()
@@ -442,6 +480,11 @@ class Bookings
         return get_posts($args);
     }
 
+    /**
+     * Find legacy and course bookings matching the visible date/time filters.
+     *
+     * @return array Matching booking IDs.
+     */
     private function getBookingIDsByFilter()
     {
         global $wpdb;
@@ -449,6 +492,8 @@ class Bookings
         $wpdb->query("SET time_zone = '+00:00'");
 
         $sql = "SELECT ID FROM $wpdb->posts WHERE post_type = 'booking' AND post_status = 'publish'";
+        // Course times are UTC; compare them in PHP with the site's timezone below.
+        $sql .= " AND ID NOT IN (SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'rrze-rsvp-booking-course-date')";
 
         if ($this->filterRoomIDs) {
             $sql .= " AND ID IN (SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'rrze-rsvp-booking-seat' AND meta_value IN (SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'rrze-rsvp-seat-room' AND meta_value = $this->filterRoomIDs))";
@@ -469,6 +514,27 @@ class Bookings
         $aPostIDs = $wpdb->get_results($sql, ARRAY_N);
         foreach ($aPostIDs as $postID) {
             $ret[] = $postID[0];
+        }
+        if (!$this->filterRoomIDs) {
+            $courseIds = get_posts([
+                'post_type' => 'booking',
+                'post_status' => 'publish',
+                'fields' => 'ids',
+                'nopaging' => true,
+                'meta_key' => 'rrze-rsvp-booking-course-date',
+            ]);
+            foreach ($courseIds as $bookingId) {
+                $start = (int) get_post_meta($bookingId, 'rrze-rsvp-booking-start', true);
+                $end = (int) get_post_meta($bookingId, 'rrze-rsvp-booking-end', true);
+                if ($this->filterDate && !in_array($this->filterDate, [wp_date('Y-m-d', $start), wp_date('Y-m-d', $end)], true)) {
+                    continue;
+                }
+                if (($this->filterStart && wp_date('H:i', $start) !== $this->filterStart)
+                    || ($this->filterEnd && wp_date('H:i', $end) !== $this->filterEnd)) {
+                    continue;
+                }
+                $ret[] = $bookingId;
+            }
         }
         return $ret;
     }
@@ -509,6 +575,12 @@ class Bookings
 
 
 
+    /**
+     * Apply booking searches and mark date ordering for timestamp normalization.
+     *
+     * @param \WP_Query $query Main booking query.
+     * @return void
+     */
     public function searchBookings($query)
     {
         if (
@@ -551,6 +623,7 @@ class Bookings
             case 'bookingdate':
                 $query->set('meta_key', 'rrze-rsvp-booking-start');
                 $query->set('orderby', 'meta_value_num');
+                $query->set('rsvp_mixed_booking_date_sort', true);
                 break;
                 // case 'email':
                 //     $query->set('meta_key', 'rrze-rsvp-booking-guest-email');
@@ -571,6 +644,43 @@ class Bookings
                 // break;
 
         }
+    }
+
+    /**
+     * Sort course UTC timestamps beside legacy room wall-clock timestamps.
+     *
+     * Offsets are computed for each course's date in PHP, so historical DST
+     * rules work even when MySQL has no timezone tables. Only the SQL sort
+     * expression changes; stored room data and normal pagination stay intact.
+     *
+     * @param string $orderby Existing SQL ordering.
+     * @param \WP_Query $query Booking date query marked by searchBookings().
+     * @return string Ordering in the website's displayed local time.
+     */
+    public function orderBookingDates(string $orderby, $query): string
+    {
+        if (!$query->get('rsvp_mixed_booking_date_sort') || $query->get('post_type') !== 'booking') {
+            return $orderby;
+        }
+        global $wpdb;
+        $rows = $wpdb->get_results("SELECT DISTINCT p.ID, s.meta_value AS start FROM {$wpdb->posts} p
+            INNER JOIN {$wpdb->postmeta} c ON c.post_id = p.ID AND c.meta_key = 'rrze-rsvp-booking-course-date'
+            INNER JOIN {$wpdb->postmeta} s ON s.post_id = p.ID AND s.meta_key = 'rrze-rsvp-booking-start'
+            WHERE p.post_type = 'booking'", ARRAY_A);
+        $cases = [];
+        foreach ($rows as $row) {
+            $date = new \DateTimeImmutable('@' . (int) $row['start']);
+            $offset = $date->setTimezone(wp_timezone())->getOffset();
+            if ($offset) {
+                $cases[] = 'WHEN ' . (int) $row['ID'] . ' THEN ' . $offset;
+            }
+        }
+        if (!$cases) {
+            return $orderby;
+        }
+        $direction = strtoupper((string) $query->get('order')) === 'ASC' ? 'ASC' : 'DESC';
+        return '(CAST(' . $wpdb->postmeta . '.meta_value AS SIGNED) + CASE ' . $wpdb->posts . '.ID '
+            . implode(' ', $cases) . ' ELSE 0 END) ' . $direction . ', ' . $wpdb->posts . '.ID ' . $direction;
     }
 
     public function removeMonthsDropdown($months, $postType)

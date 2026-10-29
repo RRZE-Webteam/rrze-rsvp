@@ -229,11 +229,18 @@ class Tracking
     }
 
 
-    /*
-    * inserts, updates or deletes booking infos in table tracking
-    */
+    /**
+     * Update legacy room check-in tracking, excluding independent course registrations.
+     *
+     * @param int $blogID Website ID.
+     * @param int $bookingID Legacy booking ID.
+     * @return void
+     */
     public function doTracking(int $blogID, int $bookingID)
     {
+        if (Functions::isCourseBooking($bookingID)) {
+            return;
+        }
         // if row does not exist: insert
         // if row exists in table tracking and $booking['status'] != 'cancelled' : update
         // if row exists in table tracking and $booking['status'] == 'cancelled' : delete

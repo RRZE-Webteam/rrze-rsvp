@@ -8,6 +8,10 @@ use RRZE\RSVP\Auth\IdM;
 use RRZE\RSVP\Auth\LDAP;
 use WP_Query;
 
+if (isset($_GET['id']) && Functions::isCourseBooking(absint($_GET['id']))) {
+    wp_die(esc_html__('Use the link in your course booking email.', 'rrze-rsvp'), '', ['response' => 403]);
+}
+
 $idm = new IdM;
 $ldapInstance = new LDAP;
 

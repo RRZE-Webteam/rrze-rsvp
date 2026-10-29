@@ -124,6 +124,12 @@ class Schedule
             ],
         ];
 
+        // Courses have independent expiry and retention rules.
+        $args['meta_query']['course_exclusion'] = [
+            'key' => 'rrze-rsvp-booking-course-date',
+            'compare' => 'NOT EXISTS',
+        ];
+
         $query = new WP_Query($args);
 
         if ($query->have_posts()) {
@@ -162,6 +168,12 @@ class Schedule
                     'compare' => 'IN',
                 ],
             ],
+        ];
+
+        // Courses have independent expiry and retention rules.
+        $args['meta_query']['course_exclusion'] = [
+            'key' => 'rrze-rsvp-booking-course-date',
+            'compare' => 'NOT EXISTS',
         ];
 
         $query = new WP_Query($args);
@@ -206,6 +218,12 @@ class Schedule
             ],
         ];
 
+        // Courses have independent expiry and retention rules.
+        $args['meta_query']['course_exclusion'] = [
+            'key' => 'rrze-rsvp-booking-course-date',
+            'compare' => 'NOT EXISTS',
+        ];
+
         $query = new WP_Query($args);
 
         if ($query->have_posts()) {
@@ -248,6 +266,12 @@ class Schedule
                     'compare' => 'IN',
                 ],
             ],
+        ];
+
+        // Courses have independent expiry and retention rules.
+        $args['meta_query']['course_exclusion'] = [
+            'key' => 'rrze-rsvp-booking-course-date',
+            'compare' => 'NOT EXISTS',
         ];
 
         $query = new WP_Query($args);
@@ -335,6 +359,12 @@ class Schedule
                     ],
                 ],
             ],
+        ];
+
+        // Courses have independent expiry and retention rules.
+        $args['meta_query']['course_exclusion'] = [
+            'key' => 'rrze-rsvp-booking-course-date',
+            'compare' => 'NOT EXISTS',
         ];
 
         $query = new WP_Query($args);

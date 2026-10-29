@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "rrze-rsvp/course-booking",
+  "version": "1.0.0",
+  "title": "Course booking",
+  "category": "widgets",
+  "icon": "calendar-alt",
+  "description": "Display a course and its individually bookable dates.",
+  "textdomain": "rrze-rsvp",
+  "attributes": { "courseId": { "type": "integer", "default": 0 } },
+  "supports": { "html": false }
+}

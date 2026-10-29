@@ -39,7 +39,7 @@ class Rooms{
      * A theme's body min-height of 100vh refers to the editor iframe's height.
      * WordPress autoresize adds the body spacing to that height on each pass,
      * creating a feedback loop even when the editor is empty. Reset only the
-     * room content editor's minimum height so it can resize to its actual content.
+     * room and course editors' minimum height so they resize to their content.
      * Existing editor styles and editors on other screens remain unchanged.
      *
      * @param array $settings TinyMCE initialization settings.
@@ -50,7 +50,7 @@ class Rooms{
     {
         $screen = function_exists('get_current_screen') ? get_current_screen() : null;
 
-        if ($editorId !== 'content' || !$screen || $screen->base !== 'post' || $screen->post_type !== 'room') {
+        if ($editorId !== 'content' || !$screen || $screen->base !== 'post' || !in_array($screen->post_type, ['room', 'rsvp_course'], true)) {
             return $settings;
         }
 

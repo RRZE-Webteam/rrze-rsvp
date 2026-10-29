@@ -20,7 +20,12 @@
     "scripts": {
         "test": [
             "php tests/booking-lifecycle.php",
-            "php tests/timeslot-compatibility.php"
+            "php tests/timeslot-compatibility.php",
+            "php tests/course-core.php",
+            "php tests/course-notifications.php",
+            "php tests/course-admin.php",
+            "php tests/course-frontend.php",
+            "php tests/course-module.php"
         ]
     },
     "extra": {

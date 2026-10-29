@@ -27,6 +27,11 @@ class Main
         $this->pluginFile = $pluginFile;
     }
 
+    /**
+     * Register the legacy room functionality and the independent course module.
+     *
+     * @return void
+     */
     public function onLoaded()
     {
         // Settings
@@ -69,6 +74,8 @@ class Main
 
         $actions = new Actions;
         $actions->onLoaded();
+
+        (new Courses\Module())->onLoaded();
 
         // Enqueue scripts
         add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
@@ -138,8 +145,16 @@ class Main
         exit;
     }
 
+    /**
+     * Start legacy seat authentication only for room/seat booking requests.
+     *
+     * @return void
+     */
     public function maybeAuthenticate()
     {
+        if (isset($_REQUEST['id']) && Functions::isCourseBooking(absint($_REQUEST['id']))) {
+            return;
+        }
         // Check In/Out (seat)
         if (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rrze-rsvp-seat-check-inout')) {
             $idm = new IdM;
@@ -159,6 +174,9 @@ class Main
     public function skipCache(): bool
     {
         global $post_type;
+        if (has_block('rrze-rsvp/course-booking') || is_page('rsvp-course-booking')) {
+            return true;
+        }
         if (in_array($post_type, array_keys(Capabilities::getCurrentCptArgs()))) {
             return true;
         }

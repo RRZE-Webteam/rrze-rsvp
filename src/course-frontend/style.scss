@@ -1,0 +1,45 @@
+.rrze-rsvp-course {
+    --rsvp-course-border: #767676;
+    --rsvp-course-accent: #005a9c;
+    max-width: 52rem;
+
+    fieldset { border: 0; padding: 0; margin: 1.5rem 0; min-width: 0; }
+    legend { font-weight: 700; margin-bottom: .75rem; padding: 0; }
+    .rrze-rsvp-course-dates { display: grid; gap: .75rem; }
+    .rrze-rsvp-course-date {
+        display: flex;
+        align-items: flex-start;
+        gap: .8rem;
+        border: 1px solid var(--rsvp-course-border);
+        border-radius: 4px;
+        padding: 1rem;
+        margin: 0;
+        cursor: pointer;
+        line-height: 1.5;
+        &:has(input:checked) { outline: 2px solid var(--rsvp-course-accent); }
+        &:has(input:disabled) { background: #f5f5f5; cursor: default; }
+        input { margin-top: .35rem; flex-shrink: 0; }
+    }
+    .rrze-rsvp-course-location, .rrze-rsvp-course-availability { display: block; }
+    .rrze-rsvp-course-availability { font-size: .9em; }
+    .rrze-rsvp-course-participant {
+        display: grid;
+        gap: 1rem;
+        label { display: block; margin: 0; }
+        input { display: block; box-sizing: border-box; width: 100%; max-width: 32rem; padding: .6rem; margin-top: .3rem; }
+    }
+    .rrze-rsvp-course-consent { display: flex; align-items: flex-start; gap: .6rem; line-height: 1.5; }
+    input[type=radio], input[type=checkbox] { width: 1.2rem; height: 1.2rem; min-width: 1.2rem; }
+    input:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--rsvp-course-accent); outline-offset: 3px; }
+    .rrze-rsvp-course-submit { min-height: 44px; padding: .75rem 1rem; cursor: pointer; }
+    .rrze-rsvp-course-submit:disabled { cursor: default; opacity: .7; }
+    .rrze-rsvp-course-hint { font-size: .9em; }
+    .rrze-rsvp-course-result:not(:empty), .rrze-rsvp-course-notice {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-inline-start: 4px solid var(--rsvp-course-accent);
+        background: #f2f7fa;
+        color: #1d2327;
+    }
+    .rrze-rsvp-course-result.is-error { border-color: #b32d2e; background: #fcf0f1; }
+}

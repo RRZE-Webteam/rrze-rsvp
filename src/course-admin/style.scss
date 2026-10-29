@@ -1,0 +1,96 @@
+.rsvp-course-date {
+    border: 1px solid #c3c4c7;
+    border-left: 4px solid #2271b1;
+    margin: 20px 0;
+    padding: 16px 20px;
+
+    h3 {
+        margin: 0 0 8px;
+    }
+
+    .rsvp-course-counts {
+        font-weight: 600;
+    }
+
+    &[aria-busy="true"] {
+        border-left-color: #8c8f94;
+    }
+}
+
+.rsvp-course-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 4px 20px;
+
+    p {
+        margin: 8px 0;
+    }
+
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    input,
+    select {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: none;
+    }
+
+    input[readonly] {
+        background: #f6f7f7;
+    }
+
+    [aria-invalid="true"] {
+        border-color: #b32d2e;
+    }
+}
+
+.rsvp-course-row-actions,
+.rsvp-course-booking-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.rsvp-course-feedback:not(:empty) {
+    margin-top: 12px;
+    font-weight: 600;
+}
+
+.rsvp-course-error {
+    color: #b32d2e;
+}
+
+.rsvp-course-settings > p {
+    margin: 16px 0 24px;
+}
+
+.rsvp-course-booking-details {
+    display: grid;
+    grid-template-columns: minmax(100px, 160px) 1fr;
+    gap: 12px 20px;
+
+    dt {
+        font-weight: 600;
+    }
+
+    dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .rsvp-course-date {
+        padding: 16px 12px;
+    }
+
+    .rsvp-course-fields,
+    .rsvp-course-booking-details {
+        grid-template-columns: 1fr;
+    }
+}

@@ -353,8 +353,24 @@ class Functions
     }
 
 
+    /**
+     * Read a booking using its course or legacy room representation.
+     *
+     * Course dates use UTC timestamps; legacy room timestamps are not converted.
+     *
+     * @param int $bookingId Booking post ID.
+     * @return array Booking data, or an empty array when missing or course access is denied.
+     */
     public static function getBooking(int $bookingId): array
     {
+        if (self::isCourseBooking($bookingId)) {
+            // Legacy public callers must never obtain a private course participant DTO.
+            if (!current_user_can('edit_post', $bookingId)) {
+                return [];
+            }
+            $booking = (new Courses\Repository())->getBooking($bookingId);
+            return is_wp_error($booking) ? [] : $booking;
+        }
         $data = [];
 
         $post = get_post($bookingId);
@@ -399,8 +415,28 @@ class Functions
         return $data;
     }
 
+    /**
+     * Determine whether a booking belongs to an independent course occurrence.
+     *
+     * @param int $postId Booking post ID.
+     * @return bool Whether the direct course occurrence relationship exists.
+     */
+    public static function isCourseBooking(int $postId): bool
+    {
+        return (int) get_post_meta($postId, 'rrze-rsvp-booking-course-date', true) > 0;
+    }
+
+    /**
+     * Check whether the booking has ended in its own timestamp convention.
+     *
+     * @param int $postId Booking post ID.
+     * @return bool Whether its end lies in the past.
+     */
     public static function isBookingArchived(int $postId): bool
     {
+        if (self::isCourseBooking($postId)) {
+            return (int) get_post_meta($postId, 'rrze-rsvp-booking-end', true) < time();
+        }
         $now = current_time('timestamp');
         $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
         $end = absint(get_post_meta($postId, 'rrze-rsvp-booking-end', true));
@@ -591,8 +627,17 @@ class Functions
         }
     }
 
+    /**
+     * Check manual deletion rules without bypassing course retention.
+     *
+     * @param int $postId Booking post ID.
+     * @return bool Whether a legacy booking can be manually deleted.
+     */
     public static function canDeleteBooking(int $postId): bool
     {
+        if (self::isCourseBooking($postId)) {
+            return false;
+        }
         $post = get_post($postId);
         if (!$post || $post->post_type !== 'booking') {
             return false;

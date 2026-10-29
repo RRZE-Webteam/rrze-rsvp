@@ -69,8 +69,17 @@ class Metaboxes
         }
     }
 
+    /**
+     * Register legacy seat-booking fields, leaving course bookings to their UI.
+     *
+     * @return void
+     */
     public function booking()
     {
+        $postId = absint($_GET['post'] ?? $_POST['post_ID'] ?? 0);
+        if ($postId && Functions::isCourseBooking($postId)) {
+            return;
+        }
         $cmb = new_cmb2_box(array(
             'id' => 'rrze-rsvp-booking-details',
             'title' => __('Details', 'rrze-rsvp'),
