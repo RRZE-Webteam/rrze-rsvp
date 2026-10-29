@@ -308,6 +308,13 @@ class Metaboxes
             // 'closed'     => true, // Keep the metabox closed by default
         ));
 
+        $this->addRoomDetailsSection(
+            $cmb_general,
+            'booking',
+            __('Booking and access', 'rrze-rsvp'),
+            __('Choose the booking mode, advance booking period and login requirements.', 'rrze-rsvp')
+        );
+
         $cmb_general->add_field(array(
             'name' => __('Booking mode', 'rrze-rsvp'),
             // 'desc'             => __('', 'rrze-rsvp'),
@@ -330,6 +337,19 @@ class Metaboxes
         ));
 
         $cmb_general->add_field(array(
+            'name' => __('Available days in advance', 'rrze-rsvp'),
+            'desc' => __('Number of days for which bookings are available in advance.', 'rrze-rsvp'),
+            'id' => 'rrze-rsvp-room-days-in-advance',
+            'type' => 'text',
+            'attributes' => array(
+                'type' => 'number',
+                'min' => '0',
+            ),
+            'default' => 7,
+            'classes' => ['hide-check-only'],
+        ));
+
+        $cmb_general->add_field(array(
             'name' => __('SSO is required', 'rrze-rsvp'),
             'desc' => __('If SSO is enabled, the customer must log in via SSO in order to use the booking system.', 'rrze-rsvp'),
             'id' => 'rrze-rsvp-room-sso-required',
@@ -347,18 +367,12 @@ class Metaboxes
             ));
         }
 
-        $cmb_general->add_field(array(
-            'name' => __('Available days in advance', 'rrze-rsvp'),
-            'desc' => __('Number of days for which bookings are available in advance.', 'rrze-rsvp'),
-            'id' => 'rrze-rsvp-room-days-in-advance',
-            'type' => 'text',
-            'attributes' => array(
-                'type' => 'number',
-                'min' => '0',
-            ),
-            'default' => 7,
-            'classes' => ['hide-check-only'],
-        ));
+        $this->addRoomDetailsSection(
+            $cmb_general,
+            'confirmation',
+            __('Confirmation and emails', 'rrze-rsvp'),
+            __('Decide who confirms a booking and who receives a calendar copy.', 'rrze-rsvp')
+        );
 
         $cmb_general->add_field(array(
             'name' => __('Automatic confirmation', 'rrze-rsvp'),
@@ -376,15 +390,6 @@ class Metaboxes
             'type' => 'checkbox',
             'default' => '',
             'classes' => ['hide-check-only'],
-        ));
-
-        $cmb_general->add_field(array(
-            'name' => __('Checkout notification', 'rrze-rsvp'),
-            'desc' => __('Send an email to the booking manager when customer has checked out.', 'rrze-rsvp'),
-            'id' => 'rrze-rsvp-room-checkout-notification',
-            'type' => 'checkbox',
-            'default' => '',
-            'classes' => ['hide-no-check', 'hide-consultation'],
         ));
 
         // https://github.com/RRZE-Webteam/rrze-rsvp/issues/311
@@ -412,14 +417,13 @@ class Metaboxes
         }
         $cmb_general->add_field($aArgs);
 
-        $cmb_general->add_field(array(
-            'name' => __('Allow Instant Check-In', 'rrze-rsvp'),
-            'desc' => __('Seats can be booked and checked-in in one step. This only works if automatic confirmation activated!', 'rrze-rsvp'),
-            'id' => 'rrze-rsvp-room-instant-check-in',
-            'type' => 'checkbox',
-            'default' => '',
-            'classes' => ['hide-no-check', 'hide-consultation', 'hide-check-only'],
-        ));
+        $this->addRoomDetailsSection(
+            $cmb_general,
+            'checkin',
+            __('Check-in and check-out', 'rrze-rsvp'),
+            __('Manage attendance on site and notifications when someone checks out.', 'rrze-rsvp'),
+            ['hide-no-check', 'hide-consultation']
+        );
 
         $cmb_general->add_field(array(
             'name' => __('Check-in is required', 'rrze-rsvp'),
@@ -446,6 +450,31 @@ class Metaboxes
         ));
 
         $cmb_general->add_field(array(
+            'name' => __('Allow Instant Check-In', 'rrze-rsvp'),
+            'desc' => __('Seats can be booked and checked-in in one step. This only works if automatic confirmation activated!', 'rrze-rsvp'),
+            'id' => 'rrze-rsvp-room-instant-check-in',
+            'type' => 'checkbox',
+            'default' => '',
+            'classes' => ['hide-no-check', 'hide-consultation', 'hide-check-only'],
+        ));
+
+        $cmb_general->add_field(array(
+            'name' => __('Checkout notification', 'rrze-rsvp'),
+            'desc' => __('Send an email to the booking manager when customer has checked out.', 'rrze-rsvp'),
+            'id' => 'rrze-rsvp-room-checkout-notification',
+            'type' => 'checkbox',
+            'default' => '',
+            'classes' => ['hide-no-check', 'hide-consultation'],
+        ));
+
+        $this->addRoomDetailsSection(
+            $cmb_general,
+            'form',
+            __('Booking form', 'rrze-rsvp'),
+            __('Configure the additional information participants can provide when booking.', 'rrze-rsvp')
+        );
+
+        $cmb_general->add_field(array(
             'name' => __('Show notes/comment input in booking form', 'rrze-rsvp'),
             'desc' => __('If not checked, the comment text input will still be visible in the backend for booking admins for internal notes.', 'rrze-rsvp'),
             'id' => 'rrze-rsvp-room-notes-check',
@@ -460,6 +489,13 @@ class Metaboxes
             'id' => 'rrze-rsvp-room-notes-label',
             'default' => __('Additional information', 'rrze-rsvp'),
         ));
+
+        $this->addRoomDetailsSection(
+            $cmb_general,
+            'location',
+            __('Location and floor plan', 'rrze-rsvp'),
+            __('Provide the address and a floor plan to help participants find the room.', 'rrze-rsvp')
+        );
 
         $cmb_general->add_field(array(
             'name' => __('Street', 'rrze-rsvp'),
@@ -521,6 +557,37 @@ class Metaboxes
             'type' => 'textarea',
             'desc' => __("This textarea contains the 'Additional Information' to show on top of occupancy grids shown on public displays only.", 'rrze-rsvp'),
         ));
+    }
+
+    /**
+     * Insert a translated section heading without adding any persisted room data.
+     *
+     * Visibility classes use the same booking-mode rules as the following fields.
+     * The heading remains available when JavaScript is disabled.
+     *
+     * @param \CMB2 $box Existing room details metabox.
+     * @param string $section Unique section identifier within the metabox.
+     * @param string $title Translated section title.
+     * @param string $description Translated explanation of the grouped settings.
+     * @param array $classes Additional booking-mode visibility classes.
+     * @return void
+     */
+    protected function addRoomDetailsSection(
+        \CMB2 $box,
+        string $section,
+        string $title,
+        string $description,
+        array $classes = []
+    ): void {
+        $box->add_field([
+            'id' => 'rrze-rsvp-room-section-' . $section,
+            'name' => $title,
+            'desc' => $description,
+            'type' => 'title',
+            'save_field' => false,
+            'attributes' => ['tag' => 'h3'],
+            'classes' => array_merge(['rsvp-details-heading'], $classes),
+        ]);
     }
 
     public function seat()

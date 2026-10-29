@@ -365,3 +365,38 @@ div.cmb2-id-rrze-rsvp-booking-start {
 	padding: 10px 12px;
 	background: #fcf9e8;
 }
+
+// Section titles group the existing room fields without altering their markup.
+#rrze_rsvp_general-meta {
+	.rsvp-details-heading {
+		margin: 24px 0 0;
+		padding: 16px;
+		background: #f0f6fc;
+		border: 0;
+		border-left: 3px solid #2271b1;
+
+		&:first-child {
+			margin-top: 12px;
+		}
+
+		> .cmb-td {
+			float: none;
+			width: auto;
+			padding: 0;
+		}
+
+		.cmb2-metabox-title {
+			margin: 0;
+			padding: 0;
+			font-size: 15px;
+			font-weight: 600;
+		}
+
+		.cmb2-metabox-description {
+			margin: 6px 0 0;
+			padding: 0;
+			color: #50575e;
+			font-style: normal;
+		}
+	}
+}

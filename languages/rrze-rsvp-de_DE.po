@@ -2376,3 +2376,33 @@ msgstr "Datumsliste (JJJJ-MM-TT)"
 
 msgid "Some lines cannot be displayed in the calendar. Enter one valid date per line (YYYY-MM-DD), without spaces. Your text is retained."
 msgstr "Einige Zeilen können im Kalender nicht angezeigt werden. Gib pro Zeile ein gültiges Datum (JJJJ-MM-TT) ohne Leerzeichen ein. Dein Text bleibt erhalten."
+
+msgid "Booking and access"
+msgstr "Buchung und Zugang"
+
+msgid "Choose the booking mode, advance booking period and login requirements."
+msgstr "Wähle den Buchungsmodus, den Zeitraum für Vorabreservierungen und die Voraussetzungen für die Anmeldung."
+
+msgid "Confirmation and emails"
+msgstr "Bestätigung und E-Mails"
+
+msgid "Decide who confirms a booking and who receives a calendar copy."
+msgstr "Lege fest, wer eine Buchung bestätigt und wer eine Kalenderkopie erhält."
+
+msgid "Check-in and check-out"
+msgstr "Check-in und Check-out"
+
+msgid "Manage attendance on site and notifications when someone checks out."
+msgstr "Regle die Anwesenheit vor Ort und Benachrichtigungen beim Auschecken."
+
+msgid "Booking form"
+msgstr "Buchungsformular"
+
+msgid "Configure the additional information participants can provide when booking."
+msgstr "Passe zusätzliche Angaben an, die Teilnehmende bei der Buchung machen können."
+
+msgid "Location and floor plan"
+msgstr "Ort und Raumplan"
+
+msgid "Provide the address and a floor plan to help participants find the room."
+msgstr "Hinterlege die Adresse und einen Raumplan zur Orientierung."
