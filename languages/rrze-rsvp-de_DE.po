@@ -3106,9 +3106,9 @@ msgid "Email address"
 msgstr "E-Mail-Adresse"
 
 
-#: includes/Courses/Frontend.php:330
-msgid "Confirm your email address within 60 minutes, before the course starts. Your place is reserved until then."
-msgstr "Bestätigen Sie Ihre E-Mail-Adresse innerhalb von 60 Minuten, spätestens vor Kursbeginn. Bis dahin ist Ihr Platz reserviert."
+#: includes/Courses/Frontend.php:338
+msgid "After registering, you will receive an email with a confirmation link. Confirm your email address within 60 minutes. If the course starts sooner, the deadline is the course start time. We will hold your place until then."
+msgstr "Nach der Anmeldung erhalten Sie eine E-Mail mit einem Bestätigungslink. Bestätigen Sie Ihre E-Mail-Adresse innerhalb von 60 Minuten. Beginnt der Kurs früher, endet die Frist bereits mit Kursbeginn. Bis dahin halten wir Ihren Platz frei."
 
 
 #: includes/Courses/Frontend.php:332

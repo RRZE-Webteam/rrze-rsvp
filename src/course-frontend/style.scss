@@ -25,6 +25,7 @@
     .rrze-rsvp-course-participant {
         display: grid;
         gap: 1rem;
+        .rrze-rsvp-course-login-option { margin: 0; }
         label { display: block; margin: 0; }
         input { display: block; box-sizing: border-box; width: 100%; max-width: 32rem; padding: .6rem; margin-top: .3rem; }
     }

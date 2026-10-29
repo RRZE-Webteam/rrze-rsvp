@@ -303,10 +303,12 @@ class Frontend
                 <p><?php esc_html_e('No upcoming course dates are currently available.', 'rrze-rsvp'); ?></p>
             <?php else : ?>
                 <p><?php esc_html_e('Each date is booked separately. One registration reserves one place.', 'rrze-rsvp'); ?></p>
-                <?php if (!$identity['authenticated'] && $identity['available']) : ?>
-                    <p><a class="rrze-rsvp-course-login" href="<?php echo esc_url($this->loginUrl()); ?>"><?php esc_html_e('Sign in with SSO', 'rrze-rsvp'); ?></a><?php if (!$requiresSso) : ?> — <?php esc_html_e('or register with your email address below.', 'rrze-rsvp'); ?><?php endif; ?></p>
-                <?php elseif ($requiresSso && !$identity['authenticated']) : ?>
-                    <p class="rrze-rsvp-course-notice"><?php esc_html_e('SSO is currently unavailable. Please contact the course organizer.', 'rrze-rsvp'); ?></p>
+                <?php if ($requiresSso && !$identity['authenticated']) : ?>
+                    <?php if ($identity['available']) : ?>
+                        <p><a class="rrze-rsvp-course-login" href="<?php echo esc_url($this->loginUrl()); ?>"><?php esc_html_e('Sign in with SSO', 'rrze-rsvp'); ?></a></p>
+                    <?php else : ?>
+                        <p class="rrze-rsvp-course-notice"><?php esc_html_e('SSO is currently unavailable. Please contact the course organizer.', 'rrze-rsvp'); ?></p>
+                    <?php endif; ?>
                 <?php elseif ($identity['authenticated']) : ?>
                     <p><?php esc_html_e('You are signed in with SSO. Your verified profile will be used for this registration.', 'rrze-rsvp'); ?></p>
                 <?php endif; ?>
@@ -326,11 +328,14 @@ class Frontend
                         <?php if (!$identity['authenticated']) : ?>
                             <fieldset class="rrze-rsvp-course-participant">
                                 <legend><?php esc_html_e('Your registration details', 'rrze-rsvp'); ?></legend>
+                                <?php if ($identity['available']) : ?>
+                                    <p class="rrze-rsvp-course-login-option"><a class="rrze-rsvp-course-login" href="<?php echo esc_url($this->loginUrl()); ?>"><?php esc_html_e('Sign in with SSO', 'rrze-rsvp'); ?></a> — <?php esc_html_e('or register with your email address below.', 'rrze-rsvp'); ?></p>
+                                <?php endif; ?>
                                 <label for="<?php echo esc_attr($uid); ?>firstname"><?php esc_html_e('First name', 'rrze-rsvp'); ?><input id="<?php echo esc_attr($uid); ?>firstname" name="firstname" type="text" autocomplete="given-name" maxlength="254" required></label>
                                 <label for="<?php echo esc_attr($uid); ?>lastname"><?php esc_html_e('Last name', 'rrze-rsvp'); ?><input id="<?php echo esc_attr($uid); ?>lastname" name="lastname" type="text" autocomplete="family-name" maxlength="254" required></label>
                                 <label for="<?php echo esc_attr($uid); ?>email"><?php esc_html_e('Email address', 'rrze-rsvp'); ?><input id="<?php echo esc_attr($uid); ?>email" name="email" type="email" autocomplete="email" maxlength="254" required></label>
                             </fieldset>
-                            <p class="rrze-rsvp-course-hint"><?php esc_html_e('Confirm your email address within 60 minutes, before the course starts. Your place is reserved until then.', 'rrze-rsvp'); ?></p>
+                            <p class="rrze-rsvp-course-hint"><?php esc_html_e('After registering, you will receive an email with a confirmation link. Confirm your email address within 60 minutes. If the course starts sooner, the deadline is the course start time. We will hold your place until then.', 'rrze-rsvp'); ?></p>
                         <?php endif; ?>
                         <label class="rrze-rsvp-course-consent" for="<?php echo esc_attr($uid); ?>consent"><input id="<?php echo esc_attr($uid); ?>consent" name="consent" type="checkbox" required> <span><?php esc_html_e('I agree to the processing of my details for this course registration.', 'rrze-rsvp'); ?><?php $privacyUrl = get_privacy_policy_url(); if ($privacyUrl) : ?> <a href="<?php echo esc_url($privacyUrl); ?>"><?php esc_html_e('Privacy policy', 'rrze-rsvp'); ?></a><?php endif; ?></span></label>
                         <p><?php echo esc_html($course['settings']['auto_confirm']
