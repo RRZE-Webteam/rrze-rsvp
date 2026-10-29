@@ -18,7 +18,10 @@
         ]
     },
     "scripts": {
-        "test": "php tests/booking-lifecycle.php"
+        "test": [
+            "php tests/booking-lifecycle.php",
+            "php tests/timeslot-compatibility.php"
+        ]
     },
     "extra": {
         "installer-paths": {

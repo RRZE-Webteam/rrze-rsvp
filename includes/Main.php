@@ -173,6 +173,11 @@ class Main
         }
     }
 
+    /**
+     * Load admin assets and translated configuration for RSVP editing screens.
+     *
+     * @return void
+     */
     public function adminEnqueueScripts()
     {
         global $post_type;
@@ -192,14 +197,14 @@ class Main
             'rrze-rsvp-admin',
             plugins_url('build/admin.css', plugin()->getBasename()),
             [],
-            plugin()->getVersion()
+            $this->getAdminAssetVersion('admin.css')
         );
 
         wp_enqueue_script(
             'rrze-rsvp-admin',
             plugins_url('build/admin.js', plugin()->getBasename()),
             ['jquery'],
-            plugin()->getVersion()
+            $this->getAdminAssetVersion('admin.js')
         );
 
         wp_localize_script('rrze-rsvp-admin', 'rrze_rsvp_admin', array(
@@ -210,6 +215,7 @@ class Main
             'text_confirmed' => _x('Confirmed', 'Booking', 'rrze-rsvp'),
             'ajaxurl' => admin_url('admin-ajax.php'),
             'booking_action_nonce' => wp_create_nonce('rrze-rsvp-booking-action'),
+            'timeslots' => $post_type === 'room' ? $this->getTimeslotEditorLabels() : null,
             // Strings für CPT Booking Backend
             'alert_no_seat_date' => __('Please select a seat first.', 'rrze-rsvp')
         ));
@@ -229,6 +235,50 @@ class Main
 
             wp_localize_script('rrze-rsvp-seat', 'button_label', ['label' => __('Create Seats', 'rrze-rsvp')]);
         }
+    }
+
+    /**
+     * Invalidate cached admin bundles whenever their compiled content is updated.
+     *
+     * @param string $filename Admin bundle filename within the build directory.
+     * @return string Plugin version with an asset modification timestamp.
+     */
+    protected function getAdminAssetVersion(string $filename): string
+    {
+        $path = dirname(__DIR__) . '/build/' . $filename;
+        return plugin()->getVersion() . (is_file($path) ? '.' . filemtime($path) : '');
+    }
+
+    /**
+     * Provide translated schedule controls and distinguish saved legacy rules.
+     *
+     * @return array Labels and flags used by the progressive schedule editor.
+     */
+    protected function getTimeslotEditorLabels(): array
+    {
+        $timeslots = get_post_meta(get_the_ID(), 'rrze-rsvp-room-timeslots', true);
+
+        return [
+            'hasSavedTimeslots' => is_array($timeslots) && !empty($timeslots),
+            'type' => __('Schedule type', 'rrze-rsvp'),
+            'single' => __('Single date', 'rrze-rsvp'),
+            'weekly' => __('Weekly', 'rrze-rsvp'),
+            'date' => __('Date', 'rrze-rsvp'),
+            'singleHelp' => __('Bookable only on this date. Add another time slot for additional dates.', 'rrze-rsvp'),
+            'weeklyHelp' => __('Repeats on the selected weekdays. Optionally limit the date range below.', 'rrze-rsvp'),
+            'chooseDate' => __('Choose a date and time.', 'rrze-rsvp'),
+            'chooseWeekdays' => __('Choose weekdays and a time.', 'rrze-rsvp'),
+            'from' => __('from', 'rrze-rsvp'),
+            'until' => __('until', 'rrze-rsvp'),
+            'unlimited' => __('No date limit', 'rrze-rsvp'),
+            'locked' => __('Bookings exist for this time slot. Its schedule type, weekdays and times are protected.', 'rrze-rsvp'),
+            'dateRequired' => __('Please select a date for this time slot.', 'rrze-rsvp'),
+            'weekdayRequired' => __('Please select at least one weekday.', 'rrze-rsvp'),
+            'invalidDate' => __('Please enter a valid date.', 'rrze-rsvp'),
+            'dateOrder' => __('The end date must not be before the start date.', 'rrze-rsvp'),
+            'timeRequired' => __('Please enter start and end times in HH:MM format.', 'rrze-rsvp'),
+            'timeOrder' => __('The end time must be after the start time on the same day.', 'rrze-rsvp'),
+        ];
     }
 
     public function wpEnqueueScripts()

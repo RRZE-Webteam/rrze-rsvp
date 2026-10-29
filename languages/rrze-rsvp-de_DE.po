@@ -2284,3 +2284,63 @@ msgstr[0] ""
 msgstr[1] ""
 "Der Beitrag kann nicht gespeichert werden: Die Änderungen würden "
 "Zeitfenster entfernen, die von geschützten Buchungen verwendet werden."
+
+msgid "Schedule type"
+msgstr "Terminart"
+
+msgid "Single date"
+msgstr "Einzelner Tag"
+
+msgid "Weekly"
+msgstr "Wöchentlich"
+
+msgid "Bookable only on this date. Add another time slot for additional dates."
+msgstr "Nur an diesem Tag buchbar. Für weitere Tage einen weiteren Termin hinzufügen."
+
+msgid "Repeats on the selected weekdays. Optionally limit the date range below."
+msgstr "Wiederholt sich an den gewählten Wochentagen. Den Zeitraum kannst du unten bei Bedarf begrenzen."
+
+msgid "Choose a date and time."
+msgstr "Datum und Uhrzeit wählen."
+
+msgid "Choose weekdays and a time."
+msgstr "Wochentage und Uhrzeit wählen."
+
+msgid "from"
+msgstr "ab"
+
+msgid "until"
+msgstr "bis"
+
+msgid "No date limit"
+msgstr "Ohne Datumsbegrenzung"
+
+msgid "Bookings exist for this time slot. Its schedule type, weekdays and times are protected."
+msgstr "Für diesen Termin liegen Buchungen vor. Terminart, Wochentage und Uhrzeiten sind deshalb geschützt."
+
+msgid "Please select a date for this time slot."
+msgstr "Bitte ein Datum für diesen Termin auswählen."
+
+msgid "Please select at least one weekday."
+msgstr "Bitte mindestens einen Wochentag auswählen."
+
+msgid "Please enter a valid date."
+msgstr "Bitte ein gültiges Datum eingeben."
+
+msgid "The end date must not be before the start date."
+msgstr "Das Enddatum darf nicht vor dem Startdatum liegen."
+
+msgid "Please enter start and end times in HH:MM format."
+msgstr "Bitte Start- und Endzeit im Format HH:MM eingeben."
+
+msgid "The end time must be after the start time on the same day."
+msgstr "Die Endzeit muss am selben Tag nach der Startzeit liegen."
+
+msgid "Add a time slot for each specific date or weekly schedule. Each time slot can be booked separately."
+msgstr "Lege einzelne Tage oder einen Wochenrhythmus fest. Jeder Termin ist einzeln buchbar."
+
+msgid "Add time slot"
+msgstr "Weiteren Termin hinzufügen"
+
+msgid "Remove time slot"
+msgstr "Termin entfernen"

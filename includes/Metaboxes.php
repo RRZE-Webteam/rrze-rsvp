@@ -215,6 +215,11 @@ class Metaboxes
         ));
     }
 
+    /**
+     * Register room settings and the legacy-compatible repeatable schedule fields.
+     *
+     * @return void
+     */
     public function room()
     {
         $cmb_timeslots = new_cmb2_box(array(
@@ -231,11 +236,11 @@ class Metaboxes
         $group_field_id = $cmb_timeslots->add_field(array(
             'id' => 'rrze-rsvp-room-timeslots',
             'type' => 'group',
-            'description' => __('Define bookable time slots.', 'rrze-rsvp'),
+            'description' => __('Add a time slot for each specific date or weekly schedule. Each time slot can be booked separately.', 'rrze-rsvp'),
             'options' => array(
                 'group_title' => __('Time slot {#}', 'rrze-rsvp'), // since version 1.1.4, {#} gets replaced by row number
-                'add_button' => __('Add Another Entry', 'cmb2'),
-                'remove_button' => __('Remove Entry', 'cmb2'),
+                'add_button' => __('Add time slot', 'rrze-rsvp'),
+                'remove_button' => __('Remove time slot', 'rrze-rsvp'),
                 'sortable' => false,
                 // 'closed'         => true, // true to have the groups closed by default
                 // 'remove_confirm' => esc_html__( 'Are you sure you want to remove?', 'cmb2' ), // Performs confirmation before removing group.
