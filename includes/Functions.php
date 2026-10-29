@@ -603,18 +603,16 @@ class Functions
             return true;
         }
 
-        $now = current_time('timestamp');
-        $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
-        $endOfDay = Utils::getEndOfDayTimestamp($start);
-
-        if (
-            self::isBookingArchived($postId)
-            && !(in_array($status, ['checked-in', 'checked-out'], true) || $endOfDay > $now)
-        ) {
-            return true;
-        } else {
+        if (!self::isBookingArchived($postId)) {
             return false;
         }
+
+        if (in_array($status, ['checked-in', 'checked-out'], true)) {
+            return true;
+        }
+
+        $start = absint(get_post_meta($postId, 'rrze-rsvp-booking-start', true));
+        return Utils::getEndOfDayTimestamp($start) <= current_time('timestamp');
     }
 
     public static function canDeleteSeat(int $postId): bool
