@@ -15,16 +15,16 @@ function transport() {
     return { calls, send };
 }
 
-test('a late date response cannot overwrite the latest date or month',
+test('a late date response cannot overwrite the latest selected date',
     /** @returns {Promise<void>} Resolve reads in reverse order, as a slow server might. */
     async function latestSelectionWins() {
         const server = transport();
         const request = latestRequest(server.send);
         const first = request({ action: 'UpdateForm', date: '2026-10-30' });
-        const second = request({ action: 'UpdateCalendar', month: '2026-11' });
+        const second = request({ action: 'UpdateForm', date: '2026-11-02' });
         assert.equal(server.calls[0].signal.aborted, true);
-        server.calls[1].resolve('November');
-        assert.deepEqual(await second, { status: 'success', data: 'November' });
+        server.calls[1].resolve('November slots');
+        assert.deepEqual(await second, { status: 'success', data: 'November slots' });
         server.calls[0].resolve('October slots');
         assert.deepEqual(await first, { status: 'stale' });
     }
@@ -56,6 +56,89 @@ test('current failures are recoverable with a fresh request',
         assert.equal(server.calls[1].signal.aborted, false);
         server.calls[1].resolve('Available');
         assert.deepEqual(await retry, { status: 'success', data: 'Available' });
+    }
+);
+
+test('separate month and appointment reads can complete without cancelling each other',
+    /** @returns {Promise<void>} A month change must not strand pending time controls. */
+    async function independentRequests() {
+        const server = transport();
+        const options = latestRequest(server.send);
+        const calendar = latestRequest(server.send);
+        const day = options({ action: 'UpdateForm', date: '2026-10-30' });
+        const month = calendar({ action: 'UpdateCalendar', month: '2026-11' });
+        assert.equal(server.calls[0].signal.aborted, false);
+        server.calls[1].resolve('November');
+        assert.equal((await month).status, 'success');
+        server.calls[0].resolve('October slots');
+        assert.equal((await day).status, 'success');
+    }
+);
+
+const { calendarSelection } = require('../src/shortcode/calendar-selection');
+
+/**
+ * Model calendar DOM replacement and the form's successful date controls.
+ * @param {string} date Day represented by a radio.
+ * @param {boolean} checked Initial selection.
+ * @returns {Object} Minimal native radio state.
+ */
+function dayRadio(date, checked = false) {
+    return { type: 'radio', name: 'rsvp_date', value: date, checked, required: true, dataset: { label: date } };
+}
+
+/** @param {Object[]} radios Initial month. @returns {Object} Stable fieldset with replaceable radios. */
+function calendarHost(radios) {
+    return {
+        radios, persistent: [],
+        ownerDocument: {
+            /** @returns {Object} An input that survives calendar replacement. */
+            createElement() { return { dataset: {} }; },
+        },
+        /** @returns {Object|undefined} Initially checked date radio. */
+        querySelector() { return this.radios.find(
+            /** @param {Object} radio Date control. @returns {boolean} Selected state. */
+            (radio) => radio.checked
+        ); },
+        /** @returns {Object[]} Radios belonging to the currently displayed month. */
+        querySelectorAll() { return this.radios; },
+        /** @param {Object} input Persistent form control. @returns {void} */
+        append(input) { this.persistent.push(input); },
+    };
+}
+
+test('the submitted date survives browsing away and is marked again on return',
+    /** @returns {void} Keep one form value even when the selected radio is not rendered. */
+    function retainDateAcrossMonths() {
+        const host = calendarHost([dayRadio('2026-10-30', true)]);
+        const selection = calendarSelection(host);
+        host.radios = [dayRadio('2026-11-02')];
+        selection.sync();
+        assert.equal(selection.input.value, '2026-10-30');
+        assert.equal(selection.input.dataset.label, '2026-10-30');
+        assert.equal(host.radios[0].checked, false);
+        assert.equal(host.radios[0].required, false, 'An unselected visible month must not block native form validation.');
+        assert.equal(host.radios[0].name, 'rsvp_calendar_date', 'Only the persistent field submits rsvp_date.');
+        assert.deepEqual(host.persistent, [selection.input]);
+        host.radios = [dayRadio('2026-10-30')];
+        selection.sync();
+        assert.equal(host.radios[0].checked, true);
+    }
+);
+
+test('a newly chosen date wins over a later month response, with no default auto-selection',
+    /** @returns {void} Month rendering cannot restore the date captured before the request. */
+    function latestDateSurvivesCalendarResponse() {
+        const host = calendarHost([dayRadio('2026-11-02')]);
+        const selection = calendarSelection(host);
+        assert.equal(selection.input.value, '');
+        assert.equal(host.radios[0].checked, false);
+        selection.select(host.radios[0]);
+        host.radios = [dayRadio('2026-11-02'), dayRadio('2026-11-03', true)];
+        selection.sync();
+        assert.equal(selection.input.value, '2026-11-02');
+        assert.equal(host.radios[0].checked, true);
+        assert.equal(host.radios[1].checked, false);
     }
 );
 

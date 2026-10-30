@@ -1,5 +1,6 @@
 import { latestRequest } from './latest-request';
 import { revealTimeChoice } from './time-options';
+import { calendarSelection } from './calendar-selection';
 
 /**
  * Read calendar HTML or dependent form controls from the existing WP endpoints.
@@ -32,6 +33,9 @@ async function sendRequest(payload, signal) {
 function initializePicker(picker) {
     const form = picker.closest('form');
     const calendarHost = picker.querySelector('.rsvp-date-container');
+    const dateSelection = calendarSelection(calendarHost);
+    const calendarStatus = calendarHost.querySelector('.rsvp-calendar-status');
+    const calendarRetry = calendarHost.querySelector('.rsvp-calendar-retry');
     const timeHost = picker.querySelector('.rsvp-time-container');
     const seatHost = picker.querySelector('.rsvp-seat-container');
     const status = picker.querySelector('.rsvp-picker-status');
@@ -40,12 +44,15 @@ function initializePicker(picker) {
     const submit = form.querySelector('[type="submit"]');
     const labels = rsvp_booking.picker;
     const request = latestRequest(sendRequest);
+    const requestCalendar = latestRequest(sendRequest);
     let busy = false;
     let failed = false;
     let retryAction;
+    let retryCalendar;
 
     /** @param {string} name Form field name. @returns {HTMLInputElement|HTMLSelectElement|null} Selected control. */
     function selected(name) {
+        if (name === 'rsvp_date') return dateSelection.input;
         return picker.querySelector(`input[name="${name}"]:checked, select[name="${name}"]`);
     }
 
@@ -172,15 +179,67 @@ function initializePicker(picker) {
 
     /** @param {Event} event Changed radio or seat select. @returns {void} */
     function changeSelection(event) {
-        const name = event.target.name;
+        let name = event.target.name;
+        if (name === 'rsvp_calendar_date') {
+            dateSelection.select(event.target);
+            name = 'rsvp_date';
+        }
         if (!['rsvp_date', 'rsvp_time', 'rsvp_seat'].includes(name)) return;
         if (name === 'rsvp_date') clear('rsvp_time');
         if (name !== 'rsvp_seat') clear('rsvp_seat');
         updateOptions();
     }
 
+    /**
+     * Browse months independently of the selected appointment and its requests.
+     * Only the calendar reports loading or errors; valid booking fields stay usable.
+     *
+     * @param {Object} payload Month navigation parameters.
+     * @returns {Promise<void>} Completion of the latest calendar request.
+     */
+    async function loadCalendar(payload) {
+        const calendar = calendarHost.querySelector('.rsvp-calendar');
+        calendar.setAttribute('aria-busy', 'true');
+        calendar.querySelectorAll('.rsvp-calendar-nav').forEach(
+            /** @param {HTMLButtonElement} button Month navigation control. @returns {void} */
+            function markNavigation(button) {
+                button.dataset.loading = String(button.dataset.direction === payload.direction);
+            }
+        );
+        calendarStatus.classList.add('rsvp-picker-sr');
+        calendarStatus.textContent = labels.loadingMonth;
+        calendarRetry.hidden = true;
+        const result = await requestCalendar(payload);
+        if (result.status === 'stale') return;
+        calendar.setAttribute('aria-busy', 'false');
+        calendar.querySelectorAll('.rsvp-calendar-nav').forEach(
+            /** @param {HTMLButtonElement} button Month navigation control. @returns {void} */
+            function finishNavigation(button) { button.dataset.loading = 'false'; }
+        );
+        if (result.status === 'error') {
+            calendarStatus.classList.remove('rsvp-picker-sr');
+            calendarStatus.textContent = labels.monthError;
+            calendarRetry.hidden = false;
+            /** @returns {Promise<void>} Retry only the failed month navigation. */
+            retryCalendar = () => loadCalendar(payload);
+            return;
+        }
+        const hadFocus = calendar.contains(document.activeElement);
+        calendar.outerHTML = result.data;
+        dateSelection.sync();
+        calendarStatus.textContent = calendarHost.querySelector('h3').textContent;
+        if (hadFocus) {
+            const nextButton = calendarHost.querySelector(`[data-direction="${payload.direction}"]`);
+            (nextButton.disabled ? calendarHost.querySelector('h3') : nextButton).focus({ preventScroll: true });
+        }
+    }
+
     /** @param {MouseEvent} event Month navigation or retry activation. @returns {void} */
     function clickPicker(event) {
+        if (event.target.closest('.rsvp-calendar-retry')) {
+            retryCalendar?.();
+            return;
+        }
         if (event.target.closest('.rsvp-picker-retry')) {
             retryAction?.();
             return;
@@ -189,20 +248,7 @@ function initializePicker(picker) {
         if (!button || button.disabled) return;
         const calendar = calendarHost.querySelector('.rsvp-calendar');
         const direction = button.dataset.direction;
-        load({ action: 'UpdateCalendar', room: form.elements.rsvp_room.value, month: calendar.dataset.period, end: calendar.dataset.end, direction },
-            /** @param {string} html Adjacent month markup. @returns {void} */
-            function applyCalendar(html) {
-                const hadFocus = calendar.contains(document.activeElement);
-                calendar.outerHTML = html;
-                clear('rsvp_time');
-                clear('rsvp_seat');
-                timeHost.querySelector('.rsvp-time-select').textContent = labels.chooseDay;
-                if (seatHost) seatHost.querySelector('.rsvp-seat-options').textContent = labels.chooseTime;
-                if (hadFocus) {
-                    const nextButton = calendarHost.querySelector(`[data-direction="${direction}"]`);
-                    (nextButton.disabled ? calendarHost.querySelector('h3') : nextButton).focus({ preventScroll: true });
-                }
-            });
+        loadCalendar({ action: 'UpdateCalendar', room: form.elements.rsvp_room.value, month: calendar.dataset.period, end: calendar.dataset.end, direction });
     }
 
     /** @param {SubmitEvent} event Final form submission. @returns {void} */

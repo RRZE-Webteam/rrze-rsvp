@@ -262,6 +262,8 @@ class Bookings extends Shortcodes
                 . '<div class="rsvp-picker-layout">'
                 . '<fieldset class="rsvp-date-container"><legend><span class="rsvp-picker-step">1</span> ' . esc_html__('Date', 'rrze-rsvp') . '</legend>'
                 . $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date)
+                . '<span class="rsvp-calendar-status rsvp-picker-sr" role="status"></span>'
+                . '<button type="button" class="rsvp-calendar-retry rsvp-picker-retry" hidden>' . esc_html__('Try again', 'rrze-rsvp') . '</button>'
                 . '</fieldset>'
                 . '<fieldset class="rsvp-time-container"><legend><span class="rsvp-picker-step">2</span> ' . esc_html__('Time', 'rrze-rsvp') . '</legend>'
                 . '<div class="rsvp-time-panel">'

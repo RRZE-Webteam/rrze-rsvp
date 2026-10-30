@@ -3580,6 +3580,12 @@ msgstr "Verfügbarkeit wird geladen …"
 msgid "Loading available times…"
 msgstr "Freie Uhrzeiten werden geladen …"
 
+msgid "Loading calendar month…"
+msgstr "Kalendermonat wird geladen …"
+
+msgid "The calendar month could not be loaded. Your selection is unchanged."
+msgstr "Der Kalendermonat konnte nicht geladen werden. Ihre Auswahl bleibt erhalten."
+
 msgid "Availability updated."
 msgstr "Verfügbarkeit aktualisiert."
 
