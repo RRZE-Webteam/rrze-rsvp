@@ -348,6 +348,7 @@ class Main
             'nonce' => wp_create_nonce('rsvp-ajax-nonce'),
             'picker' => [
                 'loading' => __('Loading availability…', 'rrze-rsvp'),
+                'loadingTimes' => __('Loading available times…', 'rrze-rsvp'),
                 'updated' => __('Availability updated.', 'rrze-rsvp'),
                 'error' => __('Availability could not be loaded. Please try again.', 'rrze-rsvp'),
                 'chooseDay' => __('Select an available day in the calendar to see its times.', 'rrze-rsvp'),

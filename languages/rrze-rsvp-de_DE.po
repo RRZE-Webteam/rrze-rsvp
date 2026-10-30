@@ -3577,6 +3577,9 @@ msgstr "Erneut versuchen"
 msgid "Loading availability…"
 msgstr "Verfügbarkeit wird geladen …"
 
+msgid "Loading available times…"
+msgstr "Freie Uhrzeiten werden geladen …"
+
 msgid "Availability updated."
 msgstr "Verfügbarkeit aktualisiert."
 

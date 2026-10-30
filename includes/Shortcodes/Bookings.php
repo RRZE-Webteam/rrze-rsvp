@@ -264,8 +264,11 @@ class Bookings extends Shortcodes
                 . $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date)
                 . '</fieldset>'
                 . '<fieldset class="rsvp-time-container"><legend><span class="rsvp-picker-step">2</span> ' . esc_html__('Time', 'rrze-rsvp') . '</legend>'
+                . '<div class="rsvp-time-panel">'
+                . '<div class="rsvp-time-loading" aria-hidden="true" hidden><span class="rsvp-loading-spinner"></span>'
+                . '<div><strong class="rsvp-loading-label"></strong><span class="rsvp-loading-date"></span></div></div>'
                 . $this->buildTimeslotSelect($roomID, $get_date, $get_time, $availability)
-                . '</fieldset></div>';
+                . '</div></fieldset></div>';
             if ($bookingMode != 'consultation') {
                 $output .= '<fieldset class="rsvp-seat-container"><legend><span class="rsvp-picker-step">3</span> ' . esc_html__('Seat', 'rrze-rsvp') . '</legend>'
                     . '<div class="rsvp-seat-options">' . $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability) . '</div></fieldset>';

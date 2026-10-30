@@ -82,6 +82,32 @@ function initializePicker(picker) {
     }
 
     /**
+     * Show an immediate local loader while retaining the previous panel height.
+     * Keep announcements outside aria-busy content so assistive technology can
+     * announce loading before the response arrives.
+     *
+     * @param {boolean} active Whether the latest request is pending.
+     * @param {Object} payload Current availability request, used for its context.
+     * @returns {void}
+     */
+    function showLoading(active, payload) {
+        const panel = timeHost.querySelector('.rsvp-time-panel');
+        const content = timeHost.querySelector('.rsvp-time-select');
+        const indicator = panel.querySelector('.rsvp-time-loading');
+        picker.dataset.loading = String(active);
+        indicator.hidden = !active;
+        content.setAttribute('aria-busy', String(active));
+        if (seatHost) seatHost.querySelector('.rsvp-seat-options').setAttribute('aria-busy', String(active));
+        if (active) {
+            const message = payload.action === 'UpdateForm' && !payload.time ? labels.loadingTimes : labels.loading;
+            const dateLabel = payload.date ? label('rsvp_date') : '';
+            panel.querySelector('.rsvp-loading-label').textContent = message;
+            panel.querySelector('.rsvp-loading-date').textContent = dateLabel;
+            status.textContent = [message, dateLabel].filter(Boolean).join(' ');
+        }
+    }
+
+    /**
      * Preserve the current view during loading, with a recoverable inline failure.
      *
      * @param {Object} payload Endpoint parameters.
@@ -93,16 +119,15 @@ function initializePicker(picker) {
         busy = true;
         failed = false;
         retry.hidden = true;
-        status.textContent = labels.loading;
-        picker.setAttribute('aria-busy', 'true');
         // Disable dependent controls while keeping date navigation available.
         timeHost.disabled = true;
         if (seatHost) seatHost.disabled = true;
+        showLoading(true, payload);
         updateSummary();
         const result = await request(payload);
         if (result.status === 'stale') return;
         busy = false;
-        picker.setAttribute('aria-busy', 'false');
+        showLoading(false, payload);
         if (result.status === 'error') {
             failed = true;
             status.textContent = labels.error;

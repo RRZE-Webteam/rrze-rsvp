@@ -258,6 +258,49 @@
     }
 
     .rsvp-picker-date { margin: .5rem 0 1rem; padding: 0; font-size: 1rem; font-weight: 600; color: var(--picker-ink); }
+    .rsvp-time-panel { position: relative; min-height: 8rem; }
+    .rsvp-time-loading {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        align-items: flex-start;
+        gap: .85rem;
+        padding: 1.25rem;
+        border: 1px solid #b6cce4;
+        border-left: 4px solid var(--picker-accent);
+        border-radius: .25rem;
+        background: #edf4fc;
+        color: var(--picker-ink);
+        cursor: progress;
+    }
+    .rsvp-loading-spinner {
+        display: block;
+        flex: 0 0 auto;
+        width: 2rem;
+        height: 2rem;
+        margin-top: .15rem;
+        border: 3px solid #b6cce4;
+        border-top-color: var(--picker-accent);
+        border-radius: 50%;
+        animation: rsvp-picker-spin .8s linear infinite;
+        &::before, &::after { content: none; }
+    }
+    .rsvp-loading-label { display: block; color: var(--picker-ink); font-size: 1rem; font-weight: 700; line-height: 1.5; }
+    .rsvp-loading-date { display: block; margin-top: .35rem; color: var(--picker-muted); font-size: .875rem; line-height: 1.5; }
+    &[data-loading="true"] {
+        .rsvp-time-select { visibility: hidden; }
+        .rsvp-seat-options { opacity: .4; }
+        .rsvp-calendar-table input:checked + label::after {
+            content: '';
+            width: .7rem;
+            height: .7rem;
+            border: 2px solid rgba(255, 255, 255, .4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: rsvp-picker-spin .8s linear infinite;
+        }
+    }
     .rsvp-picker-empty, .rsvp-time-select, .rsvp-seat-options { color: var(--picker-muted); font-size: .95rem; line-height: 1.6; }
     .rsvp-picker-empty { margin: .5rem 0; padding: 0; }
     .rsvp-picker-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr)); gap: .5rem; }
@@ -281,7 +324,6 @@
     .rsvp-picker-feedback { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: .75rem; min-height: 1.5rem; font-size: .85rem; color: var(--picker-muted); }
     button.rsvp-picker-retry { width: auto; height: auto; padding: .5rem .75rem; font-size: .9rem; }
     button:focus-visible, h3:focus-visible { outline: 3px solid var(--picker-accent); outline-offset: 3px; }
-    &[aria-busy="true"] .rsvp-time-select, &[aria-busy="true"] .rsvp-seat-options { opacity: .55; }
     .rsvp-picker-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
     @media (max-width: 480px) {
@@ -289,4 +331,15 @@
         .rsvp-seat-container { padding: 1rem .75rem; }
         .rsvp-calendar-table { border-spacing: .1rem; }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+        .rsvp-loading-spinner,
+        &[data-loading="true"] .rsvp-calendar-table input:checked + label::after {
+            animation: none;
+        }
+    }
+}
+
+@keyframes rsvp-picker-spin {
+    to { transform: rotate(360deg); }
 }
