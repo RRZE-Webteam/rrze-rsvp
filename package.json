@@ -4,9 +4,11 @@
     "main": "rrze-rsvp.php",
     "scripts": {
         "start": "webpack --mode=development --watch",
-        "build": "webpack --mode=production",
+        "build": "webpack --mode=production && npm run build:email",
         "test": "node --test tests/*.test.cjs",
-        "clean": "rm -rf build/"
+        "clean": "rm -rf build/",
+        "build:email": "maizzle build --config mail/maizzle.config.ts && node mail/verify-template.mjs",
+        "dev:email": "maizzle serve --config mail/maizzle.config.ts"
     },
     "repository": {
         "type": "git",
@@ -31,6 +33,7 @@
     "devDependencies": {
         "@babel/core": "^7.29",
         "@babel/preset-env": "^7.29",
+        "@maizzle/framework": "6.0.13",
         "autoprefixer": "^10.4.27",
         "babel-loader": "^10.1.1",
         "clean-webpack-plugin": "^4.0.0",

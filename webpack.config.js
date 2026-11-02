@@ -12,6 +12,7 @@ const occupancy = path.join(__dirname, "src", "occupancy");
 const reload = path.join(__dirname, "src", "reload");
 
 module.exports = (env, argv) => {
+    /** @returns {boolean} Whether development source maps are needed. */
     function isDevelopment() {
         return argv.mode === "development";
     }
@@ -31,7 +32,8 @@ module.exports = (env, argv) => {
         output: {
             path: path.resolve(__dirname, "build"),
             filename: "[name].js",
-            clean: true,
+            // Email assets are owned by Maizzle, including during watch builds.
+            clean: { keep: /^email\// },
         },
         optimization: {
             minimizer: [

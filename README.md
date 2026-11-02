@@ -57,3 +57,8 @@ Das Suchformular hierfür wird über "Werkzeuge" -> "RSVP Kontaktverfolgung" auf
 Falls der Zugriff nur für SuperAdmins möglich sein soll, muss das Plugin rrze-rsvp-network ( https://github.com/RRZE-Webteam/rrze-rsvp-network ) installiert und aktiviert werden.
 Damit kann das Suchformular nur im Dashboard der Netzwerkverwaltung über "RSVP Kontaktverfolgung" aufgerufen werden und Administratoren erhalten einen Hinweis anstelle des Formulars.
 Alle persönlichen Daten der Kontaktverfolgung werden verschlüsselt gespeichert und automatisch nach 4 Wochen gelöscht. Nur im Fall eines Suchtreffers werden sie entschlüsselt und in einem CSV bereitgestellt.
+
+## Mail development
+
+Room and course notifications share a Maizzle-generated layout. See
+[mail/README.md](mail/README.md) for build commands, preview generation and mail checks.
