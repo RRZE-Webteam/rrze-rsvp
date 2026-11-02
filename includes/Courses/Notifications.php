@@ -3,6 +3,7 @@
 namespace RRZE\RSVP\Courses;
 
 use RRZE\RSVP\Email;
+use RRZE\RSVP\Mail\EmailLayout;
 use RRZE\RSVP\Settings;
 use Throwable;
 use function RRZE\RSVP\plugin;
@@ -168,13 +169,13 @@ final class Notifications
     {
         $errors = [];
         $status = $booking['status'];
-        [$subject, $paragraphs, $links] = $this->participantMessage($booking, $tokens);
+        [$subject, $paragraphs, $links, $details] = $this->participantMessage($booking, $tokens);
         $calendarSent = $repository->meta($booking['id'], self::CALENDAR_META);
         $organizer = (string) ($this->options['email_sender_email'] ?? '');
         $booking['calendar_organizer'] = is_array($calendarSent) ? $calendarSent['organizer']
             : (is_email($organizer) ? $organizer : (string) get_option('admin_email'));
         $calendar = $status === 'confirmed' || ($status === 'cancelled' && $calendarSent);
-        if (!$this->deliver((string) $booking['guest_email'], $subject, $paragraphs, $links, $calendar ? $booking : null)) {
+        if (!$this->deliver((string) $booking['guest_email'], $subject, $paragraphs, $links, $details, $status, $calendar ? $booking : null)) {
             $errors[] = __('The participant email could not be sent. Use Resend notification to try again.', 'rrze-rsvp');
         } elseif ($status === 'confirmed') {
             update_post_meta($booking['id'], self::CALENDAR_META, ['organizer' => $booking['calendar_organizer']]);
@@ -185,8 +186,8 @@ final class Notifications
         $enabled = $this->options['email_notification_if_' . ($adminEvent === 'cancelled' ? 'cancel' : 'new')] ?? 'no';
         $recipient = (string) ($this->options['email_notification_email'] ?? '');
         if ($adminEvent !== '' && $enabled === 'yes' && $recipient !== '' && empty($sent[$adminEvent])) {
-            [$adminSubject, $adminParagraphs, $adminLinks] = $this->administratorMessage($booking);
-            if ($this->deliver($recipient, $adminSubject, $adminParagraphs, $adminLinks)) {
+            [$adminSubject, $adminParagraphs, $adminLinks, $adminDetails] = $this->administratorMessage($booking);
+            if ($this->deliver($recipient, $adminSubject, $adminParagraphs, $adminLinks, $adminDetails, $status)) {
                 $sent[$adminEvent] = true;
                 update_post_meta($booking['id'], self::ADMIN_META, $sent);
             } else {
@@ -210,7 +211,7 @@ final class Notifications
      *
      * @param array $booking Private course booking.
      * @param array $tokens Ephemeral action tokens.
-     * @return array Subject, paragraphs and labelled links.
+     * @return array Subject, paragraphs, labelled links and structured details.
      */
     private function participantMessage(array $booking, array $tokens): array
     {
@@ -239,18 +240,18 @@ final class Notifications
             }
             $links[] = [__('Cancel my booking', 'rrze-rsvp'), ActionPage::url('cancel', $booking['id'], $tokens['cancel'])];
         }
-        $paragraphs = array_merge([$intro], $this->details($booking));
+        $paragraphs = [$intro];
         if ($status !== 'cancelled') {
             $paragraphs[] = __('You may cancel your registration until the course begins.', 'rrze-rsvp');
         }
-        return [$subject, $paragraphs, $links];
+        return [$subject, $paragraphs, $links, $this->details($booking)];
     }
 
     /**
      * Create an organizer notice with a capability-protected admin link, never a guest token.
      *
      * @param array $booking Private booking.
-     * @return array Subject, paragraphs and labelled links.
+     * @return array Subject, paragraphs, labelled links and structured details.
      */
     private function administratorMessage(array $booking): array
     {
@@ -258,25 +259,37 @@ final class Notifications
         $subject = sprintf($cancelled ? __('[RSVP] Registration cancelled: %s', 'rrze-rsvp') : __('[RSVP] New course registration: %s', 'rrze-rsvp'), $booking['course_title']);
         $intro = $cancelled ? $this->cancellationReason((string) ($booking['cancel_reason'] ?? ''))
             : ($booking['status'] === 'customer-confirmed' ? __('A verified course registration is awaiting your approval.', 'rrze-rsvp') : __('A course registration has been confirmed.', 'rrze-rsvp'));
-        $paragraphs = array_merge([$intro], $this->details($booking), [
-            sprintf(__('Participant: %s', 'rrze-rsvp'), trim($booking['guest_firstname'] . ' ' . $booking['guest_lastname'])),
-            sprintf(__('Email address: %s', 'rrze-rsvp'), $booking['guest_email']),
+        $details = array_merge($this->details($booking), [
+            $this->detail(__('Participant', 'rrze-rsvp'), trim($booking['guest_firstname'] . ' ' . $booking['guest_lastname']), __('Participant: %s', 'rrze-rsvp')),
+            $this->detail(__('Email address', 'rrze-rsvp'), $booking['guest_email'], __('Email address: %s', 'rrze-rsvp')),
         ]);
-        return [$subject, $paragraphs, [[__('Manage booking', 'rrze-rsvp'), admin_url('post.php?post=' . (int) $booking['id'] . '&action=edit')]]];
+        return [$subject, [$intro], [[__('Manage booking', 'rrze-rsvp'), admin_url('post.php?post=' . (int) $booking['id'] . '&action=edit')]], $details];
     }
 
     /**
      * @param array $booking Private booking snapshot.
-     * @return array Human-readable snapshot details in the website's timezone.
+     * @return array Structured snapshot details with the existing translated plain-text sentences.
      */
     private function details(array $booking): array
     {
         return [
-            sprintf(__('Course: %s', 'rrze-rsvp'), $booking['course_title']),
-            sprintf(__('Starts: %s', 'rrze-rsvp'), $this->formatTime((int) $booking['start'])),
-            sprintf(__('Ends: %s', 'rrze-rsvp'), $this->formatTime((int) $booking['end'])),
-            sprintf(__('Location: %s', 'rrze-rsvp'), $booking['location']),
+            $this->detail(__('Course', 'rrze-rsvp'), $booking['course_title'], __('Course: %s', 'rrze-rsvp')),
+            $this->detail(__('Starts', 'rrze-rsvp'), $this->formatTime((int) $booking['start']), __('Starts: %s', 'rrze-rsvp')),
+            $this->detail(__('Ends', 'rrze-rsvp'), $this->formatTime((int) $booking['end']), __('Ends: %s', 'rrze-rsvp')),
+            $this->detail(__('Location', 'rrze-rsvp'), $booking['location'], __('Location: %s', 'rrze-rsvp')),
         ];
+    }
+
+    /**
+     * Keep HTML labels and the original plain-text translations independent.
+     * @param string $label Translated table heading.
+     * @param string $value Unescaped snapshot value.
+     * @param string $format Existing translated sentence containing one %s placeholder.
+     * @return array{label: string, value: string, plain: string} One detail for both formats.
+     */
+    private function detail(string $label, string $value, string $format): array
+    {
+        return ['label' => $label, 'value' => $value, 'plain' => sprintf($format, $value)];
     }
 
     /**
@@ -315,23 +328,37 @@ final class Notifications
      * @param string $subject Translated subject containing the course title.
      * @param array $paragraphs Plain-text paragraphs.
      * @param array $links Label/URL tuples.
+     * @param array $details Structured detail rows with their original plain-text sentences.
+     * @param string $status Current booking state for the visual status label.
      * @param array|null $calendarBooking Optional booking to attach as a calendar event.
      * @return bool Whether WordPress accepted the complete message for delivery.
      */
-    private function deliver(string $recipient, string $subject, array $paragraphs, array $links, ?array $calendarBooking = null): bool
+    private function deliver(string $recipient, string $subject, array $paragraphs, array $links, array $details, string $status, ?array $calendarBooking = null): bool
     {
         $attachment = '';
         try {
-            $body = '<!doctype html><html><body>';
-            foreach ($paragraphs as $paragraph) {
-                $body .= '<p>' . esc_html($paragraph) . '</p>';
+            $body = '';
+            $plainParts = [];
+            $rows = [];
+            foreach ($details as $detail) {
+                $rows[$detail['label']] = nl2br(esc_html($detail['value']));
             }
-            $plain = implode("\n\n", $paragraphs);
+            foreach ($paragraphs as $index => $paragraph) {
+                $body .= EmailLayout::paragraph($paragraph);
+                $plainParts[] = $paragraph;
+                if ($index === 0) {
+                    $body .= EmailLayout::detailsTable($rows);
+                    $plainParts = array_merge($plainParts, array_column($details, 'plain'));
+                }
+            }
+            $plain = implode("\n\n", $plainParts);
             foreach ($links as [$label, $url]) {
-                $body .= '<p><a href="' . esc_url($url) . '">' . esc_html($label) . '</a></p>';
+                $body .= EmailLayout::actionButton($url, $label);
                 $plain .= "\n\n" . $label . ': ' . $url;
             }
-            $body .= '</body></html>';
+            $plain = html_entity_decode($plain, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            [$palette, $statusLabel] = EmailLayout::bookingStatus($status);
+            $body = EmailLayout::wrap($body, $subject, $palette, $statusLabel);
             if ($calendarBooking !== null) {
                 $temporary = wp_tempnam('rsvp-course.ics');
                 if (!$temporary) {

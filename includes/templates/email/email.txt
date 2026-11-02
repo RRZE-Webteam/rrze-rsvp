@@ -13,6 +13,9 @@
 {{=time}}
 
 {{=room_name}}
+{{location}}
+{{=location}}
+{{/location}}
 {{seat_name}}
 {{=seat_name}}
 {{/seat_name}}
@@ -60,6 +63,9 @@
 {{=time_en}}
 
 {{=room_name}}
+{{location}}
+{{=location}}
+{{/location}}
 {{seat_name}}
 {{=seat_name}}
 {{/seat_name}}

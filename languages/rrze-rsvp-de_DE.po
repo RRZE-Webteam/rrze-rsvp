@@ -3602,3 +3602,36 @@ msgstr "Bitte wählen Sie zuerst Ihren Termin vollständig aus."
 #, php-format
 msgid "%d available time slots. Scroll down to see more times."
 msgstr "%d freie Zeitfenster. Für weitere Uhrzeiten nach unten scrollen."
+
+msgid "Confirmation required"
+msgstr "Bestätigung erforderlich"
+
+msgid "Booking confirmed"
+msgstr "Buchung bestätigt"
+
+msgid "Checked in"
+msgstr "Eingecheckt"
+
+msgid "Booking cancelled"
+msgstr "Buchung storniert"
+
+msgid "Checked out"
+msgstr "Ausgecheckt"
+
+msgid "Booking update"
+msgstr "Aktualisierung Ihrer Buchung"
+
+msgid "Appointment update"
+msgstr "Aktualisierung Ihres Termins"
+
+msgid "Privacy Policy"
+msgstr "Datenschutzerklärung"
+
+msgid "Legal Notice"
+msgstr "Impressum"
+
+msgid "Starts"
+msgstr "Beginn"
+
+msgid "Ends"
+msgstr "Ende"

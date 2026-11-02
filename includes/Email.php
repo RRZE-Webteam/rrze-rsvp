@@ -2,6 +2,8 @@
 
 namespace RRZE\RSVP;
 
+use RRZE\RSVP\Mail\EmailLayout;
+use RRZE\RSVP\Mail\RoomMessage;
 use function RRZE\RSVP\Config\defaultOptions;
 
 defined('ABSPATH') || exit;
@@ -71,6 +73,7 @@ class Email
         $showCheckoutButton = false;
         $showCancelButton = false;
         $showNotes = false;
+        $cancelReason_en = false;
         if ($cancelReason == '') {
             $cancelReason = false;
             $cancelReason_en = false;
@@ -196,10 +199,10 @@ class Email
             $showCheckoutButton = false;
         }
 
-        $subject = $this->placeholderParser($subject, $booking);
-        $subject_en = $this->placeholderParser($subject_en, $booking);
-        $text = $this->placeholderParser($text, $booking);
-        $text_en = $this->placeholderParser($text_en, $booking);
+        $subject = EmailLayout::plainText($this->placeholderParser($subject, $booking, true));
+        $subject_en = EmailLayout::plainText($this->placeholderParser($subject_en, $booking, true));
+        $htmlText = wp_kses_post($this->placeholderParser($text, $booking, true));
+        $htmlText_en = wp_kses_post($this->placeholderParser($text_en, $booking, true));
 
         $data = [];
 
@@ -218,25 +221,41 @@ class Email
         $data['checked_in'] = ($status == 'checked-in');
 
         // Website data
-        $data['header_image'] = has_header_image() ? get_header_image() : false;
         $data['site_url'] = site_url();
         $data['site_name'] = get_bloginfo('name') ? get_bloginfo('name') : parse_url(site_url(), PHP_URL_HOST);
 
         // Booking data
         $data['subject'] = $subject;
         $data['subject_en'] = $subject_en;
-        $data['text'] = $this->placeholderParser($text, $booking);
-        $data['text_en'] = $this->placeholderParser($text_en, $booking);
-        $data['reason'] = $cancelReason;
-        $data['reason_en'] = $cancelReason_en;
+        $data['text_html'] = $htmlText;
+        $data['text_en_html'] = $htmlText_en;
+        $data['text'] = EmailLayout::plainText($htmlText);
+        $data['text_en'] = EmailLayout::plainText($htmlText_en);
+        $data['reason'] = EmailLayout::plainText((string) $cancelReason);
+        $data['reason_en'] = EmailLayout::plainText((string) $cancelReason_en);
+        $data['mail_status'] = match ($mailContext) {
+            'bookingCancelled' => 'cancelled',
+            'bookingCheckedIn' => 'checked-in',
+            'bookingCheckedOut' => 'checked-out',
+            'customerConfirmationRequired' => 'booked',
+            'adminConfirmationRequired' => 'customer-confirmed',
+            'customerConfirmed' => $adminConfirmationRequired ? 'customer-confirmed' : 'confirmed',
+            'adminConfirmed' => 'confirmed',
+            default => $status ?: ($booking['status'] ?? ''),
+        };
         $data['date'] = $booking['date'];
         $data['date_en'] = $booking['date_en'];
         $data['time'] = $booking['time'];
         $data['time_en'] = $booking['time_en'];
         $data['room_name'] = $booking['room_name'];
+        $data['location'] = trim(($booking['room_street'] ?? '') . "\n"
+            . trim(($booking['room_zip'] ?? '') . ' ' . ($booking['room_city'] ?? '')));
         $data['seat_name'] = ($bookingMode != 'consultation') ? $booking['seat_name'] : '';
         $data['customer']['name'] = sprintf('%s: %s %s', __('Name', 'rrze-rsvp'), $booking['guest_firstname'], $booking['guest_lastname']);
         $data['customer']['email'] = sprintf('%s: %s', __('Email', 'rrze-rsvp'), $booking['guest_email']);
+        $data['customer_name'] = trim($booking['guest_firstname'] . ' ' . $booking['guest_lastname']);
+        $data['customer_email'] = $booking['guest_email'];
+        $data['notes'] = $booking['notes'];
 
         // Show Booking Notes
         if (
@@ -251,7 +270,8 @@ class Email
                 $notesLabel = $defaults['room-notes-label'];
             }
             $data['show_notes'] = true;
-            $data['customer']['notes'] = sprintf('%s:<br />%s', $notesLabel, $booking['notes']);
+            $data['notes_label'] = $notesLabel;
+            $data['customer']['notes'] = $notesLabel . ":\n" . $booking['notes'];
         } else {
             $data['show_notes'] = false;
         }
@@ -367,8 +387,8 @@ class Email
             $attachment = $this->tempFile($icsFilename, $icsContent);
         }
 
-        $message = $this->template->getContent('email/email', $data);
-        $altMessage = $this->template->getContent('email/email.txt', $data);
+        $message = RoomMessage::render($data);
+        $altMessage = $this->renderPlainMessage($data);
 
         $this->send($to, $subject, $message, $altMessage, $attachment);
 
@@ -397,11 +417,16 @@ class Email
             $data['subject_en'] = $subject_en;
             $data['text'] = $text;
             $data['text_en'] = $text_en;
+            $data['text_html'] = esc_html($text);
+            $data['text_en_html'] = esc_html($text_en);
+            $data['mail_status'] = $status === 'confirmed' ? 'confirmed' : 'cancelled';
             $data['customer']['name'] = $customerName;
             $data['customer']['email'] = $customerEmail;
             $data['show_check_btns'] = false;
             $data['show_cancel_btn'] = false;
             $data['show_confirm_button'] = false;
+            $data['show_checkin_btn'] = false;
+            $data['show_checkout_btn'] = false;
             if (
                 isset($roomMeta['rrze-rsvp-room-notes-check'])
                 && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on'
@@ -414,13 +439,14 @@ class Email
                     $notesLabel = $defaults['room-notes-label'];
                 }
                 $data['show_notes'] = true;
-                $data['customer']['notes'] = sprintf('%s:<br />%s', $notesLabel, $booking['notes']);
+                $data['notes_label'] = $notesLabel;
+                $data['customer']['notes'] = $notesLabel . ":\n" . $booking['notes'];
             } else {
                 $data['show_notes'] = false;
             }
 
-            $message = $this->template->getContent('email/email', $data);
-            $altMessage = $this->template->getContent('email/email.txt', $data);
+            $message = RoomMessage::render($data);
+            $altMessage = $this->renderPlainMessage($data);
 
             $icsFilename = sprintf('%s-%s-copy.ics', sanitize_title($booking['room_name']), date('YmdHi', $booking['start']));
             $icsContent = ICS::generate($booking, $icsFilename, 'send-to-email');
@@ -428,6 +454,16 @@ class Email
 
             $this->send($sendToEmail, $subject, $message, $altMessage, $attachment);
         }
+    }
+
+    /**
+     * Preserve the existing plain-text template and restore literal braces protected by Parser.
+     * @param array $data Prepared room-mail values, with rich text already converted to plain text.
+     * @return string Readable alternative without parser escape characters.
+     */
+    protected function renderPlainMessage(array $data): string
+    {
+        return str_replace("{\f{", '{{', $this->template->getContent('email/email.txt', $data));
     }
 
     /**
@@ -478,9 +514,10 @@ class Email
      * YA Email Template Parser.
      * @param string $text
      * @param array $booking Booking data
+     * @param bool $html Escape dynamic values while preserving configured template formatting.
      * @return string
      */
-    protected function placeholderParser(string $text, array $booking): string
+    protected function placeholderParser(string $text, array $booking, bool $html = false): string
     {
         $data = [
             'date' => $booking['date'],
@@ -494,11 +531,16 @@ class Email
             'notes' => $booking['notes'],
         ];
 
-        foreach ($data as $key => $field) {
-            $text = str_replace('{{' . $key . '}}', $field, $text);
-        }
-        $text = preg_replace('%\{\{.+\}\}%', '', $text);
-        return $text;
+        // One pass prevents placeholder-like participant text from being interpreted again.
+        return preg_replace_callback('/\{\{([^{}]+)\}\}/',
+            /**
+             * @param array $match Template placeholder.
+             * @return string Context-escaped substitution.
+             */
+            static function (array $match) use ($data, $html): string {
+                $value = (string) ($data[$match[1]] ?? '');
+                return $html ? esc_html($value) : $value;
+            }, $text);
     }
 
     /**
