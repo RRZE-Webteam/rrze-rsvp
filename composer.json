@@ -26,7 +26,8 @@
             "php tests/course-notifications.php",
             "php tests/course-admin.php",
             "php tests/course-frontend.php",
-            "php tests/course-module.php"
+            "php tests/course-module.php",
+            "php tests/mail-rendering.php"
         ]
     },
     "extra": {

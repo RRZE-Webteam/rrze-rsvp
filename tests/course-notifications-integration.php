@@ -48,6 +48,9 @@ $mailTransport = new \RRZE\RSVP\Email();
 function courseMailCapture($pre, array $mail): bool
 {
     global $courseMailMessages, $courseMailFailure;
+    $alternative = (object) ['AltBody' => ''];
+    do_action('phpmailer_init', $alternative);
+    $mail['plain'] = $alternative->AltBody;
     $mail['locale'] = get_locale();
     $mail['calendar'] = '';
     foreach ((array) $mail['attachments'] as $path) {
@@ -164,6 +167,22 @@ try {
     }
     $page->render('POST', ['action' => 'cancel', 'bookingId' => $booking['id'], 'token' => $cancelToken]);
     courseMailAssert(count($courseMailMessages) === 6, 'Cancellation replay must not send duplicate mail.');
+
+    foreach ($courseMailMessages as $message) {
+        courseMailAssert(substr_count(strtolower($message['message']), '<!doctype html>') === 1
+            && str_contains($message['message'], 'rrze-email-details')
+            && !str_contains($message['message'], '___RRZE_EMAIL_'), 'Every course message uses the shared layout exactly once.');
+        courseMailAssert(str_contains($message['message'], 'lang="en-US"'), 'HTML uses the booking locale rather than the website default.');
+        courseMailAssert(str_contains($message['plain'], 'Course:') && str_contains($message['plain'], 'Location:')
+            && !str_contains($message['plain'], '<table') && !str_contains($message['plain'], '&amp;'), 'Course plain text retains original translated sentences without layout HTML.');
+        if ($message['to'] === 'organizers@example.invalid') {
+            courseMailAssert(str_contains($message['message'], 'example.invalid')
+                && !str_contains($message['message'], 'rsvp-course-action=verify'), 'Organizer details remain separate from participant action tokens.');
+        }
+    }
+    courseMailAssert(str_contains($courseMailMessages[0]['message'], '#fff8e1')
+        && str_contains($confirmation['message'], '#e8f5e9')
+        && str_contains($cancellation['message'], '#ffebee'), 'Pending, confirmed and cancelled messages use the intended semantic palettes.');
 
     // A failed transmission leaves the committed hold intact and an explicit resend retries it.
     $courseMailFailure = true;
