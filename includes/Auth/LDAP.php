@@ -76,14 +76,20 @@ final class LDAP extends Auth
         ];
     }
 
+    /**
+     * Read identity without consuming the session; submission owns logout.
+     *
+     * @return array{customer_email: string} Authenticated email address.
+     */
     public function getCustomerData(): array
     {
-        $this->logout();
+        $this->setAttributes();
         return [
             'customer_email' => $this->personAttributes['mail'] ?: __('no@email', 'rrze-rsvp')
         ];
     }
 
+    /** @return void Authenticate submitted LDAP credentials and persist the session before redirect. */
     public function login()
     {
         $username = sanitize_text_field($_POST['username'] ?? '');
@@ -118,7 +124,7 @@ final class LDAP extends Auth
                             if (isset($aEntry[0]['cn'][0]) && isset($aEntry[0]['mail'][0])) {
                                 $mail = $aEntry[0]['mail'][0];
                                 $sessionStarted = false;
-                                if (!isset($_SESSION)) {
+                                if (session_status() !== PHP_SESSION_ACTIVE) {
                                     session_name($this->sessionName);
                                     session_start();
                                     $sessionStarted = true;
@@ -141,8 +147,20 @@ final class LDAP extends Auth
         }
     }
 
+    /** @return void Clear LDAP identity and its cookies once a booking has completed. */
     public function logout()
     {
+        $started = session_status() !== PHP_SESSION_ACTIVE;
+        if ($started && !headers_sent()) {
+            session_name($this->sessionName);
+            session_start();
+        }
+        unset($_SESSION['ldap_uid'], $_SESSION['ldap_mail']);
+        $this->ldapUid = null;
+        $this->ldapMail = null;
+        if ($started && session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
         $cookies = [
             $this->sessionName,
             substr($this->sessionName, 1),

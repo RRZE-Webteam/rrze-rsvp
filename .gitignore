@@ -12,6 +12,7 @@ node_modules/
 composer.lock
 ### WordPress ###
 *.pot
+!languages/rrze-rsvp.pot
 ### Bundle ###
 bundle/
 ### Tmp ###

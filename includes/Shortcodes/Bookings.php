@@ -4,6 +4,7 @@ namespace RRZE\RSVP\Shortcodes;
 
 use RRZE\RSVP\{Email, Functions, Template, TransientData};
 use RRZE\RSVP\Auth\{IdM, LDAP};
+use RRZE\RSVP\Blocks\Context;
 
 use function RRZE\RSVP\Config\defaultOptions;
 use function RRZE\RSVP\Config\getShortcodeSettings;
@@ -23,6 +24,20 @@ class Bookings extends Shortcodes
     protected $email;
     protected $nonce;
 
+    /** @var Context|null The currently rendered block, never a global room override. */
+    private ?Context $renderContext = null;
+    /** @var Context|null Authenticated submission context. */
+    private ?Context $submissionContext = null;
+    /** @var array<string, mixed> Only request fields addressed to the current form. */
+    private array $viewRequest = [];
+    /** @var array<string, mixed> Validation feedback consumed once before rendering. */
+    private array $blockErrors = [];
+    /** @var string|null Context action owning the feedback. */
+    private ?string $errorOwner = null;
+    /** @var bool Failed LDAP login for the addressed block. */
+    private bool $ldapFailed = false;
+
+    /** @param \RRZE\RSVP\Settings $settings Plugin configuration. Register the room booking adapter. */
     public function __construct($settings)
     {
         parent::__construct();
@@ -33,8 +48,9 @@ class Bookings extends Shortcodes
         $this->email = new Email;
         $this->template = new Template;
 
-        $this->nonce = (isset($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
+        $this->nonce = (isset($_REQUEST['nonce']) && is_string($_REQUEST['nonce']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')) ? $_REQUEST['nonce'] : '';
 
+        add_action('template_redirect', [$this, 'prepareBlockRequest'], 5);
         add_action('template_redirect', [$this, 'bookingSubmitted']);
 
         add_action('wp_ajax_UpdateCalendar', [$this, 'ajaxUpdateCalendar']);
@@ -47,6 +63,216 @@ class Bookings extends Shortcodes
     }
 
     /**
+     * Render the legacy shortcode using only unaddressed query parameters.
+     *
+     * @param array $atts Shortcode attributes.
+     * @param string $content Enclosed content.
+     * @param string $tag Registered shortcode tag.
+     * @return string Legacy booking form.
+     */
+    public function shortcodeBooking($atts, $content = '', $tag = 'rsvp-booking')
+    {
+        $this->viewRequest = isset($_GET['rsvp_instance']) ? [] : array_filter(wp_unslash($_GET), 'is_scalar');
+        return $this->renderRoom($atts, $content, $tag ?: 'rsvp-booking');
+    }
+
+    /**
+     * Render one immutable block resource and scope all fields and accessibility references.
+     *
+     * @param Context $context Server-created identity of this occurrence.
+     * @return string Independent booking form or addressed receipt.
+     */
+    public function renderBlock(Context $context): string
+    {
+        $request = Context::fromRequest(wp_unslash($_GET));
+        $this->renderContext = $context;
+        $this->viewRequest = $request instanceof Context && $context->matches($request)
+            ? array_filter(wp_unslash($_GET), 'is_scalar') : [];
+        try {
+            return $context->scopeHtml($this->renderRoom(['room' => $context->resourceId], '', 'rsvp-booking'));
+        } finally {
+            $this->renderContext = null;
+            $this->viewRequest = [];
+        }
+    }
+
+    /**
+     * Handle LDAP login and consume validation feedback once, before any block renders.
+     *
+     * @return void No action for legacy or unaddressed requests.
+     */
+    public function prepareBlockRequest(): void
+    {
+        $input = wp_unslash(isset($_POST['rsvp_instance']) ? $_POST : $_GET);
+        $context = Context::fromRequest($input);
+        if (!$context instanceof Context || $context->mode === 'course') {
+            return;
+        }
+        if (isset($_POST['submit_ldap']) && get_post_meta($context->resourceId, 'rrze-rsvp-room-ldap-required', true)
+            && $this->settings->getOption('ldap', 'server')) {
+            $ldap = new LDAP();
+            $ldap->login();
+            $this->ldapFailed = !$ldap->isAuthenticated();
+            if (!$this->ldapFailed) {
+                wp_safe_redirect($context->url());
+                exit;
+            }
+        }
+        $transient = $input['transient-data'] ?? '';
+        if (is_string($transient) && preg_match('/^[a-f0-9]{16}$/D', $transient)
+            && is_string($input['transient-data-nonce'] ?? null)
+            && wp_verify_nonce($input['transient-data-nonce'], $context->action() . ':error:' . $transient)) {
+            $this->blockErrors = (array) (new TransientData($transient))->getData();
+            $this->errorOwner = $context->action();
+        }
+    }
+
+    /**
+     * Render authentication choices without performing login, logout or redirect operations.
+     *
+     * @param IdM $idm Current SSO adapter.
+     * @param bool $ssoRequired Whether SSO is configured for this room.
+     * @param bool $ldapRequired Whether LDAP is configured for this room.
+     * @return string Bound authentication form.
+     */
+    private function blockAuthForm(IdM $idm, bool $ssoRequired, bool $ldapRequired): string
+    {
+        $context = $this->renderContext;
+        $html = '<div class="rrze-rsvp"><h2>' . esc_html__('Authentication Required', 'rrze-rsvp') . '</h2>';
+        if ($ssoRequired && $idm->simplesamlAuth) {
+            $html .= '<p><a href="' . esc_url($idm->simplesamlAuth->getLoginURL($context->url())) . '">'
+                . esc_html__('Please login with your IdM username', 'rrze-rsvp') . '</a></p>';
+        }
+        if ($ldapRequired) {
+            $posted = Context::fromRequest(wp_unslash($_POST));
+            if ($this->ldapFailed && $posted instanceof Context && $context->matches($posted)) {
+                $html .= '<p role="alert">' . esc_html__('Login denied', 'rrze-rsvp') . '</p>';
+            }
+            $html .= '<form method="post" action="' . esc_url($context->url()) . '" class="rsvp-booking-form">'
+                . $context->hiddenFields()
+                . '<p><label for="rsvp_username">' . esc_html__('Username:', 'rrze-rsvp') . '</label>'
+                . '<input id="rsvp_username" name="username" autocomplete="username" required></p>'
+                . '<p><label for="rsvp_password">' . esc_html__('Password:', 'rrze-rsvp') . '</label>'
+                . '<input id="rsvp_password" name="password" type="password" autocomplete="current-password" required></p>'
+                . '<button type="submit" name="submit_ldap" value="1">' . esc_html__('Submit', 'rrze-rsvp') . '</button></form>';
+        }
+        if (!$ldapRequired && (!$ssoRequired || !$idm->simplesamlAuth)) {
+            $html .= '<p>' . esc_html__('Authentication is currently unavailable. Please contact the website administrator.', 'rrze-rsvp') . '</p>';
+        }
+        return $html . '</div>';
+    }
+
+    /**
+     * Enforce the configured resource, identity requirements, horizon and available seat at submission.
+     *
+     * @param Context $context Verified request binding.
+     * @param int $room Posted room ID.
+     * @param int $seat Posted or consultation seat ID.
+     * @param string $date Posted date.
+     * @param string $time Posted start time.
+     * @return string Authoritative end time; invalid submissions terminate before writes.
+     */
+    private function validateBlockBooking(Context $context, int $room, int $seat, string $date, string $time): string
+    {
+        if ($room !== $context->resourceId) {
+            wp_die(esc_html__('Invalid or missing booking data.', 'rrze-rsvp'), '', ['response' => 403]);
+        }
+        $available = [];
+        if ($this->isCalendarDate($date) && $date >= current_datetime()->format('Y-m-d') && $date <= $this->bookingEnd($room)) {
+            $available = Functions::getRoomAvailability($room, $date, $date, false)[$date] ?? [];
+        }
+        foreach ($available as $interval => $seats) {
+            if (explode('-', $interval)[0] === $time && in_array($seat, array_map('intval', $seats), true)) {
+                return explode('-', $interval)[1];
+            }
+        }
+        $this->redirectBooking(add_query_arg('booking', wp_create_nonce('post_data'), $context->url()));
+        exit;
+    }
+
+    /**
+     * Check shared room access even when a client uses the legacy submission endpoint.
+     *
+     * @param int $room Room ID.
+     * @param int $seat Seat ID.
+     * @param IdM $idm SSO adapter.
+     * @param LDAP $ldap LDAP adapter.
+     * @return void Reject unpublished, unrelated or unauthenticated resource submissions.
+     */
+    private function validateRoomAccess(int $room, int $seat, IdM $idm, LDAP $ldap): void
+    {
+        $sso = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-sso-required', true));
+        $needsLdap = Functions::getBoolValueFromAtt(get_post_meta($room, 'rrze-rsvp-room-ldap-required', true))
+            && $this->settings->getOption('ldap', 'server');
+        if (get_post_type($room) !== 'room' || get_post_status($room) !== 'publish' || !$seat || get_post_type($seat) !== 'seat' || get_post_status($seat) !== 'publish'
+            || (int) get_post_meta($seat, 'rrze-rsvp-seat-room', true) !== $room
+            || ($sso && !$idm->isAuthenticated()) || ($needsLdap && !$ldap->isAuthenticated())) {
+            wp_die(esc_html__('Invalid or missing booking data.', 'rrze-rsvp'), '', ['response' => 403]);
+        }
+    }
+
+    /** @param int $room Room ID. @return string Authoritative final bookable date. */
+    private function bookingEnd(int $room): string
+    {
+        $days = max(0, (int) get_post_meta($room, 'rrze-rsvp-room-days-in-advance', true));
+        return current_datetime()->modify('+' . $days . ' days')->format('Y-m-d');
+    }
+
+    /**
+     * Route a result to its local source and finish authentication only after successful booking.
+     *
+     * @param string $url Legacy redirect URL whose result parameters are retained.
+     * @param int $bookingId Successful booking ID, or zero on an error.
+     * @return void Send the redirect header. Callers terminate the request.
+     */
+    private function redirectBooking(string $url, int $bookingId = 0): void
+    {
+        if ($context = $this->submissionContext) {
+            parse_str((string) wp_parse_url($url, PHP_URL_QUERY), $parameters);
+            if (!empty($parameters['transient-data'])) {
+                $parameters['transient-data-nonce'] = wp_create_nonce($context->action() . ':error:' . $parameters['transient-data']);
+            }
+            if ($bookingId) {
+                $parameters['id'] = $bookingId;
+                $parameters['rsvp_receipt'] = wp_create_nonce($context->receiptAction($bookingId));
+                unset($parameters['booking'], $parameters['nonce']);
+            }
+            // Do not carry a legacy page override or foreign return target into the block flow.
+            unset($parameters['room_id'], $parameters['require-auth']);
+            $url = $context->url($parameters);
+        }
+        if ($bookingId) {
+            $ldap = new LDAP();
+            if ($ldap->isAuthenticated()) {
+                $ldap->logout();
+            }
+            $idm = new IdM();
+            if ($idm->isAuthenticated()) {
+                $idm->logout($url);
+            }
+        }
+        wp_safe_redirect($url);
+    }
+
+    /**
+     * Authenticate AJAX context and restrict it to its own published room.
+     *
+     * @param int $room Requested room.
+     * @return Context|null Bound block context or a legacy request.
+     */
+    private function ajaxContext(int $room): ?Context
+    {
+        if (!array_intersect(['rsvp_source', 'rsvp_instance', 'rsvp_mode', 'rsvp_resource', 'rsvp_context_nonce'], array_keys($_POST))) {
+            return null;
+        }
+        $context = Context::fromRequest(wp_unslash($_POST));
+        if (is_wp_error($context) || ($context && ($context->resourceId !== $room || $context->mode === 'course'))) {
+            wp_die('', '', ['response' => 403]);
+        }
+        return $context;
+    }
+
+    /**
      * Render the room booking form, including its availability-driven picker.
      *
      * @param array $atts Shortcode attributes.
@@ -54,13 +280,14 @@ class Bookings extends Shortcodes
      * @param string $tag Registered shortcode name.
      * @return string Booking form or authentication/availability notice.
      */
-    public function shortcodeBooking($atts, $content = '', $tag = '')
+    private function renderRoom($atts, $content = '', $tag = 'rsvp-booking')
     {
         global $post;
-        $postID = $post->ID;      
+        $postID = $post->ID ?? 0;
+        $fieldErrors = $this->renderContext && $this->errorOwner === $this->renderContext->action() ? $this->blockErrors : [];
 
-        if (isset($_GET['transient-data']) && isset($_GET['transient-data-nonce']) && wp_verify_nonce($_GET['transient-data-nonce'], 'transient-data-' . $_GET['transient-data'])) {
-            $transient = $_GET['transient-data'];
+        if (!$this->renderContext && isset($this->viewRequest['transient-data']) && isset($this->viewRequest['transient-data-nonce']) && wp_verify_nonce($this->viewRequest['transient-data-nonce'], 'transient-data-' . $this->viewRequest['transient-data'])) {
+            $transient = $this->viewRequest['transient-data'];
             $transientData = new TransientData($transient);
             if (empty($fieldErrors = $transientData->getData())) {
                 $redirectUrl = add_query_arg(
@@ -72,8 +299,8 @@ class Bookings extends Shortcodes
                 wp_redirect($redirectUrl);
                 exit;
             }
-        } 
-        
+        }
+
         wp_enqueue_style('rrze-rsvp-shortcode');
 
         if ($output = $this->ssoAuthenticationError()) {
@@ -102,7 +329,7 @@ class Bookings extends Shortcodes
         }
 
         $shortcode_atts = parent::shortcodeAtts($atts, $tag, $this->shortcodesettings);
-        $input_room = absint($shortcode_atts['room']);
+        $input_room = $this->renderContext ? $this->renderContext->resourceId : absint($this->viewRequest['room_id'] ?? $shortcode_atts['room']);
         $post_room = get_post($input_room);
         if (!$post_room) {
             return __('Room specified in shortcode does not exist.', 'rrze-rsvp');
@@ -122,14 +349,14 @@ class Bookings extends Shortcodes
         $ldapRequired = Functions::getBoolValueFromAtt(get_post_meta($input_room, 'rrze-rsvp-room-ldap-required', true));
         $ldapRequired = $ldapRequired && $this->settings->getOption('ldap', 'server') ? true : false;
         if (($ssoRequired && !$idm->isAuthenticated()) || ($ldapRequired && !$ldap->isAuthenticated())) {
-            if ($output = $this->authForm($ssoRequired, $ldapRequired)) {
+            if ($output = ($this->renderContext ? $this->blockAuthForm($idm, $ssoRequired, $ldapRequired) : $this->authForm($ssoRequired, $ldapRequired))) {
                 return $output;
             }
         }
 
         $output = '';
 
-        $roomID = isset($_GET['room_id']) ? absint($_GET['room_id']) : $input_room;
+        $roomID = $input_room;
         $roomMeta = get_post_meta($roomID);
         $days = $shortcode_atts['days'] != '' ? (int)$shortcode_atts['days'] : $roomMeta['rrze-rsvp-room-days-in-advance'][0];
         $comment = (isset($roomMeta['rrze-rsvp-room-notes-check']) && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on');
@@ -194,13 +421,13 @@ class Bookings extends Shortcodes
             return $alert;
         }
 
-        $get_date = isset($_GET['bookingdate']) ? sanitize_text_field($_GET['bookingdate']) : date('Y-m-d', current_time('timestamp'));
+        $get_date = isset($this->viewRequest['bookingdate']) ? sanitize_text_field($this->viewRequest['bookingdate']) : date('Y-m-d', current_time('timestamp'));
         if (!$this->isCalendarDate($get_date)) {
             $get_date = current_datetime()->format('Y-m-d');
         }
-        $get_time = isset($_GET['timeslot']) ? sanitize_text_field($_GET['timeslot']) : false;
-        $get_seat = isset($_GET['seat_id']) ? absint($_GET['seat_id']) : false;
-        $get_instant = (isset($_GET['instant']) && $_GET['instant'] == '1');
+        $get_time = isset($this->viewRequest['timeslot']) ? sanitize_text_field($this->viewRequest['timeslot']) : false;
+        $get_seat = isset($this->viewRequest['seat_id']) ? absint($this->viewRequest['seat_id']) : false;
+        $get_instant = (isset($this->viewRequest['instant']) && $this->viewRequest['instant'] == '1');
 
         $availability = Functions::getRoomAvailability(
             $roomID,
@@ -210,16 +437,17 @@ class Bookings extends Shortcodes
         );
 
         $output .= '<div class="rrze-rsvp">';
-        $output .= '<form action="' . get_permalink() . '" method="post" id="rsvp_by_room" class="mode-' . $bookingMode . '">';
+        $output .= '<form action="' . esc_url($this->renderContext ? $this->renderContext->url() : get_permalink()) . '" method="post" id="rsvp_by_room" class="rsvp-booking-form mode-' . $bookingMode . '">';
+        $output .= $this->renderContext ? $this->renderContext->hiddenFields() : '';
         if ($get_instant) {
             $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
         }
 
-        if (isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'rsvp-availability')) {
-            $output .= '<div><input type="hidden" value="' . $_GET['nonce'] . '" id="rsvp_availability" name="nonce"></div>';
+        if (isset($this->viewRequest['nonce']) && wp_verify_nonce($this->viewRequest['nonce'], 'rsvp-availability')) {
+            $output .= '<div><input type="hidden" value="' . $this->viewRequest['nonce'] . '" id="rsvp_availability" name="nonce"></div>';
         }
         $output .= '<p><input type="hidden" value="' . $roomID . '" id="rsvp_room" name="rsvp_room">'
-            . wp_nonce_field('post_nonce', 'rrze_rsvp_post_nonce_field', TRUE, FALSE)
+            . wp_nonce_field($this->renderContext ? $this->renderContext->action() . ':submit' : 'post_nonce', 'rrze_rsvp_post_nonce_field', TRUE, FALSE)
             . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($roomID) . '</strong>'
             . '</p>';
 
@@ -285,7 +513,7 @@ class Bookings extends Shortcodes
         $output .= '<legend>' . __('Your data', 'rrze-rsvp') . ' <span class="notice-required">(' . __('Required', 'rrze-rsvp') . ')</span></legend>';
 
         if ($idm->isAuthenticated()) {
-            $data = $idm->getCustomerData();
+            $data = array_map('esc_attr', $idm->getCustomerData());
             $output .= '<input type="hidden" value="' . $data['customer_lastname'] . '" id="rsvp_lastname" name="rsvp_lastname">';
             $output .= '<input type="hidden" value="' . $data['customer_firstname'] . '" id="rsvp_firstname" name="rsvp_firstname">';
             $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
@@ -297,8 +525,8 @@ class Bookings extends Shortcodes
                 . '</div>';
         }
 
-        if ($ldap->isAuthenticated()) {
-            $data = $ldap->getCustomerData();
+        if (!$idm->isAuthenticated() && $ldap->isAuthenticated()) {
+            $data = array_map('esc_attr', $ldap->getCustomerData());
             $output .= '<input type="hidden" value="' . $data['customer_email'] . '" id="rsvp_email" name="rsvp_email">';
 
             $output .= '<div class="form-group">'
@@ -308,7 +536,7 @@ class Bookings extends Shortcodes
 
         if (!$idm->isAuthenticated()) {
             $error = isset($fieldErrors['rsvp_lastname']) ? ' error' : '';
-            $value = isset($fieldErrors['rsvp_lastname']['value']) ? $fieldErrors['rsvp_lastname']['value'] : '';
+            $value = isset($fieldErrors['rsvp_lastname']['value']) ? esc_attr($fieldErrors['rsvp_lastname']['value']) : '';
             $message = isset($fieldErrors['rsvp_lastname']['message']) ? $fieldErrors['rsvp_lastname']['message'] : '';
             $output .= '<div class="form-group' . $error . '"><label for="rsvp_lastname">'
                 . __('Last name', 'rrze-rsvp') . '</label>'
@@ -317,7 +545,7 @@ class Bookings extends Shortcodes
                 . '</div>';
 
             $error = isset($fieldErrors['rsvp_firstname']) ? ' error' : '';
-            $value = isset($fieldErrors['rsvp_firstname']['value']) ? $fieldErrors['rsvp_firstname']['value'] : '';
+            $value = isset($fieldErrors['rsvp_firstname']['value']) ? esc_attr($fieldErrors['rsvp_firstname']['value']) : '';
             $message = isset($fieldErrors['rsvp_firstname']['message']) ? $fieldErrors['rsvp_firstname']['message'] : '';
             $output .= '<div class="form-group' . $error . '"><label for="rsvp_firstname">'
                 . __('First name', 'rrze-rsvp') . '</label>'
@@ -328,7 +556,7 @@ class Bookings extends Shortcodes
 
         if (!$idm->isAuthenticated() && !$ldap->isAuthenticated()) {
             $error = isset($fieldErrors['rsvp_email']) ? ' error' : '';
-            $value = isset($fieldErrors['rsvp_email']['value']) ? $fieldErrors['rsvp_email']['value'] : '';
+            $value = isset($fieldErrors['rsvp_email']['value']) ? esc_attr($fieldErrors['rsvp_email']['value']) : '';
             $message = isset($fieldErrors['rsvp_email']['message']) ? $fieldErrors['rsvp_email']['message'] : '';
             $output .= '<div class="form-group' . $error . '"><label for="rsvp_email">'
                 . __('Email', 'rrze-rsvp') . '</label>'
@@ -341,7 +569,7 @@ class Bookings extends Shortcodes
 
         if (CORONA_MODE) {
             $error = isset($fieldErrors['rsvp_phone']) ? ' error' : '';
-            $value = isset($fieldErrors['rsvp_phone']['value']) ? $fieldErrors['rsvp_phone']['value'] : '';
+            $value = isset($fieldErrors['rsvp_phone']['value']) ? esc_attr($fieldErrors['rsvp_phone']['value']) : '';
             $message = isset($fieldErrors['rsvp_phone']['message']) ? $fieldErrors['rsvp_phone']['message'] : '';
             $output .= '<div class="form-group' . $error . '"><label for="rsvp_phone">'
                 . __('Phone Number', 'rrze-rsvp') . '</label>'
@@ -395,9 +623,10 @@ class Bookings extends Shortcodes
         return $output;
     }
 
+    /** @return string Render the addressed SSO failure. */
     protected function ssoAuthenticationError()
     {
-        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'sso_authentication')) {
+        if (!isset($this->viewRequest['booking']) || !wp_verify_nonce($this->viewRequest['booking'], 'sso_authentication')) {
             return '';
         }
 
@@ -410,7 +639,7 @@ class Bookings extends Shortcodes
     }
 
     // protected function ldapAuthenticationError(){
-    //     if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'ldap_authentication')) {
+    //     if (!isset($this->viewRequest['booking']) || !wp_verify_nonce($this->viewRequest['booking'], 'ldap_authentication')) {
     //         return '';
     //     }
 
@@ -422,9 +651,10 @@ class Bookings extends Shortcodes
     //     return $this->template->getContent('shortcode/booking-error', $data);
     // }
 
+    /** @return string Render the addressed invalid-data failure. */
     protected function postDataError()
     {
-        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'post_data')) {
+        if (!isset($this->viewRequest['booking']) || !wp_verify_nonce($this->viewRequest['booking'], 'post_data')) {
             return '';
         }
 
@@ -436,9 +666,10 @@ class Bookings extends Shortcodes
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
+    /** @return string Render the addressed persistence failure. */
     protected function saveError()
     {
-        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'save_error-' . $_GET['nonce'])) {
+        if (!isset($this->viewRequest['booking']) || !wp_verify_nonce($this->viewRequest['booking'], 'save_error-' . $this->viewRequest['nonce'])) {
             return '';
         }
 
@@ -450,9 +681,10 @@ class Bookings extends Shortcodes
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
+    /** @return string Render the addressed duplicate-booking failure. */
     protected function multipleBookingError()
     {
-        if (!isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'multiple_booking-' . $_GET['nonce'])) {
+        if (!isset($this->viewRequest['booking']) || !wp_verify_nonce($this->viewRequest['booking'], 'multiple_booking-' . $this->viewRequest['nonce'])) {
             return '';
         }
 
@@ -466,13 +698,14 @@ class Bookings extends Shortcodes
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
+    /** @return string Render the addressed seat conflict with a local block return URL. */
     protected function seatUnavailableError()
     {
-        if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'seat_unavailable-' . $_GET['url'])) {
+        if (!isset($this->viewRequest['url']) || !isset($this->viewRequest['booking']) || !wp_verify_nonce($this->viewRequest['booking'], 'seat_unavailable-' . $this->viewRequest['url'])) {
             return '';
         }
-        // $url = $_GET['url'];
-        $url = filter_input(INPUT_GET, 'url', FILTER_SANITIZE_URL);
+        // $url = $this->viewRequest['url'];
+        $url = $this->renderContext ? $this->renderContext->url() : esc_url_raw($this->viewRequest['url']);
 
         if (sanitize_text_field($url) != $url) {
             return '';
@@ -487,13 +720,14 @@ class Bookings extends Shortcodes
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
+    /** @return string Render the addressed time conflict with a local block return URL. */
     protected function timeslotUnavailableError()
     {
-        if (!isset($_GET['url']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'timeslot_unavailable-' . $_GET['url'])) {
+        if (!isset($this->viewRequest['url']) || !isset($this->viewRequest['booking']) || !wp_verify_nonce($this->viewRequest['booking'], 'timeslot_unavailable-' . $this->viewRequest['url'])) {
             return '';
         }
-        // $url = $_GET['url'];
-        $url = filter_input(INPUT_GET, 'url', FILTER_SANITIZE_URL);
+        // $url = $this->viewRequest['url'];
+        $url = $this->renderContext ? $this->renderContext->url() : esc_url_raw($this->viewRequest['url']);
 
         if (sanitize_text_field($url) != $url) {
             return '';
@@ -508,9 +742,10 @@ class Bookings extends Shortcodes
         return $this->template->getContent('shortcode/booking-error', $data);
     }
 
+    /** @param int|string $input_room Configured room. @return string Legacy room selector when unconfigured. */
     protected function selectRoom($input_room = '')
     {
-        $get_room = isset($_GET['room_id']) ? absint($_GET['room_id']) : '';
+        $get_room = isset($this->viewRequest['room_id']) ? absint($this->viewRequest['room_id']) : '';
         if ($input_room != '' || $get_room != '') {
             return '';
         }
@@ -542,31 +777,21 @@ class Bookings extends Shortcodes
      */
     protected function bookedNotice()
     {
-        if (!isset($_GET['id']) || !isset($_GET['booking']) || !wp_verify_nonce($_GET['booking'], 'booked-' . $_GET['nonce'])) {
+        $receiptId = absint($this->viewRequest['id'] ?? 0);
+        $validReceipt = $this->renderContext
+            ? wp_verify_nonce($this->viewRequest['rsvp_receipt'] ?? '', $this->renderContext->receiptAction($receiptId))
+            : wp_verify_nonce($this->viewRequest['booking'] ?? '', 'booked-' . $receiptId . '-' . ($this->viewRequest['nonce'] ?? ''));
+        if (!$receiptId || !$validReceipt) {
             return '';
         }
 
-        $bookingId = absint($_GET['id']);
+        $bookingId = absint($this->viewRequest['id']);
         if (Functions::isCourseBooking($bookingId)) {
             return '';
         }
 
-        $idm = new IdM;
-        $ldap = new LDAP;
-
-        $queryStr = Functions::getQueryStr([], ['require-auth']);
-        $returnTo = trailingslashit(get_permalink()) . ($queryStr ? '?' . $queryStr : '');
-
-        if ($idm->isAuthenticated()) {
-            $idm->logout($returnTo);
-        }
-
-        if ($ldap->isAuthenticated()) {
-            $ldap->logout($returnTo);
-        }
-
         $booking = Functions::getBooking($bookingId);
-        if (!$booking) {
+        if (!$booking || ($this->renderContext && (int) $booking['room'] !== $this->renderContext->resourceId)) {
             return '';
         }
 
@@ -622,18 +847,41 @@ class Bookings extends Shortcodes
         // forceToCheckin
         $data['check_in_when_arrive'] = __('Please remember to <strong>check in</strong> to your seat when you arrive!', 'rrze-rsvp');
 
+        if ($this->renderContext && $booking['status'] === 'checked-in') {
+            $data['force_to_confirm'] = false;
+            $data['force_to_checkin'] = false;
+            $data['autoconfirmation'] = true;
+            $data['reservation_submitted'] = __('Check in has been completed.', 'rrze-rsvp');
+            $checkout = add_query_arg(['id' => $bookingId, 'action' => 'checkout',
+                'nonce' => wp_create_nonce('rrze-rsvp-seat-check-inout')], get_permalink($booking['seat']));
+            $data['place_has_been_reserved'] = esc_html__('Please check out when you leave the site.', 'rrze-rsvp')
+                . ' <a href="' . esc_url($checkout) . '">' . esc_html__('Check out', 'rrze-rsvp') . '</a>';
+        }
+
         return $this->template->getContent('shortcode/booking-booked', $data);
     }
 
+    /** @return void Validate and process one room booking, then return to its originating form. */
     public function bookingSubmitted()
     {
-        if (!isset($_POST['rrze_rsvp_post_nonce_field']) || !wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], 'post_nonce')) {
+        if (!isset($_POST['rrze_rsvp_post_nonce_field'])) {
             return;
         }
-
+        $context = Context::fromRequest(wp_unslash($_POST));
+        if (is_wp_error($context) || ($context && $context->mode === 'course')
+            || !is_string($_POST['rrze_rsvp_post_nonce_field'])
+            || !wp_verify_nonce($_POST['rrze_rsvp_post_nonce_field'], $context ? $context->action() . ':submit' : 'post_nonce')) {
+            wp_die(esc_html__('This booking form has expired or changed. Please reload the page.', 'rrze-rsvp'), '', ['response' => 403]);
+        }
+        $this->submissionContext = $context;
+        foreach ($_POST as $value) {
+            if (!is_scalar($value)) {
+                wp_die(esc_html__('Invalid or missing booking data.', 'rrze-rsvp'), '', ['response' => 400]);
+            }
+        }
         $idm = new IdM;
         $ldap = new LDAP;
-        
+
         array_walk_recursive(
             $_POST,
             function (&$value) {
@@ -643,17 +891,17 @@ class Bookings extends Shortcodes
             }
         );
 
-        $posted_data = $_POST;
-        $booking_date = sanitize_text_field($posted_data['rsvp_date']);
-        $booking_start = sanitize_text_field($posted_data['rsvp_time']);
+        $posted_data = wp_unslash($_POST);
+        $booking_date = sanitize_text_field(($posted_data['rsvp_date'] ?? ''));
+        $booking_start = sanitize_text_field(($posted_data['rsvp_time'] ?? ''));
         $booking_timestamp_start = strtotime($booking_date . ' ' . $booking_start);
         if (CORONA_MODE) {
-            $booking_phone = sanitize_text_field($posted_data['rsvp_phone']);
+            $booking_phone = sanitize_text_field(($posted_data['rsvp_phone'] ?? ''));
         }
         $booking_instant = (isset($posted_data['rsvp_instant']) && $posted_data['rsvp_instant'] == '1');
         $booking_comment = (isset($posted_data['rsvp_comment']) ? sanitize_textarea_field($posted_data['rsvp_comment']) : '');
         $booking_dsgvo = (isset($posted_data['rsvp_dsgvo']) && $posted_data['rsvp_dsgvo'] == '1');
-        $booking_room = absint($posted_data['rsvp_room']);
+        $booking_room = absint($posted_data['rsvp_room'] ?? 0);
         $booking_mode = get_post_meta($booking_room, 'rrze-rsvp-room-bookingmode', true);
         if ($booking_mode == 'consultation') {
             $room_seats = get_posts([
@@ -664,14 +912,19 @@ class Bookings extends Shortcodes
                 'orderby' => 'date',
                 'order' => 'ASC',
             ]);
-            $booking_seat = $room_seats[0]->ID;
+            $booking_seat = $room_seats[0]->ID ?? 0;
         } else {
-            $booking_seat = absint($posted_data['rsvp_seat']);
+            $booking_seat = absint(($posted_data['rsvp_seat'] ?? 0));
+        }
+        $this->validateRoomAccess($booking_room, $booking_seat, $idm, $ldap);
+        if ($context) {
+            $validatedEnd = $this->validateBlockBooking($context, $booking_room, $booking_seat, $booking_date, $booking_start);
         }
         $room_id = $booking_room;
         $room_meta = get_post_meta($room_id);
-        $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : '';
-        foreach ($room_timeslots as $week) {
+        $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? maybe_unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : [];
+        $schedule = [];
+        foreach ($context ? [] : (array) $room_timeslots as $week) {
             $valid_from = ((isset($week['rrze-rsvp-room-timeslot-valid-from']) && $week['rrze-rsvp-room-timeslot-valid-from'] != '') ? $week['rrze-rsvp-room-timeslot-valid-from'] : 'unlimited');
             $valid_to   = ((isset($week['rrze-rsvp-room-timeslot-valid-to']) && $week['rrze-rsvp-room-timeslot-valid-to'] != '') ? strtotime(
                 '+23 hours, +59 minutes',
@@ -688,7 +941,7 @@ class Bookings extends Shortcodes
             }
         }
         $weekday = date('N', $booking_timestamp_start);
-        $booking_end = array_key_exists($booking_start, $schedule[$weekday]) ? $schedule[$weekday][$booking_start] : $booking_start;
+        $booking_end = $validatedEnd ?? $schedule[$weekday][$booking_start] ?? $booking_start;
         $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
 
         if ($idm->isAuthenticated()) {
@@ -705,11 +958,13 @@ class Bookings extends Shortcodes
                     ],
                     get_permalink()
                 );
-                wp_redirect($redirectUrl);
+                $this->redirectBooking($redirectUrl);
                 exit;
             }
         } elseif ($ldap->isAuthenticated()) {
             if ($ldap->isAuthenticated()) {
+                $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname'] ?? '');
+                $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname'] ?? '');
                 $ldap_data = $ldap->getCustomerData();
                 $booking_email  = $ldap_data['customer_email'];
             } else {
@@ -720,13 +975,13 @@ class Bookings extends Shortcodes
                     ],
                     get_permalink()
                 );
-                wp_redirect($redirectUrl);
+                $this->redirectBooking($redirectUrl);
                 exit;
             }
         } else {
-            $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname']);
-            $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname']);
-            $booking_email = sanitize_email($posted_data['rsvp_email']);
+            $booking_lastname = sanitize_text_field($posted_data['rsvp_lastname'] ?? '');
+            $booking_firstname = sanitize_text_field($posted_data['rsvp_firstname'] ?? '');
+            $booking_email = sanitize_email($posted_data['rsvp_email'] ?? '');
         }
 
         // Postdaten überprüfen
@@ -761,7 +1016,7 @@ class Bookings extends Shortcodes
         }
         if (empty($booking_lastname)) {
             $transientData->addData(
-                'customer_lastname',
+                'rsvp_lastname',
                 [
                     'value' => $booking_lastname,
                     'message' => __('Your last name is required.', 'rrze-rsvp')
@@ -773,7 +1028,7 @@ class Bookings extends Shortcodes
         }
         if (empty($booking_firstname)) {
             $transientData->addData(
-                'customer_firstname',
+                'rsvp_firstname',
                 [
                     'value' => $booking_firstname,
                     'message' => __('Your name is required.', 'rrze-rsvp')
@@ -785,8 +1040,7 @@ class Bookings extends Shortcodes
         }
         if (!filter_var($booking_email, FILTER_VALIDATE_EMAIL)) {
             $transientData->addData(
-                '
-                rsvp_date',
+                'rsvp_email',
                 [
                     'value' => $booking_email,
                     'message' => __('The email address is not valid.', 'rrze-rsvp')
@@ -822,7 +1076,7 @@ class Bookings extends Shortcodes
                 ],
                 wp_get_referer()
             );
-            wp_redirect($redirectUrl);
+            $this->redirectBooking($redirectUrl);
             exit;
         }
 
@@ -875,7 +1129,7 @@ class Bookings extends Shortcodes
                 ],
                 get_permalink()
             );
-            wp_redirect($redirectUrl);
+            $this->redirectBooking($redirectUrl);
             exit;
         }
 
@@ -891,7 +1145,7 @@ class Bookings extends Shortcodes
                 ],
                 get_permalink()
             );
-            wp_redirect($redirectUrl);
+            $this->redirectBooking($redirectUrl);
             exit;
         }
 
@@ -932,7 +1186,7 @@ class Bookings extends Shortcodes
                 ],
                 get_permalink()
             );
-            wp_redirect($redirectUrl);
+            $this->redirectBooking($redirectUrl);
             exit;
         }
 
@@ -963,7 +1217,7 @@ class Bookings extends Shortcodes
                 ],
                 get_permalink()
             );
-            wp_redirect($redirectUrl);
+            $this->redirectBooking($redirectUrl);
             exit;
         }
 
@@ -1073,7 +1327,7 @@ class Bookings extends Shortcodes
                 ],
                 get_permalink($booking_seat)
             );
-            wp_redirect($redirectUrl);
+            $this->redirectBooking($redirectUrl, (int) $booking_id);
             exit;
         }
 
@@ -1081,12 +1335,12 @@ class Bookings extends Shortcodes
         $redirectUrl = add_query_arg(
             [
                 'id' => $booking_id,
-                'booking' => wp_create_nonce('booked-' . $this->nonce),
+                'booking' => wp_create_nonce('booked-' . $booking_id . '-' . $this->nonce),
                 'nonce' => $this->nonce
             ],
             get_permalink()
         );
-        wp_redirect($redirectUrl);
+        $this->redirectBooking($redirectUrl, (int) $booking_id);
         exit;
     }
 
@@ -1196,14 +1450,17 @@ class Bookings extends Shortcodes
     public function ajaxUpdateCalendar()
     {
         check_ajax_referer('rsvp-ajax-nonce', 'nonce');
+        $roomID = absint($_POST['room'] ?? 0);
+        $context = $this->ajaxContext($roomID);
         $period = sanitize_text_field(wp_unslash($_POST['month'] ?? ''));
         $direction = sanitize_text_field(wp_unslash($_POST['direction'] ?? ''));
-        $end = sanitize_text_field(wp_unslash($_POST['end'] ?? ''));
+        $end = $context ? $this->bookingEnd($roomID) : sanitize_text_field(wp_unslash($_POST['end'] ?? ''));
         if (!$this->isCalendarDate($period . '-01') || !$this->isCalendarDate($end) || !in_array($direction, ['prev', 'next'], true)) {
             wp_die('', '', ['response' => 400]);
         }
         $date = (new \DateTimeImmutable($period . '-01'))->modify($direction === 'next' ? '+1 month' : '-1 month');
-        echo $this->buildCalendar((int) $date->format('n'), (int) $date->format('Y'), current_datetime()->format('Y-m-d'), $end, absint($_POST['room'] ?? 0));
+        $html = $this->buildCalendar((int) $date->format('n'), (int) $date->format('Y'), current_datetime()->format('Y-m-d'), $end, $roomID);
+        echo $context ? $context->scopeHtml($html) : $html;
         wp_die();
     }
 
@@ -1216,14 +1473,23 @@ class Bookings extends Shortcodes
     {
         check_ajax_referer('rsvp-ajax-nonce', 'nonce');
         $roomID = absint($_POST['room'] ?? 0);
+        $context = $this->ajaxContext($roomID);
         $date = sanitize_text_field(wp_unslash($_POST['date'] ?? ''));
         $time = sanitize_text_field(wp_unslash($_POST['time'] ?? ''));
         $seat = absint($_POST['seat'] ?? 0);
         $date = $this->isCalendarDate($date) ? $date : '';
+        if ($context && ($date < current_datetime()->format('Y-m-d') || $date > $this->bookingEnd($roomID))) {
+            $date = '';
+        }
         $availability = $date ? Functions::getRoomAvailability($roomID, $date, $date, false) : [];
         $response = ['time' => $this->buildTimeslotSelect($roomID, $date, $time, $availability)];
         if (get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true) !== 'consultation') {
             $response['seat'] = $this->buildSeatSelect($roomID, $date, $time, $seat, $availability);
+        }
+        if ($context) {
+            foreach ($response as $key => $html) {
+                $response[$key] = $context->scopeHtml($html);
+            }
         }
         wp_send_json($response);
     }

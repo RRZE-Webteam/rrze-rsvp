@@ -75,7 +75,7 @@ RSVP Form Adjustments
     .rsvp-seat-container {
         margin-bottom: 1em;
     }
-    input#rsvp_dsgvo {
+    input[name="rsvp_dsgvo"] {
         display: block;
         float: left;
         margin-right: 10px;

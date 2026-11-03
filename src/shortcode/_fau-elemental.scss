@@ -109,7 +109,7 @@ body.wp-theme-FAU-Elemental #content .rrze-rsvp form div.rsvp-datetime-container
 body.wp-theme-FAU-Elemental .rrze-rsvp {
 
 	form.mode-reservation,
-	form#rsvp_by_room {
+	form.rsvp-booking-form {
 		max-width: 100%;
 
 		a {
@@ -517,7 +517,7 @@ body.wp-theme-FAU-Elemental .rrze-rsvp {
 
 	.is-style-dark {
 		form.mode-reservation,
-		form#rsvp_by_room {
+		form.rsvp-booking-form {
 			color: var(--FAU-Col-FAU-Weiss-100);
 
 			a,

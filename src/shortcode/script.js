@@ -43,8 +43,16 @@ function initializePicker(picker) {
     const summary = picker.querySelector('.rsvp-picker-summary');
     const submit = form.querySelector('[type="submit"]');
     const labels = rsvp_booking.picker;
-    const request = latestRequest(sendRequest);
-    const requestCalendar = latestRequest(sendRequest);
+    /** @param {Object} payload Availability parameters. @param {AbortSignal} signal Cancellation. @returns {Promise<string|Object>} Instance-bound response. */
+    function sendFormRequest(payload, signal) {
+        const context = {};
+        ['rsvp_source', 'rsvp_instance', 'rsvp_mode', 'rsvp_resource', 'rsvp_context_nonce'].forEach(name => {
+            if (form.elements[name]) context[name] = form.elements[name].value;
+        });
+        return sendRequest({ ...payload, ...context }, signal);
+    }
+    const request = latestRequest(sendFormRequest);
+    const requestCalendar = latestRequest(sendFormRequest);
     let busy = false;
     let failed = false;
     let retryAction;

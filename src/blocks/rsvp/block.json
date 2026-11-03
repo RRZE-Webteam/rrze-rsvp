@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "rrze/rsvp",
+  "version": "1.0.0",
+  "title": "RSVP",
+  "category": "rrze",
+  "description": "Embed course registrations, consultation appointments or seat bookings.",
+  "keywords": ["booking", "course", "room"],
+  "textdomain": "rrze-rsvp",
+  "attributes": {
+    "mode": { "type": "string", "enum": ["", "course", "consultation", "seat"], "default": "" },
+    "resourceId": { "type": "integer", "default": 0 },
+    "instanceId": { "type": "string", "default": "" }
+  },
+  "supports": { "html": false },
+  "editorScript": "file:./index.tsx",
+  "editorStyle": "file:./index.css",
+  "render": "file:./render.php"
+}

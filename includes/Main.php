@@ -53,7 +53,8 @@ class Main
         }
 
         // Shortcodes
-        new Bookings($settings);
+        $bookings = new Bookings($settings);
+        (new Blocks\BookingBlock())->onLoaded($bookings);
         new Availability($settings);
         new QR();
 
@@ -120,7 +121,7 @@ class Main
         }
 
         $template = '';
-        if (isset($_GET['require-auth']) && wp_verify_nonce($_GET['require-auth'], 'require-auth')) {
+        if (!isset($_REQUEST['rsvp_instance']) && isset($_GET['require-auth']) && wp_verify_nonce($_GET['require-auth'], 'require-auth')) {
             $idm = new IdM;
             $ldap = new LDAP;
             if (!$idm->isAuthenticated() && !$ldap->isAuthenticated()) {
@@ -128,7 +129,7 @@ class Main
             }
         } elseif (
             isset($_REQUEST['nonce']) &&
-            wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')
+            !isset($_REQUEST['rsvp_instance']) && wp_verify_nonce($_REQUEST['nonce'], 'rsvp-availability')
         ) {
             $template = plugin()->getPath('includes/templates') . 'single-form.php';
         } elseif ($post->post_type == 'room') {

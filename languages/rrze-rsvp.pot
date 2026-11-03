@@ -1,0 +1,3686 @@
+# Copyright (C) 2026 RRZE-Webteam
+# This file is distributed under the GNU General Public License Version 3.
+msgid ""
+msgstr ""
+"Project-Id-Version: RRZE RSVP 2.11.8\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rrze-rsvp\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-11-03T11:46:30+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: rrze-rsvp\n"
+
+#. Plugin Name of the plugin
+#: rrze-rsvp.php
+#: config/config.php:157
+#: config/config.php:158
+msgid "RRZE RSVP"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: rrze-rsvp.php
+msgid "https://github.com/RRZE-Webteam/rrze-rsvp"
+msgstr ""
+
+#. Description of the plugin
+#: rrze-rsvp.php
+msgid "FAU Reservation Tool"
+msgstr ""
+
+#. Author of the plugin
+#: rrze-rsvp.php
+msgid "RRZE-Webteam"
+msgstr ""
+
+#. Author URI of the plugin
+#: rrze-rsvp.php
+msgid "https://blogs.fau.de/webworking/"
+msgstr ""
+
+#: config/config.php:107
+msgid "Requests for booking data"
+msgstr ""
+
+#: config/config.php:108
+msgid "Exports of booking data are managed centrally in this network. Contact the network administration and specify the room and time period you need."
+msgstr ""
+
+#: config/config.php:114
+msgid "Thank you for booking"
+msgstr ""
+
+#: config/config.php:116
+msgid "We received your booking and we will notify you once it has been confirmed."
+msgstr ""
+
+#: config/config.php:118
+msgid "Please confirm your booking"
+msgstr ""
+
+#: config/config.php:120
+msgid "You are required to confirm the booking now. Please note that unconfirmed bookings automatically expire after one hour."
+msgstr ""
+
+#: config/config.php:122
+msgid "Your booking has been confirmed"
+msgstr ""
+
+#: config/config.php:124
+msgid "We are happy to inform you that your booking has been confirmed."
+msgstr ""
+
+#: config/config.php:126
+msgid "Your booking has been cancelled"
+msgstr ""
+
+#: config/config.php:128
+msgid "You haven't confirmed your reservation."
+msgstr ""
+
+#: config/config.php:130
+msgid "You haven't checked in."
+msgstr ""
+
+#: config/config.php:132
+msgid "Unfortunately we have to cancel your booking on {{date}} at {{time}}."
+msgstr ""
+
+#: config/config.php:144
+msgid "Additional informations"
+msgstr ""
+
+#: config/config.php:146
+msgid "Ich bin damit einverstanden, dass meine Kontaktdaten für die Dauer des Vorganges der Platzbuchung und bis zu 4 Wochen danach zum Zwecke der Nachverfolgung gemäß der gesetzlichen Grundlagen zur Corona-Bekämpfung gespeichert werden dürfen. Ebenso wird Raumverantwortlichen und Veranstalter von Sprechstunden das Recht eingeräumt, während der Dauer des Buchungsprozesses und bis zum Ende des ausgewählten Termins Einblick in folgende Buchungsdaten zu nehmen: E-Mailadresse, Name, Vorname. Raumverantwortliche und Veranstalter von Sprechstunden erhalten diese Daten allein zum Zweck der Durchführung und Verwaltung des Termins gemäß §6 Abs1 a DSGVO. Die Telefonnummer wird nur zum Zwecke der Kontaktverfolgung aufgrund der gesetzlicher Grundlagen zur Pandemiebekämpfung für Gesundheitsbehörden erfasst."
+msgstr ""
+
+#: config/config.php:161
+msgid "RRZE RSVP Settings"
+msgstr ""
+
+#: config/config.php:175
+msgid "General Settings"
+msgstr ""
+
+#: config/config.php:176
+msgid "Configure availability on room pages and the default check-in deadline. Booking periods and other rules are configured for each room."
+msgstr ""
+
+#: config/config.php:180
+msgid "E-Mail Settings"
+msgstr ""
+
+#: config/config.php:181
+msgid "Sender and notification settings apply to room and course bookings. The text templates below apply to room bookings; course emails use their own texts."
+msgstr ""
+
+#: config/config.php:182
+msgid "Room emails include an additional English section when the website language is not English. Edit both language versions together."
+msgstr ""
+
+#: config/config.php:183
+msgid "Booking details and action buttons are added automatically to the message."
+msgstr ""
+
+#: config/config.php:184
+msgid "Available placeholders"
+msgstr ""
+
+#: config/config.php:185
+msgid "Use these placeholders in subjects and message texts. They are replaced with the booking details when the email is sent."
+msgstr ""
+
+#: config/config.php:192
+msgid "QR PDF Settings"
+msgstr ""
+
+#: config/config.php:193
+msgid "Design the printable QR-code sheets for your seats. Each sheet links to the seat page and includes the room name and seat name."
+msgstr ""
+
+#: config/config.php:194
+msgid "Create the PDF using “Generate PDF” in the room or seat list. Changes here apply to newly generated PDFs."
+msgstr ""
+
+#: config/config.php:199
+msgid "LDAP Settings"
+msgstr ""
+
+#: config/config.php:200
+msgid "Configure the directory used for LDAP login to room bookings. Choose which rooms require this login in the settings of each room."
+msgstr ""
+
+#: config/config.php:201
+msgid "If you do not use LDAP, leave the server field empty. Your IT administration can provide the connection and directory details."
+msgstr ""
+
+#: config/config.php:206
+msgid "Reset Settings"
+msgstr ""
+
+#: config/config.php:207
+msgid "Restore the default RSVP settings for this website."
+msgstr ""
+
+#: config/config.php:210
+msgid "What will be reset?"
+msgstr ""
+
+#: config/config.php:211
+msgid "General, email, QR-code and LDAP settings will be reset. Your custom email texts, QR-code instructions and LDAP connection details will be removed."
+msgstr ""
+
+#: config/config.php:213
+msgid "Rooms, seats, courses and bookings, including their individual settings, will be kept. This action cannot be undone; copy any settings you want to keep before continuing."
+msgstr ""
+
+#: config/config.php:229
+msgid "Sender and notifications"
+msgstr ""
+
+#: config/config.php:230
+msgid "Choose the sender shown in booking emails and who receives internal notifications."
+msgstr ""
+
+#: config/config.php:234
+msgid "Booking received — awaiting approval"
+msgstr ""
+
+#: config/config.php:235
+msgid "Sent to the person booking when their request still needs approval by the room administration."
+msgstr ""
+
+#: config/config.php:240
+msgid "Booking confirmation required"
+msgstr ""
+
+#: config/config.php:241
+msgid "Asks the person booking to confirm their reservation using the link in the email."
+msgstr ""
+
+#: config/config.php:246
+#: includes/Mail/EmailLayout.php:43
+#: includes/Mail/EmailLayout.php:279
+msgid "Booking confirmed"
+msgstr ""
+
+#: config/config.php:247
+msgid "Sent when a booking is confirmed. These texts are also used for the check-in notification."
+msgstr ""
+
+#: config/config.php:252
+#: includes/Mail/EmailLayout.php:45
+#: includes/Mail/EmailLayout.php:291
+msgid "Booking cancelled"
+msgstr ""
+
+#: config/config.php:253
+msgid "Sent to the person booking when their reservation is cancelled. For automatic cancellations, the matching reason is added to the message."
+msgstr ""
+
+#: config/config.php:269
+msgid "Header and footer"
+msgstr ""
+
+#: config/config.php:270
+msgid "Choose which website information appears on the printed sheets."
+msgstr ""
+
+#: config/config.php:274
+msgid "Instructions beside the QR code"
+msgstr ""
+
+#: config/config.php:275
+msgid "Both language versions appear beside the QR code. Leave a field empty to omit that language from the PDF."
+msgstr ""
+
+#: config/config.php:281
+msgid "Additional room and seat details"
+msgstr ""
+
+#: config/config.php:282
+msgid "Add information from the room or seat. The room name, seat name, QR code and link to the seat page are always included."
+msgstr ""
+
+#: config/config.php:297
+msgid "Server connection"
+msgstr ""
+
+#: config/config.php:298
+msgid "Enter the server address and port supplied by your IT administration."
+msgstr ""
+
+#: config/config.php:302
+msgid "Login and directory search"
+msgstr ""
+
+#: config/config.php:303
+msgid "RSVP signs in with username@domain and searches for the account by sAMAccountName. The account must contain cn and mail attributes."
+msgstr ""
+
+#: config/config.php:317
+msgid "German"
+msgstr ""
+
+#: config/config.php:318
+#: config/config.php:410
+#: config/config.php:424
+#: config/config.php:438
+#: config/config.php:452
+#: config/config.php:466
+#: config/config.php:480
+#: config/config.php:494
+#: config/config.php:508
+#: config/config.php:522
+#: config/config.php:537
+msgid "English"
+msgstr ""
+
+#: config/config.php:318
+msgid "Website language"
+msgstr ""
+
+#: config/config.php:324
+msgid "Availability on room pages"
+msgstr ""
+
+#: config/config.php:325
+msgid "Choose whether public room pages show available times and seats with links to the booking form. This does not affect the booking calendar embedded with a shortcode."
+msgstr ""
+
+#: config/config.php:329
+msgid "Show available times with booking links"
+msgstr ""
+
+#: config/config.php:330
+msgid "Show available times without booking links"
+msgstr ""
+
+#: config/config.php:331
+msgid "Hide the availability list"
+msgstr ""
+
+#: config/config.php:336
+msgid "Check-in deadline (minutes)"
+msgstr ""
+
+#: config/config.php:337
+msgid "Default time allowed for check-in, starting when the booking begins. For bookings made after the start time, it starts when the booking is made. If check-in is required, bookings without a check-in are cancelled after this deadline. You can set a different deadline for each room."
+msgstr ""
+
+#: config/config.php:344
+msgid "Notice about central data exports"
+msgstr ""
+
+#: config/config.php:345
+msgid "Internal text on the contact-tracking information page when data exports are managed by the network extension. Only network administrators can edit this text."
+msgstr ""
+
+#: config/config.php:346
+msgid "Allowed HTML-Tags are:"
+msgstr ""
+
+#: config/config.php:356
+msgid "Recipient of internal notifications"
+msgstr ""
+
+#: config/config.php:357
+msgid "New-booking and cancellation notifications are sent to this address when enabled below."
+msgstr ""
+
+#: config/config.php:364
+msgid "Booking Notification"
+msgstr ""
+
+#: config/config.php:365
+msgid "Notify the address above about new bookings."
+msgstr ""
+
+#: config/config.php:368
+#: config/config.php:379
+msgid "Yes"
+msgstr ""
+
+#: config/config.php:369
+#: config/config.php:380
+msgid "No"
+msgstr ""
+
+#: config/config.php:375
+msgid "Cancel Notification"
+msgstr ""
+
+#: config/config.php:376
+msgid "Notify the address above about cancelled bookings."
+msgstr ""
+
+#: config/config.php:386
+#: config/config.php:388
+msgid "Sender name"
+msgstr ""
+
+#: config/config.php:387
+msgid "The name recipients see as the sender of RSVP emails."
+msgstr ""
+
+#: config/config.php:395
+msgid "Sender email"
+msgstr ""
+
+#: config/config.php:396
+msgid "The email address RSVP uses as the sender of booking messages."
+msgstr ""
+
+#: config/config.php:403
+#: config/config.php:410
+#: config/config.php:431
+#: config/config.php:438
+#: config/config.php:459
+#: config/config.php:466
+#: config/config.php:487
+#: config/config.php:494
+#, php-format
+msgid "Subject (%s)"
+msgstr ""
+
+#: config/config.php:418
+#: config/config.php:424
+#: config/config.php:446
+#: config/config.php:452
+#: config/config.php:474
+#: config/config.php:480
+#: config/config.php:502
+#: config/config.php:508
+#, php-format
+msgid "Message (%s)"
+msgstr ""
+
+#: config/config.php:515
+#: config/config.php:522
+#, php-format
+msgid "Reason: no confirmation (%s)"
+msgstr ""
+
+#: config/config.php:530
+#: config/config.php:537
+#, php-format
+msgid "Reason: no check-in (%s)"
+msgstr ""
+
+#: config/config.php:547
+msgid "FAU logo"
+msgstr ""
+
+#: config/config.php:548
+msgid "Include the FAU logo in the header."
+msgstr ""
+
+#: config/config.php:554
+msgid "Website branding"
+msgstr ""
+
+#: config/config.php:555
+msgid "Include the website header image. If none is configured, use the website title."
+msgstr ""
+
+#: config/config.php:561
+msgid "Website address"
+msgstr ""
+
+#: config/config.php:562
+msgid "Include the website address in the footer."
+msgstr ""
+
+#: config/config.php:568
+#: config/config.php:569
+msgid "Instructions in German"
+msgstr ""
+
+#: config/config.php:576
+#: config/config.php:577
+msgid "Instructions in English"
+msgstr ""
+
+#: config/config.php:584
+msgid "Room description"
+msgstr ""
+
+#: config/config.php:585
+msgid "Include the description saved for the room."
+msgstr ""
+
+#: config/config.php:597
+msgid "Room address"
+msgstr ""
+
+#: config/config.php:598
+msgid "Include the street, postal code and city saved for the room."
+msgstr ""
+
+#: config/config.php:610
+msgid "Seat equipment"
+msgstr ""
+
+#: config/config.php:611
+msgid "Include the equipment assigned to the seat."
+msgstr ""
+
+#: config/config.php:619
+msgid "LDAP server"
+msgstr ""
+
+#: config/config.php:620
+msgid "Full server address, for example ldaps://ldap.example.org. An empty field disables LDAP login for room bookings."
+msgstr ""
+
+#: config/config.php:626
+msgid "Port"
+msgstr ""
+
+#: config/config.php:627
+msgid "Use the port specified for your LDAP connection."
+msgstr ""
+
+#: config/config.php:635
+msgid "DN"
+msgstr ""
+
+#: config/config.php:636
+msgid "LDAP Distinguished Name."
+msgstr ""
+
+#: config/config.php:642
+msgid "Login domain"
+msgstr ""
+
+#: config/config.php:643
+msgid "Domain appended to the username for login, for example example.org. Enter the domain without @."
+msgstr ""
+
+#: config/config.php:649
+msgid "User search base (Base DN)"
+msgstr ""
+
+#: config/config.php:650
+msgid "Directory branch in which RSVP searches for user accounts, for example OU=People,DC=example,DC=org."
+msgstr ""
+
+#: config/config.php:658
+msgid "Confirm reset"
+msgstr ""
+
+#: config/config.php:659
+msgid "I want to reset all RSVP settings on this website to their defaults."
+msgstr ""
+
+#: config/config.php:679
+msgid "RSVP Booking"
+msgstr ""
+
+#: config/config.php:683
+#: config/config.php:718
+#: config/config.php:754
+msgid "Find the settings on the right side"
+msgstr ""
+
+#: config/config.php:688
+#: config/config.php:723
+msgid "Days in advance"
+msgstr ""
+
+#: config/config.php:694
+#: includes/Courses/Admin.php:237
+#: includes/CPT/Bookings.php:115
+#: includes/CPT/CPT.php:174
+#: includes/CPT/Rooms.php:93
+#: includes/CPT/Rooms.php:120
+#: includes/CPT/Seats.php:117
+#: includes/Mail/RoomMessage.php:49
+#: includes/Metaboxes.php:599
+#: includes/Printing/Printing.php:130
+#: includes/Shortcodes/Bookings.php:474
+#: includes/Shortcodes/Bookings.php:814
+#: includes/templates/single-seat.php:125
+#: includes/Tools.php:137
+msgid "Room"
+msgstr ""
+
+#: config/config.php:699
+msgid "Require SSO Authentication"
+msgstr ""
+
+#: config/config.php:705
+msgid "Require LDAP Authentication"
+msgstr ""
+
+#: config/config.php:714
+msgid "RSVP Availability"
+msgstr ""
+
+#: config/config.php:729
+msgid "Room(s)"
+msgstr ""
+
+#: config/config.php:735
+msgid "Seat(s)"
+msgstr ""
+
+#: config/config.php:740
+msgid "Show booking link"
+msgstr ""
+
+#: config/config.php:759
+msgid "Seat ID"
+msgstr ""
+
+#: includes/Actions.php:62
+#: includes/Actions.php:104
+#: includes/Actions.php:1135
+#: includes/Actions.php:1305
+msgid "Action not available"
+msgstr ""
+
+#: includes/Actions.php:70
+#: includes/Actions.php:89
+msgid "Booking not found."
+msgstr ""
+
+#: includes/Actions.php:82
+#: includes/Actions.php:137
+msgid "Use the course booking actions for this booking."
+msgstr ""
+
+#: includes/Actions.php:178
+msgid "Booking can only be checked in between 15 minutes before the start of the timeslot and the end of the timeslot."
+msgstr ""
+
+#: includes/Actions.php:179
+#: includes/Actions.php:729
+#: includes/Actions.php:918
+#: includes/Actions.php:1011
+msgid "Update Error"
+msgstr ""
+
+#: includes/Actions.php:243
+#: includes/Actions.php:327
+#: includes/Actions.php:344
+msgctxt "Booking"
+msgid "Delete"
+msgstr ""
+
+#: includes/Actions.php:298
+msgctxt "Room|Seat"
+msgid "Delete"
+msgstr ""
+
+#: includes/Actions.php:323
+#: includes/Actions.php:1249
+#: includes/CPT/Bookings.php:233
+#: includes/Email.php:317
+msgctxt "Booking"
+msgid "Cancel"
+msgstr ""
+
+#: includes/Actions.php:582
+#, php-format
+msgid "%s post cancelled."
+msgid_plural "%s posts cancelled."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Actions.php:587
+#, php-format
+msgid "%s post skipped because it is not eligible for this action."
+msgid_plural "%s posts skipped because they are not eligible for this action."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Actions.php:715
+msgid "This item cannot be deleted."
+msgstr ""
+
+#: includes/Actions.php:808
+msgid "Seat unavailable."
+msgstr ""
+
+#: includes/Actions.php:836
+msgid "This item is used in a booking and cannot be deleted."
+msgstr ""
+
+#: includes/Actions.php:841
+msgid "This item is used in a booking and cannot be set to draft, to private or scheduled to be published in a future date."
+msgstr ""
+
+#: includes/Actions.php:846
+msgid "This item is used in a booking and cannot be password protected."
+msgstr ""
+
+#: includes/Actions.php:887
+#, php-format
+msgid "Unable to save post: End time must be greater than start time in timeslot no. %s."
+msgid_plural "Unable to save post: End time must be greater than start time in timeslots no. %s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Actions.php:898
+msgid "Unable to save post: The changes would remove the time slot used by a protected booking."
+msgid_plural "Unable to save post: The changes would remove time slots used by protected bookings."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Actions.php:1003
+msgid "This seat is used in a booking and cannot be assigned to a different room."
+msgstr ""
+
+#: includes/Actions.php:1039
+#: includes/templates/single-seat.php:12
+msgid "Use the link in your course booking email."
+msgstr ""
+
+#: includes/Actions.php:1117
+#: includes/Actions.php:1127
+#: includes/Actions.php:1275
+msgid "Booking Confirmed"
+msgstr ""
+
+#: includes/Actions.php:1118
+#: includes/Actions.php:1123
+#, php-format
+msgid "The booking has been %s"
+msgstr ""
+
+#: includes/Actions.php:1118
+#: includes/Actions.php:1128
+msgctxt "Booking"
+msgid "confirmed"
+msgstr ""
+
+#: includes/Actions.php:1119
+msgid "Your customer has received an email confirmation."
+msgstr ""
+
+#: includes/Actions.php:1122
+#: includes/Actions.php:1131
+#: includes/Actions.php:1261
+#: includes/Actions.php:1268
+msgid "Booking Cancelled"
+msgstr ""
+
+#: includes/Actions.php:1123
+#: includes/Actions.php:1132
+msgctxt "Booking"
+msgid "cancelled"
+msgstr ""
+
+#: includes/Actions.php:1124
+msgid "Your customer has received an email cancellation."
+msgstr ""
+
+#: includes/Actions.php:1128
+#: includes/Actions.php:1132
+#, php-format
+msgid "The booking has already been %s."
+msgstr ""
+
+#: includes/Actions.php:1136
+#: includes/Actions.php:1306
+msgid "No action was taken."
+msgstr ""
+
+#: includes/Actions.php:1140
+#: includes/Courses/Admin.php:599
+#: includes/CPT/Bookings.php:117
+#: includes/Email.php:254
+#: includes/Email.php:413
+#: includes/ICS.php:76
+#: includes/Mail/RoomMessage.php:58
+msgid "Name"
+msgstr ""
+
+#: includes/Actions.php:1141
+#: includes/Courses/Admin.php:600
+#: includes/CPT/Bookings.php:118
+#: includes/Email.php:255
+#: includes/Email.php:414
+#: includes/ICS.php:77
+#: includes/Mail/RoomMessage.php:59
+#: includes/Metaboxes.php:186
+#: includes/Shortcodes/Bookings.php:526
+#: includes/Shortcodes/Bookings.php:535
+#: includes/Shortcodes/Bookings.php:564
+#: includes/Tracking.php:157
+msgid "Email"
+msgstr ""
+
+#: includes/Actions.php:1254
+#: includes/ICS.php:82
+msgid "Cancel Booking"
+msgstr ""
+
+#: includes/Actions.php:1255
+msgid "Do you really want to cancel your booking?"
+msgstr ""
+
+#: includes/Actions.php:1262
+msgid "Your booking has been cancelled. Please contact us to find a different arrangement."
+msgstr ""
+
+#: includes/Actions.php:1269
+msgid "The booking is already canceled."
+msgstr ""
+
+#: includes/Actions.php:1276
+msgid "Thank you for confirming your booking."
+msgstr ""
+
+#: includes/Actions.php:1281
+msgid "Booking Check In"
+msgstr ""
+
+#: includes/Actions.php:1282
+msgid "Check in is not possible at this time."
+msgstr ""
+
+#: includes/Actions.php:1287
+#: includes/templates/single-seat.php:138
+#: includes/templates/single-seat.php:184
+msgid "Booking Checked In"
+msgstr ""
+
+#: includes/Actions.php:1288
+#: includes/templates/single-seat.php:139
+#: includes/templates/single-seat.php:185
+msgid "Check in has been completed."
+msgstr ""
+
+#: includes/Actions.php:1293
+msgid "Booking Check Out"
+msgstr ""
+
+#: includes/Actions.php:1294
+msgid "Check-out is not possible at this time."
+msgstr ""
+
+#: includes/Actions.php:1299
+#: includes/templates/single-seat.php:199
+msgid "Booking Checked Out"
+msgstr ""
+
+#: includes/Actions.php:1300
+#: includes/templates/single-seat.php:200
+msgid "Check-out has been completed."
+msgstr ""
+
+#: includes/Auth/IdM.php:74
+msgid "No name"
+msgstr ""
+
+#: includes/Auth/IdM.php:81
+#: includes/Auth/LDAP.php:88
+msgid "no@email"
+msgstr ""
+
+#: includes/Blocks/BookingBlock.php:38
+msgid "RRZE"
+msgstr ""
+
+#: includes/Blocks/BookingBlock.php:61
+msgid "This offer is currently unavailable."
+msgstr ""
+
+#: includes/Blocks/Context.php:81
+#: includes/Shortcodes/Bookings.php:865
+msgid "This booking form has expired or changed. Please reload the page."
+msgstr ""
+
+#: includes/Blocks/Editor.php:41
+msgid "You do not have permission to select these offers."
+msgstr ""
+
+#: includes/Blocks/Editor.php:80
+msgid "This offer is unavailable or you cannot edit it."
+msgstr ""
+
+#: includes/Blocks/Editor.php:83
+msgid "This offer no longer matches the selected booking type. Please select another offer."
+msgstr ""
+
+#: includes/Blocks/Editor.php:94
+msgid "The preview could not be loaded. Please try again."
+msgstr ""
+
+#: includes/Courses/ActionPage.php:60
+#: includes/Courses/Admin.php:94
+#: includes/Courses/Frontend.php:59
+msgid "Course booking"
+msgstr ""
+
+#: includes/Courses/ActionPage.php:82
+msgid "This booking link is invalid. Please use the complete link from your email."
+msgstr ""
+
+#: includes/Courses/ActionPage.php:92
+msgid "Your course booking has been cancelled."
+msgstr ""
+
+#: includes/Courses/ActionPage.php:95
+msgid "Your email address and your participation are confirmed."
+msgstr ""
+
+#: includes/Courses/ActionPage.php:96
+msgid "Your email address is confirmed. Your booking is awaiting approval by the organizers."
+msgstr ""
+
+#: includes/Courses/ActionPage.php:99
+msgid "Confirm your email address to complete this step of your course registration."
+msgstr ""
+
+#: includes/Courses/ActionPage.php:100
+msgid "Cancel this course booking? Your reserved place will become available to other people."
+msgstr ""
+
+#: includes/Courses/ActionPage.php:101
+#: includes/Courses/Notifications.php:226
+msgid "Confirm email address"
+msgstr ""
+
+#: includes/Courses/ActionPage.php:101
+#: includes/Courses/Notifications.php:241
+msgid "Cancel my booking"
+msgstr ""
+
+#: includes/Courses/Admin.php:73
+msgid "Saving…"
+msgstr ""
+
+#: includes/Courses/Admin.php:74
+msgid "The request could not be completed. Your entered values have been kept. Please try again."
+msgstr ""
+
+#: includes/Courses/Admin.php:88
+msgid "Registration and notifications"
+msgstr ""
+
+#: includes/Courses/Admin.php:89
+#: includes/Courses/PostTypes.php:32
+msgid "Course dates"
+msgstr ""
+
+#: includes/Courses/Admin.php:114
+msgid "Access"
+msgstr ""
+
+#: includes/Courses/Admin.php:116
+msgid "SSO or verified email address"
+msgstr ""
+
+#: includes/Courses/Admin.php:117
+msgid "SSO required"
+msgstr ""
+
+#: includes/Courses/Admin.php:120
+msgid "Allowed email domains (optional)"
+msgstr ""
+
+#: includes/Courses/Admin.php:122
+msgid "Leave empty to allow all email domains. Enter one domain per line or separate them with commas, with or without @. Only exact matches are allowed; add subdomains separately. This also applies to the email address in the SSO profile and only affects new registrations."
+msgstr ""
+
+#: includes/Courses/Admin.php:123
+msgid "Confirm participation automatically"
+msgstr ""
+
+#: includes/Courses/Admin.php:124
+msgid "Otherwise, responsible staff approve each verified registration. Pending registrations already reserve a place."
+msgstr ""
+
+#: includes/Courses/Admin.php:125
+msgid "Keep bookings after the course date (days)"
+msgstr ""
+
+#: includes/Courses/Admin.php:127
+msgid "Includes cancellations. After this period, participant information and action links are deleted automatically."
+msgstr ""
+
+#: includes/Courses/Admin.php:128
+msgid "Notifications"
+msgstr ""
+
+#: includes/Courses/Admin.php:128
+msgid "Participants receive verification, approval and cancellation messages as needed. Sender and staff notifications use the existing RSVP email settings."
+msgstr ""
+
+#: includes/Courses/Admin.php:129
+msgid "Save these settings with the course. Changes to access and confirmation apply to new registrations."
+msgstr ""
+
+#: includes/Courses/Admin.php:169
+msgid "Save the course as a draft before adding its dates."
+msgstr ""
+
+#: includes/Courses/Admin.php:172
+msgid "Each date is booked separately. Dates are saved with their own button; the course title and description use the usual Save button."
+msgstr ""
+
+#: includes/Courses/Admin.php:173
+#, php-format
+msgid "Times are entered in the website timezone: %s."
+msgstr ""
+
+#: includes/Courses/Admin.php:214
+msgid "Add course date"
+msgstr ""
+
+#: includes/Courses/Admin.php:216
+#, php-format
+msgid "%1$d confirmed · %2$d pending · %3$d free"
+msgstr ""
+
+#: includes/Courses/Admin.php:219
+msgid "This course date has been cancelled."
+msgstr ""
+
+#: includes/Courses/Admin.php:221
+#: includes/Courses/Admin.php:264
+msgid "View registrations"
+msgstr ""
+
+#: includes/Courses/Admin.php:224
+#: includes/Courses/Admin.php:262
+msgid "Move this unused date to the Trash?"
+msgstr ""
+
+#: includes/Courses/Admin.php:224
+#: includes/Courses/Admin.php:262
+msgid "Remove date"
+msgstr ""
+
+#: includes/Courses/Admin.php:230
+msgid "Active registrations protect the date, time and location. Capacity cannot be reduced below the number of reserved places."
+msgstr ""
+
+#: includes/Courses/Admin.php:233
+msgid "Start"
+msgstr ""
+
+#: includes/Courses/Admin.php:234
+#: includes/Metaboxes.php:127
+msgid "End"
+msgstr ""
+
+#: includes/Courses/Admin.php:235
+msgid "Maximum participants"
+msgstr ""
+
+#: includes/Courses/Admin.php:239
+msgid "Enter a different location"
+msgstr ""
+
+#: includes/Courses/Admin.php:248
+msgid "Location when no room is selected"
+msgstr ""
+
+#: includes/Courses/Admin.php:250
+msgid "Registration opens (optional)"
+msgstr ""
+
+#: includes/Courses/Admin.php:251
+msgid "Registration closes (optional)"
+msgstr ""
+
+#: includes/Courses/Admin.php:252
+msgid "Without a registration period, registration opens when the course is published and closes when the date begins."
+msgstr ""
+
+#: includes/Courses/Admin.php:254
+msgid "Save date"
+msgstr ""
+
+#: includes/Courses/Admin.php:254
+msgid "Add date"
+msgstr ""
+
+#: includes/Courses/Admin.php:258
+msgid "Cancel this date and all its active registrations?"
+msgstr ""
+
+#: includes/Courses/Admin.php:258
+msgid "Cancel date"
+msgstr ""
+
+#: includes/Courses/Admin.php:350
+msgid "This action has expired. Reload the page and try again."
+msgstr ""
+
+#: includes/Courses/Admin.php:354
+msgid "You are not allowed to manage this item."
+msgstr ""
+
+#: includes/Courses/Admin.php:359
+msgid "This booking does not belong to the selected course."
+msgstr ""
+
+#: includes/Courses/Admin.php:378
+msgid "This date does not belong to the selected course."
+msgstr ""
+
+#: includes/Courses/Admin.php:401
+#: includes/Courses/Admin.php:430
+msgid "Use POST for this action."
+msgstr ""
+
+#: includes/Courses/Admin.php:410
+#: includes/Courses/Admin.php:448
+msgid "Saved."
+msgstr ""
+
+#: includes/Courses/Admin.php:463
+msgid "Room / course"
+msgstr ""
+
+#: includes/Courses/Admin.php:466
+msgid "Seat / location"
+msgstr ""
+
+#: includes/Courses/Admin.php:523
+msgid "Waiting for email verification"
+msgstr ""
+
+#: includes/Courses/Admin.php:523
+#: includes/Mail/EmailLayout.php:42
+msgid "Awaiting approval"
+msgstr ""
+
+#: includes/Courses/Admin.php:523
+msgid "Confirmed"
+msgstr ""
+
+#: includes/Courses/Admin.php:523
+msgid "Cancelled"
+msgstr ""
+
+#: includes/Courses/Admin.php:527
+msgid "Expired"
+msgstr ""
+
+#: includes/Courses/Admin.php:529
+msgid "Registration rejected"
+msgstr ""
+
+#: includes/Courses/Admin.php:529
+msgid "Cancelled by participant"
+msgstr ""
+
+#: includes/Courses/Admin.php:529
+msgid "Cancelled by staff"
+msgstr ""
+
+#: includes/Courses/Admin.php:529
+msgid "Email verification expired"
+msgstr ""
+
+#: includes/Courses/Admin.php:529
+#: includes/Courses/Admin.php:530
+#: includes/Courses/Frontend.php:453
+msgid "Course date cancelled"
+msgstr ""
+
+#: includes/Courses/Admin.php:539
+msgid "Approve registration"
+msgstr ""
+
+#: includes/Courses/Admin.php:542
+msgid "Resend email"
+msgstr ""
+
+#: includes/Courses/Admin.php:545
+msgid "Reject registration"
+msgstr ""
+
+#: includes/Courses/Admin.php:548
+msgid "Cancel registration"
+msgstr ""
+
+#: includes/Courses/Admin.php:559
+msgid "Cancel this registration and release its place?"
+msgstr ""
+
+#: includes/Courses/Admin.php:586
+#: includes/CPT/Bookings.php:113
+#: includes/Mail/RoomMessage.php:47
+#: includes/Main.php:286
+#: includes/Shortcodes/Availability.php:122
+#: includes/Shortcodes/Bookings.php:472
+#: includes/Shortcodes/Bookings.php:493
+#: includes/Shortcodes/Bookings.php:810
+msgid "Date"
+msgstr ""
+
+#: includes/Courses/Admin.php:587
+#: includes/CPT/Bookings.php:114
+#: includes/Mail/RoomMessage.php:48
+#: includes/Shortcodes/Bookings.php:473
+#: includes/Shortcodes/Bookings.php:498
+#: includes/Shortcodes/Bookings.php:812
+msgid "Time"
+msgstr ""
+
+#: includes/Courses/Admin.php:588
+#: includes/Courses/Notifications.php:279
+#: includes/Mail/RoomMessage.php:52
+msgid "Location"
+msgstr ""
+
+#: includes/Courses/Admin.php:591
+#: includes/Courses/Notifications.php:276
+#: includes/Courses/PostTypes.php:16
+msgid "Course"
+msgstr ""
+
+#: includes/Courses/Admin.php:598
+#: includes/Courses/Notifications.php:263
+msgid "Participant"
+msgstr ""
+
+#: includes/Courses/Admin.php:601
+#: includes/Metaboxes.php:211
+msgid "Notes"
+msgstr ""
+
+#: includes/Courses/Admin.php:602
+msgid "No notes provided."
+msgstr ""
+
+#: includes/Courses/Admin.php:604
+#: includes/CPT/Bookings.php:122
+#: includes/Metaboxes.php:147
+msgid "Status"
+msgstr ""
+
+#: includes/Courses/Admin.php:606
+msgid "Back to registrations for this date"
+msgstr ""
+
+#: includes/Courses/Admin.php:619
+msgid "View registration"
+msgstr ""
+
+#: includes/Courses/Admin.php:640
+msgid "Filter by course"
+msgstr ""
+
+#: includes/Courses/Admin.php:641
+msgid "All courses and rooms"
+msgstr ""
+
+#: includes/Courses/Admin.php:647
+msgid "Filter by course date"
+msgstr ""
+
+#: includes/Courses/Admin.php:648
+msgid "All course dates"
+msgstr ""
+
+#: includes/Courses/Admin.php:700
+msgid "Course booking is unavailable because the database does not support the required transactions. Existing room reservations remain available."
+msgstr ""
+
+#: includes/Courses/Admin/Input.php:31
+msgid "Enter a valid date and time in the website timezone."
+msgstr ""
+
+#: includes/Courses/Admin/Input.php:58
+msgid "Enter a valid participant limit and location."
+msgstr ""
+
+#: includes/Courses/BookingService.php:65
+msgid "Availability could not be read. Please try again."
+msgstr ""
+
+#: includes/Courses/BookingService.php:104
+#: includes/Courses/BookingService.php:120
+#: includes/Courses/BookingService.php:203
+msgid "You cannot edit this course."
+msgstr ""
+
+#: includes/Courses/BookingService.php:141
+msgid "Please provide your name, a valid email address and consent."
+msgstr ""
+
+#: includes/Courses/BookingService.php:167
+#: includes/Courses/BookingService.php:217
+msgid "You cannot manage this booking."
+msgstr ""
+
+#: includes/Courses/BookingService.php:185
+msgid "You cannot cancel this booking."
+msgstr ""
+
+#: includes/Courses/BookingService.php:258
+msgid "You cannot delete this booking."
+msgstr ""
+
+#: includes/Courses/BookingService.php:277
+msgid "You cannot delete this course date."
+msgstr ""
+
+#: includes/Courses/BookingService.php:292
+msgid "You cannot delete this course."
+msgstr ""
+
+#: includes/Courses/BookingService.php:308
+#: includes/Courses/BookingService.php:337
+msgid "This course date still has retained bookings."
+msgstr ""
+
+#: includes/Courses/BookingService.php:330
+msgid "This course still has retained bookings."
+msgstr ""
+
+#: includes/Courses/BookingService.php:363
+msgid "Course booking requires transactional database tables."
+msgstr ""
+
+#: includes/Courses/BookingService.php:366
+msgid "A course update is already running."
+msgstr ""
+
+#: includes/Courses/BookingService.php:409
+msgid "The booking could not be saved. Please try again."
+msgstr ""
+
+#: includes/Courses/BookingService.php:435
+msgid "A booking notification could not be sent. Please resend it."
+msgstr ""
+
+#: includes/Courses/BookingService.php:483
+msgid "Please check the course access and retention settings."
+msgstr ""
+
+#: includes/Courses/BookingService.php:487
+msgid "Please enter valid email domains, such as fau.de or uk-erlangen.de. Separate them with commas or line breaks. Do not enter full email addresses, URLs or wildcards."
+msgstr ""
+
+#: includes/Courses/BookingService.php:510
+msgid "Please enter valid course dates and capacity."
+msgstr ""
+
+#: includes/Courses/BookingService.php:516
+msgid "Please check the course times, registration period and capacity."
+msgstr ""
+
+#: includes/Courses/BookingService.php:527
+msgid "Please select a published room or enter a location."
+msgstr ""
+
+#: includes/Courses/BookingService.php:535
+msgid "Please enter the course location."
+msgstr ""
+
+#: includes/Courses/BookingService.php:540
+msgid "Capacity cannot be lower than the number of reserved places."
+msgstr ""
+
+#: includes/Courses/BookingService.php:544
+msgid "Dates and location cannot be changed while active bookings exist."
+msgstr ""
+
+#: includes/Courses/BookingService.php:583
+msgid "This request has already been used. Please reload the form."
+msgstr ""
+
+#: includes/Courses/BookingService.php:587
+#: includes/Courses/Frontend.php:221
+msgid "Please sign in using SSO to book this course."
+msgstr ""
+
+#: includes/Courses/BookingService.php:592
+msgid "This email domain is not allowed for this course. Please use an email address with one of the listed domains. If you signed in with SSO, the email address in your SSO profile is used."
+msgstr ""
+
+#: includes/Courses/BookingService.php:597
+msgid "This course date is fully booked."
+msgstr ""
+
+#: includes/Courses/BookingService.php:597
+msgid "Registration for this course date is closed."
+msgstr ""
+
+#: includes/Courses/BookingService.php:601
+msgid "An active booking already exists for this email address and course date."
+msgstr ""
+
+#: includes/Courses/BookingService.php:650
+msgid "This confirmation link is invalid."
+msgstr ""
+
+#: includes/Courses/BookingService.php:653
+msgid "This booking is no longer active. Please make a new booking."
+msgstr ""
+
+#: includes/Courses/BookingService.php:659
+msgid "This confirmation link has expired. Please make a new booking."
+msgstr ""
+
+#: includes/Courses/BookingService.php:688
+msgid "Only identity-verified bookings can be approved before the course begins."
+msgstr ""
+
+#: includes/Courses/BookingService.php:717
+msgid "This cancellation link is invalid."
+msgstr ""
+
+#: includes/Courses/BookingService.php:723
+#: includes/Courses/BookingService.php:742
+msgid "The cancellation deadline has passed."
+msgstr ""
+
+#: includes/Courses/BookingService.php:772
+msgid "The email confirmation period has expired."
+msgstr ""
+
+#: includes/Courses/BookingService.php:830
+msgid "This course booking is still within its retention period."
+msgstr ""
+
+#: includes/Courses/BookingService.php:848
+msgid "Course maintenance could not read the stored dates."
+msgstr ""
+
+#: includes/Courses/Frontend.php:60
+msgid "Display a course and its individually bookable dates."
+msgstr ""
+
+#: includes/Courses/Frontend.php:61
+msgid "Select a course"
+msgstr ""
+
+#: includes/Courses/Frontend.php:62
+msgid "Loading courses…"
+msgstr ""
+
+#: includes/Courses/Frontend.php:63
+msgid "Create a course under RSVP → Courses first."
+msgstr ""
+
+#: includes/Courses/Frontend.php:64
+msgid "The published page displays this course, its dates and the registration form."
+msgstr ""
+
+#: includes/Courses/Frontend.php:65
+msgid "Courses could not be loaded. Check your permissions and try again."
+msgstr ""
+
+#: includes/Courses/Frontend.php:66
+msgid "Draft"
+msgstr ""
+
+#: includes/Courses/Frontend.php:117
+msgid "You cannot manage courses."
+msgstr ""
+
+#: includes/Courses/Frontend.php:134
+msgid "Please reload the page before registering."
+msgstr ""
+
+#: includes/Courses/Frontend.php:149
+msgid "This request must originate from this website."
+msgstr ""
+
+#: includes/Courses/Frontend.php:215
+#: includes/Courses/Frontend.php:227
+msgid "Please check your registration details."
+msgstr ""
+
+#: includes/Courses/Frontend.php:222
+#: includes/Courses/Frontend.php:317
+msgid "SSO is currently unavailable. Please contact the course organizer."
+msgstr ""
+
+#: includes/Courses/Frontend.php:231
+msgid "Your SSO profile does not provide a valid email address. Please contact the course organizer."
+msgstr ""
+
+#: includes/Courses/Frontend.php:271
+msgid "This course is currently unavailable."
+msgstr ""
+
+#: includes/Courses/Frontend.php:304
+msgid "No upcoming course dates are currently available."
+msgstr ""
+
+#: includes/Courses/Frontend.php:306
+msgid "Each date is booked separately. One registration reserves one place."
+msgstr ""
+
+#. translators: %s: Comma-separated email domains, each prefixed with @.
+#: includes/Courses/Frontend.php:310
+#, php-format
+msgid "Registration is only possible with an email address ending in: %s. This also applies when signing in with SSO."
+msgstr ""
+
+#: includes/Courses/Frontend.php:315
+#: includes/Courses/Frontend.php:339
+msgid "Sign in with SSO"
+msgstr ""
+
+#: includes/Courses/Frontend.php:320
+msgid "You are signed in with SSO. Your verified profile will be used for this registration."
+msgstr ""
+
+#: includes/Courses/Frontend.php:324
+msgid "Choose a course date"
+msgstr ""
+
+#: includes/Courses/Frontend.php:337
+msgid "Your registration details"
+msgstr ""
+
+#: includes/Courses/Frontend.php:339
+msgid "or register with your email address below."
+msgstr ""
+
+#: includes/Courses/Frontend.php:341
+#: includes/Metaboxes.php:175
+#: includes/Shortcodes/Bookings.php:525
+#: includes/Shortcodes/Bookings.php:553
+msgid "First name"
+msgstr ""
+
+#: includes/Courses/Frontend.php:342
+#: includes/Metaboxes.php:164
+#: includes/Shortcodes/Bookings.php:524
+#: includes/Shortcodes/Bookings.php:544
+msgid "Last name"
+msgstr ""
+
+#: includes/Courses/Frontend.php:343
+#: includes/Courses/Notifications.php:264
+msgid "Email address"
+msgstr ""
+
+#: includes/Courses/Frontend.php:345
+msgid "After registering, you will receive an email with a confirmation link. Confirm your email address within 60 minutes. If the course starts sooner, the deadline is the course start time. We will hold your place until then."
+msgstr ""
+
+#: includes/Courses/Frontend.php:347
+msgid "I agree to the processing of my details for this course registration."
+msgstr ""
+
+#: includes/Courses/Frontend.php:347
+msgid "Privacy policy"
+msgstr ""
+
+#: includes/Courses/Frontend.php:349
+msgid "Participation is confirmed automatically once your identity has been verified."
+msgstr ""
+
+#: includes/Courses/Frontend.php:350
+msgid "The course organizer will review and confirm your registration."
+msgstr ""
+
+#: includes/Courses/Frontend.php:353
+#: includes/Courses/Frontend.php:530
+msgid "Register for this date"
+msgstr ""
+
+#: includes/Courses/Frontend.php:356
+msgid "Please enable JavaScript to use the course registration form."
+msgstr ""
+
+#: includes/Courses/Frontend.php:429
+msgid "Your place is reserved. Please confirm your email using the link we sent within 60 minutes and before the course starts."
+msgstr ""
+
+#: includes/Courses/Frontend.php:430
+msgid "Your registration has been received and is awaiting confirmation by the course organizer."
+msgstr ""
+
+#: includes/Courses/Frontend.php:431
+msgid "Your participation is confirmed. You will receive the details by email."
+msgstr ""
+
+#: includes/Courses/Frontend.php:432
+msgid "Your course registration has been cancelled."
+msgstr ""
+
+#: includes/Courses/Frontend.php:434
+msgid "Your registration has been updated."
+msgstr ""
+
+#: includes/Courses/Frontend.php:452
+msgid "Fully booked"
+msgstr ""
+
+#: includes/Courses/Frontend.php:452
+msgid "Registration closed"
+msgstr ""
+
+#: includes/Courses/Frontend.php:453
+#: includes/Courses/Frontend.php:457
+msgid "Currently unavailable"
+msgstr ""
+
+#: includes/Courses/Frontend.php:454
+msgid "Registration is currently unavailable."
+msgstr ""
+
+#: includes/Courses/Frontend.php:456
+#, php-format
+msgid "%d place available"
+msgid_plural "%d places available"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Courses/Frontend.php:478
+msgid "Course or date not found."
+msgstr ""
+
+#: includes/Courses/Frontend.php:530
+msgid "Registering…"
+msgstr ""
+
+#: includes/Courses/Frontend.php:531
+msgid "Your registration has been received."
+msgstr ""
+
+#: includes/Courses/Frontend.php:532
+msgid "The request could not be completed. Please try again; an existing registration will not be duplicated."
+msgstr ""
+
+#: includes/Courses/Frontend.php:533
+msgid "A previous registration may already have been saved. Enter the same details and submit again to retrieve its result."
+msgstr ""
+
+#: includes/Courses/Frontend.php:534
+msgid "Please choose an available course date."
+msgstr ""
+
+#: includes/Courses/Frontend.php:535
+msgid "The selected date is no longer available. Please choose another date."
+msgstr ""
+
+#: includes/Courses/Frontend.php:536
+msgid "Availability could not be refreshed. It will be checked again when you register."
+msgstr ""
+
+#: includes/Courses/Module.php:98
+#: includes/Courses/Module.php:99
+#: includes/Courses/PostTypes.php:15
+#: includes/Courses/PostTypes.php:17
+msgid "Courses"
+msgstr ""
+
+#: includes/Courses/Notifications.php:71
+msgid "The course notification is busy. Use Resend notification to try again."
+msgstr ""
+
+#: includes/Courses/Notifications.php:87
+msgid "The course notification could not be prepared. Use Resend notification to try again."
+msgstr ""
+
+#: includes/Courses/Notifications.php:179
+msgid "The participant email could not be sent. Use Resend notification to try again."
+msgstr ""
+
+#: includes/Courses/Notifications.php:194
+msgid "The organizer notification could not be sent. Use Resend notification to try again."
+msgstr ""
+
+#: includes/Courses/Notifications.php:221
+#, php-format
+msgid "[RSVP] Confirm your email address: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:222
+#, php-format
+msgid "Please confirm your email address by %s. Your place is reserved until that time; after the deadline you must register again."
+msgstr ""
+
+#: includes/Courses/Notifications.php:228
+#, php-format
+msgid "[RSVP] Awaiting approval: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:229
+msgid "Your email address has been verified. Your place is reserved while the organizers review your registration. You will receive another email when they confirm your participation."
+msgstr ""
+
+#: includes/Courses/Notifications.php:231
+#, php-format
+msgid "[RSVP] Participation confirmed: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:232
+msgid "Your participation is confirmed. The attached calendar file contains your course date."
+msgstr ""
+
+#: includes/Courses/Notifications.php:234
+#, php-format
+msgid "[RSVP] Course booking cancelled: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:245
+msgid "You may cancel your registration until the course begins."
+msgstr ""
+
+#: includes/Courses/Notifications.php:259
+#, php-format
+msgid "[RSVP] Registration cancelled: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:259
+#, php-format
+msgid "[RSVP] New course registration: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:261
+msgid "A verified course registration is awaiting your approval."
+msgstr ""
+
+#: includes/Courses/Notifications.php:261
+msgid "A course registration has been confirmed."
+msgstr ""
+
+#: includes/Courses/Notifications.php:263
+#, php-format
+msgid "Participant: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:264
+#, php-format
+msgid "Email address: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:266
+msgid "Manage booking"
+msgstr ""
+
+#: includes/Courses/Notifications.php:276
+#, php-format
+msgid "Course: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:277
+msgid "Starts"
+msgstr ""
+
+#: includes/Courses/Notifications.php:277
+#, php-format
+msgid "Starts: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:278
+msgid "Ends"
+msgstr ""
+
+#: includes/Courses/Notifications.php:278
+#, php-format
+msgid "Ends: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:279
+#, php-format
+msgid "Location: %s"
+msgstr ""
+
+#: includes/Courses/Notifications.php:312
+msgid "Your reservation expired because your email address was not confirmed in time. You can register again if places are still available."
+msgstr ""
+
+#: includes/Courses/Notifications.php:314
+msgid "The organizers could not approve your course registration. Your reserved place has been released."
+msgstr ""
+
+#: includes/Courses/Notifications.php:316
+msgid "The organizers have cancelled this course date. Your registration has therefore been cancelled."
+msgstr ""
+
+#: includes/Courses/Notifications.php:318
+msgid "Your course registration has been cancelled at your request."
+msgstr ""
+
+#: includes/Courses/Notifications.php:320
+msgid "Your course registration has been cancelled by the organizers."
+msgstr ""
+
+#: includes/Courses/PostTypes.php:18
+msgid "Add course"
+msgstr ""
+
+#: includes/Courses/PostTypes.php:19
+msgid "Edit course"
+msgstr ""
+
+#: includes/Courses/PostTypes.php:20
+msgid "New course"
+msgstr ""
+
+#: includes/Courses/PostTypes.php:21
+msgid "Search courses"
+msgstr ""
+
+#: includes/Courses/PostTypes.php:22
+msgid "No courses found."
+msgstr ""
+
+#: includes/Courses/PostTypes.php:32
+msgid "Course date"
+msgstr ""
+
+#: includes/Courses/Repository.php:90
+msgid "Course not found."
+msgstr ""
+
+#: includes/Courses/Repository.php:111
+msgid "Course date not found."
+msgstr ""
+
+#: includes/Courses/Repository.php:181
+msgid "Course booking not found."
+msgstr ""
+
+#: includes/CPT/Bookings.php:63
+msgctxt "Post type general name"
+msgid "Bookings"
+msgstr ""
+
+#: includes/CPT/Bookings.php:64
+msgctxt "Post type singular name"
+msgid "Booking"
+msgstr ""
+
+#: includes/CPT/Bookings.php:66
+msgctxt "Add New on Toolbar"
+msgid "Booking"
+msgstr ""
+
+#: includes/CPT/Bookings.php:67
+#: includes/CPT/Rooms.php:71
+#: includes/CPT/Seats.php:46
+msgid "Add New"
+msgstr ""
+
+#: includes/CPT/Bookings.php:68
+msgid "Add New Booking"
+msgstr ""
+
+#: includes/CPT/Bookings.php:69
+msgid "New Booking"
+msgstr ""
+
+#: includes/CPT/Bookings.php:70
+msgid "Edit Booking"
+msgstr ""
+
+#: includes/CPT/Bookings.php:71
+msgid "View Booking"
+msgstr ""
+
+#: includes/CPT/Bookings.php:72
+msgid "All Bookings"
+msgstr ""
+
+#: includes/CPT/Bookings.php:73
+msgid "Search Bookings"
+msgstr ""
+
+#: includes/CPT/Bookings.php:74
+msgid "No Bookings found."
+msgstr ""
+
+#: includes/CPT/Bookings.php:75
+msgid "No Bookings found in Trash."
+msgstr ""
+
+#: includes/CPT/Bookings.php:76
+msgctxt "The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4"
+msgid "Booking archives"
+msgstr ""
+
+#: includes/CPT/Bookings.php:77
+msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+msgid "Filter Bookings list"
+msgstr ""
+
+#: includes/CPT/Bookings.php:78
+msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+msgid "Bookings list navigation"
+msgstr ""
+
+#: includes/CPT/Bookings.php:79
+msgctxt "Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4"
+msgid "Bookings list"
+msgstr ""
+
+#: includes/CPT/Bookings.php:83
+#: includes/Main.php:73
+#: includes/templates/single-seat.php:209
+msgid "Booking"
+msgstr ""
+
+#: includes/CPT/Bookings.php:84
+msgid "Add and edit Booking informations"
+msgstr ""
+
+#: includes/CPT/Bookings.php:116
+#: includes/CPT/Seats.php:68
+#: includes/CPT/Seats.php:116
+#: includes/Functions.php:135
+#: includes/Functions.php:243
+#: includes/Mail/RoomMessage.php:55
+#: includes/Metaboxes.php:95
+#: includes/Printing/Printing.php:142
+#: includes/Shortcodes/Bookings.php:475
+#: includes/Shortcodes/Bookings.php:505
+#: includes/Shortcodes/Bookings.php:816
+msgid "Seat"
+msgstr ""
+
+#: includes/CPT/Bookings.php:120
+#: includes/Metaboxes.php:198
+#: includes/Tracking.php:162
+msgid "Phone"
+msgstr ""
+
+#: includes/CPT/Bookings.php:186
+msgid "Booked on"
+msgstr ""
+
+#: includes/CPT/Bookings.php:194
+#: includes/CPT/Bookings.php:216
+#: includes/Main.php:233
+msgctxt "Booking"
+msgid "Cancelled"
+msgstr ""
+
+#: includes/CPT/Bookings.php:197
+msgctxt "Booking"
+msgid "Booked"
+msgstr ""
+
+#: includes/CPT/Bookings.php:200
+#: includes/Main.php:234
+msgctxt "Booking"
+msgid "Confirmed"
+msgstr ""
+
+#: includes/CPT/Bookings.php:203
+#: includes/CPT/Bookings.php:259
+#: includes/CPT/Bookings.php:274
+msgctxt "Booking"
+msgid "Checked-In"
+msgstr ""
+
+#: includes/CPT/Bookings.php:206
+#: includes/CPT/Bookings.php:262
+#: includes/CPT/Bookings.php:276
+msgctxt "Booking"
+msgid "Checked-Out"
+msgstr ""
+
+#: includes/CPT/Bookings.php:240
+msgctxt "Booking"
+msgid "Check-In"
+msgstr ""
+
+#: includes/CPT/Bookings.php:247
+msgctxt "Booking"
+msgid "Check-Out"
+msgstr ""
+
+#: includes/CPT/Bookings.php:270
+msgctxt "Booking"
+msgid "Waiting for customer confirmation"
+msgstr ""
+
+#: includes/CPT/Bookings.php:283
+#: includes/Email.php:295
+msgctxt "Booking"
+msgid "Confirm"
+msgstr ""
+
+#: includes/CPT/Bookings.php:310
+msgid "Select timeslot"
+msgstr ""
+
+#: includes/CPT/Bookings.php:319
+msgid "No timeslots available for this seat/day."
+msgstr ""
+
+#: includes/CPT/Bookings.php:338
+msgid "Show all dates"
+msgstr ""
+
+#: includes/CPT/Bookings.php:339
+msgid "Show all time slots"
+msgstr ""
+
+#: includes/CPT/Bookings.php:340
+#: includes/CPT/Seats.php:148
+msgid "Show all rooms"
+msgstr ""
+
+#: includes/CPT/CPT.php:101
+#: includes/CPT/CPT.php:102
+#: includes/Shortcodes/Bookings.php:1503
+#: includes/templates/single-seat.php:40
+#: includes/Tools.php:190
+msgid "Equipment"
+msgstr ""
+
+#: includes/CPT/CPT.php:109
+#: includes/Functions.php:106
+msgid "Room occupancy for today"
+msgstr ""
+
+#: includes/CPT/CPT.php:110
+msgid "Room occupancy"
+msgstr ""
+
+#: includes/CPT/CPT.php:170
+msgctxt "admin page title"
+msgid "Room occupancy for today"
+msgstr ""
+
+#: includes/CPT/CPT.php:177
+msgid "Please select room"
+msgstr ""
+
+#: includes/CPT/Rooms.php:67
+msgctxt "Post type general name"
+msgid "Rooms"
+msgstr ""
+
+#: includes/CPT/Rooms.php:68
+msgctxt "Post type singular name"
+msgid "Room"
+msgstr ""
+
+#: includes/CPT/Rooms.php:69
+msgctxt "Admin Menu text"
+msgid "Rooms"
+msgstr ""
+
+#: includes/CPT/Rooms.php:70
+msgctxt "Add New on Toolbar"
+msgid "Room"
+msgstr ""
+
+#: includes/CPT/Rooms.php:72
+msgid "Add New Room"
+msgstr ""
+
+#: includes/CPT/Rooms.php:73
+msgid "New Room"
+msgstr ""
+
+#: includes/CPT/Rooms.php:74
+msgid "Edit Room"
+msgstr ""
+
+#: includes/CPT/Rooms.php:75
+msgid "View Room"
+msgstr ""
+
+#: includes/CPT/Rooms.php:76
+msgid "All Rooms"
+msgstr ""
+
+#: includes/CPT/Rooms.php:77
+msgid "Search Rooms"
+msgstr ""
+
+#: includes/CPT/Rooms.php:78
+msgid "No Rooms found."
+msgstr ""
+
+#: includes/CPT/Rooms.php:79
+msgid "No Rooms found in Trash."
+msgstr ""
+
+#: includes/CPT/Rooms.php:80
+msgctxt "Overrides the “Featured Image” phrase for this post type. Added in 4.3"
+msgid "Room Image"
+msgstr ""
+
+#: includes/CPT/Rooms.php:81
+msgctxt "Overrides the “Set featured image” phrase for this post type. Added in 4.3"
+msgid "Set room image"
+msgstr ""
+
+#: includes/CPT/Rooms.php:82
+msgctxt "Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
+msgid "Remove room image"
+msgstr ""
+
+#: includes/CPT/Rooms.php:83
+msgctxt "Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
+msgid "Use as Room image"
+msgstr ""
+
+#: includes/CPT/Rooms.php:84
+msgctxt "The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4"
+msgid "Room archives"
+msgstr ""
+
+#: includes/CPT/Rooms.php:85
+msgctxt "Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4"
+msgid "Insert into Room"
+msgstr ""
+
+#: includes/CPT/Rooms.php:86
+msgctxt "Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4"
+msgid "Uploaded to this Room"
+msgstr ""
+
+#: includes/CPT/Rooms.php:87
+msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+msgid "Filter Rooms list"
+msgstr ""
+
+#: includes/CPT/Rooms.php:88
+msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+msgid "Rooms list navigation"
+msgstr ""
+
+#: includes/CPT/Rooms.php:89
+msgctxt "Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4"
+msgid "Rooms list"
+msgstr ""
+
+#: includes/CPT/Rooms.php:94
+msgid "Add and edit room informations"
+msgstr ""
+
+#: includes/CPT/Seats.php:42
+msgctxt "Post type general name"
+msgid "Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:43
+msgctxt "Post type singular name"
+msgid "Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:44
+msgctxt "Admin Menu text"
+msgid "Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:45
+msgctxt "Add New on Toolbar"
+msgid "Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:47
+msgid "Add New Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:48
+msgid "New Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:49
+msgid "Edit Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:50
+msgid "View Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:51
+msgid "All Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:52
+msgid "Search Seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:53
+msgid "No Seats found."
+msgstr ""
+
+#: includes/CPT/Seats.php:54
+msgid "No Seats found in Trash."
+msgstr ""
+
+#: includes/CPT/Seats.php:55
+msgctxt "Overrides the “Featured Image” phrase for this post type. Added in 4.3"
+msgid "Seat Image"
+msgstr ""
+
+#: includes/CPT/Seats.php:56
+msgctxt "Overrides the “Set featured image” phrase for this post type. Added in 4.3"
+msgid "Set seat image"
+msgstr ""
+
+#: includes/CPT/Seats.php:57
+msgctxt "Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
+msgid "Remove seat image"
+msgstr ""
+
+#: includes/CPT/Seats.php:58
+msgctxt "Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
+msgid "Use as Seat image"
+msgstr ""
+
+#: includes/CPT/Seats.php:59
+msgctxt "The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4"
+msgid "Seat archives"
+msgstr ""
+
+#: includes/CPT/Seats.php:60
+msgctxt "Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4"
+msgid "Insert into Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:61
+msgctxt "Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4"
+msgid "Uploaded to this Seat"
+msgstr ""
+
+#: includes/CPT/Seats.php:62
+msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+msgid "Filter Seats list"
+msgstr ""
+
+#: includes/CPT/Seats.php:63
+msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+msgid "Seats list navigation"
+msgstr ""
+
+#: includes/CPT/Seats.php:64
+msgctxt "Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4"
+msgid "Seats list"
+msgstr ""
+
+#: includes/CPT/Seats.php:69
+msgid "Add and edit seat informations"
+msgstr ""
+
+#: includes/CPT/Seats.php:95
+msgctxt "taxonomy general name"
+msgid "Equipment"
+msgstr ""
+
+#: includes/CPT/Seats.php:96
+msgctxt "taxonomy singular name"
+msgid "Equipment"
+msgstr ""
+
+#: includes/Email.php:96
+#: includes/Email.php:124
+msgctxt "Mail Subject for room admin: new booking received"
+msgid "[RSVP] Confirm new booking"
+msgstr ""
+
+#: includes/Email.php:98
+#: includes/Email.php:126
+msgid "You received a new request for a booking."
+msgstr ""
+
+#: includes/Email.php:151
+msgctxt "Mail Subject for room admin: new booking received"
+msgid "[RSVP] New booking"
+msgstr ""
+
+#: includes/Email.php:153
+msgid "You received a new booking."
+msgstr ""
+
+#: includes/Email.php:159
+msgid "[RSVP] Booking cancelled"
+msgstr ""
+
+#: includes/Email.php:161
+msgid "A booking has been cancelled by the customer."
+msgstr ""
+
+#: includes/Email.php:188
+msgid "Seat checked out"
+msgstr ""
+
+#: includes/Email.php:190
+msgid "A customer has checked out from a seat:"
+msgstr ""
+
+#: includes/Email.php:284
+#: includes/Email.php:286
+msgid "Please confirm the customer's booking."
+msgstr ""
+
+#: includes/Email.php:290
+#: includes/Email.php:292
+msgid "Please confirm your booking now."
+msgstr ""
+
+#: includes/Email.php:312
+#: includes/Email.php:314
+msgid "Please cancel your booking in time if your plans change."
+msgstr ""
+
+#: includes/Email.php:327
+#: includes/templates/single-seat.php:300
+#: includes/templates/single-seat.php:369
+#: includes/templates/single-seat.php:372
+msgid "Check In"
+msgstr ""
+
+#: includes/Email.php:348
+#: includes/Email.php:350
+#, php-format
+msgid "Please check-in your booking on site until %s."
+msgstr ""
+
+#: includes/Email.php:353
+#: includes/Email.php:355
+msgid "Please check-in your booking on site."
+msgstr ""
+
+#: includes/Email.php:366
+#: includes/templates/single-seat.php:319
+msgid "Check Out"
+msgstr ""
+
+#: includes/Email.php:368
+#: includes/Email.php:370
+#: includes/templates/single-seat.php:141
+#: includes/templates/single-seat.php:186
+msgid "Please check out when you leave the site."
+msgstr ""
+
+#: includes/Email.php:398
+msgid "New confirmed booking"
+msgstr ""
+
+#: includes/Email.php:400
+msgid "There is a new confirmed booking for your room. Calendar file (.ics) attached."
+msgstr ""
+
+#: includes/Email.php:403
+#: includes/Email.php:408
+msgid "Booking has been cancelled"
+msgstr ""
+
+#: includes/Email.php:405
+msgid "A booking for your room has been cancelled by the administrator. Calendar file (.ics) attached."
+msgstr ""
+
+#: includes/Email.php:410
+msgid "A booking for your room has been cancelled by the customer. Calendar file (.ics) attached."
+msgstr ""
+
+#: includes/Functions.php:101
+#, php-format
+msgid "This room has no available seat within %u days."
+msgstr ""
+
+#: includes/Functions.php:112
+msgid "This room has no available seat for today."
+msgstr ""
+
+#: includes/Functions.php:112
+msgid "The next available seat is on"
+msgid_plural "The next available seats are on"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Functions.php:154
+#: includes/Functions.php:261
+msgid "This room has no seats for today."
+msgstr ""
+
+#: includes/Functions.php:352
+msgid "Links to display the current room occupancy"
+msgstr ""
+
+#: includes/Functions.php:352
+msgid "Normal website"
+msgstr ""
+
+#: includes/Functions.php:352
+msgid "Website for public displays"
+msgstr ""
+
+#: includes/ICS.php:84
+msgid "Generated"
+msgstr ""
+
+#: includes/Mail/EmailLayout.php:41
+#: includes/Mail/EmailLayout.php:285
+msgid "Confirmation required"
+msgstr ""
+
+#: includes/Mail/EmailLayout.php:44
+msgid "Checked in"
+msgstr ""
+
+#: includes/Mail/EmailLayout.php:46
+msgid "Checked out"
+msgstr ""
+
+#: includes/Mail/EmailLayout.php:47
+msgid "Booking update"
+msgstr ""
+
+#: includes/Mail/EmailLayout.php:235
+msgid "Privacy Policy"
+msgstr ""
+
+#: includes/Mail/EmailLayout.php:242
+msgid "Legal Notice"
+msgstr ""
+
+#: includes/Mail/EmailLayout.php:297
+msgid "Appointment update"
+msgstr ""
+
+#: includes/Main.php:231
+msgid "Do you want to cancel?"
+msgstr ""
+
+#: includes/Main.php:232
+msgid "Are you sure you want to permanently delete the selected bookings? This cannot be undone."
+msgstr ""
+
+#: includes/Main.php:240
+msgid "Please select a seat first."
+msgstr ""
+
+#: includes/Main.php:256
+#: includes/Tools.php:207
+msgid "Create Seats"
+msgstr ""
+
+#: includes/Main.php:283
+msgid "Schedule type"
+msgstr ""
+
+#: includes/Main.php:284
+msgid "Single date"
+msgstr ""
+
+#: includes/Main.php:285
+msgid "Weekly"
+msgstr ""
+
+#: includes/Main.php:287
+msgid "Bookable only on this date. Add another time slot for additional dates."
+msgstr ""
+
+#: includes/Main.php:288
+msgid "Repeats on the selected weekdays. Optionally limit the date range below."
+msgstr ""
+
+#: includes/Main.php:289
+msgid "Choose a date and time."
+msgstr ""
+
+#: includes/Main.php:290
+msgid "Choose weekdays and a time."
+msgstr ""
+
+#: includes/Main.php:291
+msgid "from"
+msgstr ""
+
+#: includes/Main.php:292
+msgid "until"
+msgstr ""
+
+#: includes/Main.php:293
+msgid "No date limit"
+msgstr ""
+
+#: includes/Main.php:294
+msgid "Bookings exist for this time slot. Its schedule type, weekdays and times are protected."
+msgstr ""
+
+#: includes/Main.php:295
+msgid "Please select a date for this time slot."
+msgstr ""
+
+#: includes/Main.php:296
+msgid "Please select at least one weekday."
+msgstr ""
+
+#: includes/Main.php:297
+msgid "Please enter a valid date."
+msgstr ""
+
+#: includes/Main.php:298
+msgid "The end date must not be before the start date."
+msgstr ""
+
+#: includes/Main.php:299
+msgid "Please enter start and end times in HH:MM format."
+msgstr ""
+
+#: includes/Main.php:300
+msgid "The end time must be after the start time on the same day."
+msgstr ""
+
+#: includes/Main.php:314
+msgid "Closed days calendar"
+msgstr ""
+
+#: includes/Main.php:315
+msgid "Select closed days in the calendar. Highlighted days are closed; click again to remove them."
+msgstr ""
+
+#: includes/Main.php:316
+#: includes/Shortcodes/Bookings.php:1362
+msgid "Previous month"
+msgstr ""
+
+#: includes/Main.php:317
+#: includes/Shortcodes/Bookings.php:1365
+msgid "Next month"
+msgstr ""
+
+#: includes/Main.php:318
+msgid "Current month"
+msgstr ""
+
+#: includes/Main.php:319
+msgid "Selected closed days"
+msgstr ""
+
+#: includes/Main.php:320
+msgid "No closed days selected."
+msgstr ""
+
+#. translators: %s: Localized calendar date.
+#: includes/Main.php:322
+#, php-format
+msgid "Remove closed day: %s"
+msgstr ""
+
+#: includes/Main.php:323
+msgid "Date list (YYYY-MM-DD)"
+msgstr ""
+
+#: includes/Main.php:324
+msgid "Some lines cannot be displayed in the calendar. Enter one valid date per line (YYYY-MM-DD), without spaces. Your text is retained."
+msgstr ""
+
+#: includes/Main.php:351
+msgid "Loading availability…"
+msgstr ""
+
+#: includes/Main.php:352
+msgid "Loading available times…"
+msgstr ""
+
+#: includes/Main.php:353
+msgid "Loading calendar month…"
+msgstr ""
+
+#: includes/Main.php:354
+msgid "The calendar month could not be loaded. Your selection is unchanged."
+msgstr ""
+
+#: includes/Main.php:355
+msgid "Availability updated."
+msgstr ""
+
+#: includes/Main.php:356
+msgid "Availability could not be loaded. Please try again."
+msgstr ""
+
+#: includes/Main.php:357
+#: includes/Shortcodes/Bookings.php:1519
+msgid "Select an available day in the calendar to see its times."
+msgstr ""
+
+#: includes/Main.php:358
+#: includes/Shortcodes/Bookings.php:1572
+msgid "Choose a day and time to see available seats."
+msgstr ""
+
+#: includes/Main.php:359
+msgid "Your selection"
+msgstr ""
+
+#: includes/Main.php:360
+msgid "Please complete your appointment selection first."
+msgstr ""
+
+#: includes/Metaboxes.php:85
+#: includes/Metaboxes.php:311
+#: includes/Metaboxes.php:589
+msgid "Details"
+msgstr ""
+
+#: includes/Metaboxes.php:98
+#: includes/Metaboxes.php:150
+#: includes/Metaboxes.php:603
+#: includes/Tools.php:140
+msgid "Please select"
+msgstr ""
+
+#: includes/Metaboxes.php:107
+msgid "Timeslot"
+msgstr ""
+
+#: includes/Metaboxes.php:123
+msgid "Click on the date input to select a date and a time slot."
+msgstr ""
+
+#: includes/Metaboxes.php:153
+msgctxt "Booking status in booking editor"
+msgid "Booked"
+msgstr ""
+
+#: includes/Metaboxes.php:154
+msgctxt "Booking status in booking editor"
+msgid "Confirmed by customer"
+msgstr ""
+
+#: includes/Metaboxes.php:155
+msgctxt "Booking status in booking editor"
+msgid "Confirmed"
+msgstr ""
+
+#: includes/Metaboxes.php:156
+msgctxt "Booking status in booking editor"
+msgid "Cancelled"
+msgstr ""
+
+#: includes/Metaboxes.php:157
+msgctxt "Booking status in booking editor"
+msgid "Checked In"
+msgstr ""
+
+#: includes/Metaboxes.php:158
+msgctxt "Booking status in booking editor"
+msgid "Checked Out"
+msgstr ""
+
+#: includes/Metaboxes.php:214
+msgid "This textarea contains the 'Additional Information' field content if this option is activated in the room settings. Internal notes can be added below."
+msgstr ""
+
+#: includes/Metaboxes.php:221
+msgid "Internal Notes"
+msgstr ""
+
+#: includes/Metaboxes.php:236
+msgid "Timeslots"
+msgstr ""
+
+#: includes/Metaboxes.php:248
+msgid "Add a time slot for each specific date or weekly schedule. Each time slot can be booked separately."
+msgstr ""
+
+#: includes/Metaboxes.php:250
+msgid "Time slot {#}"
+msgstr ""
+
+#: includes/Metaboxes.php:251
+msgid "Add time slot"
+msgstr ""
+
+#: includes/Metaboxes.php:252
+msgid "Remove time slot"
+msgstr ""
+
+#: includes/Metaboxes.php:260
+msgid "Week day"
+msgstr ""
+
+#: includes/Metaboxes.php:270
+msgid "Start time"
+msgstr ""
+
+#: includes/Metaboxes.php:279
+msgid "End time"
+msgstr ""
+
+#: includes/Metaboxes.php:288
+msgid "Valid from (optional)"
+msgstr ""
+
+#: includes/Metaboxes.php:295
+msgid "Valid until (optional)"
+msgstr ""
+
+#: includes/Metaboxes.php:302
+msgid "Days closed"
+msgstr ""
+
+#: includes/Metaboxes.php:303
+msgid "Enter days when this room is not available (format YYYY-MM-DD). One date per line. Will overwrite timeslots (e.g. Room is available every Monday, except 2020-09-21.)"
+msgstr ""
+
+#: includes/Metaboxes.php:323
+msgid "Booking and access"
+msgstr ""
+
+#: includes/Metaboxes.php:324
+msgid "Choose the booking mode, advance booking period and login requirements."
+msgstr ""
+
+#: includes/Metaboxes.php:328
+msgid "Booking mode"
+msgstr ""
+
+#: includes/Metaboxes.php:334
+msgid "Reservation with check-in"
+msgstr ""
+
+#: includes/Metaboxes.php:335
+msgid "Reservation without check-in"
+msgstr ""
+
+#: includes/Metaboxes.php:336
+#: includes/templates/single-seat.php:384
+msgid "Consultation"
+msgstr ""
+
+#: includes/Metaboxes.php:337
+msgid "Check-in and check-out only on site"
+msgstr ""
+
+#: includes/Metaboxes.php:349
+msgid "Available days in advance"
+msgstr ""
+
+#: includes/Metaboxes.php:350
+msgid "Number of days for which bookings are available in advance."
+msgstr ""
+
+#: includes/Metaboxes.php:362
+msgid "SSO is required"
+msgstr ""
+
+#: includes/Metaboxes.php:363
+msgid "If SSO is enabled, the customer must log in via SSO in order to use the booking system."
+msgstr ""
+
+#: includes/Metaboxes.php:371
+msgid "LDAP is required"
+msgstr ""
+
+#: includes/Metaboxes.php:372
+msgid "If LDAP is enabled, the customer must log in via LDAP in order to use the booking system."
+msgstr ""
+
+#: includes/Metaboxes.php:382
+msgid "Confirmation and emails"
+msgstr ""
+
+#: includes/Metaboxes.php:383
+msgid "Decide who confirms a booking and who receives a calendar copy."
+msgstr ""
+
+#: includes/Metaboxes.php:387
+msgid "Automatic confirmation"
+msgstr ""
+
+#: includes/Metaboxes.php:388
+msgid "Incoming bookings do <u>not</u> need to be confirmed by the booking managers."
+msgstr ""
+
+#: includes/Metaboxes.php:396
+msgid "Customer confirmation required"
+msgstr ""
+
+#: includes/Metaboxes.php:397
+msgid "The customer must confirm his reservation within one hour. Otherwise the system will cancel the booking."
+msgstr ""
+
+#: includes/Metaboxes.php:405
+msgid "Email address for calendar copies (optional)"
+msgstr ""
+
+#: includes/Metaboxes.php:406
+msgid "This address receives booking confirmations and cancellations with a calendar file (.ics). Leave empty if no additional copy is needed."
+msgstr ""
+
+#: includes/Metaboxes.php:415
+msgid "Check-in and check-out"
+msgstr ""
+
+#: includes/Metaboxes.php:416
+msgid "Manage attendance on site and notifications when someone checks out."
+msgstr ""
+
+#: includes/Metaboxes.php:421
+msgid "Check-in is required"
+msgstr ""
+
+#: includes/Metaboxes.php:422
+msgid "The customer must check-in their booking within a certain time from the start of the event. Otherwise the system will cancel the booking. The time allowed can be set just below in the \"Allowed Check-In Time\" section."
+msgstr ""
+
+#: includes/Metaboxes.php:432
+msgid "Allowed Check-In Time (minutes)"
+msgstr ""
+
+#: includes/Metaboxes.php:433
+#, php-format
+msgid "You can specify an allowed check-in time for this room. If \"Check-In required\" is checked, the system will cancel the booking after this time. Default is %s minutes."
+msgstr ""
+
+#: includes/Metaboxes.php:445
+msgid "Allow Instant Check-In"
+msgstr ""
+
+#: includes/Metaboxes.php:446
+msgid "Seats can be booked and checked-in in one step. This only works if automatic confirmation activated!"
+msgstr ""
+
+#: includes/Metaboxes.php:454
+msgid "Checkout notification"
+msgstr ""
+
+#: includes/Metaboxes.php:455
+msgid "Send an email to the booking manager when customer has checked out."
+msgstr ""
+
+#: includes/Metaboxes.php:465
+msgid "Booking form"
+msgstr ""
+
+#: includes/Metaboxes.php:466
+msgid "Configure the additional information participants can provide when booking."
+msgstr ""
+
+#: includes/Metaboxes.php:470
+msgid "Show notes/comment input in booking form"
+msgstr ""
+
+#: includes/Metaboxes.php:471
+msgid "If not checked, the comment text input will still be visible in the backend for booking admins for internal notes."
+msgstr ""
+
+#: includes/Metaboxes.php:478
+msgid "Comment input label"
+msgstr ""
+
+#: includes/Metaboxes.php:479
+msgid "Choose a label for the text input on the booking form. E.g. 'Additional information' or 'Main interests'"
+msgstr ""
+
+#: includes/Metaboxes.php:482
+msgid "Additional information"
+msgstr ""
+
+#: includes/Metaboxes.php:488
+msgid "Location and floor plan"
+msgstr ""
+
+#: includes/Metaboxes.php:489
+msgid "Provide the address and a floor plan to help participants find the room."
+msgstr ""
+
+#: includes/Metaboxes.php:493
+msgid "Street"
+msgstr ""
+
+#: includes/Metaboxes.php:499
+msgid "ZIP"
+msgstr ""
+
+#: includes/Metaboxes.php:505
+msgid "City"
+msgstr ""
+
+#: includes/Metaboxes.php:511
+msgid "Floor plan"
+msgstr ""
+
+#: includes/Metaboxes.php:537
+msgid "Public Displays"
+msgstr ""
+
+#: includes/Metaboxes.php:547
+msgid "Text"
+msgstr ""
+
+#: includes/Metaboxes.php:550
+msgid "This textarea contains the 'Additional Information' to show on top of occupancy grids shown on public displays only."
+msgstr ""
+
+#: includes/Metaboxes.php:663
+msgid "Time slot booked"
+msgstr ""
+
+#: includes/Printing/Printing.php:36
+#: includes/Printing/Printing.php:221
+msgid "Generate PDF"
+msgstr ""
+
+#: includes/Printing/Printing.php:63
+#: includes/Printing/Printing.php:71
+#: includes/Printing/Printing.php:271
+msgid "No seats found"
+msgstr ""
+
+#: includes/Printing/Printing.php:203
+msgid "Equipment:"
+msgstr ""
+
+#: includes/Printing/Printing.php:268
+#, php-format
+msgid "Generate PDF for %s seat"
+msgid_plural "Generate PDF for %s seats"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/RoomAvailability.php:35
+#: includes/Shortcodes/Availability.php:83
+msgid "No seats available."
+msgstr ""
+
+#: includes/RoomAvailability.php:50
+msgid "Search seats"
+msgstr ""
+
+#: includes/RoomAvailability.php:51
+msgid "Close seat selection"
+msgstr ""
+
+#: includes/RoomAvailability.php:52
+msgid "No seats match your search."
+msgstr ""
+
+#. translators: 1: Number of matching seats, 2: Total available seats.
+#: includes/RoomAvailability.php:54
+#, php-format
+msgid "%1$s of %2$s seats"
+msgstr ""
+
+#: includes/RoomAvailability.php:58
+msgid "Choose a date and book an available seat. Your booking details are entered in the next step."
+msgstr ""
+
+#. translators: %s: Number of available time slots within a month.
+#: includes/RoomAvailability.php:64
+#, php-format
+msgid "%s available time slot"
+msgid_plural "%s available time slots"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: Number of available seats for this time slot.
+#: includes/RoomAvailability.php:98
+#, php-format
+msgid "%s seat available"
+msgid_plural "%s seats available"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/RoomAvailability.php:103
+msgid "Choose a seat"
+msgstr ""
+
+#: includes/RoomAvailability.php:103
+msgid "Show seats"
+msgstr ""
+
+#. translators: %s: Public seat name.
+#: includes/RoomAvailability.php:115
+#, php-format
+msgid "Book seat %s"
+msgstr ""
+
+#: includes/Schedule.php:58
+msgid "Every five minutes"
+msgstr ""
+
+#: includes/Settings.php:320
+msgid "Reset all RSVP settings"
+msgstr ""
+
+#: includes/Shortcodes/Availability.php:50
+msgid "Date/Time"
+msgstr ""
+
+#: includes/Shortcodes/Availability.php:51
+#: includes/Shortcodes/Bookings.php:1389
+msgid "Seats available"
+msgstr ""
+
+#: includes/Shortcodes/Availability.php:68
+#: includes/Shortcodes/Availability.php:133
+msgid "Book this seat/timeslot now"
+msgstr ""
+
+#: includes/Shortcodes/Availability.php:102
+msgid "Please enter a valid seat slug or ID."
+msgstr ""
+
+#: includes/Shortcodes/Availability.php:118
+msgid "No timeslots available for this seat."
+msgstr ""
+
+#: includes/Shortcodes/Availability.php:123
+msgid "Available Time Slots"
+msgstr ""
+
+#: includes/Shortcodes/Availability.php:148
+msgid "Please specify a room ID in your Shortcode."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:141
+#: includes/Shortcodes/Shortcodes.php:54
+#: includes/templates/auth/single-auth.php:85
+msgid "Authentication Required"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:144
+msgid "Please login with your IdM username"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:149
+#: includes/Shortcodes/Shortcodes.php:45
+#: includes/templates/auth/single-auth.php:38
+msgid "Login denied"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:153
+#: includes/Shortcodes/Shortcodes.php:70
+msgid "Username:"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:155
+#: includes/Shortcodes/Shortcodes.php:71
+msgid "Password:"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:157
+#: includes/Shortcodes/Shortcodes.php:72
+msgid "Submit"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:160
+msgid "Authentication is currently unavailable. Please contact the website administrator."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:180
+#: includes/Shortcodes/Bookings.php:212
+#: includes/Shortcodes/Bookings.php:666
+#: includes/Shortcodes/Bookings.php:870
+msgid "Invalid or missing booking data."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:337
+msgid "Room specified in shortcode does not exist."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:370
+msgid "Checkin in room"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:371
+msgid "Reservations disabled. Please checkin at the seats in the room."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:384
+#: includes/templates/single-room.php:31
+msgid "Weekday"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:385
+#: includes/templates/single-room.php:32
+msgid "Time slots"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:403
+#: includes/Shortcodes/Bookings.php:417
+#: includes/templates/single-room.php:189
+#: includes/templates/single-room.php:206
+msgid "Schedule"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:408
+#: includes/templates/single-room.php:192
+msgid "Current Room Occupancy"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:453
+msgid "Book a seat at"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:464
+#: includes/Shortcodes/Bookings.php:740
+msgid "Timeslot not available."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:471
+msgid "Your booking"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:490
+msgid "Select date and time"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:491
+msgid "Choose a day, then a time that suits you."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:496
+#: includes/Shortcodes/Bookings.php:510
+msgid "Try again"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:515
+msgid "Your data"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:515
+msgid "Required"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:577
+msgid "Phone Number"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:621
+msgid "Submit booking"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:637
+msgid "SSO error"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:638
+msgid "Error retrieving your data from SSO. Please try again or contact the website administrator."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:665
+msgid "Booking data"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:680
+#: includes/Shortcodes/Bookings.php:697
+msgid "Save booking"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:681
+#: includes/Shortcodes/Bookings.php:698
+msgid "Error saving the booking."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:718
+msgid "Seat already booked"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:719
+msgid "<strong>Sorry! The seat you selected is no longer available.</strong><br>Please try again."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:720
+#: includes/Shortcodes/Bookings.php:742
+#, php-format
+msgid "<a href=\"%s\">Back to booking form &rarr;</a>"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:741
+msgid "<strong>The timeslot you selected lies in the past.</strong><br>Please try again."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:764
+msgid "Please select a room."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:770
+msgid "Continue booking"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:831
+#, php-format
+msgid "These data were also sent to your email address <strong>%s</strong>."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:834
+msgid "Your reservation has been submitted. Please confirm your booking!"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:835
+msgid "An email with the confirmation link and your booking information has been sent to your email address.<br><strong>Please note that unconfirmed bookings automatically expire after one hour.</strong>"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:837
+msgid "Your reservation has been submitted. Thank you for booking!"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:840
+msgid "Your reservation:"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:842
+msgid "Your reservation request:"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:845
+msgid "<strong>This seat has been reserved for you.</strong><br>You can cancel it at any time if you cannot keep the appointment. You can find information on this in your confirmation email."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:847
+msgid "<strong>Please note that this is only a reservation request.</strong><br>It only becomes binding as soon as we confirm your booking by email."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:850
+msgid "Please remember to <strong>check in</strong> to your seat when you arrive!"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:986
+msgid "DSGVO field is required."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:995
+msgid "The date or time of the booking is not valid."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1004
+msgid "The room does not exist."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1013
+msgid "Your last name is required."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1025
+msgid "Your name is required."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1037
+msgid "The email address is not valid."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1051
+msgid "Your phone number is not valid."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1389
+msgid "No available appointments"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1391
+msgid "Not bookable (outside booking period)"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1393
+#: includes/Shortcodes/Bookings.php:1414
+msgid "Today"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1412
+msgid "Available"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1413
+msgid "Selected"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1416
+msgid "No available appointments this month."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1538
+msgid "No times are available on this day. Please choose another day."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1545
+#, php-format
+msgid "%d available time slots. Scroll down to see more times."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1548
+msgid "Available time slots:"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1582
+#: includes/Shortcodes/Bookings.php:1583
+msgid "Select a seat"
+msgstr ""
+
+#: includes/Shortcodes/QR.php:46
+msgid "Please enter a valid seat slug or ID"
+msgstr ""
+
+#: includes/Shortcodes/QR.php:54
+msgid "Please specify a seat ID in your Shortcode."
+msgstr ""
+
+#: includes/Shortcodes/Shortcodes.php:39
+#: includes/templates/auth/single-auth.php:15
+msgid "Please login to the account you have used to book this seat."
+msgstr ""
+
+#: includes/Shortcodes/Shortcodes.php:51
+#: includes/templates/auth/single-auth.php:44
+#, php-format
+msgid "<a href=\"%s\">Please login with your IdM username</a>."
+msgstr ""
+
+#: includes/Shortcodes/Shortcodes.php:63
+#: includes/templates/auth/single-auth.php:98
+msgid "Oder"
+msgstr ""
+
+#: includes/Shortcodes/Shortcodes.php:67
+msgid "Please login with your UB-AD username and password:"
+msgstr ""
+
+#: includes/templates/auth/single-auth.php:102
+msgid "Please login with your UB-AD username"
+msgstr ""
+
+#: includes/templates/single-room.php:80
+msgid "No floorplan available."
+msgstr ""
+
+#: includes/templates/single-room.php:198
+#: includes/templates/single-room.php:215
+msgid "Availability"
+msgstr ""
+
+#: includes/templates/single-room.php:228
+msgid "Floor Plan"
+msgstr ""
+
+#: includes/templates/single-seat.php:129
+msgid "Consult"
+msgstr ""
+
+#: includes/templates/single-seat.php:130
+msgid "This time slot has been reserved for you."
+msgstr ""
+
+#: includes/templates/single-seat.php:131
+#: includes/templates/single-seat.php:140
+#, php-format
+msgid "Additional information has been sent to your email address <strong>%s</strong>."
+msgstr ""
+
+#: includes/templates/single-seat.php:154
+#: includes/templates/single-seat.php:182
+#: includes/templates/single-seat.php:316
+msgid "Check out"
+msgstr ""
+
+#: includes/templates/single-seat.php:166
+#: includes/templates/single-seat.php:228
+msgid "Room:"
+msgstr ""
+
+#: includes/templates/single-seat.php:210
+msgid "If you reserved this seat please refer to the message sent to your email address."
+msgstr ""
+
+#: includes/templates/single-seat.php:297
+msgid "Check in"
+msgstr ""
+
+#: includes/templates/single-seat.php:301
+msgid "This seat is currently reserved. If you have reserved this seat, please check in."
+msgstr ""
+
+#: includes/templates/single-seat.php:320
+msgid "This seat is currently reserved. If you have reserved this seat, please check out when you leave the site."
+msgstr ""
+
+#: includes/templates/single-seat.php:373
+msgid "This seat is free for instant check-in (booking and check-in in one step) for the current timeslot."
+msgstr ""
+
+#: includes/templates/single-seat.php:385
+msgid "Please reserve a time slot for a consultation."
+msgstr ""
+
+#: includes/templates/single-seat.php:387
+msgid "Availability information"
+msgstr ""
+
+#: includes/templates/single-seat.php:388
+msgid "This seat is for instant check-in only and cannot be reserved. These are the next available time slots:"
+msgstr ""
+
+#: includes/templates/single-seat.php:390
+msgid "Reservation"
+msgstr ""
+
+#: includes/templates/single-seat.php:391
+msgid "Please reserve a time slot for this seat"
+msgstr ""
+
+#: includes/Tools.php:24
+#: includes/Tools.php:45
+msgctxt "admin page title"
+msgid "Create Seats"
+msgstr ""
+
+#: includes/Tools.php:25
+msgctxt "admin menu entry title"
+msgid "RSVP Create Seats"
+msgstr ""
+
+#: includes/Tools.php:81
+msgctxt "part of the generated seat name"
+msgid "Row"
+msgstr ""
+
+#: includes/Tools.php:82
+msgctxt "part of the generated seat name"
+msgid "Seat"
+msgstr ""
+
+#: includes/Tools.php:121
+msgid "Done!"
+msgstr ""
+
+#: includes/Tools.php:123
+#, php-format
+msgid "%s new seat has been created."
+msgid_plural "%s new seats have been created."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Tools.php:154
+msgid "Number of Rows"
+msgstr ""
+
+#: includes/Tools.php:159
+msgid "Number of Seats per Row"
+msgstr ""
+
+#: includes/Tools.php:164
+msgid "Rows Numbering System"
+msgstr ""
+
+#: includes/Tools.php:165
+#: includes/Tools.php:179
+msgid "Numeric (1 - 999)"
+msgstr ""
+
+#: includes/Tools.php:166
+#: includes/Tools.php:180
+msgid "A-Z"
+msgstr ""
+
+#: includes/Tools.php:171
+msgid "Starting number"
+msgstr ""
+
+#: includes/Tools.php:171
+#: includes/Tools.php:184
+#: includes/Tools.php:190
+msgid "optional"
+msgstr ""
+
+#: includes/Tools.php:173
+msgid "Row numbers will start with 1 by default. You may enter a different starting number, e.g. 101."
+msgstr ""
+
+#: includes/Tools.php:178
+msgid "Seats Numbering System"
+msgstr ""
+
+#: includes/Tools.php:184
+msgid "Prefix"
+msgstr ""
+
+#: includes/Tools.php:186
+msgid "Seat names will look like \"15A\" or \"C7\" where the first element indicates the row and the second indicates the seat. <br />If the same numbering system ist used for rows and seats, labels will be added automatically: \"Row 20 - Seat 3\".<br />If a name prefix is given, it will be added before the row, e.g. \"1st floor 15A\""
+msgstr ""
+
+#: includes/Tools.php:203
+msgid "Preselect equipment that will be available on all seats. You can modify the equipment later by editing the seats individually or by bulk editing several seats in the seats table."
+msgstr ""
+
+#: includes/Tracking.php:85
+#: includes/Tracking.php:97
+#: includes/Tracking.php:117
+#: includes/Tracking.php:176
+msgctxt "admin page title"
+msgid "Contact tracking"
+msgstr ""
+
+#: includes/Tracking.php:86
+#: includes/Tracking.php:98
+msgctxt "admin menu entry title"
+msgid "RSVP Contact tracking"
+msgstr ""
+
+#: includes/Tracking.php:133
+msgid "Guests found!"
+msgstr ""
+
+#: includes/Tracking.php:134
+msgid "Download CSV"
+msgstr ""
+
+#: includes/Tracking.php:138
+msgid "No guest found."
+msgstr ""
+
+#: includes/Tracking.php:148
+msgid "Search date"
+msgstr ""
+
+#: includes/Tracking.php:153
+msgid "days"
+msgstr ""
+
+#: includes/Tracking.php:167
+msgid "Search"
+msgstr ""
+
+#: includes/Users.php:82
+msgid "Booking Agent"
+msgstr ""
+
+#. translators: 1: Server WordPress version number, 2: Required WordPress version number.
+#: rrze-rsvp.php:106
+#, php-format
+msgid "The server is running WordPress version %1$s. The Plugin requires at least WordPress version %2$s."
+msgstr ""
+
+#. translators: 1: Server PHP version number, 2: Required PHP version number.
+#: rrze-rsvp.php:114
+#, php-format
+msgid "The server is running PHP version %1$s. The Plugin requires at least PHP version %2$s."
+msgstr ""
+
+#. translators: 1: The plugin name, 2: The error string.
+#: rrze-rsvp.php:153
+#, php-format
+msgid "Plugins: %1$s: %2$s"
+msgstr ""
+
+#: blocks/course-booking/block.json
+msgctxt "block title"
+msgid "Course booking"
+msgstr ""
+
+#: blocks/course-booking/block.json
+msgctxt "block description"
+msgid "Display a course and its individually bookable dates."
+msgstr ""
+
+#: src/blocks/rsvp/block.json
+msgctxt "block title"
+msgid "RSVP"
+msgstr ""
+
+#: src/blocks/rsvp/block.json
+msgctxt "block description"
+msgid "Embed course registrations, consultation appointments or seat bookings."
+msgstr ""
+
+#: src/blocks/rsvp/block.json
+msgctxt "block keyword"
+msgid "booking"
+msgstr ""
+
+#: src/blocks/rsvp/block.json
+msgctxt "block keyword"
+msgid "course"
+msgstr ""
+
+#: src/blocks/rsvp/block.json
+msgctxt "block keyword"
+msgid "room"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:16
+msgid "RSVP"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:22
+msgid "Pending review"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:23
+msgid "Scheduled"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:24
+msgid "Private"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:31
+msgid "Select a consultation room"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:31
+msgid "Select a room"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:37
+msgid "What would you like visitors to book?"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:38
+msgid "Choose a booking type, then select an existing offer."
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:87
+msgid "Search offers"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:88
+#, javascript-format
+msgid "Search results for “%s”"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:91
+msgid "Loading offers…"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:96
+msgid "No offers match your search."
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:97
+msgid "No matching offers are available. Create the course or room in RSVP first, or ask your administrator for access."
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:100
+msgid "Previous page"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:101
+#, javascript-format
+msgid "Page %d"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:102
+msgid "Next page"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:141
+msgid "Booking type"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:146 src/blocks/rsvp/edit.tsx:165
+msgid "Edit offer (opens in a new tab)"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:148
+msgid "Dates, capacity and booking rules are managed on the selected offer."
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:152 src/blocks/rsvp/edit.tsx:162
+msgid "Change offer"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:153
+msgid "Change booking type"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:159
+msgid "Keep current selection"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:163
+msgid "Refresh preview"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:168
+msgid "Loading preview…"
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:170
+msgid "The saved selection is kept. Retry or choose another offer."
+msgstr ""
+
+#: src/blocks/rsvp/edit.tsx:175
+msgid "This offer is not published. Visitors can book it once it has been published."
+msgstr ""
+
+#: src/blocks/rsvp/preview.tsx:7
+msgid "Preview — bookings are made on the published page"
+msgstr ""
+
+#: src/blocks/rsvp/preview.tsx:18
+msgid "Currently not bookable"
+msgstr ""
+
+#: src/blocks/rsvp/preview.tsx:20
+msgid "Further dates appear on the published page."
+msgstr ""
+
+#: src/blocks/rsvp/preview.tsx:27
+msgid "Not available"
+msgstr ""
+
+#: src/blocks/rsvp/preview.tsx:35
+msgid "The seat selection follows after choosing a time."
+msgstr ""
+
+#: src/blocks/rsvp/use-offers.ts:9
+msgid "Offers could not be loaded. Please try again."
+msgstr ""
+
+#: src/blocks/rsvp/variations.ts:7
+msgid "Course registration"
+msgstr ""
+
+#: src/blocks/rsvp/variations.ts:8
+msgid "Register for individual dates of an existing course."
+msgstr ""
+
+#: src/blocks/rsvp/variations.ts:10
+msgid "Consultation appointment"
+msgstr ""
+
+#: src/blocks/rsvp/variations.ts:11
+msgid "Book a consultation time without selecting a seat."
+msgstr ""
+
+#: src/blocks/rsvp/variations.ts:13
+msgid "Seat booking"
+msgstr ""
+
+#: src/blocks/rsvp/variations.ts:14
+msgid "Reserve a seat in a room for a selected time."
+msgstr ""

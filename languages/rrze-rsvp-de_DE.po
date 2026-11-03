@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: rrze-rsvp\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rrze-rsvp\n"
 "POT-Creation-Date: 2022-07-06T14:33:41+00:00\n"
-"PO-Revision-Date: 2026-06-23 00:00+0200\n"
+"PO-Revision-Date: 2026-11-03 12:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -3951,3 +3951,218 @@ msgstr "Ich möchte alle RSVP-Einstellungen dieser Website auf die Standardwerte
 #: includes/Settings.php
 msgid "Reset all RSVP settings"
 msgstr "Alle RSVP-Einstellungen zurücksetzen"
+
+#: includes/Blocks/BookingBlock.php
+msgid "RRZE"
+msgstr "RRZE"
+
+#: includes/Blocks/BookingBlock.php
+msgid "This offer is currently unavailable."
+msgstr "Dieses Angebot ist derzeit nicht verfügbar."
+
+#: includes/Blocks/Context.php includes/Shortcodes/Bookings.php
+msgid "This booking form has expired or changed. Please reload the page."
+msgstr "Dieses Buchungsformular ist abgelaufen oder wurde geändert. Bitte laden Sie die Seite neu."
+
+#: includes/Blocks/Editor.php
+msgid "You do not have permission to select these offers."
+msgstr "Sie haben keine Berechtigung, diese Angebote auszuwählen."
+
+#: includes/Blocks/Editor.php
+msgid "This offer is unavailable or you cannot edit it."
+msgstr "Dieses Angebot ist nicht verfügbar oder Sie haben keine Berechtigung, es zu bearbeiten."
+
+#: includes/Blocks/Editor.php
+msgid "This offer no longer matches the selected booking type. Please select another offer."
+msgstr "Dieses Angebot passt nicht mehr zur gewählten Buchungsart. Bitte wählen Sie ein anderes Angebot."
+
+#: includes/Blocks/Editor.php
+msgid "The preview could not be loaded. Please try again."
+msgstr "Die Vorschau konnte nicht geladen werden. Bitte versuchen Sie es erneut."
+
+#: includes/Shortcodes/Bookings.php
+msgid "Please login with your IdM username"
+msgstr "Bitte melden Sie sich mit Ihrer IdM-Kennung an"
+
+#: includes/Shortcodes/Bookings.php
+msgid "Authentication is currently unavailable. Please contact the website administrator."
+msgstr "Die Anmeldung ist derzeit nicht möglich. Bitte wenden Sie sich an die Administration der Website."
+
+#: src/blocks/rsvp/edit.tsx
+msgid "RSVP"
+msgstr "RSVP"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Pending review"
+msgstr "Ausstehende Überprüfung"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Scheduled"
+msgstr "Geplant"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Private"
+msgstr "Privat"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Select a consultation room"
+msgstr "Raum für die Sprechstunde auswählen"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Select a room"
+msgstr "Raum auswählen"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "What would you like visitors to book?"
+msgstr "Was sollen Besucherinnen und Besucher buchen können?"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Choose a booking type, then select an existing offer."
+msgstr "Wählen Sie eine Buchungsart und anschließend ein vorhandenes Angebot."
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Search offers"
+msgstr "Angebote suchen"
+
+#: src/blocks/rsvp/edit.tsx
+#, javascript-format
+msgid "Search results for “%s”"
+msgstr "Suchergebnisse für „%s“"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Loading offers…"
+msgstr "Angebote werden geladen …"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "No offers match your search."
+msgstr "Keine Angebote passen zu Ihrer Suche."
+
+#: src/blocks/rsvp/edit.tsx
+msgid "No matching offers are available. Create the course or room in RSVP first, or ask your administrator for access."
+msgstr "Es sind keine passenden Angebote verfügbar. Legen Sie zuerst einen Kurs oder Raum in RSVP an oder bitten Sie Ihre Administration um Zugriff."
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Previous page"
+msgstr "Vorherige Seite"
+
+#: src/blocks/rsvp/edit.tsx
+#, javascript-format
+msgid "Page %d"
+msgstr "Seite %d"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Next page"
+msgstr "Nächste Seite"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Booking type"
+msgstr "Buchungsart"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Edit offer (opens in a new tab)"
+msgstr "Angebot bearbeiten (öffnet einen neuen Tab)"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Dates, capacity and booking rules are managed on the selected offer."
+msgstr "Termine, Kapazität und Buchungsregeln verwalten Sie beim ausgewählten Angebot."
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Change offer"
+msgstr "Angebot ändern"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Change booking type"
+msgstr "Buchungsart ändern"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Keep current selection"
+msgstr "Aktuelle Auswahl behalten"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Refresh preview"
+msgstr "Vorschau aktualisieren"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "Loading preview…"
+msgstr "Vorschau wird geladen …"
+
+#: src/blocks/rsvp/edit.tsx
+msgid "The saved selection is kept. Retry or choose another offer."
+msgstr "Ihre gespeicherte Auswahl bleibt erhalten. Versuchen Sie es erneut oder wählen Sie ein anderes Angebot."
+
+#: src/blocks/rsvp/edit.tsx
+msgid "This offer is not published. Visitors can book it once it has been published."
+msgstr "Dieses Angebot ist noch nicht veröffentlicht. Nach der Veröffentlichung können Besucherinnen und Besucher es buchen."
+
+#: src/blocks/rsvp/preview.tsx
+msgid "Preview — bookings are made on the published page"
+msgstr "Vorschau – Buchungen sind auf der veröffentlichten Seite möglich"
+
+#: src/blocks/rsvp/preview.tsx
+msgid "Currently not bookable"
+msgstr "Derzeit nicht buchbar"
+
+#: src/blocks/rsvp/preview.tsx
+msgid "Further dates appear on the published page."
+msgstr "Weitere Termine werden auf der veröffentlichten Seite angezeigt."
+
+#: src/blocks/rsvp/preview.tsx
+msgid "Not available"
+msgstr "Nicht verfügbar"
+
+#: src/blocks/rsvp/preview.tsx
+msgid "The seat selection follows after choosing a time."
+msgstr "Die Platzauswahl folgt nach der Auswahl einer Uhrzeit."
+
+#: src/blocks/rsvp/use-offers.ts
+msgid "Offers could not be loaded. Please try again."
+msgstr "Die Angebote konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+
+#: src/blocks/rsvp/variations.ts
+msgid "Course registration"
+msgstr "Kursanmeldung"
+
+#: src/blocks/rsvp/variations.ts
+msgid "Register for individual dates of an existing course."
+msgstr "Anmeldungen zu einzelnen Terminen eines vorhandenen Kurses ermöglichen."
+
+#: src/blocks/rsvp/variations.ts
+msgid "Consultation appointment"
+msgstr "Sprechstundentermin"
+
+#: src/blocks/rsvp/variations.ts
+msgid "Book a consultation time without selecting a seat."
+msgstr "Termine für eine Sprechstunde ohne Platzauswahl anbieten."
+
+#: src/blocks/rsvp/variations.ts
+msgid "Seat booking"
+msgstr "Platzbuchung"
+
+#: src/blocks/rsvp/variations.ts
+msgid "Reserve a seat in a room for a selected time."
+msgstr "Plätze in einem Raum für eine gewählte Zeit zur Buchung anbieten."
+
+#: src/blocks/rsvp/block.json
+msgctxt "block title"
+msgid "RSVP"
+msgstr "RSVP"
+
+#: src/blocks/rsvp/block.json
+msgctxt "block description"
+msgid "Embed course registrations, consultation appointments or seat bookings."
+msgstr "Kursanmeldungen, Sprechstundentermine oder Platzbuchungen einbinden."
+
+#: src/blocks/rsvp/block.json
+msgctxt "block keyword"
+msgid "booking"
+msgstr "Buchung"
+
+#: src/blocks/rsvp/block.json
+msgctxt "block keyword"
+msgid "course"
+msgstr "Kurs"
+
+#: src/blocks/rsvp/block.json
+msgctxt "block keyword"
+msgid "room"
+msgstr "Raum"

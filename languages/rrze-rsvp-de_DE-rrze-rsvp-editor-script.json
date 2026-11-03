@@ -1,0 +1,178 @@
+{
+  "translation-revision-date": "2026-11-03 12:50+0100",
+  "generator": "RRZE-RSVP block translation builder",
+  "domain": "rrze-rsvp",
+  "source": "build/blocks/rsvp/index.js",
+  "locale_data": {
+    "messages": {
+      "": {
+        "domain": "rrze-rsvp",
+        "lang": "de_DE",
+        "plural-forms": "nplurals=2; plural=n != 1;"
+      },
+      "RSVP": [
+        "RSVP"
+      ],
+      "Draft": [
+        "Entwurf"
+      ],
+      "Pending review": [
+        "Ausstehende Überprüfung"
+      ],
+      "Scheduled": [
+        "Geplant"
+      ],
+      "Private": [
+        "Privat"
+      ],
+      "Select a course": [
+        "Kurs auswählen"
+      ],
+      "Select a consultation room": [
+        "Raum für die Sprechstunde auswählen"
+      ],
+      "Select a room": [
+        "Raum auswählen"
+      ],
+      "What would you like visitors to book?": [
+        "Was sollen Besucherinnen und Besucher buchen können?"
+      ],
+      "Choose a booking type, then select an existing offer.": [
+        "Wählen Sie eine Buchungsart und anschließend ein vorhandenes Angebot."
+      ],
+      "Search offers": [
+        "Angebote suchen"
+      ],
+      "Search results for “%s”": [
+        "Suchergebnisse für „%s“"
+      ],
+      "Loading offers…": [
+        "Angebote werden geladen …"
+      ],
+      "Try again": [
+        "Erneut versuchen"
+      ],
+      "No offers match your search.": [
+        "Keine Angebote passen zu Ihrer Suche."
+      ],
+      "No matching offers are available. Create the course or room in RSVP first, or ask your administrator for access.": [
+        "Es sind keine passenden Angebote verfügbar. Legen Sie zuerst einen Kurs oder Raum in RSVP an oder bitten Sie Ihre Administration um Zugriff."
+      ],
+      "Previous page": [
+        "Vorherige Seite"
+      ],
+      "Page %d": [
+        "Seite %d"
+      ],
+      "Next page": [
+        "Nächste Seite"
+      ],
+      "Booking": [
+        "Buchung"
+      ],
+      "Booking type": [
+        "Buchungsart"
+      ],
+      "Edit offer (opens in a new tab)": [
+        "Angebot bearbeiten (öffnet einen neuen Tab)"
+      ],
+      "Dates, capacity and booking rules are managed on the selected offer.": [
+        "Termine, Kapazität und Buchungsregeln verwalten Sie beim ausgewählten Angebot."
+      ],
+      "Change offer": [
+        "Angebot ändern"
+      ],
+      "Change booking type": [
+        "Buchungsart ändern"
+      ],
+      "Keep current selection": [
+        "Aktuelle Auswahl behalten"
+      ],
+      "Refresh preview": [
+        "Vorschau aktualisieren"
+      ],
+      "Loading preview…": [
+        "Vorschau wird geladen …"
+      ],
+      "The saved selection is kept. Retry or choose another offer.": [
+        "Ihre gespeicherte Auswahl bleibt erhalten. Versuchen Sie es erneut oder wählen Sie ein anderes Angebot."
+      ],
+      "This offer is not published. Visitors can book it once it has been published.": [
+        "Dieses Angebot ist noch nicht veröffentlicht. Nach der Veröffentlichung können Besucherinnen und Besucher es buchen."
+      ],
+      "Preview — bookings are made on the published page": [
+        "Vorschau – Buchungen sind auf der veröffentlichten Seite möglich"
+      ],
+      "Choose a course date": [
+        "Kurstermin auswählen"
+      ],
+      "No upcoming course dates are currently available.": [
+        "Derzeit sind keine zukünftigen Kurstermine verfügbar."
+      ],
+      "%d place available": [
+        "%d Platz verfügbar",
+        "%d Plätze verfügbar"
+      ],
+      "Currently not bookable": [
+        "Derzeit nicht buchbar"
+      ],
+      "Further dates appear on the published page.": [
+        "Weitere Termine werden auf der veröffentlichten Seite angezeigt."
+      ],
+      "Date": [
+        "Datum"
+      ],
+      "Available": [
+        "Verfügbar"
+      ],
+      "Not available": [
+        "Nicht verfügbar"
+      ],
+      "Time": [
+        "Zeit"
+      ],
+      "No available appointments this month.": [
+        "In diesem Monat sind keine Termine frei."
+      ],
+      "The seat selection follows after choosing a time.": [
+        "Die Platzauswahl folgt nach der Auswahl einer Uhrzeit."
+      ],
+      "Offers could not be loaded. Please try again.": [
+        "Die Angebote konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+      ],
+      "Course registration": [
+        "Kursanmeldung"
+      ],
+      "Register for individual dates of an existing course.": [
+        "Anmeldungen zu einzelnen Terminen eines vorhandenen Kurses ermöglichen."
+      ],
+      "Consultation appointment": [
+        "Sprechstundentermin"
+      ],
+      "Book a consultation time without selecting a seat.": [
+        "Termine für eine Sprechstunde ohne Platzauswahl anbieten."
+      ],
+      "Seat booking": [
+        "Platzbuchung"
+      ],
+      "Reserve a seat in a room for a selected time.": [
+        "Plätze in einem Raum für eine gewählte Zeit zur Buchung anbieten."
+      ],
+      "block title\u0004RSVP": [
+        "RSVP"
+      ],
+      "block description\u0004Embed course registrations, consultation appointments or seat bookings.": [
+        "Kursanmeldungen, Sprechstundentermine oder Platzbuchungen einbinden."
+      ],
+      "block keyword\u0004booking": [
+        "Buchung"
+      ],
+      "block keyword\u0004course": [
+        "Kurs"
+      ],
+      "block keyword\u0004room": [
+        "Raum"
+      ]
+    }
+  }
+}

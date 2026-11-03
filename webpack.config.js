@@ -32,8 +32,8 @@ module.exports = (env, argv) => {
         output: {
             path: path.resolve(__dirname, "build"),
             filename: "[name].js",
-            // Email assets are owned by Maizzle, including during watch builds.
-            clean: { keep: /^email\// },
+            // Maizzle and WordPress Scripts own their subdirectories, including during watch builds.
+            clean: { keep: /^(email|blocks)\// },
         },
         optimization: {
             minimizer: [

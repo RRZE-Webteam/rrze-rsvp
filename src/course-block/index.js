@@ -85,7 +85,7 @@ window.wp.blocks.registerBlockType('rrze-rsvp/course-booking', {
     category: 'widgets',
     icon: 'calendar-alt',
     attributes: { courseId: { type: 'integer', default: 0 } },
-    supports: { html: false },
+    supports: { html: false, inserter: false },
     edit: CourseEditor,
     save,
 });

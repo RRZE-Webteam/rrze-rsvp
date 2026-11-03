@@ -1,6 +1,6 @@
 // Scope the complete component so theme table, label and pseudo-element rules
 // cannot change its alignment. Form fields outside the picker retain theme styles.
-.rrze-rsvp form#rsvp_by_room fieldset.rsvp-booking-picker {
+.rrze-rsvp form.rsvp-booking-form fieldset.rsvp-booking-picker {
     --picker-ink: #16345b;
     --picker-muted: #526176;
     --picker-border: #d6dfe8;
