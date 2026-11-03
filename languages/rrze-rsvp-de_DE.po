@@ -3635,3 +3635,159 @@ msgstr "Beginn"
 
 msgid "Ends"
 msgstr "Ende"
+
+#: config/config.php
+msgid "Configure availability on room pages and the default check-in deadline. Booking periods and other rules are configured for each room."
+msgstr "Hier legen Sie die Verfügbarkeitsanzeige auf Raumseiten und die Standardfrist für den Check-in fest. Buchungszeiträume und weitere Regeln stellen Sie im jeweiligen Raum ein."
+
+#: config/config.php
+msgid "Availability on room pages"
+msgstr "Verfügbarkeit auf Raumseiten"
+
+#: config/config.php
+msgid "Choose whether public room pages show available times and seats with links to the booking form. This does not affect the booking calendar embedded with a shortcode."
+msgstr "Legt fest, ob freie Termine und Plätze auf den öffentlichen Raumseiten angezeigt und mit dem Buchungsformular verlinkt werden. Der per Shortcode eingebundene Buchungskalender bleibt davon unabhängig."
+
+#: config/config.php
+msgid "Show available times with booking links"
+msgstr "Freie Termine mit Buchungslinks anzeigen"
+
+#: config/config.php
+msgid "Show available times without booking links"
+msgstr "Freie Termine ohne Buchungslinks anzeigen"
+
+#: config/config.php
+msgid "Hide the availability list"
+msgstr "Verfügbarkeitsliste ausblenden"
+
+#: config/config.php
+msgid "Check-in deadline (minutes)"
+msgstr "Check-in-Frist (Minuten)"
+
+#: config/config.php
+msgid "Default time allowed for check-in, starting when the booking begins. For bookings made after the start time, it starts when the booking is made. If check-in is required, bookings without a check-in are cancelled after this deadline. You can set a different deadline for each room."
+msgstr "Standardfrist für den Check-in ab Terminbeginn. Bei späteren Buchungen läuft die Frist ab dem Buchungszeitpunkt. Ist der Check-in verpflichtend, werden nicht eingecheckte Buchungen nach Ablauf automatisch storniert. Im jeweiligen Raum können Sie eine andere Frist festlegen."
+
+#: config/config.php
+msgid "Requests for booking data"
+msgstr "Anfragen zu Buchungsdaten"
+
+#: config/config.php
+msgid "Exports of booking data are managed centrally in this network. Contact the network administration and specify the room and time period you need."
+msgstr "Der Export von Buchungsdaten wird in diesem Netzwerk zentral verwaltet. Wenden Sie sich an die Netzwerkadministration und nennen Sie den benötigten Raum und Zeitraum."
+
+#: config/config.php
+msgid "Notice about central data exports"
+msgstr "Hinweis zum zentralen Datenexport"
+
+#: config/config.php
+msgid "Internal text on the contact-tracking information page when data exports are managed by the network extension. Only network administrators can edit this text."
+msgstr "Interner Text auf der Informationsseite zur Kontaktnachverfolgung, wenn Datenexporte über die Netzwerkerweiterung verwaltet werden. Nur Netzwerkadministratoren können diesen Text bearbeiten."
+
+#: config/config.php
+msgid "Sender and notification settings apply to room and course bookings. The text templates below apply to room bookings; course emails use their own texts."
+msgstr "Absender und Benachrichtigungen gelten für Raum- und Kursbuchungen. Die Textvorlagen unten gelten für Raumbuchungen; Kursmails verwenden eigene Texte."
+
+#: config/config.php
+msgid "Room emails include an additional English section when the website language is not English. Edit both language versions together."
+msgstr "Bei nicht englischer Website-Sprache enthalten Raummails zusätzlich einen englischen Abschnitt. Hier bearbeiten Sie beide Sprachfassungen gemeinsam."
+
+#: config/config.php
+msgid "Booking details and action buttons are added automatically to the message."
+msgstr "Buchungsdetails und Aktionsbuttons werden automatisch in die Nachricht eingefügt."
+
+#: config/config.php
+msgid "Available placeholders"
+msgstr "Verfügbare Platzhalter"
+
+#: config/config.php
+msgid "Use these placeholders in subjects and message texts. They are replaced with the booking details when the email is sent."
+msgstr "Diese Platzhalter können Sie in Betreffzeilen und Nachrichtentexten verwenden. Beim Versand werden sie durch die Buchungsdaten ersetzt."
+
+#: config/config.php
+msgid "Sender and notifications"
+msgstr "Absender und Benachrichtigungen"
+
+#: config/config.php
+msgid "Choose the sender shown in booking emails and who receives internal notifications."
+msgstr "Legen Sie fest, welcher Absender in Buchungsmails erscheint und wer interne Benachrichtigungen erhält."
+
+#: config/config.php
+msgid "Booking received — awaiting approval"
+msgstr "Buchung eingegangen – Freigabe ausstehend"
+
+#: config/config.php
+msgid "Sent to the person booking when their request still needs approval by the room administration."
+msgstr "Nachricht an die buchende Person, wenn die Anfrage noch von der Raumverwaltung freigegeben werden muss."
+
+#: config/config.php
+msgid "Booking confirmation required"
+msgstr "Bestätigung der Buchung erforderlich"
+
+#: config/config.php
+msgid "Asks the person booking to confirm their reservation using the link in the email."
+msgstr "Fordert die buchende Person auf, ihre Reservierung über den Link in der E-Mail zu bestätigen."
+
+#: config/config.php
+msgid "Sent when a booking is confirmed. These texts are also used for the check-in notification."
+msgstr "Nachricht zur bestätigten Buchung. Diese Texte werden auch für die Benachrichtigung beim Check-in verwendet."
+
+#: config/config.php
+msgid "Sent to the person booking when their reservation is cancelled. For automatic cancellations, the matching reason is added to the message."
+msgstr "Nachricht an die buchende Person bei einer Stornierung. Bei automatischen Stornierungen wird der passende Grund ergänzt."
+
+#: config/config.php
+msgid "German"
+msgstr "Deutsch"
+
+#: config/config.php
+msgid "English"
+msgstr "Englisch"
+
+#: config/config.php
+msgid "Website language"
+msgstr "Website-Sprache"
+
+#. translators: %s: language name.
+#, php-format
+msgid "Subject (%s)"
+msgstr "Betreff (%s)"
+
+#. translators: %s: language name.
+#, php-format
+msgid "Message (%s)"
+msgstr "Nachricht (%s)"
+
+#. translators: %s: language name.
+#, php-format
+msgid "Reason: no confirmation (%s)"
+msgstr "Grund: Buchung nicht bestätigt (%s)"
+
+#. translators: %s: language name.
+#, php-format
+msgid "Reason: no check-in (%s)"
+msgstr "Grund: Nicht eingecheckt (%s)"
+
+#: config/config.php
+msgid "Recipient of internal notifications"
+msgstr "Empfänger interner Benachrichtigungen"
+
+#: config/config.php
+msgid "New-booking and cancellation notifications are sent to this address when enabled below."
+msgstr "An diese Adresse gehen Mitteilungen zu neuen Buchungen und Stornierungen, wenn Sie die jeweilige Benachrichtigung unten aktivieren."
+
+#: config/config.php
+msgid "Notify the address above about new bookings."
+msgstr "Die oben angegebene Adresse über neue Buchungen informieren."
+
+#: config/config.php
+msgid "Notify the address above about cancelled bookings."
+msgstr "Die oben angegebene Adresse über stornierte Buchungen informieren."
+
+#: config/config.php
+msgid "The name recipients see as the sender of RSVP emails."
+msgstr "Dieser Name wird Empfängern als Absender der RSVP-Mails angezeigt."
+
+#: config/config.php
+msgid "The email address RSVP uses as the sender of booking messages."
+msgstr "Diese E-Mail-Adresse verwendet RSVP als Absender für Buchungsnachrichten."

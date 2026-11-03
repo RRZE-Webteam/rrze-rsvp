@@ -335,27 +335,33 @@ class Settings
     }
 
     /**
-     * Optionen Seitenausgabe
+     * Render the settings screen with a plugin-specific styling scope.
+     *
+     * @return void
      */
     public function pageOutput()
     {
-        echo '<div class="wrap">', PHP_EOL;
+        echo '<div class="wrap rrze-rsvp-settings">', PHP_EOL;
         $this->showTabs();
         $this->showSections();
         echo '</div>', PHP_EOL;
     }
 
     /**
-     * Initialisierung und Registrierung der Bereiche und Felder.
+     * Register settings sections and visible fields while retaining defaults for hidden fields.
+     *
+     * @return void
      */
     public function adminInit()
     {
+        $fieldSections = [];
         // Hinzufügen von Einstellungsbereichen
         foreach ($this->settingsSections as $section) {
             if (isset($section['desc']) && !empty($section['desc'])) {
                 $section['desc'] = '<div class="inside">' . $section['desc'] . '</div>';
+                /** @return void Render the section description supplied by the settings definition. */
                 $callback = function () use ($section) {
-                    echo str_replace('"', '\"', $section['desc']);
+                    echo wp_kses_post($section['desc']);
                 };
             } elseif (isset($section['callback'])) {
                 $callback = $section['callback'];
@@ -364,13 +370,39 @@ class Settings
             }
 
             add_settings_section($this->settingsPrefix . $section['id'], $section['title'], $callback, $this->settingsPrefix . $section['id']);
+
+            foreach ($section['groups'] ?? [] as $groupKey => $group) {
+                $groupId = $this->settingsPrefix . $section['id'] . '-' . $groupKey;
+                $classes = 'rrze-rsvp-settings-group';
+                if (!empty($group['bilingual'])) {
+                    $classes .= ' rrze-rsvp-settings-template';
+                    if (!Functions::isLocaleEnglish()) {
+                        $classes .= ' rrze-rsvp-settings-bilingual';
+                    }
+                }
+                add_settings_section($groupId, esc_html($group['title']),
+                    /** @return void Describe when the group's settings or message templates apply. */
+                    static function () use ($group): void {
+                        echo '<p class="description">' . esc_html($group['desc']) . '</p>';
+                    },
+                    $this->settingsPrefix . $section['id'],
+                    ['before_section' => '<div class="%s">', 'after_section' => '</div>', 'section_class' => $classes]
+                );
+                foreach ($group['fields'] as $fieldName) {
+                    $fieldSections[$section['id'] . '_' . $fieldName] = $groupId;
+                }
+            }
         }
 
         // Hinzufügen von Einstellungsfelder
         foreach ($this->settingsFields as $section => $field) {
             foreach ($field as $option) {
+                // Keep hidden settings in the schema so saving another field preserves their values.
+                if (!empty($option['hidden'])) {
+                    continue;
+                }
                 if (isset($option['exception'])) {
-                    if (isset($option['exception']['locale']) && $option['exception']['locale'] = 'en' && Functions::isLocaleEnglish()) {
+                    if (($option['exception']['locale'] ?? '') === 'en' && Functions::isLocaleEnglish()) {
                         continue;
                     }
                 }
@@ -382,7 +414,8 @@ class Settings
                 $args = [
                     'id' => $name,
                     'class' => isset($option['class']) ? $option['class'] : $name,
-                    'label_for' => "{$section}[{$name}]",
+                    'label_for' => in_array($type, ['radio', 'multicheck'], true) ? ''
+                        : ($type === 'file' ? "{$section}[{$name}]" : "{$section}-{$name}"),
                     'desc' => isset($option['desc']) ? $option['desc'] : '',
                     'name' => $label,
                     'section' => $section,
@@ -397,7 +430,8 @@ class Settings
                     'step' => isset($option['step']) ? $option['step'] : '',
                 ];
 
-                add_settings_field("{$section}[{$name}]", $label, $callback, $this->settingsPrefix . $section, $this->settingsPrefix . $section, $args);
+                $fieldSection = $fieldSections[$section . '_' . $name] ?? $this->settingsPrefix . $section;
+                add_settings_field("{$section}[{$name}]", $label, $callback, $this->settingsPrefix . $section, $fieldSection, $args);
 
                 if (in_array($type, ['color', 'file'])) {
                     add_action('admin_enqueue_scripts', [$this, $type . 'EnqueueScripts']);

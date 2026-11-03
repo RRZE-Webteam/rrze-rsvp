@@ -83,6 +83,11 @@ function sanitize_natint_field($input)
     return filter_var($input, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 }
 
+/**
+ * Provide localized defaults for room booking, notifications and related settings.
+ *
+ * @return array<string, mixed> Default values before saved site settings are applied.
+ */
 function defaultOptions()
 {
 
@@ -99,7 +104,8 @@ function defaultOptions()
 
     return [
         'single_room_availability_table' => 'yes_link',
-        'contact_tracking_note' => '<h3>Hinweis</h3><p>Bei Anfragen des Gesundheitsamtes oder anderer Behörden ist auf die Adresse <a href="mailto:kanzler@fau.de">kanzler@fau.de</a> zu verweisen. Eine Abfrage der Daten zur Kontaktverfolgung wird auf Anforderung und Freigabe des Kanzlerbüros zentral durch das RRZE vorgenommen. Bei technischen Fragen hierzu wenden Sie sich an <a href="mailto:webmaster@fau.de">webmaster@fau.de</a>.</p><p>Weitergehende Informationen finden sie hier:</p><ul><li><a href="https://www.verwaltung.zuv.fau.de/arbeitssicherheit/gefaehrungen-am-arbeitsplatz/biologische-arbeitsstoffe/#sprungmarke2">Empfehlungen zu Hygienemaßnahmen des Referats Arbeitssicherheit</a></li><li><a href="https://www.verwaltung.zuv.fau.de/arbeitssicherheit/dokumentation-im-arbeitsschutz/gefaehrdungsbeurteilung/#sprungmarke7">Handlungshilfen des Referats Arbeitssicherheit</a></li><li><a href="https://www.wordpress.rrze.fau.de/plugins/fau-und-rrze-plugins/rsvp/hilfsmittel-und-hinweise-zur-nutzung/">Hilfsmittel und Hinweise zur Nutzung der Platzbuchungssystems</a></li></ul>',
+        'contact_tracking_note' => '<h3>' . esc_html__('Requests for booking data', 'rrze-rsvp') . '</h3><p>'
+            . esc_html__('Exports of booking data are managed centrally in this network. Contact the network administration and specify the room and time period you need.', 'rrze-rsvp') . '</p>',
         'notification_email' => $notification_email,
         'notification_if_new' => 'yes',
         'notification_if_cancel' => 'yes',
@@ -157,8 +163,9 @@ function getMenuSettings()
 }
 
 /**
- * Gibt die Einstellungen der Optionsbereiche zurück.
- * @return array [description]
+ * Define settings tabs and their introductory descriptions.
+ *
+ * @return array<int, array<string, mixed>> Tab identifiers, titles, descriptions and optional field groups.
  */
 function getSections()
 {
@@ -166,10 +173,19 @@ function getSections()
         [
             'id' => 'general',
             'title' => __('General Settings', 'rrze-rsvp'),
+            'desc' => esc_html__('Configure availability on room pages and the default check-in deadline. Booking periods and other rules are configured for each room.', 'rrze-rsvp'),
         ],
         [
             'id' => 'email',
             'title' => __('E-Mail Settings', 'rrze-rsvp'),
+            'desc' => '<p>' . esc_html__('Sender and notification settings apply to room and course bookings. The text templates below apply to room bookings; course emails use their own texts.', 'rrze-rsvp') . '</p>'
+                . '<p>' . esc_html__('Room emails include an additional English section when the website language is not English. Edit both language versions together.', 'rrze-rsvp') . '</p>'
+                . '<p>' . esc_html__('Booking details and action buttons are added automatically to the message.', 'rrze-rsvp') . '</p>'
+                . '<details><summary>' . esc_html__('Available placeholders', 'rrze-rsvp') . '</summary><p>'
+                . esc_html__('Use these placeholders in subjects and message texts. They are replaced with the booking details when the email is sent.', 'rrze-rsvp') . '</p>'
+                . '<p><code>{{date}}</code>, <code>{{time}}</code>, <code>{{date_en}}</code>, <code>{{time_en}}</code>, '
+                . '<code>{{room_name}}</code>, <code>{{seat_name}}</code>, <code>{{guest_name}}</code>, <code>{{guest_email}}</code>, <code>{{notes}}</code></p></details>',
+            'groups' => getEmailSettingGroups(),
         ],
         [
             'id' => 'pdf',
@@ -187,37 +203,84 @@ function getSections()
 }
 
 /**
- * Gibt die Einstellungen der Optionsfelder zurück.
- * @return array [description]
+ * Group existing email option keys by purpose without changing their storage names.
+ *
+ * @return array<string, array<string, mixed>> Ordered headings, help text and field keys.
+ */
+function getEmailSettingGroups(): array
+{
+    return [
+        'delivery' => [
+            'title' => __('Sender and notifications', 'rrze-rsvp'),
+            'desc' => __('Choose the sender shown in booking emails and who receives internal notifications.', 'rrze-rsvp'),
+            'fields' => ['notification_email', 'notification_if_new', 'notification_if_cancel', 'sender_name', 'sender_email'],
+        ],
+        'received' => [
+            'title' => __('Booking received — awaiting approval', 'rrze-rsvp'),
+            'desc' => __('Sent to the person booking when their request still needs approval by the room administration.', 'rrze-rsvp'),
+            'bilingual' => true,
+            'fields' => ['received_subject', 'received_subject_en', 'received_text', 'received_text_en'],
+        ],
+        'verification' => [
+            'title' => __('Booking confirmation required', 'rrze-rsvp'),
+            'desc' => __('Asks the person booking to confirm their reservation using the link in the email.', 'rrze-rsvp'),
+            'bilingual' => true,
+            'fields' => ['force_to_confirm_subject', 'force_to_confirm_subject_en', 'force_to_confirm_text', 'force_to_confirm_text_en'],
+        ],
+        'confirmation' => [
+            'title' => __('Booking confirmed', 'rrze-rsvp'),
+            'desc' => __('Sent when a booking is confirmed. These texts are also used for the check-in notification.', 'rrze-rsvp'),
+            'bilingual' => true,
+            'fields' => ['confirm_subject', 'confirm_subject_en', 'confirm_text', 'confirm_text_en'],
+        ],
+        'cancellation' => [
+            'title' => __('Booking cancelled', 'rrze-rsvp'),
+            'desc' => __('Sent to the person booking when their reservation is cancelled. For automatic cancellations, the matching reason is added to the message.', 'rrze-rsvp'),
+            'bilingual' => true,
+            'fields' => ['cancel_subject', 'cancel_subject_en', 'cancel_text', 'cancel_text_en', 'cancel_reason_notconfirmed', 'cancel_reason_notconfirmed_en', 'cancel_reason_notcheckedin', 'cancel_reason_notcheckedin_en'],
+        ],
+    ];
+}
+
+/**
+ * Define settings fields, defaults, help text and validation callbacks for each tab.
+ *
+ * @return array<string, array<int, array<string, mixed>>> Field definitions grouped by tab.
  */
 function getFields()
 {
     $defaults = defaultOptions();
+    $language = str_starts_with(get_locale(), 'de_') ? __('German', 'rrze-rsvp')
+        : (str_starts_with(get_locale(), 'en_') ? __('English', 'rrze-rsvp') : __('Website language', 'rrze-rsvp'));
 
     return [
         'general' => [
             [
+                'name' => 'single_room_availability_table',
+                'label' => __('Availability on room pages', 'rrze-rsvp'),
+                'desc' => __('Choose whether public room pages show available times and seats with links to the booking form. This does not affect the booking calendar embedded with a shortcode.', 'rrze-rsvp'),
+                'type' => 'radio',
+                'default' => $defaults['single_room_availability_table'],
+                'options' => [
+                    'yes_link' => __('Show available times with booking links', 'rrze-rsvp'),
+                    'yes' => __('Show available times without booking links', 'rrze-rsvp'),
+                    'no' => __('Hide the availability list', 'rrze-rsvp'),
+                ],
+            ],
+            [
                 'name' => 'check-in-time',
-                'label' => __('Allowed Check-In Time', 'rrze-rsvp'),
+                'label' => __('Check-in deadline (minutes)', 'rrze-rsvp'),
+                'desc' => __('Default time allowed for check-in, starting when the booking begins. For bookings made after the start time, it starts when the booking is made. If check-in is required, bookings without a check-in are cancelled after this deadline. You can set a different deadline for each room.', 'rrze-rsvp'),
                 'type' => 'number',
                 'default' => $defaults['check-in-time'],
                 'sanitize_callback' => 'sanitize_natint_field',
             ],
             [
-                'name' => 'single_room_availability_table',
-                'label' => __('Show Availability table on Room page.', 'rrze-rsvp'),
-                'type' => 'radio',
-                'default' => $defaults['single_room_availability_table'],
-                'options' => [
-                    'yes_link' => __('Yes (with seats linked to booking form)', 'rrze-rsvp'),
-                    'yes' => __('Yes (no link)', 'rrze-rsvp'),
-                    'no' => __('No', 'rrze-rsvp'),
-                ],
-            ],
-            [
                 'name' => 'contact_tracking_note',
-                'label' => __('Note for admins', 'rrze-rsvp'),
-                'desc' => __('Allowed HTML-Tags are:', 'rrze-rsvp') . esc_html(' <' . implode('> <', array_keys(getAllowedHTML())) . '>'),
+                'label' => __('Notice about central data exports', 'rrze-rsvp'),
+                'desc' => __('Internal text on the contact-tracking information page when data exports are managed by the network extension. Only network administrators can edit this text.', 'rrze-rsvp')
+                    . '<br>' . __('Allowed HTML-Tags are:', 'rrze-rsvp') . esc_html(' <' . implode('> <', array_keys(getAllowedHTML())) . '>'),
+                'hidden' => !CORONA_MODE,
                 'type' => 'textarea' . (is_super_admin() ? '' : 'readonly'),
                 'default' => $defaults['contact_tracking_note'],
                 'sanitize_callback' => 'wp_kses_custom',
@@ -226,8 +289,8 @@ function getFields()
         'email' => [
             [
                 'name' => 'notification_email',
-                'label' => __('Notification email', 'rrze-rsvp'),
-                'desc' => __('Email address for notifications.', 'rrze-rsvp'),
+                'label' => __('Recipient of internal notifications', 'rrze-rsvp'),
+                'desc' => __('New-booking and cancellation notifications are sent to this address when enabled below.', 'rrze-rsvp'),
                 'type' => 'email',
                 'default' => $defaults['notification_email'],
                 'sanitize_callback' => 'sanitize_email',
@@ -235,7 +298,7 @@ function getFields()
             [
                 'name' => 'notification_if_new',
                 'label' => __('Booking Notification', 'rrze-rsvp'),
-                'desc' => __('New booking notification.', 'rrze-rsvp'),
+                'desc' => __('Notify the address above about new bookings.', 'rrze-rsvp'),
                 'type' => 'radio',
                 'options' => [
                     'yes' => __('Yes', 'rrze-rsvp'),
@@ -246,7 +309,7 @@ function getFields()
             [
                 'name' => 'notification_if_cancel',
                 'label' => __('Cancel Notification', 'rrze-rsvp'),
-                'desc' => __('Notification of booking cancellation.', 'rrze-rsvp'),
+                'desc' => __('Notify the address above about cancelled bookings.', 'rrze-rsvp'),
                 'type' => 'radio',
                 'options' => [
                     'yes' => __('Yes', 'rrze-rsvp'),
@@ -257,7 +320,7 @@ function getFields()
             [
                 'name' => 'sender_name',
                 'label' => __('Sender name', 'rrze-rsvp'),
-                'desc' => __('Name for Sender for the booking system.', 'rrze-rsvp'),
+                'desc' => __('The name recipients see as the sender of RSVP emails.', 'rrze-rsvp'),
                 'placeholder' => __('Sender name', 'rrze-rsvp'),
                 'type' => 'text',
                 'default' => $defaults['sender_name'],
@@ -266,23 +329,21 @@ function getFields()
             [
                 'name' => 'sender_email',
                 'label' => __('Sender email', 'rrze-rsvp'),
-                'desc' => __('Email address of sender.', 'rrze-rsvp'),
+                'desc' => __('The email address RSVP uses as the sender of booking messages.', 'rrze-rsvp'),
                 'type' => 'email',
                 'default' => $defaults['sender_email'],
                 'sanitize_callback' => 'sanitize_email',
             ],
             [
                 'name' => 'received_subject',
-                'label' => __('Subject of the received booking', 'rrze-rsvp'),
-                'desc' => __('Subject of the email replying to a booking received.', 'rrze-rsvp'),
+                'label' => sprintf(__('Subject (%s)', 'rrze-rsvp'), $language),
                 'type' => 'text',
                 'default' => $defaults['received_subject'],
                 'sanitize_callback' => 'sanitize_text_field',
             ],
             [
                 'name' => 'received_subject_en',
-                'label' => __('Subject of the received booking (english)', 'rrze-rsvp'),
-                'desc' => __('Subject of the email replying to a booking received.', 'rrze-rsvp'),
+                'label' => sprintf(__('Subject (%s)', 'rrze-rsvp'), __('English', 'rrze-rsvp')),
                 'type' => 'text',
                 'default' => $defaults['received_subject_en'],
                 'sanitize_callback' => 'sanitize_text_field',
@@ -290,29 +351,27 @@ function getFields()
             ],
             [
                 'name' => 'received_text',
-                'label' => __('Text of the received booking', 'rrze-rsvp'),
+                'label' => sprintf(__('Message (%s)', 'rrze-rsvp'), $language),
                 'type' => 'textarea',
                 'default' => $defaults['received_text'],
             ],
             [
                 'name' => 'received_text_en',
-                'label' => __('Text of the received booking (english)', 'rrze-rsvp'),
+                'label' => sprintf(__('Message (%s)', 'rrze-rsvp'), __('English', 'rrze-rsvp')),
                 'type' => 'textarea',
                 'default' => $defaults['received_text_en'],
                 'exception' => ['locale' => 'en'],
             ],
             [
                 'name' => 'force_to_confirm_subject',
-                'label' => __('Subject for confirmation required.', 'rrze-rsvp'),
-                'desc' => __('Subject of the email where confirmation of the booking by the customer is required.', 'rrze-rsvp'),
+                'label' => sprintf(__('Subject (%s)', 'rrze-rsvp'), $language),
                 'type' => 'text',
                 'default' => $defaults['force_to_confirm_subject'],
                 'sanitize_callback' => 'sanitize_text_field',
             ],
             [
                 'name' => 'force_to_confirm_subject_en',
-                'label' => __('Subject for confirmation required (english)', 'rrze-rsvp'),
-                'desc' => __('Subject of the email where confirmation of the booking by the customer is required.', 'rrze-rsvp'),
+                'label' => sprintf(__('Subject (%s)', 'rrze-rsvp'), __('English', 'rrze-rsvp')),
                 'type' => 'text',
                 'default' => $defaults['force_to_confirm_subject_en'],
                 'sanitize_callback' => 'sanitize_text_field',
@@ -320,29 +379,27 @@ function getFields()
             ],
             [
                 'name' => 'force_to_confirm_text',
-                'label' => __('Text for confirmation required', 'rrze-rsvp'),
+                'label' => sprintf(__('Message (%s)', 'rrze-rsvp'), $language),
                 'type' => 'textarea',
                 'default' => $defaults['force_to_confirm_text'],
             ],
             [
                 'name' => 'force_to_confirm_text_en',
-                'label' => __('Text for confirmation required (english)', 'rrze-rsvp'),
+                'label' => sprintf(__('Message (%s)', 'rrze-rsvp'), __('English', 'rrze-rsvp')),
                 'type' => 'textarea',
                 'default' => $defaults['force_to_confirm_text_en'],
                 'exception' => ['locale' => 'en'],
             ],
             [
                 'name' => 'confirm_subject',
-                'label' => __('Subject Confirmation', 'rrze-rsvp'),
-                'desc' => __('Subject for confirmation mails', 'rrze-rsvp'),
+                'label' => sprintf(__('Subject (%s)', 'rrze-rsvp'), $language),
                 'type' => 'text',
                 'default' => $defaults['confirm_subject'],
                 'sanitize_callback' => 'sanitize_text_field',
             ],
             [
                 'name' => 'confirm_subject_en',
-                'label' => __('Subject Confirmation (english)', 'rrze-rsvp'),
-                'desc' => __('Subject for confirmation mails', 'rrze-rsvp'),
+                'label' => sprintf(__('Subject (%s)', 'rrze-rsvp'), __('English', 'rrze-rsvp')),
                 'type' => 'text',
                 'default' => $defaults['confirm_subject_en'],
                 'sanitize_callback' => 'sanitize_text_field',
@@ -350,46 +407,55 @@ function getFields()
             ],
             [
                 'name' => 'confirm_text',
-                'label' => __('Confirmation Text', 'rrze-rsvp'),
+                'label' => sprintf(__('Message (%s)', 'rrze-rsvp'), $language),
                 'type' => 'textarea',
                 'default' => $defaults['confirm_text'],
             ],
             [
                 'name' => 'confirm_text_en',
-                'label' => __('Confirmation Text (english)', 'rrze-rsvp'),
+                'label' => sprintf(__('Message (%s)', 'rrze-rsvp'), __('English', 'rrze-rsvp')),
                 'type' => 'textarea',
                 'default' => $defaults['confirm_text_en'],
                 'exception' => ['locale' => 'en'],
             ],
             [
                 'name' => 'cancel_subject',
-                'label' => __('Subject Cancelling', 'rrze-rsvp'),
-                'desc' => __('Subject for cancelling mails', 'rrze-rsvp'),
+                'label' => sprintf(__('Subject (%s)', 'rrze-rsvp'), $language),
                 'type' => 'text',
                 'default' => $defaults['cancel_subject'],
                 'sanitize_callback' => 'sanitize_text_field',
             ],
             [
                 'name' => 'cancel_subject_en',
-                'label' => __('Subject Cancelling (english)', 'rrze-rsvp'),
-                'desc' => __('Subject for cancelling mails', 'rrze-rsvp'),
+                'label' => sprintf(__('Subject (%s)', 'rrze-rsvp'), __('English', 'rrze-rsvp')),
                 'type' => 'text',
                 'default' => $defaults['cancel_subject_en'],
                 'sanitize_callback' => 'sanitize_text_field',
                 'exception' => ['locale' => 'en'],
             ],
             [
+                'name' => 'cancel_text',
+                'label' => sprintf(__('Message (%s)', 'rrze-rsvp'), $language),
+                'type' => 'textarea',
+                'default' => $defaults['cancel_text'],
+            ],
+            [
+                'name' => 'cancel_text_en',
+                'label' => sprintf(__('Message (%s)', 'rrze-rsvp'), __('English', 'rrze-rsvp')),
+                'type' => 'textarea',
+                'default' => $defaults['cancel_text_en'],
+                'exception' => ['locale' => 'en'],
+            ],
+            [
                 'name' => 'cancel_reason_notconfirmed',
-                'label' => __('Reason Cancelling Not Confirmed', 'rrze-rsvp'),
-                'desc' => __('Reason for cancelling mails because there is no confirmation', 'rrze-rsvp'),
+                'label' => sprintf(__('Reason: no confirmation (%s)', 'rrze-rsvp'), $language),
                 'type' => 'textarea',
                 'default' => $defaults['cancel_reason_notconfirmed'],
                 'sanitize_callback' => 'sanitize_text_field',
             ],
             [
                 'name' => 'cancel_reason_notconfirmed_en',
-                'label' => __('Reason Cancelling Not Confirmed (english)', 'rrze-rsvp'),
-                'desc' => __('Reason for cancelling mails because there is no confirmation', 'rrze-rsvp'),
+                'label' => sprintf(__('Reason: no confirmation (%s)', 'rrze-rsvp'), __('English', 'rrze-rsvp')),
                 'type' => 'textarea',
                 'default' => $defaults['cancel_reason_notconfirmed_en'],
                 'sanitize_callback' => 'sanitize_text_field',
@@ -397,32 +463,17 @@ function getFields()
             ],
             [
                 'name' => 'cancel_reason_notcheckedin',
-                'label' => __('Reason Cancelling Not Checked In', 'rrze-rsvp'),
-                'desc' => __('Reason for cancelling mails because there is no check-in', 'rrze-rsvp'),
+                'label' => sprintf(__('Reason: no check-in (%s)', 'rrze-rsvp'), $language),
                 'type' => 'textarea',
                 'default' => $defaults['cancel_reason_notcheckedin'],
                 'sanitize_callback' => 'sanitize_text_field',
             ],
             [
                 'name' => 'cancel_reason_notcheckedin_en',
-                'label' => __('Reason Cancelling Not Checked In (english)', 'rrze-rsvp'),
-                'desc' => __('Reason for cancelling mails because there is no check-in', 'rrze-rsvp'),
+                'label' => sprintf(__('Reason: no check-in (%s)', 'rrze-rsvp'), __('English', 'rrze-rsvp')),
                 'type' => 'textarea',
                 'default' => $defaults['cancel_reason_notcheckedin_en'],
                 'sanitize_callback' => 'sanitize_text_field',
-                'exception' => ['locale' => 'en'],
-            ],
-            [
-                'name' => 'cancel_text',
-                'label' => __('Cancel Text', 'rrze-rsvp'),
-                'type' => 'textarea',
-                'default' => $defaults['cancel_text'],
-            ],
-            [
-                'name' => 'cancel_text_en',
-                'label' => __('Cancel Text (english)', 'rrze-rsvp'),
-                'type' => 'textarea',
-                'default' => $defaults['cancel_text_en'],
                 'exception' => ['locale' => 'en'],
             ],
         ],

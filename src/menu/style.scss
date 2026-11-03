@@ -5,6 +5,96 @@ li.rrze-rsvp-submenu-hidden {
 	display: none;
 }
 
+// Readable line lengths across all RSVP settings tabs, independent of other admin screens.
+.rrze-rsvp-settings {
+	p,
+	.description,
+	.inside,
+	.form-table td > fieldset {
+		max-inline-size: 70ch;
+		overflow-wrap: anywhere;
+	}
+
+	input[type="text"],
+	input[type="email"],
+	input[type="password"],
+	textarea {
+		box-sizing: border-box;
+		inline-size: 100%;
+		max-inline-size: 70ch;
+		min-inline-size: 0;
+	}
+
+	textarea {
+		resize: vertical;
+	}
+
+	details {
+		margin-block: 16px 24px;
+
+		summary {
+			cursor: pointer;
+			font-weight: 600;
+		}
+	}
+
+	.rrze-rsvp-settings-group {
+		box-sizing: border-box;
+		max-inline-size: calc(140ch + 80px);
+		margin-block: 24px;
+		padding: 24px;
+		border: 1px solid #c3c4c7;
+		background: #fff;
+
+		> h2 {
+			margin-block-start: 0;
+		}
+	}
+
+	.rrze-rsvp-settings-template {
+		container: rsvp-mail-settings / inline-size;
+
+		.form-table {
+			margin-block-start: 24px;
+		}
+
+		tbody {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr);
+			gap: 24px 32px;
+		}
+
+		tr,
+		th,
+		td {
+			display: block;
+			inline-size: auto;
+			min-inline-size: 0;
+			padding: 0;
+		}
+
+		th {
+			margin-block-end: 8px;
+		}
+
+		textarea {
+			min-block-size: 9em;
+		}
+	}
+
+	@container rsvp-mail-settings (min-width: 52rem) {
+		.rrze-rsvp-settings-bilingual tbody {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 600px) {
+		.rrze-rsvp-settings-group {
+			padding: 16px;
+		}
+	}
+}
+
 table.rsvp-room-occupancy {
 	border-collapse: collapse;
 	width: 100%;
