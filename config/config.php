@@ -190,14 +190,29 @@ function getSections()
         [
             'id' => 'pdf',
             'title' => __('QR PDF Settings', 'rrze-rsvp'),
+            'desc' => '<p>' . esc_html__('Design the printable QR-code sheets for your seats. Each sheet links to the seat page and includes the room name and seat name.', 'rrze-rsvp') . '</p>'
+                . '<p>' . esc_html__('Create the PDF using “Generate PDF” in the room or seat list. Changes here apply to newly generated PDFs.', 'rrze-rsvp') . '</p>',
+            'groups' => getQrSettingGroups(),
         ],
         [
             'id' => 'ldap',
             'title' => __('LDAP Settings', 'rrze-rsvp'),
+            'desc' => '<p>' . esc_html__('Configure the directory used for LDAP login to room bookings. Choose which rooms require this login in the settings of each room.', 'rrze-rsvp') . '</p>'
+                . '<p>' . esc_html__('If you do not use LDAP, leave the server field empty. Your IT administration can provide the connection and directory details.', 'rrze-rsvp') . '</p>',
+            'groups' => getLdapSettingGroups(),
         ],
         [
             'id' => 'reset',
             'title' => __('Reset Settings', 'rrze-rsvp'),
+            'desc' => '<p>' . esc_html__('Restore the default RSVP settings for this website.', 'rrze-rsvp') . '</p>',
+            'groups' => [
+                'defaults' => [
+                    'title' => __('What will be reset?', 'rrze-rsvp'),
+                    'desc' => __('General, email, QR-code and LDAP settings will be reset. Your custom email texts, QR-code instructions and LDAP connection details will be removed.', 'rrze-rsvp'),
+                    'fields' => ['reset_settings'],
+                    'notice' => __('Rooms, seats, courses and bookings, including their individual settings, will be kept. This action cannot be undone; copy any settings you want to keep before continuing.', 'rrze-rsvp'),
+                ],
+            ],
         ],
     ];
 }
@@ -238,6 +253,55 @@ function getEmailSettingGroups(): array
             'desc' => __('Sent to the person booking when their reservation is cancelled. For automatic cancellations, the matching reason is added to the message.', 'rrze-rsvp'),
             'bilingual' => true,
             'fields' => ['cancel_subject', 'cancel_subject_en', 'cancel_text', 'cancel_text_en', 'cancel_reason_notconfirmed', 'cancel_reason_notconfirmed_en', 'cancel_reason_notcheckedin', 'cancel_reason_notcheckedin_en'],
+        ],
+    ];
+}
+
+/**
+ * Group the print options and keep both fixed QR instruction languages visible.
+ *
+ * @return array<string, array<string, mixed>> PDF headings, descriptions and existing option keys.
+ */
+function getQrSettingGroups(): array
+{
+    return [
+        'branding' => [
+            'title' => __('Header and footer', 'rrze-rsvp'),
+            'desc' => __('Choose which website information appears on the printed sheets.', 'rrze-rsvp'),
+            'fields' => ['fau_logo', 'website_logo', 'website_url'],
+        ],
+        'instructions' => [
+            'title' => __('Instructions beside the QR code', 'rrze-rsvp'),
+            'desc' => __('Both language versions appear beside the QR code. Leave a field empty to omit that language from the PDF.', 'rrze-rsvp'),
+            'bilingual' => true,
+            'always_show_languages' => true,
+            'fields' => ['instructions_de', 'instructions_en'],
+        ],
+        'details' => [
+            'title' => __('Additional room and seat details', 'rrze-rsvp'),
+            'desc' => __('Add information from the room or seat. The room name, seat name, QR code and link to the seat page are always included.', 'rrze-rsvp'),
+            'fields' => ['room_text', 'room_address', 'seat_equipment'],
+        ],
+    ];
+}
+
+/**
+ * Separate LDAP transport settings from the directory settings used for login.
+ *
+ * @return array<string, array<string, mixed>> LDAP headings, descriptions and existing option keys.
+ */
+function getLdapSettingGroups(): array
+{
+    return [
+        'connection' => [
+            'title' => __('Server connection', 'rrze-rsvp'),
+            'desc' => __('Enter the server address and port supplied by your IT administration.', 'rrze-rsvp'),
+            'fields' => ['server', 'port'],
+        ],
+        'directory' => [
+            'title' => __('Login and directory search', 'rrze-rsvp'),
+            'desc' => __('RSVP signs in with username@domain and searches for the account by sAMAccountName. The account must contain cn and mail attributes.', 'rrze-rsvp'),
+            'fields' => ['bind_base_dn', 'search_base_dn'],
         ],
     ];
 }
@@ -480,26 +544,28 @@ function getFields()
         'pdf' => [
             [
                 'name' => 'fau_logo',
-                'label' => __('Print FAU logo', 'rrze-rsvp'),
+                'label' => __('FAU logo', 'rrze-rsvp'),
+                'desc' => __('Include the FAU logo in the header.', 'rrze-rsvp'),
                 'default' => $defaults['fau_logo'],
                 'type' => 'checkbox',
             ],
             [
                 'name' => 'website_logo',
-                'label' => __('Print website\'s logo or title', 'rrze-rsvp'),
+                'label' => __('Website branding', 'rrze-rsvp'),
+                'desc' => __('Include the website header image. If none is configured, use the website title.', 'rrze-rsvp'),
                 'default' => $defaults['website_logo'],
                 'type' => 'checkbox',
             ],
             [
                 'name' => 'website_url',
-                'label' => __('Print website\'s URL', 'rrze-rsvp'),
+                'label' => __('Website address', 'rrze-rsvp'),
+                'desc' => __('Include the website address in the footer.', 'rrze-rsvp'),
                 'default' => $defaults['website_url'],
                 'type' => 'checkbox',
             ],
             [
                 'name' => 'instructions_de',
                 'label' => __('Instructions in German', 'rrze-rsvp'),
-                'desc' => __('This text will be shown above the QR code.', 'rrze-rsvp'),
                 'placeholder' => __('Instructions in German', 'rrze-rsvp'),
                 'type' => 'textarea',
                 'default' => $defaults['instructions_de'],
@@ -508,7 +574,6 @@ function getFields()
             [
                 'name' => 'instructions_en',
                 'label' => __('Instructions in English', 'rrze-rsvp'),
-                'desc' => __('This text will be shown above the QR code.', 'rrze-rsvp'),
                 'placeholder' => __('Instructions in English', 'rrze-rsvp'),
                 'type' => 'textarea',
                 'default' => $defaults['instructions_en'],
@@ -516,7 +581,8 @@ function getFields()
             ],
             [
                 'name' => 'room_text',
-                'label' => __('Print room\'s text', 'rrze-rsvp'),
+                'label' => __('Room description', 'rrze-rsvp'),
+                'desc' => __('Include the description saved for the room.', 'rrze-rsvp'),
                 'default' => $defaults['room_text'],
                 'type' => 'checkbox',
             ],
@@ -528,7 +594,8 @@ function getFields()
             // ],
             [
                 'name' => 'room_address',
-                'label' => __('Print room\'s address', 'rrze-rsvp'),
+                'label' => __('Room address', 'rrze-rsvp'),
+                'desc' => __('Include the street, postal code and city saved for the room.', 'rrze-rsvp'),
                 'default' => $defaults['room_address'],
                 'type' => 'checkbox',
             ],
@@ -540,7 +607,8 @@ function getFields()
             // ],
             [
                 'name' => 'seat_equipment',
-                'label' => __('Print seats\' equipment', 'rrze-rsvp'),
+                'label' => __('Seat equipment', 'rrze-rsvp'),
+                'desc' => __('Include the equipment assigned to the seat.', 'rrze-rsvp'),
                 'default' => $defaults['seat_equipment'],
                 'type' => 'checkbox',
             ],
@@ -548,20 +616,22 @@ function getFields()
         'ldap' => [
             [
                 'name' => 'server',
-                'label' => __('Server', 'rrze-rsvp'),
-                'desc' => __('LDAP server URL. Leave blank if you are not using LDAP as an authentication system.', 'rrze-rsvp'),
+                'label' => __('LDAP server', 'rrze-rsvp'),
+                'desc' => __('Full server address, for example ldaps://ldap.example.org. An empty field disables LDAP login for room bookings.', 'rrze-rsvp'),
                 'type' => 'text',
                 'sanitize_callback' => 'sanitize_text_field',
             ],
             [
                 'name' => 'port',
                 'label' => __('Port', 'rrze-rsvp'),
-                'desc' => __('LDAP server port.', 'rrze-rsvp'),
+                'desc' => __('Use the port specified for your LDAP connection.', 'rrze-rsvp'),
                 'type' => 'number',
                 'sanitize_callback' => 'sanitize_natint_field',
             ],
             [
                 'name' => 'distinguished_name',
+                // Retain this legacy value in storage; LDAP login does not use it.
+                'hidden' => true,
                 'label' => __('DN', 'rrze-rsvp'),
                 'desc' => __('LDAP Distinguished Name.', 'rrze-rsvp'),
                 'type' => 'text',
@@ -569,15 +639,15 @@ function getFields()
             ],
             [
                 'name' => 'bind_base_dn',
-                'label' => __('Bind Base DN', 'rrze-rsvp'),
-                'desc' => __('DN to bind on.', 'rrze-rsvp'),
+                'label' => __('Login domain', 'rrze-rsvp'),
+                'desc' => __('Domain appended to the username for login, for example example.org. Enter the domain without @.', 'rrze-rsvp'),
                 'type' => 'text',
                 'sanitize_callback' => 'sanitize_text_field',
             ],
             [
                 'name' => 'search_base_dn',
-                'label' => __('Search Base DN', 'rrze-rsvp'),
-                'desc' => __('DN to search in.', 'rrze-rsvp'),
+                'label' => __('User search base (Base DN)', 'rrze-rsvp'),
+                'desc' => __('Directory branch in which RSVP searches for user accounts, for example OU=People,DC=example,DC=org.', 'rrze-rsvp'),
                 'type' => 'text',
                 'sanitize_callback' => 'sanitize_text_field',
             ],
@@ -585,9 +655,10 @@ function getFields()
         'reset' => [
             [
                 'name' => 'reset_settings',
-                'label' => '',
-                'desc' => __('Yes, I want to reset <strong>all</strong> settings.', 'rrze-rsvp'),
+                'label' => __('Confirm reset', 'rrze-rsvp'),
+                'desc' => __('I want to reset all RSVP settings on this website to their defaults.', 'rrze-rsvp'),
                 'type' => 'checkbox',
+                'required' => true,
             ],
         ],
     ];

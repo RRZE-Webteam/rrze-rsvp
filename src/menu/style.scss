@@ -52,7 +52,7 @@ li.rrze-rsvp-submenu-hidden {
 	}
 
 	.rrze-rsvp-settings-template {
-		container: rsvp-mail-settings / inline-size;
+		container: rsvp-language-settings / inline-size;
 
 		.form-table {
 			margin-block-start: 24px;
@@ -82,9 +82,49 @@ li.rrze-rsvp-submenu-hidden {
 		}
 	}
 
-	@container rsvp-mail-settings (min-width: 52rem) {
+	@container rsvp-language-settings (min-width: 52rem) {
 		.rrze-rsvp-settings-bilingual tbody {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	.rrze-rsvp-settings-notice {
+		margin-block-start: 16px;
+	}
+
+	#rrze-rsvp-reset {
+		.rrze-rsvp-settings-group {
+			max-inline-size: calc(70ch + 48px);
+			border-inline-start: 4px solid #b32d2e;
+		}
+
+		.form-table {
+			tr,
+			th,
+			td {
+				display: block;
+				inline-size: auto;
+				padding-inline: 0;
+			}
+
+			th {
+				padding-block: 16px 8px;
+			}
+
+			td {
+				padding-block: 0;
+			}
+		}
+
+		.rrze-rsvp-reset-button {
+			border-color: #b32d2e;
+			color: #b32d2e;
+			white-space: normal;
+
+			&:hover {
+				border-color: #8a2424;
+				color: #8a2424;
+			}
 		}
 	}
 

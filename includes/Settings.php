@@ -305,8 +305,9 @@ class Settings
     }
 
     /**
-     * Anzeigen der Einstellungsbereiche.
-     * Zeigt für jeden Einstellungsbereich das entsprechende Formular an.
+     * Render the active settings form and name the reset action explicitly.
+     *
+     * @return void
      */
     public function showSections()
     {
@@ -316,10 +317,12 @@ class Settings
             }
             switch ($this->currentTab) {
                 case 'rrze-rsvp-reset':
-                    $btn_label = __('Reset', 'rrze-rsvp');
+                    $btn_label = __('Reset all RSVP settings', 'rrze-rsvp');
+                    $btn_type = 'secondary rrze-rsvp-reset-button';
                     break;
                 default:
                     $btn_label = '';
+                    $btn_type = 'primary';
             }
 
 ?>
@@ -327,7 +330,7 @@ class Settings
                 <form method="post" action="options.php">
                     <?php settings_fields($this->settingsPrefix . $section['id']); ?>
                     <?php do_settings_sections($this->settingsPrefix . $section['id']); ?>
-                    <?php submit_button($btn_label); ?>
+                    <?php submit_button($btn_label, $btn_type); ?>
                 </form>
             </div>
 <?php
@@ -349,6 +352,7 @@ class Settings
 
     /**
      * Register settings sections and visible fields while retaining defaults for hidden fields.
+     * Fixed-language groups keep their paired layout even on English-language websites.
      *
      * @return void
      */
@@ -376,7 +380,7 @@ class Settings
                 $classes = 'rrze-rsvp-settings-group';
                 if (!empty($group['bilingual'])) {
                     $classes .= ' rrze-rsvp-settings-template';
-                    if (!Functions::isLocaleEnglish()) {
+                    if (!empty($group['always_show_languages']) || !Functions::isLocaleEnglish()) {
                         $classes .= ' rrze-rsvp-settings-bilingual';
                     }
                 }
@@ -384,6 +388,9 @@ class Settings
                     /** @return void Describe when the group's settings or message templates apply. */
                     static function () use ($group): void {
                         echo '<p class="description">' . esc_html($group['desc']) . '</p>';
+                        if (!empty($group['notice'])) {
+                            echo '<p class="description rrze-rsvp-settings-notice">' . esc_html($group['notice']) . '</p>';
+                        }
                     },
                     $this->settingsPrefix . $section['id'],
                     ['before_section' => '<div class="%s">', 'after_section' => '</div>', 'section_class' => $classes]
@@ -428,6 +435,7 @@ class Settings
                     'min' => isset($option['min']) ? $option['min'] : '',
                     'max' => isset($option['max']) ? $option['max'] : '',
                     'step' => isset($option['step']) ? $option['step'] : '',
+                    'required' => !empty($option['required']),
                 ];
 
                 $fieldSection = $fieldSections[$section . '_' . $name] ?? $this->settingsPrefix . $section;
@@ -609,8 +617,10 @@ class Settings
     }
 
     /**
-     * Zeigt ein Kontrollkästchen (Checkbox) für ein Einstellungsfeld an.
-     * @param array   $args Argumente des Einstellungsfelds
+     * Render a checkbox, including its unchecked value and optional required confirmation.
+     *
+     * @param array<string, mixed> $args Field configuration, including the label and required flag.
+     * @return void
      */
     public function callbackCheckbox($args)
     {
@@ -629,11 +639,12 @@ class Settings
             $args['id']
         );
         $html .= sprintf(
-            '<input type="checkbox" class="checkbox" id="%2$s-%3$s" name="%1$s[%2$s_%3$s]" value="on" %4$s>',
+            '<input type="checkbox" class="checkbox" id="%2$s-%3$s" name="%1$s[%2$s_%3$s]" value="on" %4$s%5$s>',
             $this->optionName,
             $args['section'],
             $args['id'],
-            checked($value, 'on', false)
+            checked($value, 'on', false),
+            !empty($args['required']) ? ' required' : ''
         );
         $html .= sprintf(
             '%1$s</label>',

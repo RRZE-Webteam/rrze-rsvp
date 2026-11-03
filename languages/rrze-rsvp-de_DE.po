@@ -908,7 +908,7 @@ msgstr ""
 
 #: config/config.php:180
 msgid "LDAP Settings"
-msgstr "LDAP Einstellungen"
+msgstr "LDAP-Einstellungen"
 
 #: includes/Functions.php:337
 msgid "Links to display the current room occupancy"
@@ -3791,3 +3791,163 @@ msgstr "Dieser Name wird Empfängern als Absender der RSVP-Mails angezeigt."
 #: config/config.php
 msgid "The email address RSVP uses as the sender of booking messages."
 msgstr "Diese E-Mail-Adresse verwendet RSVP als Absender für Buchungsnachrichten."
+
+#: config/config.php
+msgid "Design the printable QR-code sheets for your seats. Each sheet links to the seat page and includes the room name and seat name."
+msgstr "Gestalten Sie die QR-Code-Aushänge für Ihre Plätze. Jeder Aushang führt zur jeweiligen Platzseite und enthält den Raum- und Platznamen."
+
+#: config/config.php
+msgid "Create the PDF using “Generate PDF” in the room or seat list. Changes here apply to newly generated PDFs."
+msgstr "Erstellen Sie die PDF über „PDF generieren“ in der Raum- oder Platzübersicht. Änderungen hier gelten für neu erstellte PDFs."
+
+#: config/config.php
+msgid "Configure the directory used for LDAP login to room bookings. Choose which rooms require this login in the settings of each room."
+msgstr "Richten Sie den Verzeichnisdienst für die LDAP-Anmeldung bei Raumbuchungen ein. In den Einstellungen des jeweiligen Raums legen Sie fest, ob diese Anmeldung erforderlich ist."
+
+#: config/config.php
+msgid "If you do not use LDAP, leave the server field empty. Your IT administration can provide the connection and directory details."
+msgstr "Wenn Sie LDAP nicht nutzen, lassen Sie das Serverfeld leer. Die Verbindungs- und Verzeichnisangaben erhalten Sie von Ihrer IT-Administration."
+
+#: config/config.php
+msgid "Restore the default RSVP settings for this website."
+msgstr "Setzen Sie die RSVP-Einstellungen dieser Website auf die Standardwerte zurück."
+
+#: config/config.php
+msgid "What will be reset?"
+msgstr "Was wird zurückgesetzt?"
+
+#: config/config.php
+msgid "General, email, QR-code and LDAP settings will be reset. Your custom email texts, QR-code instructions and LDAP connection details will be removed."
+msgstr "Die allgemeinen Einstellungen sowie die E-Mail-, QR-Code- und LDAP-Einstellungen werden zurückgesetzt. Dabei werden auch Ihre eigenen Mailtexte, QR-Code-Anleitungen und LDAP-Verbindungsangaben entfernt."
+
+#: config/config.php
+msgid "Rooms, seats, courses and bookings, including their individual settings, will be kept. This action cannot be undone; copy any settings you want to keep before continuing."
+msgstr "Räume, Plätze, Kurse und Buchungen bleiben mit ihren jeweiligen Einstellungen erhalten. Das Zurücksetzen lässt sich nicht rückgängig machen. Kopieren Sie vorher die Einstellungen und Texte, die Sie behalten möchten."
+
+#: config/config.php
+msgid "Header and footer"
+msgstr "Kopf- und Fußzeile"
+
+#: config/config.php
+msgid "Choose which website information appears on the printed sheets."
+msgstr "Wählen Sie aus, welche Angaben zur Website auf den Aushängen erscheinen."
+
+#: config/config.php
+msgid "Instructions beside the QR code"
+msgstr "Anleitung neben dem QR-Code"
+
+#: config/config.php
+msgid "Both language versions appear beside the QR code. Leave a field empty to omit that language from the PDF."
+msgstr "Beide Sprachfassungen erscheinen neben dem QR-Code. Lassen Sie ein Feld leer, wenn diese Sprache in der PDF entfallen soll."
+
+#: config/config.php
+msgid "Additional room and seat details"
+msgstr "Zusätzliche Angaben zu Raum und Platz"
+
+#: config/config.php
+msgid "Add information from the room or seat. The room name, seat name, QR code and link to the seat page are always included."
+msgstr "Ergänzen Sie Angaben aus dem Raum oder Platz. Raumname, Platzname, QR-Code und Link zur Platzseite werden immer ausgegeben."
+
+#: config/config.php
+msgid "Server connection"
+msgstr "Verbindung zum Server"
+
+#: config/config.php
+msgid "Enter the server address and port supplied by your IT administration."
+msgstr "Tragen Sie die Serveradresse und den Port ein, die Sie von Ihrer IT-Administration erhalten haben."
+
+#: config/config.php
+msgid "Login and directory search"
+msgstr "Anmeldung und Benutzersuche"
+
+#: config/config.php
+msgid "RSVP signs in with username@domain and searches for the account by sAMAccountName. The account must contain cn and mail attributes."
+msgstr "RSVP meldet sich mit benutzername@domain an und sucht das Konto über sAMAccountName. Das Konto muss die Attribute cn und mail enthalten."
+
+#: config/config.php
+msgid "FAU logo"
+msgstr "FAU-Logo"
+
+#: config/config.php
+msgid "Include the FAU logo in the header."
+msgstr "FAU-Logo in der Kopfzeile anzeigen."
+
+#: config/config.php
+msgid "Website branding"
+msgstr "Website-Kennzeichnung"
+
+#: config/config.php
+msgid "Include the website header image. If none is configured, use the website title."
+msgstr "Headergrafik der Website anzeigen. Ist keine hinterlegt, wird der Website-Titel verwendet."
+
+#: config/config.php
+msgid "Website address"
+msgstr "Website-Adresse"
+
+#: config/config.php
+msgid "Include the website address in the footer."
+msgstr "Website-Adresse in der Fußzeile anzeigen."
+
+#: config/config.php
+msgid "Room description"
+msgstr "Raumbeschreibung"
+
+#: config/config.php
+msgid "Include the description saved for the room."
+msgstr "Die beim Raum hinterlegte Beschreibung ausgeben."
+
+#: config/config.php
+msgid "Room address"
+msgstr "Raumadresse"
+
+#: config/config.php
+msgid "Include the street, postal code and city saved for the room."
+msgstr "Straße, Postleitzahl und Ort aus den Raumangaben ausgeben."
+
+#: config/config.php
+msgid "Seat equipment"
+msgstr "Platzausstattung"
+
+#: config/config.php
+msgid "Include the equipment assigned to the seat."
+msgstr "Die dem Platz zugeordnete Ausstattung auflisten."
+
+#: config/config.php
+msgid "LDAP server"
+msgstr "LDAP-Server"
+
+#: config/config.php
+msgid "Full server address, for example ldaps://ldap.example.org. An empty field disables LDAP login for room bookings."
+msgstr "Vollständige Serveradresse, zum Beispiel ldaps://ldap.example.org. Ein leeres Feld deaktiviert die LDAP-Anmeldung für Raumbuchungen."
+
+#: config/config.php
+msgid "Use the port specified for your LDAP connection."
+msgstr "Verwenden Sie den für Ihre LDAP-Verbindung vorgesehenen Port."
+
+#: config/config.php
+msgid "Login domain"
+msgstr "Anmeldedomain"
+
+#: config/config.php
+msgid "Domain appended to the username for login, for example example.org. Enter the domain without @."
+msgstr "Domain, die bei der Anmeldung an den Benutzernamen angehängt wird, zum Beispiel example.org. Geben Sie die Domain ohne @ ein."
+
+#: config/config.php
+msgid "User search base (Base DN)"
+msgstr "Suchbasis für Benutzer (Base DN)"
+
+#: config/config.php
+msgid "Directory branch in which RSVP searches for user accounts, for example OU=People,DC=example,DC=org."
+msgstr "Verzeichniszweig, in dem RSVP nach Benutzerkonten sucht, zum Beispiel OU=People,DC=example,DC=org."
+
+#: config/config.php
+msgid "Confirm reset"
+msgstr "Zurücksetzen bestätigen"
+
+#: config/config.php
+msgid "I want to reset all RSVP settings on this website to their defaults."
+msgstr "Ich möchte alle RSVP-Einstellungen dieser Website auf die Standardwerte zurücksetzen."
+
+#: includes/Settings.php
+msgid "Reset all RSVP settings"
+msgstr "Alle RSVP-Einstellungen zurücksetzen"
