@@ -204,7 +204,7 @@ class Main
             'rrze-rsvp-admin-menu',
             plugins_url('build/menu.css', plugin()->getBasename()),
             [],
-            plugin()->getVersion()
+            $this->getAssetVersion('menu.css')
         );
 
         if (!in_array($post_type, array_keys(Capabilities::getCurrentCptArgs()))) {
