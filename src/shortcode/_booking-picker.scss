@@ -334,7 +334,21 @@
         &:focus-visible { outline: 3px solid var(--picker-accent); outline-offset: 2px; }
     }
     .rsvp-seat-select { display: block; margin: 0; }
-    .rsvp-seat-select .rsvp-picker-options { grid-template-columns: repeat(auto-fill, minmax(min(100%, 7rem), 1fr)); }
+    .rsvp-seat-select .rsvp-picker-options {
+        display: flex;
+        flex-wrap: wrap;
+
+        // Wrap whole choices first; only wrap a name if it exceeds a full row.
+        .rsvp-picker-choice {
+            flex: 0 1 auto;
+            min-width: min(100%, 7rem);
+            max-width: 100%;
+        }
+        label {
+            height: 100%;
+            hyphens: manual;
+        }
+    }
     .rsvp-seat-select select { max-width: 100%; background: #fff; color: var(--picker-ink); }
     .rsvp-item-info { margin: 1rem 0 0; padding: .75rem; background: #f5f7fa; border: 0; font-size: .9rem; }
     .rsvp-picker-summary { margin-top: 1rem; padding: 1rem; border-left: 3px solid #287b59; background: #eaf5f0; color: #18563d; font-size: .95rem; line-height: 1.6; }
