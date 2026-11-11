@@ -53,6 +53,12 @@ h1, h2, p, ul { margin: 0; }
     letter-spacing: -.035em;
     font-variant-numeric: tabular-nums;
 }
+.when .next-date {
+    font-size: clamp(2.1rem, 4.3cqi, 5.5rem);
+    line-height: 1.1;
+    text-wrap: balance;
+}
+.slot-time { margin-top: .55em; font-size: clamp(1.1rem, 2cqi, 2.25rem); }
 .capacity {
     padding: .6em 1.1em;
     align-self: center;

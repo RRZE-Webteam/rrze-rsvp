@@ -3902,9 +3902,6 @@ msgstr ""
 msgid "Last updated"
 msgstr ""
 
-#: includes/templates/public-display.php:72
-msgid "Next available day"
-msgstr ""
 
 #: includes/templates/public-display.php:78
 msgid "Later today"
@@ -3951,4 +3948,196 @@ msgstr ""
 
 #: includes/templates/public-display.php:128
 msgid "Pause rotation"
+msgstr ""
+
+#: includes/templates/public-display.php:75
+msgctxt "public display date without year"
+msgid "l, F j"
+msgstr ""
+
+#: includes/templates/public-display.php:78
+msgid "No more seats available today."
+msgstr ""
+
+#: includes/templates/public-display.php:81
+#, php-format
+msgid "From %s"
+msgstr ""
+
+#: includes/templates/public-display.php:85
+#, php-format
+msgid "Time slot: %s"
+msgstr ""
+
+#: includes/Tools.php:54
+msgid "You are not allowed to create seats."
+msgstr ""
+
+#: includes/SeatGenerator.php:49
+msgid "Select a published room."
+msgstr ""
+
+#: includes/SeatGenerator.php:55
+#, php-format
+msgid "Enter at least one row and one seat, with no more than %d seats in total."
+msgstr ""
+
+#: includes/SeatGenerator.php:58
+msgid "Choose numbers or letters for the numbering."
+msgstr ""
+
+#: includes/SeatGenerator.php:62
+msgid "Enter a starting number between 1 and 999999."
+msgstr ""
+
+#: includes/SeatGenerator.php:67
+msgid "The selected equipment is no longer available. Check your selection."
+msgstr ""
+
+#: includes/SeatGenerator.php:161
+msgid "Another batch is being created for this room. Please try again."
+msgstr ""
+
+#: includes/SeatGenerator.php:166
+msgid "Please check the current preview again before creating seats."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:8
+msgid "Create seats in bulk"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:12
+msgid "Batch result"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:14
+#, php-format
+msgid "Created: %1$d. Already present: %2$d."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:16
+#, php-format
+msgid "Seats that could not be saved: %d. Review the batch again to retry."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:19
+#, php-format
+msgid "Seats created without the selected equipment: %d. Check their equipment in the seat list."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:22
+msgid "View seats in this room"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:23
+msgid "Create another batch"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:28
+msgid "No rooms available"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:29
+msgid "You need a published room that you can edit before you can add seats."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:33
+msgid "Create numbered seats or devices for a room. You can check the names before publishing them."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:35
+msgid "Set up seats"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:36
+msgid "Review and create"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:47
+msgid "Room and quantity"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:67
+#, php-format
+msgid "For a simple list, use one row. You can create up to %d seats per batch."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:69
+msgid "Shared name prefix (optional)"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:71
+msgid "For example, enter “Microscope” for “Microscope 1”, “Microscope 2” and so on."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:74
+msgid "Adjust numbering"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:80
+msgid "Numbers (1, 2, 3 …)"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:81
+msgid "Letters (A, B, C …)"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:85
+msgid "First row number"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:85
+msgid "First seat number"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:93
+msgid "Shared equipment (optional)"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:95
+msgid "Select features that all new seats share."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:101
+msgid "No equipment features are available yet. You can also assign equipment after creating seats."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:104
+msgid "Manage equipment"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:107
+msgid "Preview seats"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:117
+msgid "Check the names below. Existing seats and their equipment stay unchanged."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:117
+msgid "All of these seats already exist in this room. There is nothing to create."
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:123
+msgid "Will be created"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:123
+msgid "Already in this room"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:126
+#, php-format
+msgid "Show remaining names (%d)"
+msgstr ""
+
+#: includes/templates/admin/seat-generator.php:135
+#, php-format
+msgid "Create %d seat"
+msgid_plural "Create %d seats"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/templates/admin/seat-generator.php:137
+msgid "Change settings"
 msgstr ""

@@ -32,6 +32,7 @@ $size = ($width ? '--display-width:' . $width . 'px;' : '') . ($height ? '--disp
 $styleFile = 'build/public-display.css';
 $styleUrl = add_query_arg('ver', filemtime(plugin()->getPath() . $styleFile), plugins_url($styleFile, plugin()->getFile()));
 $dateFormat = _x('l, F j, Y', 'room occupancy date format', 'rrze-rsvp');
+$futureDay = $board && $board['date'] > $now->format('Y-m-d');
 $roomName = get_the_title($roomId);
 $consultation = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true) === 'consultation';
 ?>
@@ -65,23 +66,37 @@ $consultation = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true) === '
                 <?php endif;
             endforeach; ?>
             <?php if ($board) :
-                $date = new \DateTimeImmutable($board['date'], wp_timezone());
-                $today = $board['date'] === $now->format('Y-m-d');
-                $clock = $now->format('H:i');
-                if (!$today) {
-                    $context = __('Next available day', 'rrze-rsvp');
-                } elseif ($board['start'] <= $clock && $clock < $board['end']) {
-                    $context = __('In progress', 'rrze-rsvp');
-                } elseif ($board['end'] <= $clock) {
-                    $context = __('Ended', 'rrze-rsvp');
-                } else {
-                    $context = __('Later today', 'rrze-rsvp');
-                }
-                ?>
+                $timeRange = $board['start'] . ' – ' . $board['end']; ?>
                 <section class="window" aria-labelledby="display-time">
                     <div class="when">
-                        <p class="date"><strong><?php echo esc_html($context); ?></strong> <time datetime="<?php echo esc_attr($board['date']); ?>"><?php echo esc_html(wp_date($dateFormat, $date->getTimestamp())); ?></time></p>
-                        <h2 id="display-time"><?php echo esc_html($board['start'] . ' – ' . $board['end']); ?></h2>
+                        <?php if ($futureDay) :
+                            $date = new \DateTimeImmutable($board['date'], $now->getTimezone());
+                            $format = $date->format('Y') === $now->format('Y')
+                                ? _x('l, F j', 'public display date without year', 'rrze-rsvp')
+                                : $dateFormat;
+                            ?>
+                            <p class="date"><?php esc_html_e('No more seats available today.', 'rrze-rsvp'); ?></p>
+                            <h2 class="next-date" id="display-time"><time datetime="<?php echo esc_attr($board['date']); ?>"><?php
+                                /* translators: %s: first date with an available seat, including its weekday. */
+                                echo esc_html(sprintf(__('From %s', 'rrze-rsvp'), wp_date($format, $date->getTimestamp())));
+                            ?></time></h2>
+                            <p class="slot-time"><?php
+                                /* translators: %s: time range on the displayed date. */
+                                echo esc_html(sprintf(__('Time slot: %s', 'rrze-rsvp'), $timeRange));
+                            ?></p>
+                        <?php else :
+                            $clock = $now->format('H:i');
+                            if ($board['end'] <= $clock) {
+                                $context = __('Ended', 'rrze-rsvp');
+                            } elseif ($board['start'] <= $clock) {
+                                $context = __('In progress', 'rrze-rsvp');
+                            } else {
+                                $context = __('Later today', 'rrze-rsvp');
+                            }
+                            ?>
+                            <p class="date"><strong><?php echo esc_html($context); ?></strong> <time datetime="<?php echo esc_attr($board['date']); ?>"><?php echo esc_html(wp_date($dateFormat, $now->getTimestamp())); ?></time></p>
+                            <h2 id="display-time"><?php echo esc_html($timeRange); ?></h2>
+                        <?php endif; ?>
                     </div>
                     <p class="capacity<?php echo $board['free'] ? '' : ' full'; ?>">
                         <?php if ($board['total'] === 1) : ?>
