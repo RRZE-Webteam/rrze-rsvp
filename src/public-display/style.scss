@@ -1,0 +1,99 @@
+// Standalone signage document. Scale typography to the player, including embedded frames.
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+    background: #edf2f6;
+    color: #122f50;
+    font: 100%/1.4 Arial, Helvetica, sans-serif;
+}
+.display {
+    width: min(100%, var(--display-width, 100%));
+    min-height: min(100vh, var(--display-height, 100vh));
+    margin-inline: auto;
+    container-type: inline-size;
+    background: white;
+    overflow-wrap: anywhere;
+}
+h1, h2, p, ul { margin: 0; }
+.masthead, .content, .pagination { padding-inline: clamp(1rem, 4cqi, 5rem); }
+.masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-block: clamp(1.1rem, 2.2cqi, 2.8rem);
+    background: #123458;
+    color: white;
+    border-block-end: .32rem solid #49b5ad;
+    .kicker { color: #c2e5e4; font-weight: 700; font-size: clamp(.9rem, 1.35cqi, 1.5rem); }
+    h1 { font-size: clamp(2rem, 3.7cqi, 4.75rem); line-height: 1.1; }
+    .updated { flex: none; text-align: end; color: #d9e5ef; font-size: clamp(.85rem, 1.25cqi, 1.4rem); }
+    time { display: block; color: white; font-size: clamp(1.35rem, 2.35cqi, 2.7rem); font-variant-numeric: tabular-nums; }
+}
+.content { padding-block: clamp(1.2rem, 2.7cqi, 3rem); }
+.window {
+    display: flex;
+    align-items: stretch;
+    gap: clamp(.8rem, 2.4cqi, 3rem);
+    justify-content: space-between;
+    padding-block-end: clamp(1rem, 2.3cqi, 2.8rem);
+    border-bottom: 2px solid #d9e3ec;
+}
+.when { align-self: center; }
+.date {
+    color: #465e74;
+    font-size: clamp(1rem, 1.7cqi, 2rem);
+    time, strong { display: inline-block; }
+    strong { margin-inline-end: .6em; color: #163a62; }
+}
+.when h2, .empty h2 {
+    margin-top: .25em;
+    font-size: clamp(2.3rem, 5.1cqi, 6.5rem);
+    line-height: 1;
+    letter-spacing: -.035em;
+    font-variant-numeric: tabular-nums;
+}
+.capacity {
+    padding: .6em 1.1em;
+    align-self: center;
+    border-inline-start: .28em solid #298367;
+    background: #e9f4ee;
+    color: #185940;
+    min-width: min(100%, 11em);
+    font-size: clamp(1rem, 1.55cqi, 1.9rem);
+    strong { font-size: clamp(2rem, 3.8cqi, 5rem); line-height: 1.05; display: block; }
+    &.full { border-color: #9a6029; background: #fbefe3; color: #73431b; }
+}
+.seats {
+    margin-top: clamp(1rem, 2cqi, 2.5rem);
+    h2 { margin-bottom: .55em; font-size: clamp(1.2rem, 1.8cqi, 2.15rem); }
+    ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(.55rem, 1cqi, 1.15rem); list-style: none; padding: 0; }
+    li { display: grid; align-content: space-between; gap: .4em; padding: .7em .9em; border: 1px solid #c9d6e1; border-radius: .35rem; font-size: clamp(1.1rem, 1.85cqi, 2.2rem); line-height: 1.2; }
+}
+.status {
+    display: flex; align-items: center; gap: .4em;
+    font-size: .82em; color: #71421d;
+    &::before { content: ''; width: .55em; height: .55em; flex: none; background: currentColor; border-radius: 50%; }
+    &.free { color: #176549; }
+}
+.notice {
+    font-size: clamp(1rem, 1.6cqi, 2rem); background: #eef3f8; padding: .65em .9em; margin-bottom: 1em;
+    p + p { margin-top: .5em; }
+}
+.empty { padding-block: 1rem; p:last-child { margin-top: 1em; font-size: clamp(1.2rem, 2cqi, 2.2rem); } }
+.pagination {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .5em;
+    padding-block: .75rem 1.25rem; color: #465e74; font-size: clamp(.95rem, 1.3cqi, 1.5rem);
+    > span { margin-inline-end: .5em; }
+    a { display: inline-flex; min-height: 2.5em; min-width: 2.5em; align-items: center; justify-content: center; padding: .25em .65em; color: #174e7f; border: 1px solid #c4d3df; border-radius: .25em; text-decoration: none; }
+    a:hover, a:focus-visible { background: #e7f2f9; outline: 2px solid #174e7f; }
+}
+@container (max-width: 56rem) {
+    .seats ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (max-width: 38rem) {
+    .window { flex-direction: column; }
+    .when, .capacity { align-self: stretch; }
+    .capacity { display: flex; align-items: baseline; gap: .5em; }
+    .date time { display: block; }
+}

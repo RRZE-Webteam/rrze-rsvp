@@ -3897,3 +3897,58 @@ msgstr ""
 #, php-format
 msgid "%s not scheduled"
 msgstr ""
+
+#: includes/templates/public-display.php:54
+msgid "Last updated"
+msgstr ""
+
+#: includes/templates/public-display.php:72
+msgid "Next available day"
+msgstr ""
+
+#: includes/templates/public-display.php:78
+msgid "Later today"
+msgstr ""
+
+#: includes/templates/public-display.php:88
+msgid "Occupied"
+msgstr ""
+
+#: includes/templates/public-display.php:93
+#, php-format
+msgid "of %s seats free"
+msgstr ""
+
+#: includes/templates/public-display.php:103
+msgid "Unavailable"
+msgstr ""
+
+#: includes/templates/public-display.php:112
+msgid "No free seats"
+msgstr ""
+
+#: includes/templates/public-display.php:112
+msgid "No time slots to display"
+msgstr ""
+
+#: includes/templates/public-display.php:115
+#, php-format
+msgid "There are no free seats through %s."
+msgstr ""
+
+#: includes/templates/public-display.php:122
+msgid "Display pages"
+msgstr ""
+
+#: includes/templates/public-display.php:124
+#, php-format
+msgid "Page %1$s of %2$s"
+msgstr ""
+
+#: includes/templates/public-display.php:128
+msgid "Resume rotation"
+msgstr ""
+
+#: includes/templates/public-display.php:128
+msgid "Pause rotation"
+msgstr ""

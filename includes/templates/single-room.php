@@ -14,6 +14,12 @@ $meta = get_post_meta($roomId);
 // Prepare the availability list before the header so its CSS loads normally.
 $daysInAdvance = get_post_meta($roomId, 'rrze-rsvp-room-days-in-advance', true);
 $daysInAdvance = $daysInAdvance === '' ? 10 : max(0, (int) $daysInAdvance);
+$displayMode = $_GET['show'] ?? '';
+if (($_GET['format'] ?? '') === 'embedded' && in_array($displayMode, PublicDisplay::MODES, true)) {
+    require __DIR__ . '/public-display.php';
+    return;
+}
+
 $roomAvailability = '';
 if (($_GET['format'] ?? '') !== 'embedded' && $options->general_single_room_availability_table !== 'no'
     && get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true) !== 'check-only') {
@@ -85,33 +91,6 @@ if (isset($_GET['format']) && $_GET['format'] == 'embedded') {
                 break;
             case 'availability':
                 echo do_shortcode('[rsvp-availability room=' . $roomId . ' days=' . $daysInAdvance . ']');
-                break;
-            case 'occupancy':
-                if (!empty($options->general_pdtxt)) {
-                    echo '<span class="rrze-rsvp-pdtxt">' . $options->general_pdtxt . '</span>';
-                }
-                if (!empty($meta['rrze-rsvp-room-pdtxt'][0])) {
-                    echo '<span class="rrze-rsvp-room-pdtxt">' . $meta['rrze-rsvp-room-pdtxt'][0] . '</span>';
-                }
-                echo Functions::getOccupancyByRoomIdHTML($roomId);
-                break;
-            case 'occupancy_now':
-                if (!empty($options->general_pdtxt)) {
-                    echo '<span class="rrze-rsvp-pdtxt">' . $options->general_pdtxt . '</span>';
-                }
-                if (!empty($meta['rrze-rsvp-room-pdtxt'][0])) {
-                    echo '<span class="rrze-rsvp-room-pdtxt">' . $meta['rrze-rsvp-room-pdtxt'][0] . '</span>';
-                }
-                echo Functions::getOccupancyByRoomIdHTML($roomId, true);
-                break;
-            case 'occupancy_nextavailable':
-                if (!empty($options->general_pdtxt)) {
-                    echo '<span class="rrze-rsvp-pdtxt">' . $options->general_pdtxt . '</span>';
-                }
-                if (!empty($meta['rrze-rsvp-room-pdtxt'][0])) {
-                    echo '<span class="rrze-rsvp-room-pdtxt">' . $meta['rrze-rsvp-room-pdtxt'][0] . '</span>';
-                }
-                echo Functions::getOccupancyByRoomIdNextHTML($roomId);
                 break;
             default:
                 echo Functions::getOccupancyByRoomIdHTML($roomId, true);

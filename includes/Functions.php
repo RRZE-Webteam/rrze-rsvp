@@ -277,14 +277,24 @@ class Functions
      */
     public static function getOccupancyByRoomIdAdmin(int $roomId): array
     {
-        $now = current_time('timestamp');
-        $defaults = [];
-        if (!self::roomClosedToday($roomId)) {
-            $schedule = self::getRoomSchedule($roomId);
-            foreach ($schedule[gmdate('N', $now)] ?? [] as $start => $end) {
-                $defaults[$start . ' - ' . $end] = 'available';
-            }
-        }
+        return self::getRoomOccupancyDays($roomId, current_datetime())->current();
+    }
+
+    /**
+     * Yield occupancy one local calendar day at a time, using one booking query for
+     * the whole interval. Room bookings store local clock values as Unix timestamps.
+     *
+     * @param int $roomId Room post ID.
+     * @param \DateTimeImmutable $now Current time in the WordPress site timezone.
+     * @param int $daysAhead Last day to include, relative to today.
+     * @return \Generator<string,array> ISO date to chronological slots and the state of each published seat.
+     */
+    public static function getRoomOccupancyDays(int $roomId, \DateTimeImmutable $now, int $daysAhead = 0): \Generator
+    {
+        $today = $now->setTime(0, 0);
+        $last = $today->modify('+' . max(0, $daysAhead) . ' days');
+        $clock = strtotime($now->format('Y-m-d H:i:s') . ' UTC');
+        $closed = preg_split('/\s+/', trim((string) get_post_meta($roomId, 'rrze-rsvp-room-days-closed', true)));
 
         // Consultations use the first published seat, as in the room booking form.
         $consultation = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true) === 'consultation';
@@ -297,21 +307,16 @@ class Functions
             'orderby' => 'date',
             'order' => 'ASC',
         ]);
-        if (!$seats) {
-            return ['room_slots' => array_keys($defaults)];
-        }
-
-        $dayStart = strtotime(gmdate('Y-m-d', $now) . ' 00:00 UTC');
-        $bookings = get_posts([
+        $bookings = $seats ? get_posts([
             'post_type' => 'booking',
             'post_status' => 'publish',
             'numberposts' => -1,
             'meta_query' => [
                 ['key' => 'rrze-rsvp-booking-seat', 'value' => wp_list_pluck($seats, 'ID'), 'compare' => 'IN'],
                 ['key' => 'rrze-rsvp-booking-status', 'value' => self::TIMESLOT_BLOCKING_BOOKING_STATUSES, 'compare' => 'IN'],
-                ['key' => 'rrze-rsvp-booking-start', 'value' => [$dayStart, $dayStart + DAY_IN_SECONDS - 1], 'compare' => 'BETWEEN', 'type' => 'NUMERIC'],
+                ['key' => 'rrze-rsvp-booking-start', 'value' => [strtotime($today->format('Y-m-d') . ' 00:00 UTC'), strtotime($last->format('Y-m-d') . ' 23:59:59 UTC')], 'compare' => 'BETWEEN', 'type' => 'NUMERIC'],
             ],
-        ]);
+        ]) : [];
 
         $occupied = [];
         $priority = ['checked-out' => 1, 'pending' => 2, 'confirmed' => 3, 'checked-in' => 4];
@@ -320,25 +325,44 @@ class Functions
             $start = (int) get_post_meta($booking->ID, 'rrze-rsvp-booking-start', true);
             $end = (int) get_post_meta($booking->ID, 'rrze-rsvp-booking-end', true);
             $status = get_post_meta($booking->ID, 'rrze-rsvp-booking-status', true);
-            if ($end <= $start || ($status === 'checked-out' && $end > $now)) {
+            if ($end <= $start || ($status === 'checked-out' && $end > $clock)) {
                 continue;
             }
+            $date = gmdate('Y-m-d', $start);
             $slot = gmdate('H:i', $start) . ' - ' . gmdate('H:i', $end);
-            $defaults[$slot] ??= 'unscheduled';
             if ($status === 'booked' || $status === 'customer-confirmed') {
                 $status = 'pending';
             }
-            $previous = $occupied[$seat][$slot] ?? '';
+            $previous = $occupied[$date][$seat][$slot] ?? '';
             if (($priority[$status] ?? 0) > ($priority[$previous] ?? 0)) {
-                $occupied[$seat][$slot] = $status;
+                $occupied[$date][$seat][$slot] = $status;
             }
         }
-        ksort($defaults);
-        $matrix = ['room_slots' => array_keys($defaults)];
-        foreach ($seats as $seat) {
-            $matrix[$seat->ID] = array_replace($defaults, $occupied[$seat->ID] ?? []);
+
+        for ($day = $today; $day <= $last; $day = $day->modify('+1 day')) {
+            $date = $day->format('Y-m-d');
+            $defaults = [];
+            if (!in_array($date, $closed, true)) {
+                $schedule = self::getRoomSchedule($roomId, false, strtotime($date . ' 12:00 UTC'));
+                foreach ($schedule[$day->format('N')] ?? [] as $start => $end) {
+                    $defaults[$start . ' - ' . $end] = 'available';
+                }
+            }
+            foreach ($occupied[$date] ?? [] as $seatSlots) {
+                foreach ($seatSlots as $slot => $status) {
+                    $defaults[$slot] ??= 'unscheduled';
+                }
+            }
+            ksort($defaults);
+            $matrix = ['room_slots' => array_keys($defaults)];
+            foreach ($seats as $seat) {
+                $matrix[$seat->ID] = array_replace($defaults, $occupied[$date][$seat->ID] ?? []);
+            }
+            yield $date => $matrix;
+            if (!$seats) {
+                return;
+            }
         }
-        return $matrix;
     }
 
     /**
@@ -1034,11 +1058,12 @@ class Functions
      * getRoomSchedule
      * Returns an array of timeslots per weekday for a specific room.
      * @param int $room_id
-     * @param boolean $with_duration = false
+     * @param bool $with_duration Whether to include rule validity in the returned schedule.
+     * @param int|null $referenceTime Legacy local clock timestamp used to select active rules, defaulting to now.
      * @return array [weekday_number(1-7)][starttime(H:i)] => endtime(H:i) [if $with_duration == false]
      * @return array [weekday_number(1-7)][valid_from-valid_to][start] => starttime(H:i) / [end] => endtime(H:i) [if $with_duration == true]
      */
-    public static function getRoomSchedule($room_id, $with_duration = false)
+    public static function getRoomSchedule($room_id, $with_duration = false, ?int $referenceTime = null)
     {
         $schedule = [];
         $room_timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
@@ -1056,7 +1081,7 @@ class Functions
                                 $schedule[$day][$valid_from . '-' . $valid_to . '-' . $week['rrze-rsvp-room-starttime'] . '-' . $week['rrze-rsvp-room-endtime']]['start'] = $week['rrze-rsvp-room-starttime'];
                                 $schedule[$day][$valid_from . '-' . $valid_to . '-' . $week['rrze-rsvp-room-starttime'] . '-' . $week['rrze-rsvp-room-endtime']]['end']   = $week['rrze-rsvp-room-endtime'];
                             } else {
-                                $now = current_time('timestamp');
+                                $now = $referenceTime ?? current_time('timestamp');
                                 if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $now >= $valid_from && $now <= $valid_to)
                                     || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $now >= $valid_from)
                                     || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $now <= $valid_to)

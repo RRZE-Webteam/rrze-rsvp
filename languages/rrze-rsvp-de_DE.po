@@ -4379,3 +4379,58 @@ msgstr "Bestätigung offen (%s)"
 #, php-format
 msgid "%s not scheduled"
 msgstr "%s nicht eingeplant"
+
+#: includes/templates/public-display.php:54
+msgid "Last updated"
+msgstr "Stand"
+
+#: includes/templates/public-display.php:72
+msgid "Next available day"
+msgstr "Nächster Tag mit freien Plätzen"
+
+#: includes/templates/public-display.php:78
+msgid "Later today"
+msgstr "Heute"
+
+#: includes/templates/public-display.php:88
+msgid "Occupied"
+msgstr "Belegt"
+
+#: includes/templates/public-display.php:93
+#, php-format
+msgid "of %s seats free"
+msgstr "von %s Plätzen frei"
+
+#: includes/templates/public-display.php:103
+msgid "Unavailable"
+msgstr "Nicht verfügbar"
+
+#: includes/templates/public-display.php:112
+msgid "No free seats"
+msgstr "Keine freien Plätze"
+
+#: includes/templates/public-display.php:112
+msgid "No time slots to display"
+msgstr "Keine Zeitfenster zur Anzeige"
+
+#: includes/templates/public-display.php:115
+#, php-format
+msgid "There are no free seats through %s."
+msgstr "Bis einschließlich %s sind keine Plätze frei."
+
+#: includes/templates/public-display.php:122
+msgid "Display pages"
+msgstr "Anzeigeseiten"
+
+#: includes/templates/public-display.php:124
+#, php-format
+msgid "Page %1$s of %2$s"
+msgstr "Seite %1$s von %2$s"
+
+#: includes/templates/public-display.php:128
+msgid "Resume rotation"
+msgstr "Automatisch weiterblättern"
+
+#: includes/templates/public-display.php:128
+msgid "Pause rotation"
+msgstr "Seitenwechsel pausieren"
