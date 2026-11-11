@@ -21,10 +21,20 @@ class Seats
 		//
 	}
 
+	/**
+	 * Register the seat post type and its administration hooks.
+	 *
+	 * @return void
+	 */
 	public function onLoaded()
 	{
 		add_action('init', [$this, 'seats_post_type']);
 		add_action('init', [$this, 'seats_taxonomies']);
+		add_action('rrze-rsvp-equipment_add_form_fields', [$this, 'equipmentOptions']);
+		add_action('after-rrze-rsvp-equipment-table', [$this, 'equipmentGuide']);
+		add_filter('manage_edit-rrze-rsvp-equipment_columns', [$this, 'equipmentColumns']);
+		add_filter('default_hidden_columns', [$this, 'equipmentHiddenColumns'], 10, 2);
+		add_filter('term_updated_messages', [$this, 'equipmentMessages']);
 
 		add_filter('manage_seat_posts_columns', [$this, 'columns']);
 		add_action('manage_seat_posts_custom_column', [$this, 'customColumn'], 10, 2);
@@ -89,11 +99,34 @@ class Seats
 		register_post_type('seat', $args);
 	}
 
+	/**
+	 * Register reusable equipment features and the labels used in the seat workflow.
+	 *
+	 * @return void
+	 */
 	public function seats_taxonomies()
 	{
 		$labels_equipment = array(
 			'name'				=> _x('Equipment', 'taxonomy general name', 'rrze-rsvp'),
 			'singular_name'		=> _x('Equipment', 'taxonomy singular name', 'rrze-rsvp'),
+			'add_new_item' => __('Add feature', 'rrze-rsvp'),
+			'new_item_name' => __('New feature name', 'rrze-rsvp'),
+			'edit_item' => __('Edit feature', 'rrze-rsvp'),
+			'update_item' => __('Update feature', 'rrze-rsvp'),
+			'view_item' => __('View feature', 'rrze-rsvp'),
+			'search_items' => __('Search features', 'rrze-rsvp'),
+			'all_items' => __('All features', 'rrze-rsvp'),
+			'parent_item' => __('Parent feature', 'rrze-rsvp'),
+			'parent_item_colon' => __('Parent feature:', 'rrze-rsvp'),
+			'items_list' => __('Existing features', 'rrze-rsvp'),
+			'items_list_navigation' => __('Equipment list navigation', 'rrze-rsvp'),
+			'not_found' => __('No equipment features found.', 'rrze-rsvp'),
+			'no_terms' => __('No equipment features', 'rrze-rsvp'),
+			'back_to_items' => __('Back to equipment', 'rrze-rsvp'),
+			'name_field_description' => __('This name appears when someone selects the seat, for example “Digital camera” or “Fluorescence filter”.', 'rrze-rsvp'),
+			'slug_field_description' => __('Leave this blank to generate the URL slug from the name.', 'rrze-rsvp'),
+			'parent_field_description' => __('To group related features, select a broader feature, such as “Optics”.', 'rrze-rsvp'),
+			'desc_field_description' => __('You can describe the feature here. The booking form only shows its name.', 'rrze-rsvp'),
 		);
 		$args_equipment = array(
 			'labels' => $labels_equipment,
@@ -107,6 +140,74 @@ class Seats
 			]
 		);
 		register_taxonomy('rrze-rsvp-equipment', 'seat', $args_equipment);
+	}
+
+	/**
+	 * Provide a disclosure for optional core fields; leave them visible without JavaScript.
+	 *
+	 * @return void
+	 */
+	public function equipmentOptions(): void
+	{
+		echo '<details class="rsvp-equipment-options" hidden><summary>'
+			. esc_html__('More options (optional)', 'rrze-rsvp') . '</summary></details>';
+	}
+
+	/**
+	 * Explain the difference between a bookable seat and its equipment and link to seat management.
+	 *
+	 * @return void
+	 */
+	public function equipmentGuide(): void
+	{
+		?>
+		<div class="rsvp-equipment-guide">
+			<h3><?php esc_html_e('Seat or equipment feature?', 'rrze-rsvp'); ?></h3>
+			<p><?php esc_html_e('If a microscope can be booked individually, create it as a seat. Its digital camera is an equipment feature. You can assign the same feature to several seats.', 'rrze-rsvp'); ?></p>
+			<p><?php esc_html_e('To assign a feature, open the seat, select the feature under Equipment and save the seat.', 'rrze-rsvp'); ?></p>
+			<a href="<?php echo esc_url(admin_url('edit.php?post_type=seat')); ?>"><?php esc_html_e('Go to seats', 'rrze-rsvp'); ?></a>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Label the equipment name and the core link to seats using the feature.
+	 *
+	 * @param array $columns Core term table columns keyed by column ID.
+	 * @return array Columns with equipment-specific headings.
+	 */
+	public function equipmentColumns(array $columns): array
+	{
+		$columns['name'] = __('Feature', 'rrze-rsvp');
+		$columns['posts'] = _x('Seats', 'Post type general name', 'rrze-rsvp');
+		return $columns;
+	}
+
+	/**
+	 * Keep optional taxonomy metadata available via Screen Options on the equipment list.
+	 *
+	 * @param array      $hidden Columns hidden by default.
+	 * @param \WP_Screen $screen Current WordPress admin screen.
+	 * @return array Default hidden columns, before any saved user preferences are applied.
+	 */
+	public function equipmentHiddenColumns(array $hidden, \WP_Screen $screen): array
+	{
+		return $screen->id === 'edit-rrze-rsvp-equipment'
+			? array_unique(array_merge($hidden, ['description', 'slug']))
+			: $hidden;
+	}
+
+	/**
+	 * Tell editors where to use a newly created feature, including after an AJAX add.
+	 *
+	 * @param array $messages Core term messages keyed by taxonomy and operation.
+	 * @return array Term messages with a next step after adding equipment.
+	 */
+	public function equipmentMessages(array $messages): array
+	{
+		$messages['rrze-rsvp-equipment'] ??= $messages['_item'];
+		$messages['rrze-rsvp-equipment'][1] = __('Feature added. You can now select it when editing a seat.', 'rrze-rsvp');
+		return $messages;
 	}
 
 	public function columns($columns)

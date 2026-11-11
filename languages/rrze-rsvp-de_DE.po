@@ -4166,3 +4166,103 @@ msgstr "Kurs"
 msgctxt "block keyword"
 msgid "room"
 msgstr "Raum"
+
+#: includes/CPT/Seats.php:111
+msgid "Add feature"
+msgstr "Merkmal hinzufügen"
+
+#: includes/CPT/Seats.php:112
+msgid "New feature name"
+msgstr "Name des neuen Merkmals"
+
+#: includes/CPT/Seats.php:113
+msgid "Edit feature"
+msgstr "Merkmal bearbeiten"
+
+#: includes/CPT/Seats.php:114
+msgid "Update feature"
+msgstr "Merkmal aktualisieren"
+
+#: includes/CPT/Seats.php:115
+msgid "View feature"
+msgstr "Merkmal ansehen"
+
+#: includes/CPT/Seats.php:116
+msgid "Search features"
+msgstr "Merkmale suchen"
+
+#: includes/CPT/Seats.php:117
+msgid "All features"
+msgstr "Alle Merkmale"
+
+#: includes/CPT/Seats.php:118
+msgid "Parent feature"
+msgstr "Übergeordnetes Merkmal"
+
+#: includes/CPT/Seats.php:119
+msgid "Parent feature:"
+msgstr "Übergeordnetes Merkmal:"
+
+#: includes/CPT/Seats.php:120
+msgid "Existing features"
+msgstr "Vorhandene Merkmale"
+
+#: includes/CPT/Seats.php:121
+msgid "Equipment list navigation"
+msgstr "Navigation der Ausstattungsliste"
+
+#: includes/CPT/Seats.php:122
+msgid "No equipment features found."
+msgstr "Keine Ausstattungsmerkmale gefunden."
+
+#: includes/CPT/Seats.php:123
+msgid "No equipment features"
+msgstr "Keine Ausstattungsmerkmale"
+
+#: includes/CPT/Seats.php:124
+msgid "Back to equipment"
+msgstr "Zurück zur Ausstattung"
+
+#: includes/CPT/Seats.php:125
+msgid "This name appears when someone selects the seat, for example “Digital camera” or “Fluorescence filter”."
+msgstr "Dieser Name erscheint bei der Platzauswahl, zum Beispiel „Digitalkamera“ oder „Fluoreszenzfilter“."
+
+#: includes/CPT/Seats.php:126
+msgid "Leave this blank to generate the URL slug from the name."
+msgstr "Wenn Sie das Feld leer lassen, erstellt WordPress die Titelform aus dem Namen."
+
+#: includes/CPT/Seats.php:127
+msgid "To group related features, select a broader feature, such as “Optics”."
+msgstr "Wenn Sie Merkmale gruppieren möchten, wählen Sie einen Oberbegriff wie „Optik“."
+
+#: includes/CPT/Seats.php:128
+msgid "You can describe the feature here. The booking form only shows its name."
+msgstr "Hier können Sie das Merkmal näher beschreiben. Im Buchungsformular erscheint nur der Name."
+
+#: includes/CPT/Seats.php:152
+msgid "More options (optional)"
+msgstr "Weitere Angaben (optional)"
+
+#: includes/CPT/Seats.php:164
+msgid "Seat or equipment feature?"
+msgstr "Platz oder Ausstattung?"
+
+#: includes/CPT/Seats.php:165
+msgid "If a microscope can be booked individually, create it as a seat. Its digital camera is an equipment feature. You can assign the same feature to several seats."
+msgstr "Ein einzeln buchbares Mikroskop legen Sie als Platz an. Seine Digitalkamera ist ein Ausstattungsmerkmal. Dasselbe Merkmal können Sie mehreren Plätzen zuordnen."
+
+#: includes/CPT/Seats.php:166
+msgid "To assign a feature, open the seat, select the feature under Equipment and save the seat."
+msgstr "Öffnen Sie den gewünschten Platz, wählen Sie unter „Ausstattung“ das Merkmal aus und speichern Sie den Platz."
+
+#: includes/CPT/Seats.php:167
+msgid "Go to seats"
+msgstr "Zur Platzübersicht"
+
+#: includes/CPT/Seats.php:180
+msgid "Feature"
+msgstr "Merkmal"
+
+#: includes/CPT/Seats.php:209
+msgid "Feature added. You can now select it when editing a seat."
+msgstr "Merkmal hinzugefügt. Sie können es jetzt beim Bearbeiten eines Platzes auswählen."

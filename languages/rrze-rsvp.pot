@@ -3684,3 +3684,103 @@ msgstr ""
 #: src/blocks/rsvp/variations.ts:14
 msgid "Reserve a seat in a room for a selected time."
 msgstr ""
+
+#: includes/CPT/Seats.php:111
+msgid "Add feature"
+msgstr ""
+
+#: includes/CPT/Seats.php:112
+msgid "New feature name"
+msgstr ""
+
+#: includes/CPT/Seats.php:113
+msgid "Edit feature"
+msgstr ""
+
+#: includes/CPT/Seats.php:114
+msgid "Update feature"
+msgstr ""
+
+#: includes/CPT/Seats.php:115
+msgid "View feature"
+msgstr ""
+
+#: includes/CPT/Seats.php:116
+msgid "Search features"
+msgstr ""
+
+#: includes/CPT/Seats.php:117
+msgid "All features"
+msgstr ""
+
+#: includes/CPT/Seats.php:118
+msgid "Parent feature"
+msgstr ""
+
+#: includes/CPT/Seats.php:119
+msgid "Parent feature:"
+msgstr ""
+
+#: includes/CPT/Seats.php:120
+msgid "Existing features"
+msgstr ""
+
+#: includes/CPT/Seats.php:121
+msgid "Equipment list navigation"
+msgstr ""
+
+#: includes/CPT/Seats.php:122
+msgid "No equipment features found."
+msgstr ""
+
+#: includes/CPT/Seats.php:123
+msgid "No equipment features"
+msgstr ""
+
+#: includes/CPT/Seats.php:124
+msgid "Back to equipment"
+msgstr ""
+
+#: includes/CPT/Seats.php:125
+msgid "This name appears when someone selects the seat, for example “Digital camera” or “Fluorescence filter”."
+msgstr ""
+
+#: includes/CPT/Seats.php:126
+msgid "Leave this blank to generate the URL slug from the name."
+msgstr ""
+
+#: includes/CPT/Seats.php:127
+msgid "To group related features, select a broader feature, such as “Optics”."
+msgstr ""
+
+#: includes/CPT/Seats.php:128
+msgid "You can describe the feature here. The booking form only shows its name."
+msgstr ""
+
+#: includes/CPT/Seats.php:152
+msgid "More options (optional)"
+msgstr ""
+
+#: includes/CPT/Seats.php:164
+msgid "Seat or equipment feature?"
+msgstr ""
+
+#: includes/CPT/Seats.php:165
+msgid "If a microscope can be booked individually, create it as a seat. Its digital camera is an equipment feature. You can assign the same feature to several seats."
+msgstr ""
+
+#: includes/CPT/Seats.php:166
+msgid "To assign a feature, open the seat, select the feature under Equipment and save the seat."
+msgstr ""
+
+#: includes/CPT/Seats.php:167
+msgid "Go to seats"
+msgstr ""
+
+#: includes/CPT/Seats.php:180
+msgid "Feature"
+msgstr ""
+
+#: includes/CPT/Seats.php:209
+msgid "Feature added. You can now select it when editing a seat."
+msgstr ""
