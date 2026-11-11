@@ -226,132 +226,134 @@ class Functions
 
 
     /**
-     * getOccupancyByRoomIdHTMLAdmin
-     * calls getOccupancyByRoomIdAdmin and returns an HTML table with room's occupancy for today 
-     * Note: css-classes are identical to status: confirmed, checked-in, available
-     * @param int $room_id (the room's post id)
-     * @return string
+     * Render today's slot totals and expandable seat lists in the administration language.
+     *
+     * @param int $room_id Published room ID.
+     * @return string Escaped occupancy view or a contextual empty state.
      */
     public static function getOccupancyByRoomIdHTMLAdmin(int $room_id): string
     {
-
-
-        $seats_slots = self::getOccupancyByRoomIdAdmin($room_id);
-
-        if ($seats_slots) {
-            $output = '<table class="rsvp-room-occupancy"><tr>';
-            $output .= '<th>' . __('Seat', 'rrze-rsvp') . '</th>';
-            foreach ($seats_slots['room_slots'] as $room_slot) {
-                $output .= '<th scope="col"><span class="rrze-rsvp-timeslot">' . $room_slot . '</span></th>';
-            }
-            $output .= '</tr>';
-            $aRoomSlots = $seats_slots['room_slots'];
-            unset($seats_slots['room_slots']);
-
-            foreach ($seats_slots as $seat_id => $aSlots) {
-                $output .= '<tr>';
-                $output .= '<th scope="row">' . get_the_title($seat_id) . '</th>';
-                foreach ($aRoomSlots as $slot) {
-                    $output .= '<td><span class="' . $aSlots[$slot] . '">' . $aSlots[$slot] . '</span></td>';
-                }
-                $output .= '</tr>';
-            }
-            $output .= '</table>';
-        } else {
-            $output = '<div class="alert">' . __('This room has no seats for today.', 'rrze-rsvp') . '</div>';
+        $matrix = self::getOccupancyByRoomIdAdmin($room_id);
+        $slots = $matrix['room_slots'];
+        unset($matrix['room_slots']);
+        $names = [];
+        foreach (array_keys($matrix) as $id) {
+            $names[$id] = get_the_title($id);
         }
-
-
-        return $output;
+        natcasesort($names);
+        $labels = [
+            'available' => __('Free', 'rrze-rsvp'),
+            'pending' => __('Awaiting confirmation', 'rrze-rsvp'),
+            'confirmed' => __('Reserved', 'rrze-rsvp'),
+            'checked-in' => __('Checked in', 'rrze-rsvp'),
+            'checked-out' => __('Checked out', 'rrze-rsvp'),
+            'unscheduled' => __('Not scheduled', 'rrze-rsvp'),
+        ];
+        $closed = self::roomClosedToday($room_id);
+        ob_start();
+        require __DIR__ . '/templates/admin/occupancy-slots.php';
+        return (string) ob_get_clean();
     }
 
+    /**
+     * Check the site's current calendar day against the room's saved closing dates.
+     *
+     * @param int $roomId Room post ID.
+     * @return bool Whether the published schedule is suspended today.
+     */
+    private static function roomClosedToday(int $roomId): bool
+    {
+        $days = (string) get_post_meta($roomId, 'rrze-rsvp-room-days-closed', true);
+        return in_array(current_time('Y-m-d'), preg_split('/\s+/', trim($days)), true);
+    }
 
     /**
-     * getOccupancyByRoomIdAdmin
-     * Returns an array('room_slots' with all timeslot-spans for given room, post_id of seat => array(timeslot-span => 'confirmed', 'checked-in' or 'available )) for today
-     * Example: given room has 3 seats; 1 seat is "confirmed" at 12:30-13:00 
-     * array(4) { ["room_slots"]=> array(3) { [0]=> string(13) "11:00 - 12:15" [1]=> string(13) "12:30 - 13:00" [2]=> string(13) "12:45 - 15:00" } [2244521]=> array(3) { ["11:00-12:15"]=> string(9) "available" ["12:30-13:00"]=> string(9) "available" ["12:45-15:00"]=> string(9) "available" } [2244522]=> array(3) { ["12:30-13:00"]=> string(9) "confirmed" ["11:00-12:15"]=> string(9) "available" ["12:45-15:00"]=> string(9) "available" } [2244523]=> array(3) { ["11:00-12:15"]=> string(9) "available" ["12:30-13:00"]=> string(9) "available" ["12:45-15:00"]=> string(9) "available" } }
-     * @param int $roomId (the room's post id)
-     * @return array
+     * Read all published seats and their booking states for the site's current day.
+     * Room bookings use legacy local clock timestamps. A booking outside today's
+     * schedule still appears, with the other seats marked as unscheduled.
+     *
+     * @param int $roomId Room post ID.
+     * @return array Chronological room_slots and seat IDs mapped to a status per interval.
      */
     public static function getOccupancyByRoomIdAdmin(int $roomId): array
     {
-        $data = [];
-
-        $timestamp = current_time('timestamp');
-        $today = date('Y-m-d', $timestamp);
-        $today_weeknumber = date('N', $timestamp);
-
-        // get timeslots for today for this room
-        $slots = self::getRoomSchedule($roomId); // liefert [wochentag-nummer][startzeit] = end-zeit;
-        $slots_today_tmp = (isset($slots[$today_weeknumber]) ? $slots[$today_weeknumber] : []);
-        $slots_today = [];
-        foreach ($slots_today_tmp as $start => $end) {
-            $slots_today[] = $start . ' - ' . $end;
-            $data['room_slots'][] =  $start . ' - ' . $end;
+        $now = current_time('timestamp');
+        $defaults = [];
+        if (!self::roomClosedToday($roomId)) {
+            $schedule = self::getRoomSchedule($roomId);
+            foreach ($schedule[gmdate('N', $now)] ?? [] as $start => $end) {
+                $defaults[$start . ' - ' . $end] = 'available';
+            }
         }
 
-        // get seats for this room
-        $aSeatIds = get_posts([
+        // Consultations use the first published seat, as in the room booking form.
+        $consultation = get_post_meta($roomId, 'rrze-rsvp-room-bookingmode', true) === 'consultation';
+        $seats = get_posts([
             'post_type' => 'seat',
             'post_status' => 'publish',
-            'nopaging' => true,
+            'numberposts' => $consultation ? 1 : -1,
             'meta_key' => 'rrze-rsvp-seat-room',
             'meta_value' => $roomId,
-            'fields' => 'ids',
-            'orderby' => 'title',
-            'order' => 'ASC'
+            'orderby' => 'date',
+            'order' => 'ASC',
+        ]);
+        if (!$seats) {
+            return ['room_slots' => array_keys($defaults)];
+        }
+
+        $dayStart = strtotime(gmdate('Y-m-d', $now) . ' 00:00 UTC');
+        $bookings = get_posts([
+            'post_type' => 'booking',
+            'post_status' => 'publish',
+            'numberposts' => -1,
+            'meta_query' => [
+                ['key' => 'rrze-rsvp-booking-seat', 'value' => wp_list_pluck($seats, 'ID'), 'compare' => 'IN'],
+                ['key' => 'rrze-rsvp-booking-status', 'value' => self::TIMESLOT_BLOCKING_BOOKING_STATUSES, 'compare' => 'IN'],
+                ['key' => 'rrze-rsvp-booking-start', 'value' => [$dayStart, $dayStart + DAY_IN_SECONDS - 1], 'compare' => 'BETWEEN', 'type' => 'NUMERIC'],
+            ],
         ]);
 
-        $end = date('Y-m-d H:i', strtotime($today . ' +23 hours, +59 minutes'));
-
-        foreach ($aSeatIds as $seatId) {
-            // get bookingIds for each seat that are confirmed oder checked-in
-            $aBookingIds = get_posts([
-                'post_type' => 'booking',
-                'post_status' => 'publish',
-                'fields' => 'ids',
-                'meta_query' => [
-                    [
-                        'key' => 'rrze-rsvp-booking-seat',
-                        'value'   => $seatId,
-                    ],
-                    [
-                        'key' => 'rrze-rsvp-booking-status',
-                        'value'   => ['confirmed', 'checked-in'],
-                        'compare' => 'IN'
-                    ],
-                    [
-                        'key'     => 'rrze-rsvp-booking-start',
-                        'value' => array(strtotime($today), strtotime($end)),
-                        'compare' => 'BETWEEN',
-                        'type' => 'numeric'
-                    ],
-                ],
-            ]);
-
-            if ($aBookingIds) {
-                foreach ($aBookingIds as $bookingId) {
-                    // set booking-status as value of key "startTime-endTime"
-                    $aBookingMeta = get_post_meta($bookingId);
-                    $timespan = date('H:i', $aBookingMeta['rrze-rsvp-booking-start'][0]) . ' - ' . date('H:i', $aBookingMeta['rrze-rsvp-booking-end'][0]);
-                    $data[$seatId][$timespan] = $aBookingMeta['rrze-rsvp-booking-status'][0];
-                }
+        $occupied = [];
+        $priority = ['checked-out' => 1, 'pending' => 2, 'confirmed' => 3, 'checked-in' => 4];
+        foreach ($bookings as $booking) {
+            $seat = (int) get_post_meta($booking->ID, 'rrze-rsvp-booking-seat', true);
+            $start = (int) get_post_meta($booking->ID, 'rrze-rsvp-booking-start', true);
+            $end = (int) get_post_meta($booking->ID, 'rrze-rsvp-booking-end', true);
+            $status = get_post_meta($booking->ID, 'rrze-rsvp-booking-status', true);
+            if ($end <= $start || ($status === 'checked-out' && $end > $now)) {
+                continue;
             }
-
-            foreach ($slots_today as $timespan) {
-                $data[$seatId][$timespan] = (isset($data[$seatId][$timespan]) ? $data[$seatId][$timespan] : 'available');
+            $slot = gmdate('H:i', $start) . ' - ' . gmdate('H:i', $end);
+            $defaults[$slot] ??= 'unscheduled';
+            if ($status === 'booked' || $status === 'customer-confirmed') {
+                $status = 'pending';
+            }
+            $previous = $occupied[$seat][$slot] ?? '';
+            if (($priority[$status] ?? 0) > ($priority[$previous] ?? 0)) {
+                $occupied[$seat][$slot] = $status;
             }
         }
-        return $data;
+        ksort($defaults);
+        $matrix = ['room_slots' => array_keys($defaults)];
+        foreach ($seats as $seat) {
+            $matrix[$seat->ID] = array_replace($defaults, $occupied[$seat->ID] ?? []);
+        }
+        return $matrix;
     }
 
+    /**
+     * Link to the public room page and its dedicated signage view.
+     *
+     * @param int $roomId Published room ID.
+     * @return string Escaped links with support for all WordPress permalink formats.
+     */
     public static function getOccupancyLinks(int $roomId): string
     {
-        $url = esc_url(get_permalink($roomId));
-        return '<span class="rrze-rsvp-occupancylinktitle">' . __('Links to display the current room occupancy', 'rrze-rsvp') . '</span>: <span class="rrze-rsvp-occupancylink"><a href="' . $url . '" target="_blank">' . __('Normal website', 'rrze-rsvp') . '</a></span> <span class="rrze-rsvp-occupancylink"><a href="' . $url . '?format=embedded&show=occupancy_nextavailable" target="_blank">' . __('Website for public displays', 'rrze-rsvp') . '</a></span>';
+        $url = get_permalink($roomId);
+        $display = add_query_arg(['format' => 'embedded', 'show' => 'occupancy_nextavailable'], $url);
+        return '<a href="' . esc_url($url) . '">' . esc_html__('Open room page', 'rrze-rsvp') . '</a>'
+            . ' <a href="' . esc_url($display) . '">' . esc_html__('Open public display view', 'rrze-rsvp') . '</a>';
     }
-
 
     /**
      * Read a booking using its course or legacy room representation.

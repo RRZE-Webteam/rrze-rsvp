@@ -1,0 +1,113 @@
+.rsvp-occupancy-admin {
+    max-width: 66rem;
+    color: #1d2327;
+
+    > .description {
+        max-width: 70ch;
+        margin: .5rem 0 1.25rem;
+        font-size: .925rem;
+        font-style: normal;
+    }
+    .rsvp-occupancy-filter, .rsvp-occupancy-heading, footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: .5rem .875rem;
+    }
+    .rsvp-occupancy-filter {
+        margin-block: 1rem;
+        label { font-weight: 600; }
+        select { max-width: 100%; }
+    }
+    .rsvp-occupancy-card {
+        margin-block: 1rem;
+        padding: clamp(1rem, 2.5vw, 1.75rem);
+        border: 1px solid #c3c4c7;
+        border-radius: 4px;
+        background: #fff;
+        overflow-wrap: anywhere;
+        h2 { margin: 0; font-size: 1.25rem; line-height: 1.35; }
+    }
+    .rsvp-occupancy-heading {
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+        time { color: #50575e; }
+    }
+    .rsvp-occupancy-slot {
+        margin-block: .625rem;
+        border: 1px solid #c3c4c7;
+        border-radius: 4px;
+        summary {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            align-items: center;
+            gap: .7rem;
+            padding: .75rem 1rem;
+            background: #f6f7f7;
+            list-style: none;
+            cursor: pointer;
+            &::-webkit-details-marker { display: none; }
+            &::before {
+                content: '';
+                width: .45rem;
+                height: .45rem;
+                border-inline-end: 2px solid;
+                border-bottom: 2px solid;
+                transform: rotate(-45deg);
+            }
+            &:hover { background: #edf2f6; }
+            &:focus-visible { outline: 2px solid var(--wp-admin-theme-color, #2271b1); outline-offset: 2px; }
+        }
+        &[open] summary::before { transform: rotate(45deg); }
+    }
+    .rsvp-occupancy-time, .rsvp-occupancy-counts {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: .35rem .65rem;
+    }
+    .rsvp-occupancy-time {
+        font-variant-numeric: tabular-nums;
+        strong { font-size: 1rem; }
+        small { color: #50575e; font-size: .8rem; }
+    }
+    .rsvp-occupancy-status {
+        display: inline-block;
+        width: fit-content;
+        padding: .15rem .55rem;
+        border-radius: .25rem;
+        background: #f0f0f1;
+        color: #3c434a;
+        font-size: .81rem;
+        line-height: 1.5;
+        &.is-available { background: #e6f3eb; color: #175138; }
+        &.is-pending { background: #fcf2d7; color: #654a0e; }
+        &.is-confirmed { background: #e5eff9; color: #174c79; }
+        &.is-checked-in { background: #eae5f6; color: #513975; }
+    }
+    .rsvp-occupancy-seats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+        gap: 0 1.5rem;
+        margin: 0;
+        padding: .5rem 1rem;
+        li {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: .75rem;
+            margin: 0;
+            padding: .5rem 0;
+            border-top: 1px solid #e5e5e5;
+        }
+        .rsvp-occupancy-status { flex: none; }
+    }
+    footer {
+        margin-top: 1.25rem;
+        gap: .5rem 1.25rem;
+    }
+    @media (max-width: 600px) {
+        .rsvp-occupancy-slot summary { grid-template-columns: auto 1fr; }
+        .rsvp-occupancy-counts { grid-column: 2; }
+    }
+}

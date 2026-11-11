@@ -4266,3 +4266,116 @@ msgstr "Merkmal"
 #: includes/CPT/Seats.php:209
 msgid "Feature added. You can now select it when editing a seat."
 msgstr "Merkmal hinzugefügt. Sie können es jetzt beim Bearbeiten eines Platzes auswählen."
+
+#: includes/templates/admin/occupancy.php:17
+msgid "No published rooms yet"
+msgstr "Noch keine Räume veröffentlicht"
+
+#: includes/templates/admin/occupancy.php:18
+msgid "Publish a room with seats and time slots to see its occupancy here."
+msgstr "Sobald ein Raum mit Plätzen und Zeitfenstern veröffentlicht ist, sehen Sie hier seine Belegung."
+
+#: includes/templates/admin/occupancy.php:20
+msgid "Manage rooms"
+msgstr "Räume verwalten"
+
+#: includes/templates/admin/occupancy.php:24
+msgid "See how many seats are free or booked in each time slot. Open a time slot to see the status of individual seats."
+msgstr "Hier sehen Sie, wie viele Plätze je Zeitfenster frei oder belegt sind. Öffnen Sie ein Zeitfenster, um die einzelnen Plätze zu sehen."
+
+#: includes/templates/admin/occupancy.php:35
+msgid "Show occupancy"
+msgstr "Belegung anzeigen"
+
+#: includes/templates/admin/occupancy.php:48
+msgid "This room is no longer available. Select a published room to view its occupancy."
+msgstr "Dieser Raum ist nicht mehr verfügbar. Wählen Sie einen veröffentlichten Raum aus."
+
+#: includes/templates/admin/occupancy-slots.php:15
+msgid "This room is closed today."
+msgstr "Der Raum ist heute geschlossen."
+
+#: includes/templates/admin/occupancy-slots.php:21
+msgid "This room has no published seats."
+msgstr "Für diesen Raum sind noch keine Plätze veröffentlicht."
+
+#: includes/templates/admin/occupancy-slots.php:22
+msgid "There are no time slots scheduled for today."
+msgstr "Für heute sind keine Zeitfenster eingetragen."
+
+#: includes/templates/admin/occupancy-slots.php:24
+msgid "Manage seats"
+msgstr "Plätze verwalten"
+
+#: includes/templates/admin/occupancy-slots.php:26
+msgid "Edit room schedule"
+msgstr "Zeitfenster bearbeiten"
+
+#: includes/templates/admin/occupancy-slots.php:45
+msgid "In progress"
+msgstr "Läuft gerade"
+
+#: includes/templates/admin/occupancy-slots.php:47
+msgid "Ended"
+msgstr "Beendet"
+
+#: includes/Functions.php:245
+msgid "Free"
+msgstr "Frei"
+
+#: includes/Functions.php:246
+msgid "Awaiting confirmation"
+msgstr "Bestätigung offen"
+
+#: includes/Functions.php:247
+msgid "Reserved"
+msgstr "Reserviert"
+
+#: includes/Functions.php:250
+msgid "Not scheduled"
+msgstr "Nicht eingeplant"
+
+#: includes/Functions.php:354
+msgid "Open room page"
+msgstr "Öffentliche Raumseite öffnen"
+
+#: includes/Functions.php:355
+msgid "Open public display view"
+msgstr "Ansicht für Infodisplays öffnen"
+
+#: includes/templates/admin/occupancy.php:43
+msgctxt "room occupancy date format"
+msgid "l, F j, Y"
+msgstr "l, j. F Y"
+
+#: includes/templates/admin/occupancy-slots.php:58
+#, php-format
+msgid "%s seat free"
+msgid_plural "%s seats free"
+msgstr[0] "%s Platz frei"
+msgstr[1] "%s Plätze frei"
+
+#: includes/templates/admin/occupancy-slots.php:59
+#, php-format
+msgid "%s reserved"
+msgstr "%s reserviert"
+
+#: includes/templates/admin/occupancy-slots.php:60
+#, php-format
+msgid "%s checked in"
+msgstr "%s eingecheckt"
+
+#: includes/templates/admin/occupancy-slots.php:61
+#, php-format
+msgid "%s checked out"
+msgstr "%s ausgecheckt"
+
+#: includes/templates/admin/occupancy-slots.php:62
+#, php-format
+msgid "%s awaiting confirmation"
+msgstr "Bestätigung offen (%s)"
+
+#: includes/templates/admin/occupancy-slots.php:63
+#, php-format
+msgid "%s not scheduled"
+msgstr "%s nicht eingeplant"

@@ -164,18 +164,13 @@ class CPT extends Main
         return $parent_file;
     }
 
-    public function getOccupancyPage()
+    /**
+     * Show today's occupancy for a published room on the current site.
+     *
+     * @return void
+     */
+    public function getOccupancyPage(): void
     {
-        echo '<div class="wrap">'
-            . '<h1>' . esc_html_x('Room occupancy for today', 'admin page title', 'rrze-rsvp') . '</h1>'
-
-            . '<div class="tablenav top">'
-            . '<div class="alignleft actions bulkactions">'
-            . '<label for="select_room" class="screen-reader-text">' . __('Room', 'rrze-rsvp') . '</label>'
-            . '<form action="" method="post" class="occupancy">'
-            . '<select id="rsvp_room_id" name="rsvp_room_id">'
-            . '<option>&mdash; ' . __('Please select room', 'rrze-rsvp') . ' &mdash;</option>';
-
         $rooms = get_posts([
             'post_type' => 'room',
             'post_status' => 'publish',
@@ -183,16 +178,12 @@ class CPT extends Main
             'orderby' => 'title',
             'order' => 'ASC',
         ]);
+        $rooms = wp_list_pluck($rooms, 'post_title', 'ID');
+        $roomId = isset($_GET['rsvp_room_id'])
+            ? (int) filter_input(INPUT_GET, 'rsvp_room_id', FILTER_VALIDATE_INT)
+            : (int) array_key_first($rooms);
 
-        foreach ($rooms as $room) {
-            echo '<option value="' . $room->ID . '">' . $room->post_title . '</option>';
-        }
-        echo '</select></form>'
-            . '<div id="loading"><i class="fa fa-refresh fa-spin fa-4x"></i></div>'
-            . '</div>'
-            . '<div class="rsvp-occupancy-links"></div>'
-            . '<div class="rsvp-occupancy-container"></div>'
-            . '</div>';
+        require dirname(__DIR__) . '/templates/admin/occupancy.php';
     }
 
     public function customSubmitdiv()

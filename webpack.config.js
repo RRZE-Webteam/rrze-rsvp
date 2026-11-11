@@ -8,7 +8,6 @@ const admin = path.join(__dirname, "src", "admin");
 const menu = path.join(__dirname, "src", "menu");
 const shortcode = path.join(__dirname, "src", "shortcode");
 const seat = path.join(__dirname, "src", "seat");
-const occupancy = path.join(__dirname, "src", "occupancy");
 const reload = path.join(__dirname, "src", "reload");
 
 module.exports = (env, argv) => {
@@ -22,7 +21,6 @@ module.exports = (env, argv) => {
             menu,
             shortcode,
             seat,
-            occupancy,
             reload,
             "course-admin": path.join(__dirname, "src", "course-admin"),
             "course-block": path.join(__dirname, "src", "course-block"),

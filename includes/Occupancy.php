@@ -4,19 +4,17 @@ namespace RRZE\RSVP;
 
 defined('ABSPATH') || exit;
 
-use RRZE\RSVP\Functions;
-
-
-
 class Occupancy
 {
+    /**
+     * Register authenticated legacy occupancy requests and the public display reload script.
+     *
+     * @return void
+     */
     public function onLoaded()
     {
-        add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
         add_action('wp_ajax_ShowOccupancy', [$this, 'ajaxGetOccupancy']);
-        add_action('wp_ajax_nopriv_ShowOccupancy', [$this, 'ajaxGetOccupancy']);
         add_action('wp_ajax_ShowOccupancyLinks', [$this, 'ajaxGetOccupancyLinks']);
-        add_action('wp_ajax_nopriv_ShowOccupancyLinks', [$this, 'ajaxGetOccupancyLinks']);
         add_action('wp_enqueue_scripts', [$this, 'wpEnqueueScripts']);
         add_action('wp_print_scripts', [$this, 'wpDenqueueScripts'], 100);
     }
@@ -41,27 +39,17 @@ class Occupancy
         }
     }
 
-    public function adminEnqueueScripts()
-    {
-        wp_enqueue_script(
-            'rrze-rsvp-occupancy',
-            plugins_url('build/occupancy.js', plugin()->getBasename()),
-            ['jquery'],
-            plugin()->getVersion()
-        );
-
-        wp_localize_script('rrze-rsvp-occupancy', 'rsvp_ajax', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('rsvp-ajax-nonce'),
-        ]);
-    }
-
+    /**
+     * Return the daily seat and time slot view for an authorized admin request.
+     *
+     * @return void Sends a JSON response and exits.
+     */
     public function ajaxGetOccupancy()
     {
         check_ajax_referer('rsvp-ajax-nonce', 'nonce');
         $roomId = filter_input(INPUT_POST, 'roomId', FILTER_VALIDATE_INT);
 
-        if (get_post_type($roomId) != 'room') {
+        if (!current_user_can('edit_seats') || !$roomId || get_post_type($roomId) !== 'room') {
             header('HTTP/1.0 403 Forbidden');
             exit;
         }
@@ -75,12 +63,17 @@ class Occupancy
         wp_send_json($response);
     }
 
+    /**
+     * Return the two public room links for an authorized admin request.
+     *
+     * @return void Sends a JSON response and exits.
+     */
     public function ajaxGetOccupancyLinks()
     {
         check_ajax_referer('rsvp-ajax-nonce', 'nonce');
         $roomId = filter_input(INPUT_POST, 'roomId', FILTER_VALIDATE_INT);
 
-        if (get_post_type($roomId) != 'room') {
+        if (!current_user_can('edit_seats') || !$roomId || get_post_type($roomId) !== 'room') {
             header('HTTP/1.0 403 Forbidden');
             exit;
         }
