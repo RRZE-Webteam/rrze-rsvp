@@ -53,6 +53,17 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
+
+    .button.rsvp-course-remove-date:not(:disabled) {
+        color: #a32929;
+        border-color: currentColor;
+
+        &:hover,
+        &:focus-visible {
+            color: #8a2424;
+            background: #fcf0f1;
+        }
+    }
 }
 
 .rsvp-course-feedback:not(:empty) {

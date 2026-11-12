@@ -218,11 +218,8 @@ final class Admin
         if ($state === 'cancelled') {
             echo '<p><strong>' . esc_html__('This course date has been cancelled.', 'rrze-rsvp') . '</strong></p>';
             echo '<p>' . esc_html($date['location']) . '</p>';
-            echo '<p><a class="button" href="' . esc_url(add_query_arg(['post_type' => 'booking', 'rsvp_course_id' => $courseId, 'rsvp_occurrence_id' => $id], admin_url('edit.php'))) . '">' . esc_html__('View registrations', 'rrze-rsvp') . '</a>';
-            if (!$this->repository->hasBookings($id)) {
-                $delete = $this->queueForm('delete_date', $courseId, $id);
-                echo ' <button type="submit" form="' . esc_attr($delete) . '" class="button-link-delete" data-course-confirm="' . esc_attr__('Move this unused date to the Trash?', 'rrze-rsvp') . '">' . esc_html__('Remove date', 'rrze-rsvp') . '</button>';
-            }
+            echo '<p class="rsvp-course-row-actions"><a class="button" href="' . esc_url(add_query_arg(['post_type' => 'booking', 'rsvp_course_id' => $courseId, 'rsvp_occurrence_id' => $id], admin_url('edit.php'))) . '">' . esc_html__('View registrations', 'rrze-rsvp') . '</a>';
+            echo $this->removeDateButton($courseId, $id);
             echo '</p><div class="rsvp-course-feedback" role="status" aria-live="polite"></div></section>';
             return (string) ob_get_clean();
         }
@@ -257,14 +254,28 @@ final class Admin
                 $cancel = $this->queueForm('cancel_date', $courseId, $id);
                 echo ' <button type="submit" form="' . esc_attr($cancel) . '" class="button" data-course-confirm="' . esc_attr__('Cancel this date and all its active registrations?', 'rrze-rsvp') . '">' . esc_html__('Cancel date', 'rrze-rsvp') . '</button>';
             }
-            if (!$this->repository->hasBookings($id)) {
-                $delete = $this->queueForm('delete_date', $courseId, $id);
-                echo ' <button type="submit" form="' . esc_attr($delete) . '" class="button-link-delete" data-course-confirm="' . esc_attr__('Move this unused date to the Trash?', 'rrze-rsvp') . '">' . esc_html__('Remove date', 'rrze-rsvp') . '</button>';
-            }
+            echo $this->removeDateButton($courseId, $id);
             echo ' <a class="button" href="' . esc_url(add_query_arg(['post_type' => 'booking', 'rsvp_course_id' => $courseId, 'rsvp_occurrence_id' => $id], admin_url('edit.php'))) . '">' . esc_html__('View registrations', 'rrze-rsvp') . '</a>';
         }
         echo '</p></section>';
         return (string) ob_get_clean();
+    }
+
+    /**
+     * Render the trash action for an unused date the current user may remove.
+     *
+     * @param int $courseId Parent course whose deletion capability is required.
+     * @param int $dateId Persisted course date.
+     * @return string Escaped submit button, or an empty string if unavailable.
+     */
+    private function removeDateButton(int $courseId, int $dateId): string
+    {
+        if (!current_user_can('delete_post', $courseId) || $this->repository->hasBookings($dateId)) {
+            return '';
+        }
+        $form = $this->queueForm('delete_date', $courseId, $dateId);
+        return ' <button type="submit" form="' . esc_attr($form) . '" class="button rsvp-course-remove-date" data-course-confirm="'
+            . esc_attr__('Move this unused date to the Trash?', 'rrze-rsvp') . '">' . esc_html__('Remove date', 'rrze-rsvp') . '</button>';
     }
 
     /**
