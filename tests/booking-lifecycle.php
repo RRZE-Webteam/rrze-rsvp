@@ -147,6 +147,7 @@ function wp_timezone(): DateTimeZone
 
 require_once dirname(__DIR__) . '/includes/Utils.php';
 require_once dirname(__DIR__) . '/includes/Functions.php';
+require_once dirname(__DIR__) . '/includes/RoomSlots.php';
 require_once dirname(__DIR__) . '/includes/Metaboxes.php';
 require_once dirname(__DIR__) . '/includes/Schedule.php';
 

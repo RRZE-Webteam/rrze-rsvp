@@ -270,3 +270,43 @@ jQuery(function initializeTimeslots($) {
     }
     group.closest('form')[0].addEventListener('submit', validateForm, true);
 });
+
+/**
+ * Keep duration fields and native field-level validation in sync with the room mode.
+ * @returns {void}
+ */
+function initializeDurationSettings() {
+    const enabled = document.getElementById('rrze-rsvp-room-flexible');
+    if (!enabled) return;
+    const mode = document.getElementById('rrze-rsvp-room-bookingmode');
+    const [minimum, maximum, interval] = ['min', 'max', 'step'].map(
+        /** @param {string} suffix Duration setting. @returns {HTMLInputElement} Its numeric field. */
+        suffix => document.getElementById('rrze-rsvp-room-duration-' + suffix)
+    );
+    /** @returns {void} Revalidate dependent fields as the rule is edited. */
+    function sync() {
+        enabled.closest('.cmb-row').hidden = mode.value === 'check-only';
+        const active = enabled.checked && mode.value !== 'check-only';
+        for (const field of [minimum, maximum, interval]) {
+            field.closest('.cmb-row').hidden = !active;
+            field.required = active;
+            field.disabled = !active;
+            field.setCustomValidity('');
+        }
+        if (!active) return;
+        for (const field of [minimum, maximum]) {
+            if (interval.valueAsNumber > 0 && field.valueAsNumber % interval.valueAsNumber > 0) {
+                field.setCustomValidity(rrze_rsvp_admin.timeslots.durationMultiple);
+            }
+        }
+        if (maximum.valueAsNumber < minimum.valueAsNumber) {
+            maximum.setCustomValidity(rrze_rsvp_admin.timeslots.durationOrder);
+        }
+    }
+    for (const field of [enabled, mode, minimum, maximum, interval]) {
+        field.addEventListener('input', sync);
+        field.addEventListener('change', sync);
+    }
+    sync();
+}
+jQuery(initializeDurationSettings);

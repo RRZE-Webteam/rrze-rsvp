@@ -28,11 +28,23 @@ final class PublicDisplay
         $nextFree = $mode === 'occupancy_nextavailable';
         $today = $now->format('Y-m-d');
         $clock = $now->format('H:i');
+        $flexible = $nextFree && RoomSlots::rule($roomId);
         foreach (Functions::getRoomOccupancyDays($roomId, $now, $nextFree ? $daysAhead : 0) as $date => $matrix) {
             $slots = $matrix['room_slots'];
             unset($matrix['room_slots']);
             if (!$matrix) {
                 return [];
+            }
+            if ($flexible) {
+                $offers = RoomSlots::available($roomId, $date, $date, false, clock: strtotime($now->format('Y-m-d H:i:s') . ' UTC'));
+                $slots = [];
+                foreach ($offers['slots'][$date] ?? [] as $range => $freeSeats) {
+                    $slot = str_replace('-', ' - ', $range);
+                    $slots[] = $slot;
+                    foreach (array_keys($matrix) as $seat) {
+                        $matrix[$seat][$slot] = in_array($seat, $freeSeats, true) ? 'available' : 'unavailable';
+                    }
+                }
             }
             $windows = [];
             $preferred = null;

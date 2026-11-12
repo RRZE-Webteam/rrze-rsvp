@@ -1,5 +1,5 @@
 import { latestRequest } from './latest-request';
-import { revealTimeChoice } from './time-options';
+import { revealTimeChoice, clearDependentChoices } from './time-options';
 import { calendarSelection } from './calendar-selection';
 
 /**
@@ -36,6 +36,7 @@ function initializePicker(picker) {
     const dateSelection = calendarSelection(calendarHost);
     const calendarStatus = calendarHost.querySelector('.rsvp-calendar-status');
     const calendarRetry = calendarHost.querySelector('.rsvp-calendar-retry');
+    const durationHost = picker.querySelector('.rsvp-duration-container');
     const timeHost = picker.querySelector('.rsvp-time-container');
     const seatHost = picker.querySelector('.rsvp-seat-container');
     const status = picker.querySelector('.rsvp-picker-status');
@@ -85,14 +86,14 @@ function initializePicker(picker) {
 
     /** @returns {boolean} Whether all required booking choices are complete. */
     function complete() {
-        return Boolean(value('rsvp_date') && value('rsvp_time') && (!seatHost || value('rsvp_seat')));
+        return Boolean(value('rsvp_date') && (!durationHost || value('rsvp_duration')) && value('rsvp_time') && (!seatHost || value('rsvp_seat')));
     }
 
     /** @returns {void} Refresh the visible confirmation and submission readiness. */
     function updateSummary() {
         const ready = complete();
         summary.hidden = !ready || busy || failed;
-        if (ready) summary.textContent = `${labels.selection}: ${[label('rsvp_date'), label('rsvp_time'), label('rsvp_seat')].filter(Boolean).join(' · ')}`;
+        if (ready) summary.textContent = `${labels.selection}: ${[label('rsvp_date'), label('rsvp_duration'), label('rsvp_time'), label('rsvp_seat')].filter(Boolean).join(' · ')}`;
         submit.disabled = busy || failed || !ready;
     }
 
@@ -143,7 +144,10 @@ function initializePicker(picker) {
         if (result.status === 'stale') return;
         busy = false;
         showLoading(false, payload);
-        if (result.status === 'error') {
+        if (result.status === 'success' && Boolean(durationHost) !== (typeof result.data.duration === 'string')) {
+            failed = true;
+            status.textContent = labels.changed;
+        } else if (result.status === 'error') {
             failed = true;
             status.textContent = labels.error;
             retry.hidden = false;
@@ -171,13 +175,22 @@ function initializePicker(picker) {
     /** @returns {void} Request the options belonging to the current date, time and seat. */
     function updateOptions() {
         const date = value('rsvp_date');
-        load({ action: 'UpdateForm', room: form.elements.rsvp_room.value, date, time: value('rsvp_time'), seat: value('rsvp_seat') },
+        load({ action: 'UpdateForm', room: form.elements.rsvp_room.value, date, rsvp_duration: value('rsvp_duration'), time: value('rsvp_time'), seat: value('rsvp_seat') },
             /** @param {Object} result Server-rendered dependent controls. @returns {void} */
             function applyOptions(result) {
                 const previous = timeHost.querySelector('.rsvp-time-select');
                 const scrollTop = previous.dataset.date === date
                     ? previous.querySelector('.rsvp-time-options-scroll')?.scrollTop || 0 : 0;
                 previous.outerHTML = result.time;
+                if (durationHost) {
+                    // Retain the focused select while replacing the options supplied by the server.
+                    const template = document.createElement('template');
+                    template.innerHTML = result.duration;
+                    const select = durationHost.querySelector('select');
+                    const updated = template.content.querySelector('select');
+                    select.innerHTML = updated.innerHTML;
+                    select.value = updated.value;
+                }
                 const viewport = timeHost.querySelector('.rsvp-time-options-scroll');
                 if (viewport) viewport.scrollTop = scrollTop;
                 revealTimeChoice(selected('rsvp_time'));
@@ -192,9 +205,8 @@ function initializePicker(picker) {
             dateSelection.select(event.target);
             name = 'rsvp_date';
         }
-        if (!['rsvp_date', 'rsvp_time', 'rsvp_seat'].includes(name)) return;
-        if (name === 'rsvp_date') clear('rsvp_time');
-        if (name !== 'rsvp_seat') clear('rsvp_seat');
+        if (!['rsvp_date', 'rsvp_duration', 'rsvp_time', 'rsvp_seat'].includes(name)) return;
+        clearDependentChoices(name, clear);
         updateOptions();
     }
 

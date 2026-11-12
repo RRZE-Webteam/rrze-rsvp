@@ -297,6 +297,8 @@ class Main
             'invalidDate' => __('Please enter a valid date.', 'rrze-rsvp'),
             'dateOrder' => __('The end date must not be before the start date.', 'rrze-rsvp'),
             'timeRequired' => __('Please enter start and end times in HH:MM format.', 'rrze-rsvp'),
+            'durationMultiple' => __('Enter a multiple of the interval.', 'rrze-rsvp'),
+            'durationOrder' => __('Maximum duration must be at least the minimum duration.', 'rrze-rsvp'),
             'timeOrder' => __('The end time must be after the start time on the same day.', 'rrze-rsvp'),
         ];
     }
@@ -351,6 +353,7 @@ class Main
                 'loading' => __('Loading availability…', 'rrze-rsvp'),
                 'loadingTimes' => __('Loading available times…', 'rrze-rsvp'),
                 'loadingMonth' => __('Loading calendar month…', 'rrze-rsvp'),
+                'changed' => __('This booking form has expired or changed. Please reload the page.', 'rrze-rsvp'),
                 'monthError' => __('The calendar month could not be loaded. Your selection is unchanged.', 'rrze-rsvp'),
                 'updated' => __('Availability updated.', 'rrze-rsvp'),
                 'error' => __('Availability could not be loaded. Please try again.', 'rrze-rsvp'),

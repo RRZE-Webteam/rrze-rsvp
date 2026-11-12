@@ -78,6 +78,7 @@ namespace {
         return new DOMXPath($dom);
     }
 
+    require_once dirname(__DIR__) . '/includes/RoomSlots.php';
     require dirname(__DIR__) . '/includes/Shortcodes/Bookings.php';
     $reflection = new ReflectionClass(RRZE\RSVP\Shortcodes\Bookings::class);
     $picker = $reflection->newInstanceWithoutConstructor();

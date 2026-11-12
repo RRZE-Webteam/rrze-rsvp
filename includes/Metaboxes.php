@@ -37,11 +37,12 @@ class Metaboxes
         }
     }
 
-    /*
+    /**
      * Set Timeslot weekday, start time and end time to disabled if protected bookings exist for this timeslot.
      * Valid from/to can still be modified.
-     * @param  object $field_args Current field args
-     * @param  object $field      Current field object
+     * @param array $args Current field arguments.
+     * @param object $field Current CMB2 field.
+     * @return void Disable protected schedule fields.
      */
     public function cbTimeslotAttributes($args, $field)
     {
@@ -51,7 +52,7 @@ class Metaboxes
         $timeslot = is_array($timeslots) && isset($timeslots[$fieldKey]) ? $timeslots[$fieldKey] : [];
 
         foreach ($bookings as $booking) {
-            if (Functions::timeslotCoversBooking($timeslot, $booking['start'], $booking['end'])) {
+            if (Functions::timeslotCoversBooking($timeslot, $booking['start'], $booking['end'], !empty($booking['flexible']))) {
                 $field->args['attributes']['disabled'] = 'disabled';
                 break;
             }
@@ -242,10 +243,27 @@ class Metaboxes
             // 'closed'     => true, // Keep the metabox closed by default
         ));
 
+        $cmb_timeslots->add_field([
+            'name' => __('Flexible booking duration', 'rrze-rsvp'),
+            'desc' => __('Use each time slot as an opening window in which guests choose their booking duration.', 'rrze-rsvp'),
+            'id' => RoomSlots::ENABLED, 'type' => 'checkbox', 'classes' => ['hide-check-only'],
+        ]);
+        foreach ([
+            RoomSlots::MIN => __('Minimum duration (minutes)', 'rrze-rsvp'),
+            RoomSlots::MAX => __('Maximum duration (minutes)', 'rrze-rsvp'),
+            RoomSlots::STEP => __('Interval (minutes)', 'rrze-rsvp'),
+        ] as $id => $name) {
+            $cmb_timeslots->add_field([
+                'name' => $name, 'id' => $id, 'type' => 'text_small',
+                'classes' => ['rsvp-duration-setting'],
+                'attributes' => ['type' => 'number', 'min' => 1, 'step' => 1],
+            ]);
+        }
+
         $group_field_id = $cmb_timeslots->add_field(array(
             'id' => 'rrze-rsvp-room-timeslots',
             'type' => 'group',
-            'description' => __('Add a time slot for each specific date or weekly schedule. Each time slot can be booked separately.', 'rrze-rsvp'),
+            'description' => __('Add a time slot for each specific date or weekly schedule. Each booking must fit within one time slot.', 'rrze-rsvp'),
             'options' => array(
                 'group_title' => __('Time slot {#}', 'rrze-rsvp'), // since version 1.1.4, {#} gets replaced by row number
                 'add_button' => __('Add time slot', 'rrze-rsvp'),
@@ -652,7 +670,7 @@ class Metaboxes
 
     /**
      * Output a message if the current page has the id of "2" (the about page)
-     * @param  object $field_args Current field args
+     * @param array $args Current field arguments.
      * @param  object $field      Current field object
      */
     public function cbDisplayTimeslot($field_args, $field)

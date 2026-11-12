@@ -2,7 +2,7 @@
 
 namespace RRZE\RSVP\Shortcodes;
 
-use RRZE\RSVP\{Email, Functions, Template, TransientData};
+use RRZE\RSVP\{Email, Functions, RoomReservations, RoomSlots, Template, TransientData};
 use RRZE\RSVP\Auth\{IdM, LDAP};
 use RRZE\RSVP\Blocks\Context;
 
@@ -160,34 +160,6 @@ class Bookings extends Shortcodes
             $html .= '<p>' . esc_html__('Authentication is currently unavailable. Please contact the website administrator.', 'rrze-rsvp') . '</p>';
         }
         return $html . '</div>';
-    }
-
-    /**
-     * Enforce the configured resource, identity requirements, horizon and available seat at submission.
-     *
-     * @param Context $context Verified request binding.
-     * @param int $room Posted room ID.
-     * @param int $seat Posted or consultation seat ID.
-     * @param string $date Posted date.
-     * @param string $time Posted start time.
-     * @return string Authoritative end time; invalid submissions terminate before writes.
-     */
-    private function validateBlockBooking(Context $context, int $room, int $seat, string $date, string $time): string
-    {
-        if ($room !== $context->resourceId) {
-            wp_die(esc_html__('Invalid or missing booking data.', 'rrze-rsvp'), '', ['response' => 403]);
-        }
-        $available = [];
-        if ($this->isCalendarDate($date) && $date >= current_datetime()->format('Y-m-d') && $date <= $this->bookingEnd($room)) {
-            $available = Functions::getRoomAvailability($room, $date, $date, false)[$date] ?? [];
-        }
-        foreach ($available as $interval => $seats) {
-            if (explode('-', $interval)[0] === $time && in_array($seat, array_map('intval', $seats), true)) {
-                return explode('-', $interval)[1];
-            }
-        }
-        $this->redirectBooking(add_query_arg('booking', wp_create_nonce('post_data'), $context->url()));
-        exit;
     }
 
     /**
@@ -358,7 +330,7 @@ class Bookings extends Shortcodes
 
         $roomID = $input_room;
         $roomMeta = get_post_meta($roomID);
-        $days = $shortcode_atts['days'] != '' ? (int)$shortcode_atts['days'] : $roomMeta['rrze-rsvp-room-days-in-advance'][0];
+        $days = $shortcode_atts['days'] != '' ? (int)$shortcode_atts['days'] : (int) ($roomMeta['rrze-rsvp-room-days-in-advance'][0] ?? 0);
         $comment = (isset($roomMeta['rrze-rsvp-room-notes-check']) && $roomMeta['rrze-rsvp-room-notes-check'][0] == 'on');
 
         $bookingMode = get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true);
@@ -429,17 +401,26 @@ class Bookings extends Shortcodes
         $get_seat = isset($this->viewRequest['seat_id']) ? absint($this->viewRequest['seat_id']) : false;
         $get_instant = (isset($this->viewRequest['instant']) && $this->viewRequest['instant'] == '1');
 
-        $availability = Functions::getRoomAvailability(
-            $roomID,
-            $get_date,
-            date('Y-m-d', strtotime($get_date . ' +1 days')),
-            false
-        );
+        $rule = RoomSlots::rule($roomID);
+        $duration = $rule && $get_time ? $rule['min'] : null;
+        $instant = $rule && $get_instant && RoomSlots::instantAllowed($roomID);
+        if ($rule) {
+            $days = min($days, max(0, (int) ($roomMeta['rrze-rsvp-room-days-in-advance'][0] ?? 0)));
+        }
+        if ($instant && (!$get_time || !$get_seat || (int) get_post_meta($get_seat, 'rrze-rsvp-seat-room', true) !== $roomID)) {
+            return esc_html__('Timeslot not available.', 'rrze-rsvp');
+        }
+        $choices = RoomSlots::available($roomID, $get_date, $get_date, false, $duration,
+            seat: $instant ? $get_seat : 0, instant: $instant, onlyStart: $instant ? $get_time : '');
+        $availability = $choices['slots'];
+        if ($instant && !RoomSlots::end($availability[$get_date] ?? [], $get_time, $get_seat)) {
+            return esc_html__('Timeslot not available.', 'rrze-rsvp');
+        }
 
         $output .= '<div class="rrze-rsvp">';
         $output .= '<form action="' . esc_url($this->renderContext ? $this->renderContext->url() : get_permalink()) . '" method="post" id="rsvp_by_room" class="rsvp-booking-form mode-' . $bookingMode . '">';
         $output .= $this->renderContext ? $this->renderContext->hiddenFields() : '';
-        if ($get_instant) {
+        if ($instant || (!$rule && $get_instant)) {
             $output .= '<div><input type="hidden" value="1" id="rsvp_instant" name="rsvp_instant"></div>';
         }
 
@@ -451,17 +432,17 @@ class Bookings extends Shortcodes
             . __('Book a seat at', 'rrze-rsvp') . ': <strong>' . get_the_title($roomID) . '</strong>'
             . '</p>';
 
-        if ($bookingMode == 'check-only') {
+        if ($instant) {
+            $output .= '<p>' . esc_html($get_date . ' · ' . get_the_title($get_seat)) . '</p>'
+                . '<input type="hidden" name="rsvp_date" value="' . esc_attr($get_date) . '">'
+                . '<input type="hidden" name="rsvp_time" value="' . esc_attr($get_time) . '">'
+                . '<input type="hidden" name="rsvp_seat" value="' . esc_attr($get_seat) . '">'
+                . '<label>' . esc_html__('Booking duration', 'rrze-rsvp') . ' '
+                . RoomSlots::durationSelect($rule, $choices['longest'], $duration, $get_time) . '</label>';
+        } elseif ($bookingMode == 'check-only') {
             // replace Calendar, time and place inputs by get parameters to avoid reservations for future timeslots
-            $timeslots = isset($availability[$get_date]) ? $availability[$get_date] : [];
-            $timeslot = '';
-            foreach ($timeslots as $key => $data) {
-                if (substr($key, 0, strlen($get_time)) == $get_time) {
-                    $timeslot = $key;
-                } else {
-                    $timeslot = __('Timeslot not available.', 'rrze-rsvp');
-                }
-            }
+            $endTime = RoomSlots::end($availability[$get_date] ?? [], (string) $get_time, (int) $get_seat);
+            $timeslot = $endTime ? $get_time . '-' . $endTime : __('Timeslot not available.', 'rrze-rsvp');
             $output .= '<input type="hidden" name="rsvp_date" value="' . $get_date . '">'
                 . '<input type="hidden" name="rsvp_time" value="' . $get_time . '">'
                 . '<input type="hidden" name="rsvp_seat" value="' . $get_seat . '">'
@@ -484,23 +465,34 @@ class Bookings extends Shortcodes
                 $get_time = false;
                 $get_seat = false;
             }
+            $durationField = '';
+            if ($rule) {
+                $durationField = '<fieldset class="rsvp-duration-container"><legend><span class="rsvp-picker-step">2</span> '
+                    . esc_html__('Booking duration', 'rrze-rsvp') . '</legend><div class="rsvp-duration-options">'
+                    . RoomSlots::durationSelect($rule, $get_date ? $choices['longest'] : 0, $duration) . '</div></fieldset>';
+                if (!$duration) {
+                    $availability = [];
+                }
+            }
             $output .= '<fieldset class="rsvp-booking-picker">'
                 . '<legend>' . esc_html__('Select date and time', 'rrze-rsvp') . '</legend>'
-                . '<p class="rsvp-picker-intro">' . esc_html__('Choose a day, then a time that suits you.', 'rrze-rsvp') . '</p>'
+                . '<p class="rsvp-picker-intro">' . ($rule ? esc_html__('Choose a day and duration to see available start times.', 'rrze-rsvp')
+                    : esc_html__('Choose a day, then a time that suits you.', 'rrze-rsvp')) . '</p>'
                 . '<div class="rsvp-picker-layout">'
                 . '<fieldset class="rsvp-date-container"><legend><span class="rsvp-picker-step">1</span> ' . esc_html__('Date', 'rrze-rsvp') . '</legend>'
                 . $this->buildCalendar($month, $year, $start, $end, $roomID, $get_date)
                 . '<span class="rsvp-calendar-status rsvp-picker-sr" role="status"></span>'
                 . '<button type="button" class="rsvp-calendar-retry rsvp-picker-retry" hidden>' . esc_html__('Try again', 'rrze-rsvp') . '</button>'
                 . '</fieldset>'
-                . '<fieldset class="rsvp-time-container"><legend><span class="rsvp-picker-step">2</span> ' . esc_html__('Time', 'rrze-rsvp') . '</legend>'
+                . $durationField
+                . '<fieldset class="rsvp-time-container"><legend><span class="rsvp-picker-step">' . ($rule ? 3 : 2) . '</span> ' . esc_html__('Time', 'rrze-rsvp') . '</legend>'
                 . '<div class="rsvp-time-panel">'
                 . '<div class="rsvp-time-loading" aria-hidden="true" hidden><span class="rsvp-loading-spinner"></span>'
                 . '<div><strong class="rsvp-loading-label"></strong><span class="rsvp-loading-date"></span></div></div>'
-                . $this->buildTimeslotSelect($roomID, $get_date, $get_time, $availability)
+                . $this->buildTimeslotSelect($roomID, $get_date, $get_time, $availability, $rule && !$duration)
                 . '</div></fieldset></div>';
             if ($bookingMode != 'consultation') {
-                $output .= '<fieldset class="rsvp-seat-container"><legend><span class="rsvp-picker-step">3</span> ' . esc_html__('Seat', 'rrze-rsvp') . '</legend>'
+                $output .= '<fieldset class="rsvp-seat-container"><legend><span class="rsvp-picker-step">' . ($rule ? 4 : 3) . '</span> ' . esc_html__('Seat', 'rrze-rsvp') . '</legend>'
                     . '<div class="rsvp-seat-options">' . $this->buildSeatSelect($roomID, $get_date, $get_time, $get_seat, $availability) . '</div></fieldset>';
             }
             $output .= '<div class="rsvp-picker-summary" aria-live="polite" hidden></div>'
@@ -909,7 +901,7 @@ class Bookings extends Shortcodes
                 'meta_key' => 'rrze-rsvp-seat-room',
                 'meta_value' => $booking_room,
                 'numberposts' => 1,
-                'orderby' => 'date',
+                'orderby' => 'date ID',
                 'order' => 'ASC',
             ]);
             $booking_seat = $room_seats[0]->ID ?? 0;
@@ -917,32 +909,10 @@ class Bookings extends Shortcodes
             $booking_seat = absint(($posted_data['rsvp_seat'] ?? 0));
         }
         $this->validateRoomAccess($booking_room, $booking_seat, $idm, $ldap);
-        if ($context) {
-            $validatedEnd = $this->validateBlockBooking($context, $booking_room, $booking_seat, $booking_date, $booking_start);
+        if ($context && $booking_room !== $context->resourceId) {
+            wp_die(esc_html__('Invalid or missing booking data.', 'rrze-rsvp'), '', ['response' => 403]);
         }
         $room_id = $booking_room;
-        $room_meta = get_post_meta($room_id);
-        $room_timeslots = isset($room_meta['rrze-rsvp-room-timeslots']) ? maybe_unserialize($room_meta['rrze-rsvp-room-timeslots'][0]) : [];
-        $schedule = [];
-        foreach ($context ? [] : (array) $room_timeslots as $week) {
-            $valid_from = ((isset($week['rrze-rsvp-room-timeslot-valid-from']) && $week['rrze-rsvp-room-timeslot-valid-from'] != '') ? $week['rrze-rsvp-room-timeslot-valid-from'] : 'unlimited');
-            $valid_to   = ((isset($week['rrze-rsvp-room-timeslot-valid-to']) && $week['rrze-rsvp-room-timeslot-valid-to'] != '') ? strtotime(
-                '+23 hours, +59 minutes',
-                intval($week['rrze-rsvp-room-timeslot-valid-to'])
-            ) : 'unlimited');
-            foreach ($week['rrze-rsvp-room-weekday'] as $day) {
-                if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $booking_timestamp_start >= $valid_from && $booking_timestamp_start <= $valid_to)
-                    || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $booking_timestamp_start >= $valid_from)
-                    || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $booking_timestamp_start <= $valid_to)
-                    || ($valid_from == 'unlimited' && $valid_to == 'unlimited')
-                ) {
-                    $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
-                }
-            }
-        }
-        $weekday = date('N', $booking_timestamp_start);
-        $booking_end = $validatedEnd ?? $schedule[$weekday][$booking_start] ?? $booking_start;
-        $booking_timestamp_end = strtotime($booking_date . ' ' . $booking_end);
 
         if ($idm->isAuthenticated()) {
             if ($idm->isAuthenticated()) {
@@ -1080,191 +1050,47 @@ class Bookings extends Shortcodes
             exit;
         }
 
-        // Überprüfen ob bereits eine Buchung mit gleicher E-Mail-Adresse zur gleichen Zeit vorliegt
-        $check_args = [
-            'post_type' => 'booking',
-            'meta_query' => [
-                'relation' => 'AND',
-                [
-                    'key' => 'rrze-rsvp-booking-guest-email',
-                    'value' => $booking_email
-                ],
-                [
-                    'key' => 'rrze-rsvp-booking-status',
-                    'value' => Functions::SEAT_RESERVING_STATUSES,
-                    'compare' => 'IN',
-                ],
-                [
-                    'relation' => 'OR',
-                    [
-                        'key' => 'rrze-rsvp-booking-start',
-                        'value' => [$booking_timestamp_start + 1, $booking_timestamp_end - 1],
-                        'compare' => 'BETWEEN',
-                    ],
-                    [
-                        'key' => 'rrze-rsvp-booking-end',
-                        'value' => [$booking_timestamp_start + 1, $booking_timestamp_end - 1],
-                        'compare' => 'BETWEEN',
-                    ],
-                    [
-                        'key' => 'rrze-rsvp-booking-start',
-                        'value' => $booking_timestamp_start,
-                        'compare' => '=',
-                    ],
-                    [
-                        'key' => 'rrze-rsvp-booking-end',
-                        'value' => $booking_timestamp_end,
-                        'compare' => '=',
-                    ],
-                ]
-            ],
-            'nopaging' => true,
-        ];
-        $check_bookings = get_posts($check_args);
-        if (!empty($check_bookings)) {
-            $redirectUrl = add_query_arg(
-                [
-                    'booking' => wp_create_nonce('multiple_booking-' . $this->nonce),
-                    'nonce' => $this->nonce
-                ],
-                get_permalink()
-            );
-            $this->redirectBooking($redirectUrl);
+        $rule = RoomSlots::rule($room_id);
+        $duration = isset($posted_data['rsvp_duration']) ? RoomSlots::minutes($posted_data['rsvp_duration']) : null;
+        if (($context || $rule) && ($booking_date < current_datetime()->format('Y-m-d') || $booking_date > $this->bookingEnd($room_id))) {
+            $this->redirectBooking(add_query_arg('booking', wp_create_nonce('post_data'), get_permalink()));
             exit;
         }
 
-        // Überprüfen ob Timeslot in der Vergangenheit liegt
-        if ($booking_timestamp_end < current_time('timestamp')) {
-            $url = urlencode(wp_get_referer());
-            $redirectUrl = add_query_arg(
-                [
-                    //'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', get_permalink(), $room_id, $booking_date, $booking_start),
-                    'url' => $url,
-                    'booking' => wp_create_nonce('timeslot_unavailable-' . $url),
-                    'nonce' => $this->nonce
-                ],
-                get_permalink()
-            );
-            $this->redirectBooking($redirectUrl);
-            exit;
-        }
-
-        // Überprüfen ob der Platz in der Zwischenzeit bereits anderweitig gebucht wurde
-        $bookings = get_posts([
-            'post_type' => 'booking',
-            'post_status' => 'publish',
-            'nopaging' => true,
-            'meta_query' => [
-                'relation' => 'AND',
-                [
-                    'key' => 'rrze-rsvp-booking-seat',
-                    'value'   => $booking_seat,
-                ],
-                [
-                    'key' => 'rrze-rsvp-booking-status',
-                    'value'   => Functions::SEAT_RESERVING_STATUSES,
-                    'compare' => 'IN'
-                ],
-                [
-                    'key'     => 'rrze-rsvp-booking-start',
-                    'value' => strtotime($booking_date . ' ' . $booking_start),
-                    'compare' => '=',
-                ],
-            ],
-        ]);
-
-        if (!empty($bookings)) {
-
-            $url = urlencode(wp_get_referer());
-
-            $redirectUrl = add_query_arg(
-                [
-                    //'url' => sprintf('%s?room_id=%s&bookingdate=%s&timeslot=%s', get_permalink(), $room_id, $booking_date, $booking_start),
-                    'url' => $url,
-                    'booking' => wp_create_nonce('seat_unavailable-' . $url),
-                    'nonce' => $this->nonce
-                ],
-                get_permalink()
-            );
-            $this->redirectBooking($redirectUrl);
-            exit;
-        }
-
-        $autoconfirmation = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true));
-        $instantCheckIn = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-instant-check-in', true));
+        $bookingMode = $booking_mode;
+        $autoconfirmation = $bookingMode === 'check-only' || Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-auto-confirmation', true));
         $forceToConfirm = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-force-to-confirm', true));
-        $forceToCheckin = Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-force-to-checkin', true));
-        $sendIcsToAdmin = get_post_meta($room_id, 'rrze-rsvp-room-send-to-email', true);
-        if ($booking_mode == 'check-only') {
-            $autoconfirmation = true;
-            $instantCheckIn = true;
-            $forceToCheckin = false;
+        $status = $autoconfirmation && !$forceToConfirm ? 'confirmed' : 'booked';
+        $instantCheckIn = $rule ? $booking_instant && RoomSlots::instantAllowed($room_id)
+            : $booking_instant || Functions::getBoolValueFromAtt(get_post_meta($room_id, 'rrze-rsvp-room-instant-check-in', true));
+        if ($status === 'confirmed' && ($bookingMode === 'check-only' || ($bookingMode === 'reservation' && $instantCheckIn))
+            && $booking_date === current_time('Y-m-d') && $booking_timestamp_start <= current_time('timestamp')) {
+            $status = 'checked-in';
         }
-
-        //Buchung speichern
-        $new_draft = [
-            'post_status' => 'publish',
-            'post_type' => 'booking',
+        $meta = [
+            'rrze-rsvp-booking-status' => $status,
+            'rrze-rsvp-booking-guest-lastname' => $booking_lastname,
+            'rrze-rsvp-booking-guest-firstname' => $booking_firstname,
+            'rrze-rsvp-booking-guest-email' => $booking_email,
+            'rrze-rsvp-booking-notes' => $booking_comment,
+            'rrze-rsvp-booking-dsgvo' => $booking_dsgvo,
         ];
-        $booking_id = wp_insert_post($new_draft);
-
-        // Booking save error
-        if (!$booking_id || is_wp_error($booking_id)) {
-            $redirectUrl = add_query_arg(
-                [
-                    'booking' => wp_create_nonce('save_error-' . $this->nonce),
-                    'nonce' => $this->nonce
-                ],
-                get_permalink()
-            );
-            $this->redirectBooking($redirectUrl);
+        if (CORONA_MODE) {
+            $meta['rrze-rsvp-booking-guest-phone'] = $booking_phone;
+        }
+        $booking_id = RoomReservations::create($room_id, $booking_seat, $booking_date, $booking_start,
+            $duration, $booking_instant, $meta);
+        if (is_wp_error($booking_id)) {
+            $code = $booking_id->get_error_code();
+            $parameters = ['nonce' => $this->nonce];
+            $suffix = $this->nonce;
+            if ($code === 'seat_unavailable') {
+                $suffix = $parameters['url'] = urlencode(wp_get_referer());
+            }
+            $parameters['booking'] = wp_create_nonce($code . '-' . $suffix);
+            $this->redirectBooking(add_query_arg($parameters, get_permalink()));
             exit;
         }
-
-        // Successful booking saved
-        update_post_meta($booking_id, 'rrze-rsvp-booking-start', $booking_timestamp_start);
-        $weekday = date_i18n('w', $booking_timestamp_start);
-        update_post_meta($booking_id, 'rrze-rsvp-booking-end', $booking_timestamp_end);
-        update_post_meta($booking_id, 'rrze-rsvp-booking-seat', $booking_seat);
-        update_post_meta($booking_id, 'rrze-rsvp-booking-guest-lastname', $booking_lastname);
-        update_post_meta($booking_id, 'rrze-rsvp-booking-guest-firstname', $booking_firstname);
-        update_post_meta($booking_id, 'rrze-rsvp-booking-guest-email', $booking_email);
-        if (CORONA_MODE) {
-            update_post_meta($booking_id, 'rrze-rsvp-booking-guest-phone', $booking_phone);
-        }
-
-        // Set booking status
-        $timestamp = current_time('timestamp');
-        $bookingMode = get_post_meta($room_id, 'rrze-rsvp-room-bookingmode', true);
-
-        if ($forceToConfirm) {
-            $status = 'booked';
-        } else {
-            if ($autoconfirmation) {
-                $status = 'confirmed';
-                switch ($bookingMode) {
-                    case 'check-only':
-                        if ($booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
-                            $status = 'checked-in';
-                        }
-                        break;
-                    case 'reservation':
-                        if (($booking_instant || $instantCheckIn) && $booking_date == date('Y-m-d', $timestamp) && $booking_timestamp_start < $timestamp) {
-                            $status = 'checked-in';
-                        }
-                        break;
-                    default:
-                        //
-                }
-            } else {
-                $status = 'booked';
-            }
-        }
-
-        update_post_meta($booking_id, 'rrze-rsvp-booking-status', $status);
-        update_post_meta($booking_id, 'rrze-rsvp-booking-notes', $booking_comment);
-        update_post_meta($booking_id, 'rrze-rsvp-booking-dsgvo', $booking_dsgvo);
-
 
         // E-Mail senden
         if ($forceToConfirm) {
@@ -1365,7 +1191,7 @@ class Bookings extends Shortcodes
         $first = new \DateTimeImmutable($period . '-01', wp_timezone());
         $last = $first->modify('last day of this month');
         $monthTitle = wp_date('F Y', $first->getTimestamp());
-        $availability = Functions::getRoomAvailability($roomID, max($start, $first->format('Y-m-d')), min($end, $last->format('Y-m-d')), false);
+        $availability = Functions::getRoomAvailability($roomID, max($start, $first->format('Y-m-d')), min($end, $last->format('Y-m-d')), false, true);
         $calendar = '<div class="rsvp-calendar" data-period="' . esc_attr($period) . '" data-end="' . esc_attr($end) . '">'
             . '<div class="rsvp-calendar-heading">'
             . '<button type="button" class="rsvp-calendar-nav" data-direction="prev" aria-label="' . esc_attr__('Previous month', 'rrze-rsvp') . '"'
@@ -1455,6 +1281,9 @@ class Bookings extends Shortcodes
         $period = sanitize_text_field(wp_unslash($_POST['month'] ?? ''));
         $direction = sanitize_text_field(wp_unslash($_POST['direction'] ?? ''));
         $end = $context ? $this->bookingEnd($roomID) : sanitize_text_field(wp_unslash($_POST['end'] ?? ''));
+        if (!$context && RoomSlots::rule($roomID) && $this->isCalendarDate($end)) {
+            $end = min($end, $this->bookingEnd($roomID));
+        }
         if (!$this->isCalendarDate($period . '-01') || !$this->isCalendarDate($end) || !in_array($direction, ['prev', 'next'], true)) {
             wp_die('', '', ['response' => 400]);
         }
@@ -1478,11 +1307,20 @@ class Bookings extends Shortcodes
         $time = sanitize_text_field(wp_unslash($_POST['time'] ?? ''));
         $seat = absint($_POST['seat'] ?? 0);
         $date = $this->isCalendarDate($date) ? $date : '';
-        if ($context && ($date < current_datetime()->format('Y-m-d') || $date > $this->bookingEnd($roomID))) {
+        $rule = RoomSlots::rule($roomID);
+        if (($context || $rule) && ($date < current_datetime()->format('Y-m-d') || $date > $this->bookingEnd($roomID))) {
             $date = '';
         }
-        $availability = $date ? Functions::getRoomAvailability($roomID, $date, $date, false) : [];
-        $response = ['time' => $this->buildTimeslotSelect($roomID, $date, $time, $availability)];
+        $response = [];
+        $duration = RoomSlots::minutes($_POST['rsvp_duration'] ?? '');
+        if ($rule) {
+            $choices = RoomSlots::available($roomID, $date, $date, false, $duration);
+            $availability = $choices['slots'];
+            $response['duration'] = RoomSlots::durationSelect($rule, $choices['longest'], $duration);
+        } else {
+            $availability = $date ? Functions::getRoomAvailability($roomID, $date, $date, false) : [];
+        }
+        $response['time'] = $this->buildTimeslotSelect($roomID, $date, $time, $availability, $rule && !$duration);
         if (get_post_meta($roomID, 'rrze-rsvp-room-bookingmode', true) !== 'consultation') {
             $response['seat'] = $this->buildSeatSelect($roomID, $date, $time, $seat, $availability);
         }
@@ -1520,12 +1358,16 @@ class Bookings extends Shortcodes
      * @param string $date Selected calendar date.
      * @param string|false $time Selected start time.
      * @param array|false $availability Availability grouped by date and interval.
+     * @param bool $needsDuration Show the duration prompt before listing times.
      * @return string Date heading and time controls, or a contextual empty state.
      */
-    private function buildTimeslotSelect($roomID, $date, $time = false, $availability = false)
+    private function buildTimeslotSelect($roomID, $date, $time = false, $availability = false, bool $needsDuration = false)
     {
         if (!$date) {
             return '<div class="rsvp-time-select"><p class="rsvp-picker-empty">' . esc_html__('Select an available day in the calendar to see its times.', 'rrze-rsvp') . '</p></div>';
+        }
+        if ($needsDuration) {
+            return '<div class="rsvp-time-select"><p class="rsvp-picker-empty">' . esc_html__('Choose a duration to see start times.', 'rrze-rsvp') . '</p></div>';
         }
         $dateObject = new \DateTimeImmutable($date, wp_timezone());
         $output = '<div class="rsvp-time-select" data-date="' . esc_attr($date) . '"><p class="rsvp-picker-date">' . esc_html(wp_date('l, j. F', $dateObject->getTimestamp())) . '</p>';

@@ -10,6 +10,7 @@ defined('ABSPATH') || exit;
 
 use RRZE\RSVP\Capabilities;
 use RRZE\RSVP\Functions;
+use RRZE\RSVP\RoomSlots;
 use function RRZE\RSVP\Config\isAllowedSearchForGuest;
 
 class Bookings
@@ -294,17 +295,31 @@ class Bookings
     }
 
 
+    /** @return void Render the seat-specific duration and time choices for a manual booking. */
     public function ajaxShowTimeslots()
     {
         $output = '';
         $seat = ((isset($_POST['seat']) && $_POST['seat'] > 0) ? (int)$_POST['seat'] : '');
-        $date_raw = (isset($_POST['date']) ? sanitize_text_field($_POST['date']) : false);
-        if (strpos($date_raw, '.') !== false) {
-            $date_parts = explode('.', $date_raw);
-            $date = $date_parts[2] . '-' . $date_parts[1] . '-' . $date_parts[0];
+        $dateRaw = sanitize_text_field(wp_unslash($_POST['date'] ?? ''));
+        $date = \DateTimeImmutable::createFromFormat('!d.m.Y', $dateRaw);
+        if (!$seat || !$date || $date->format('d.m.Y') !== $dateRaw) {
+            wp_die('');
         }
-        $availability = Functions::getSeatAvailability($seat, $date, $date);
+        $date = $date->format('Y-m-d');
+        $room = (int) get_post_meta($seat, 'rrze-rsvp-seat-room', true);
+        $rule = RoomSlots::rule($room);
+        $duration = $rule ? RoomSlots::minutes($_POST['rsvp_duration'] ?? '') : null;
+        $editing = absint($_POST['booking_id'] ?? 0);
+        $exclude = $editing && get_post_type($editing) === 'booking' && current_user_can('edit_post', $editing) ? $editing : 0;
+        $days = max(0, (int) get_post_meta($room, 'rrze-rsvp-room-days-in-advance', true));
+        $outside = $rule && $date > current_datetime()->modify('+' . $days . ' days')->format('Y-m-d');
+        $choices = $outside ? ['slots' => [], 'longest' => 0]
+            : RoomSlots::available($room, $date, $date, !$rule, $duration, seat: $seat, exclude: $exclude);
+        $availability = array_map('array_keys', $choices['slots']);
         $output .= '<div class="select_timeslot_container" style="display:inline-block;padding-left: 10px;">';
+        if ($rule) {
+            $output .= RoomSlots::durationSelect($rule, $choices['longest'], $duration);
+        }
         if (isset($availability[$date])) {
             $output .= '<select class="select_timeslot">'
                 . '<option value="">' . __('Select timeslot', 'rrze-rsvp') . '</option>';
@@ -315,7 +330,7 @@ class Bookings
             }
             $output .= '</select>';
             //            wp_send_json($availability[$date]);
-        } else {
+        } elseif (!$rule || $duration || !$choices['longest']) {
             $output .= __('No timeslots available for this seat/day.', 'rrze-rsvp');
         }
         $output .= '</div>';

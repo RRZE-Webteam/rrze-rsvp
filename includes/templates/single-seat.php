@@ -252,7 +252,7 @@ if ($checkInBooking) {
             'booking_end_clause' => [
                 'key' => 'rrze-rsvp-booking-end',
                 'value' => $now,
-                'compare' => '>=',
+                'compare' => '>',
                 'type' => 'numeric',
             ],
         ],
@@ -330,22 +330,14 @@ if ($checkInBooking) {
         $bookingStart = null;
         $bookingEnd = null;
 
-        if ($bookingmode == 'check-only' || ($bookingmode == 'reservation' && $allowInstant)) {
-            $timestamp = current_time('timestamp');
-            $day = date('Y-m-d', $timestamp);
-            $time = date('H:i', $timestamp);
-            $weekday = date('N', $timestamp);
-            $schedule = Functions::getRoomSchedule($roomId);
-            foreach ($schedule as $wday => $starttimes) {
-                if ($wday == $weekday) {
-                    asort($starttimes);
-                    foreach ($starttimes as $starttime => $endtime) {
-                        if ($endtime > $time && $starttime <= $time) {
-                            $bookingStart = $starttime;
-                            $bookingEnd = $endtime;
-                        }
-                    }
-                }
+        $flexible = RoomSlots::rule($roomId);
+        if ($bookingmode === 'check-only' || ($bookingmode === 'reservation' && $allowInstant
+            && (!$flexible || RoomSlots::instantAllowed($roomId)))) {
+            $day = current_time('Y-m-d');
+            $slots = RoomSlots::available($roomId, $day, $day, false, null, $seatId, true);
+            $current = array_key_last($slots['slots'][$day] ?? []);
+            if ($current) {
+                [$bookingStart, $bookingEnd] = explode('-', $current);
             }
         }
 

@@ -9,6 +9,7 @@ use RRZE\RSVP\PublicDisplay;
 if (!defined('WP_CLI') || !WP_CLI) {
     throw new RuntimeException('Run this test through WP-CLI.');
 }
+require_once dirname(__DIR__) . '/includes/RoomSlots.php';
 require_once dirname(__DIR__) . '/includes/Functions.php';
 require_once dirname(__DIR__) . '/includes/PublicDisplay.php';
 foreach (['room', 'seat', 'booking'] as $type) {

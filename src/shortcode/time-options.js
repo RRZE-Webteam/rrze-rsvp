@@ -19,4 +19,17 @@ function revealTimeChoice(input) {
     }
 }
 
-module.exports = { revealTimeChoice };
+/**
+ * Discard choices that depend on the changed field in the room booking form.
+ * @param {string} changed Name of the changed date, duration, time or seat field.
+ * @param {Function} clear Clear a choice if this form has the field.
+ * @returns {void}
+ */
+function clearDependentChoices(changed, clear) {
+    const fields = ['rsvp_date', 'rsvp_duration', 'rsvp_time', 'rsvp_seat'];
+    const index = fields.indexOf(changed);
+    if (index < 0) return;
+    for (const field of fields.slice(index + 1)) clear(field);
+}
+
+module.exports = { revealTimeChoice, clearDependentChoices };

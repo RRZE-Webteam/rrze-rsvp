@@ -2336,8 +2336,8 @@ msgstr "Bitte Start- und Endzeit im Format HH:MM eingeben."
 msgid "The end time must be after the start time on the same day."
 msgstr "Die Endzeit muss am selben Tag nach der Startzeit liegen."
 
-msgid "Add a time slot for each specific date or weekly schedule. Each time slot can be booked separately."
-msgstr "Lege einzelne Tage oder einen Wochenrhythmus fest. Jeder Termin ist einzeln buchbar."
+msgid "Add a time slot for each specific date or weekly schedule. Each booking must fit within one time slot."
+msgstr "Legen Sie einzelne Tage oder einen Wochenrhythmus fest. Jede Buchung muss vollständig in ein Zeitfenster passen."
 
 msgid "Add time slot"
 msgstr "Weiteren Termin hinzufügen"
@@ -4623,3 +4623,46 @@ msgstr[1] "%d Plätze anlegen"
 #: includes/templates/admin/seat-generator.php:137
 msgid "Change settings"
 msgstr "Angaben ändern"
+
+msgid "Flexible booking duration"
+msgstr "Flexible Buchungsdauer"
+
+msgid "Use each time slot as an opening window in which guests choose their booking duration."
+msgstr "Innerhalb jedes Zeitfensters können Gäste die Dauer ihrer Buchung selbst wählen."
+
+msgid "Minimum duration (minutes)"
+msgstr "Mindestdauer (Minuten)"
+
+msgid "Maximum duration (minutes)"
+msgstr "Höchstdauer (Minuten)"
+
+msgid "Interval (minutes)"
+msgstr "Intervall (Minuten)"
+
+msgid "Enter a positive whole number of minutes."
+msgstr "Geben Sie die Dauer in ganzen Minuten größer als null an."
+
+msgid "Enter a multiple of the interval."
+msgstr "Geben Sie ein Vielfaches des Intervalls an."
+
+msgid "Maximum duration must be at least the minimum duration."
+msgstr "Die Höchstdauer muss mindestens der Mindestdauer entsprechen."
+
+msgid "Booking duration"
+msgstr "Buchungsdauer"
+
+msgid "Choose a duration"
+msgstr "Dauer wählen"
+
+msgid "Choose a duration to see start times."
+msgstr "Wählen Sie eine Dauer, um die verfügbaren Startzeiten zu sehen."
+
+msgid "Choose a day and duration to see available start times."
+msgstr "Wählen Sie einen Tag und eine Dauer, um die verfügbaren Startzeiten zu sehen."
+
+#, php-format
+msgid "%d min"
+msgstr "%d Min."
+
+msgid "The selected reservation is unavailable."
+msgstr "Die gewählte Reservierung ist nicht verfügbar."

@@ -93,7 +93,7 @@ class Functions
         $start = $today;
         $end = date("Y-m-d", strtotime("+$duration day"));
 
-        $aRoomAvailability = self::getRoomAvailability($room_id, $start, $end);
+        $aRoomAvailability = self::getRoomAvailability($room_id, $start, $end, false);
 
         if (!$aRoomAvailability) {
             return '<span class="rrze-rsvp-occupancy-title">' . sprintf(__('This room has no available seat within %u days.', 'rrze-rsvp'), $duration) . '</span>';
@@ -122,7 +122,7 @@ class Functions
      * @param int $timestamp (optional, the timestampt to check occupancies at, default: current_time('timestamp') )
      * @return string
      */
-    public static function getOccupancyByRoomIdHTML(int $room_id, bool $from_now = NULL, int $timestamp = 0): string
+    public static function getOccupancyByRoomIdHTML(int $room_id, ?bool $from_now = null, int $timestamp = 0): string
     {
 
 
@@ -166,57 +166,23 @@ class Functions
      * @param int $timestamp (optional, the timestampt to check occupancies at, default: current_time('timestamp') )
      * @return array
      */
-    public static function getOccupancyByRoomId(int $room_id, bool $from_now = NULL, int $timestamp = 0): array
+    public static function getOccupancyByRoomId(int $room_id, ?bool $from_now = null, int $timestamp = 0): array
     {
+        $timestamp = $timestamp ?: current_time('timestamp');
+        $date = new \DateTimeImmutable(gmdate('Y-m-d H:i:s', $timestamp), wp_timezone());
+        $matrix = self::getRoomOccupancyDays($room_id, $date)->current();
+        $slots = $matrix['room_slots'];
+        unset($matrix['room_slots']);
         $data = [];
-        $timestamp = (!$timestamp ? current_time('timestamp') : $timestamp);
-        $thisDay = date('Y-m-d', $timestamp);
-        $thisDay_weeknumber = date('N', $timestamp);
-
-        // get timeslots for today for this room
-        $slots = self::getRoomSchedule($room_id); // liefert [wochentag-nummer][startzeit] = end-zeit;
-        $slots_thisDay_tmp = (isset($slots[$thisDay_weeknumber]) ? $slots[$thisDay_weeknumber] : []);
-
-        $slots_thisDay = [];
-        foreach ($slots_thisDay_tmp as $start => $end) {
-            $end_timestamp = strtotime($thisDay . ' ' . $end);
-            if ($from_now) {
-                if ($end_timestamp > $timestamp) {
-                    $slots_thisDay[] = $start . '-' . $end;
-                    $data['room_slots'][] =  $start . '-' . $end;
-                }
-            } else {
-                $slots_thisDay[] = $start . '-' . $end;
-                $data['room_slots'][] =  $start . '-' . $end;
+        foreach ($slots as $slot) {
+            [, $end] = explode(' - ', $slot);
+            if ($from_now && $end <= $date->format('H:i')) {
+                continue;
             }
-        }
-
-        // get seats for this room
-        $seatIds = get_posts([
-            'post_type' => 'seat',
-            'post_status' => 'publish',
-            'nopaging' => true,
-            'meta_key' => 'rrze-rsvp-seat-room',
-            'meta_value' => $room_id,
-            // 'fields' => 'ids',
-            'orderby' => 'title',
-            'order' => 'ASC'
-        ]);
-
-        // sort by title naturally
-        $seatSortedByTitle = [];
-        foreach ($seatIds as $seat) {
-            $seatSortedByTitle[$seat->ID] = $seat->post_title;
-        }
-        natsort($seatSortedByTitle);
-
-        foreach ($seatSortedByTitle as $seat_id => $title) {
-            $slots_free = self::getSeatAvailability($seat_id, $thisDay, $thisDay);
-            $slots_free_thisDay_tmp = (isset($slots_free[$thisDay]) ? $slots_free[$thisDay] : []);
-            $slots_free_thisDay = array_combine($slots_free_thisDay_tmp, $slots_free_thisDay_tmp); // set values to keys
-
-            foreach ($slots_thisDay as $timespan) {
-                $data[$seat_id][$timespan] = (isset($slots_free_thisDay[$timespan]) ? true : false);
+            $range = str_replace(' ', '', $slot);
+            $data['room_slots'][] = $range;
+            foreach ($matrix as $seat => $states) {
+                $data[$seat][$range] = $states[$slot] === 'available';
             }
         }
         return $data;
@@ -302,7 +268,7 @@ class Functions
             'numberposts' => $consultation ? 1 : -1,
             'meta_key' => 'rrze-rsvp-seat-room',
             'meta_value' => $roomId,
-            'orderby' => 'date',
+            'orderby' => 'date ID',
             'order' => 'ASC',
         ]);
         $bookings = $seats ? get_posts([
@@ -323,6 +289,7 @@ class Functions
             $start = (int) get_post_meta($booking->ID, 'rrze-rsvp-booking-start', true);
             $end = (int) get_post_meta($booking->ID, 'rrze-rsvp-booking-end', true);
             $status = get_post_meta($booking->ID, 'rrze-rsvp-booking-status', true);
+            $end = $end ?: Utils::getEndOfDayTimestamp($start);
             if ($end <= $start || ($status === 'checked-out' && $end > $clock)) {
                 continue;
             }
@@ -346,21 +313,65 @@ class Functions
                     $defaults[$start . ' - ' . $end] = 'available';
                 }
             }
-            foreach ($occupied[$date] ?? [] as $seatSlots) {
-                foreach ($seatSlots as $slot => $status) {
-                    $defaults[$slot] ??= 'unscheduled';
-                }
-            }
-            ksort($defaults);
-            $matrix = ['room_slots' => array_keys($defaults)];
-            foreach ($seats as $seat) {
-                $matrix[$seat->ID] = array_replace($defaults, $occupied[$date][$seat->ID] ?? []);
-            }
-            yield $date => $matrix;
+            yield $date => self::occupancyIntervals($defaults, $occupied[$date] ?? [], $seats, $priority);
             if (!$seats) {
                 return;
             }
         }
+    }
+
+    /**
+     * Split the day wherever an opening or booking begins or ends.
+     * @param array $windows Scheduled ranges.
+     * @param array $occupied Actual ranges and statuses by seat.
+     * @param array $seats Published seats.
+     * @param array $priority Status precedence for historical overlaps.
+     * @return array Chronological, non-overlapping intervals and seat statuses.
+     */
+    private static function occupancyIntervals(array $windows, array $occupied, array $seats, array $priority): array
+    {
+        $ranges = $windows;
+        foreach ($occupied as $bookings) {
+            $ranges += $bookings;
+        }
+        $edges = [];
+        foreach (array_keys($ranges) as $range) {
+            [$start, $end] = explode(' - ', $range);
+            $edges[$start] = $edges[$end] = true;
+        }
+        $edges = array_keys($edges);
+        sort($edges);
+        $matrix = ['room_slots' => []];
+        foreach ($seats as $seat) {
+            $matrix[$seat->ID] = [];
+        }
+        for ($i = 1, $count = count($edges); $i < $count; ++$i) {
+            $from = $edges[$i - 1];
+            $to = $edges[$i];
+            $slot = "$from - $to";
+            $states = [];
+            $scheduled = false;
+            foreach ($ranges as $range => $unused) {
+                [$start, $end] = explode(' - ', $range);
+                if ($start > $from || $end < $to) {
+                    continue;
+                }
+                $scheduled = $scheduled || isset($windows[$range]);
+                foreach ($occupied as $seat => $bookings) {
+                    $state = $bookings[$range] ?? '';
+                    if (($priority[$state] ?? 0) > ($priority[$states[$seat] ?? ''] ?? 0)) {
+                        $states[$seat] = $state;
+                    }
+                }
+            }
+            if ($scheduled || $states) {
+                $matrix['room_slots'][] = $slot;
+                foreach ($seats as $seat) {
+                    $matrix[$seat->ID][$slot] = $states[$seat->ID] ?? ($scheduled ? 'available' : 'unscheduled');
+                }
+            }
+        }
+        return $matrix;
     }
 
     /**
@@ -473,6 +484,11 @@ class Functions
         return in_array($status, self::CANCELLABLE_BOOKING_STATUSES, true);
     }
 
+    /**
+     * @param int $roomId Room whose schedule is being edited.
+     * @param array $statuses Reservation states protecting an opening.
+     * @return array Cached bookings with actual times and their original duration policy.
+     */
     private static function getRoomBookingsByStatuses(int $roomId, array $statuses): array
     {
         $statuses = array_values(array_unique(array_map('strval', $statuses)));
@@ -516,6 +532,7 @@ class Functions
         }
 
         $bookings = [];
+        $flexibleRoom = RoomSlots::rule($roomId) !== null;
         foreach ($bookingIds as $bookingId) {
             $start = absint(get_post_meta($bookingId, 'rrze-rsvp-booking-start', true));
             $end = absint(get_post_meta($bookingId, 'rrze-rsvp-booking-end', true));
@@ -530,6 +547,7 @@ class Functions
                 'start' => $start,
                 'end' => $end,
                 'status' => $status,
+                'flexible' => $flexibleRoom || (bool) get_post_meta($bookingId, 'rrze-rsvp-booking-flexible', true),
             ];
         }
 
@@ -541,80 +559,52 @@ class Functions
         return self::getRoomBookingsByStatuses($roomId, self::TIMESLOT_BLOCKING_BOOKING_STATUSES);
     }
 
-    public static function timeslotCoversBooking(array $timeslot, int $bookingStart, int $bookingEnd): bool
+    /**
+     * Check the schedule row protecting a reservation, including its validity dates when requested.
+     * @param array $timeslot Saved or submitted opening window.
+     * @param int $bookingStart Local start timestamp.
+     * @param int $bookingEnd Local end timestamp.
+     * @param bool $flexible Whether a booking may occupy part of the window.
+     * @param bool $checkValidity Whether to enforce the row's date restrictions.
+     * @return bool Whether this window covers the protected booking.
+     */
+    public static function timeslotCoversBooking(array $timeslot, int $bookingStart, int $bookingEnd,
+        bool $flexible = false, bool $checkValidity = true): bool
     {
-        if ($bookingStart <= 0 || $bookingEnd <= 0) {
+        $weekdays = array_map('strval', (array) ($timeslot['rrze-rsvp-room-weekday'] ?? []));
+        $start = (string) ($timeslot['rrze-rsvp-room-starttime'] ?? '');
+        $end = (string) ($timeslot['rrze-rsvp-room-endtime'] ?? '');
+        if (!$start || !$end || $bookingStart <= 0 || $bookingEnd <= 0
+            || !in_array(gmdate('N', $bookingStart), $weekdays, true)) {
             return false;
         }
-
-        $weekdays = array_map('strval', (array) ($timeslot['rrze-rsvp-room-weekday'] ?? []));
-        $startTime = (string) ($timeslot['rrze-rsvp-room-starttime'] ?? '');
-        $endTime = (string) ($timeslot['rrze-rsvp-room-endtime'] ?? '');
-        $validFrom = self::normalizeTimeslotDate($timeslot['rrze-rsvp-room-timeslot-valid-from'] ?? '', false);
-        $validTo = self::normalizeTimeslotDate($timeslot['rrze-rsvp-room-timeslot-valid-to'] ?? '', true);
-
-        return date('H:i', $bookingStart) === $startTime
-            && date('H:i', $bookingEnd) === $endTime
-            && in_array(date('N', $bookingStart), $weekdays, true)
-            && $bookingStart >= $validFrom
-            && $bookingEnd <= $validTo;
+        $from = gmdate('H:i', $bookingStart);
+        $to = gmdate('H:i', $bookingEnd);
+        $covers = $flexible ? $from >= $start && $to <= $end : $from === $start && $to === $end;
+        return $covers && (!$checkValidity
+            || ($bookingStart >= self::normalizeTimeslotDate($timeslot['rrze-rsvp-room-timeslot-valid-from'] ?? '', false)
+                && $bookingEnd <= self::normalizeTimeslotDate($timeslot['rrze-rsvp-room-timeslot-valid-to'] ?? '', true)));
     }
 
-    public static function getBookingsNotCoveredByTimeslots(
-        array $timeslots,
-        array $bookings,
-        bool $checkValidity = true
-    ): array
+    /**
+     * @param array $timeslots Proposed schedule.
+     * @param array $bookings Protected reservations, including historical flexible bookings.
+     * @param bool $checkValidity Whether validity dates participate in the coverage check.
+     * @return array Reservations without a covering window.
+     */
+    public static function getBookingsNotCoveredByTimeslots(array $timeslots, array $bookings, bool $checkValidity = true): array
     {
-        $uncoveredBookings = [];
-
+        $uncovered = [];
         foreach ($bookings as $booking) {
-            $covered = false;
-
             foreach ($timeslots as $timeslot) {
-                if (
-                    is_array($timeslot)
-                    && (
-                        $checkValidity
-                            ? self::timeslotCoversBooking(
-                                $timeslot,
-                                (int) ($booking['start'] ?? 0),
-                                (int) ($booking['end'] ?? 0)
-                            )
-                            : self::timeslotScheduleCoversBooking(
-                                $timeslot,
-                                (int) ($booking['start'] ?? 0),
-                                (int) ($booking['end'] ?? 0)
-                            )
-                    )
-                ) {
-                    $covered = true;
-                    break;
+                if (is_array($timeslot) && self::timeslotCoversBooking($timeslot, (int) $booking['start'],
+                    (int) $booking['end'], !empty($booking['flexible']), $checkValidity)) {
+                    continue 2;
                 }
             }
-
-            if (!$covered) {
-                $uncoveredBookings[] = $booking;
-            }
+            $uncovered[] = $booking;
         }
-
-        return $uncoveredBookings;
-    }
-
-    private static function timeslotScheduleCoversBooking(
-        array $timeslot,
-        int $bookingStart,
-        int $bookingEnd
-    ): bool {
-        if ($bookingStart <= 0 || $bookingEnd <= 0) {
-            return false;
-        }
-
-        $weekdays = array_map('strval', (array) ($timeslot['rrze-rsvp-room-weekday'] ?? []));
-
-        return date('H:i', $bookingStart) === (string) ($timeslot['rrze-rsvp-room-starttime'] ?? '')
-            && date('H:i', $bookingEnd) === (string) ($timeslot['rrze-rsvp-room-endtime'] ?? '')
-            && in_array(date('N', $bookingStart), $weekdays, true);
+        return $uncovered;
     }
 
     private static function normalizeTimeslotDate($value, bool $endOfDay): int
@@ -780,151 +770,19 @@ class Functions
      * @param string $start start date of the period (format 'Y-m-d')
      * @param string $end end date of the period (format 'Y-m-d')
      * @param bool $showPast include timeslots that ended in the past?
+     * @param bool $daysOnly Return only the first bookable slot per day for calendar markers.
      * @return array ['date(Y-m-d)']['timeslot(H:i-H:i)'] = [seat_id, seat_id...]
      */
-    public static function getRoomAvailability($room_id, $start, $end, $showPast = true)
+    public static function getRoomAvailability($room_id, $start, $end, $showPast = true, bool $daysOnly = false)
     {
-        $availability = [];
-        $room_availability = [];
-        // Array aus verfügbaren Timeslots des Raumes erstellen
-        $slots = self::getRoomSchedule($room_id, true);
-        $room_meta = get_post_meta($room_id);
-        $days_blocked_raw = isset($room_meta['rrze-rsvp-room-days-closed']) ? $room_meta['rrze-rsvp-room-days-closed'][0] : '';
-        $days_blocked = explode("\n", str_replace("\r", '', $days_blocked_raw));
-        // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
-        $bookingMode = isset($room_meta['rrze-rsvp-room-bookingmode']) ? $room_meta['rrze-rsvp-room-bookingmode'][0] : '';
-        $args_seats = [
-            'post_type' => 'seat',
-            'post_status' => 'publish',
-            'meta_key' => 'rrze-rsvp-seat-room',
-            'meta_value' => $room_id,
-            'orderby' => 'date',
-            'order' => 'ASC',
-        ];
-        if ($bookingMode == 'consultation') {
-            $args_seats['numberposts'] = 1;
-        } else {
-            $args_seats['nopaging'] = true;
-        }
-        $seats = get_posts($args_seats);
-
-        $seat_ids = [];
-        $seats_booked = [];
-        if ($start == $end) {
-            $end = date('Y-m-d H:i', strtotime($start . ' +23 hours, +59 minutes'));
-        } else {
-            $end = date('Y-m-d H:i', strtotime($end . ' +23 hours, +59 minutes'));
-        }
-        foreach ($seats as $seat) {
-            $seat_ids[] = $seat->ID;
-            $bookings = get_posts([
-                'post_type' => 'booking',
-                'post_status' => 'publish',
-                'nopaging' => true,
-                'meta_query' => [
-                    [
-                        'key' => 'rrze-rsvp-booking-seat',
-                        'value'   => $seat->ID,
-                    ],
-                    [
-                        'key' => 'rrze-rsvp-booking-status',
-                        'value'   => self::SEAT_RESERVING_STATUSES,
-                        'compare' => 'IN'
-                    ],
-                    [
-                        'key'     => 'rrze-rsvp-booking-start',
-                        'value' => array(strtotime($start), strtotime($end)),
-                        'compare' => 'BETWEEN',
-                        'type' => 'numeric'
-                    ],
-                ],
-            ]);
-            foreach ($bookings as $booking) {
-                $booking_meta = get_post_meta($booking->ID);
-                $booking_start = $booking_meta['rrze-rsvp-booking-start'][0];
-                //$seats_booked[$seat->ID][date('Y-m-d', $booking_date)] = $booking_time;
-                $seats_booked[$booking_start][] = $seat->ID;
-            }
-        }
-
-        // Tageweise durch den Zeitraum loopen, um die Verfügbarkeit je Wochentag zu ermitteln
-        $loopstart = strtotime($start);
-        $loopend = strtotime($end);
-        while ($loopstart <= $loopend) {
-            $weekday = date('w', $loopstart);
-            $dateday = date('Y-m-d', $loopstart);
-            if ($weekday == '0') $weekday = '7';
-            if (isset($slots[$weekday]) && !in_array($dateday, $days_blocked)) {
-                foreach ($slots[$weekday] as $valid => $slot_infos) {
-                    $valid_array = explode('-', $valid);
-                    $valid_from = $valid_array[0];
-                    $valid_to = $valid_array[1];
-                    $time_parts = explode(':', $slot_infos['start']);
-                    if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $loopstart >= $valid_from && $loopstart <= $valid_to)
-                        || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $loopstart >= $valid_from)
-                        || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $loopstart <= $valid_to)
-                        || ($valid_from == 'unlimited' && $valid_to == 'unlimited')
-                    ) {
-                        $room_availability[strtotime('+' . intval($time_parts[0]) . ' hours, + ' . $time_parts[1] . ' minutes', $loopstart)] = $seat_ids;
-                    }
-                }
-            }
-            $loopstart = strtotime("+1 day", $loopstart);
-        }
-
-        // Bereits gebuchte Plätze aus Array $room_availability entfernen
-        foreach ($seats_booked as $timestamp => $v) {
-            foreach ($v as $k => $seat_booked) {
-                if (isset($room_availability[$timestamp])) {
-                    $key = array_search($seat_booked, $room_availability[$timestamp]);
-                    if ($key !== false) {
-                        unset($room_availability[$timestamp][$key]);
-                    }
-                    if (empty($room_availability[$timestamp])) {
-                        unset($room_availability[$timestamp]);
-                    }
-                }
-            }
-        }
-        ksort($room_availability);
-
-        // Für Kalender aus Array-Ebene Timestamp zwei Ebenen (Tag / Zeit) machen
-        foreach ($room_availability as $timestamp => $v) {
-            $weekday = (date('w', $timestamp));
-            if ($weekday == '0') $weekday = '7';
-            $start = date('H:i', $timestamp);
-            foreach ($slots[$weekday] as $valid => $data) {
-                $valid_array = explode('-', $valid);
-                $valid_from = $valid_array[0];
-                $valid_to = $valid_array[1] == 'unlimited' ? 'unlimited' : strtotime('+23 hours, +59 minutes', intval($valid_array[1]));
-                if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $timestamp >= $valid_from && $timestamp <= $valid_to)
-                    || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $timestamp >= $valid_from)
-                    || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $timestamp <= $valid_to)
-                    || ($valid_from == 'unlimited' && $valid_to == 'unlimited')
-                ) {
-                    if ($data['start'] == $start) {
-                        $end = $data['end'];
-                    }
-                }
-            }
-            // remove past timeslots from today if needed
-            if ($showPast == false) {
-                $endTimestamp = strtotime(date('Y-m-d', $timestamp) . ' ' . $end);
-                if ($endTimestamp <= current_time('timestamp')) {
-                    continue;
-                }
-            }
-            $availability[date('Y-m-d', $timestamp)][$start . '-' . $end] = $v;
-        }
-        //echo Helper::get_html_var_dump($availability);
-        return $availability;
+        return RoomSlots::available((int) $room_id, $start, $end, $showPast, daysOnly: $daysOnly)['slots'];
     }
 
     /**
      * getSeatAvailability
      * Returns an array of dates/timeslots where the seat is available, for a defined period.
      * Array structure: date => timeslot
-     * @param string $room the seat's post id
+     * @param int $seat The seat post ID.
      * @param string $start start date of the period (format 'Y-m-d')
      * @param string $end end date of the period (format 'Y-m-d')
      * @param bool $showPast include timeslots that ended in the past?
@@ -932,89 +790,9 @@ class Functions
      */
     public static function getSeatAvailability($seat, $start, $end, $showPast = true)
     {
-        $availability = [];
-        $seat_availability = [];
-        $timeslots_booked = [];
-
-        // Array aus verfügbaren Timeslots des Raumes erstellen
-        $room_id = get_post_meta($seat, 'rrze-rsvp-seat-room', true);
-        $slots = self::getRoomSchedule($room_id, true);
-        $days_blocked_raw = get_post_meta($room_id, 'rrze-rsvp-room-days-closed', true);
-        $days_blocked = explode("\n", str_replace("\r", '', $days_blocked_raw));
-        // Array aus bereits gebuchten Plätzen im Zeitraum erstellen
-        if ($start == $end) {
-            $end = date('Y-m-d H:i', strtotime($start . ' +23 hours, +59 minutes'));
-        }
-        $bookings = get_posts([
-            'post_type' => 'booking',
-            'post_status' => 'publish',
-            'nopaging' => true,
-            'meta_query' => [
-                'relation' => 'AND',
-                [
-                    'key' => 'rrze-rsvp-booking-seat',
-                    'value'   => $seat,
-                ],
-                [
-                    'key' => 'rrze-rsvp-booking-status',
-                    'value'   => self::SEAT_RESERVING_STATUSES,
-                    'compare' => 'IN'
-                ],
-                [
-                    'key'     => 'rrze-rsvp-booking-start',
-                    'value' => array(strtotime($start), strtotime($end)),
-                    'compare' => 'BETWEEN',
-                    'type' => 'numeric'
-                ],
-            ],
-        ]);
-
-        foreach ($bookings as $booking) {
-            $booking_meta = get_post_meta($booking->ID);
-            $booking_start = $booking_meta['rrze-rsvp-booking-start'][0];
-            $timeslots_booked[] = $booking_start;
-        }
-
-        // Tageweise durch den Zeitraum loopen, um die Verfügbarkeit je Wochentag zu ermitteln
-        $loopstart = strtotime($start);
-        $loopend = strtotime($end);
-        while ($loopstart <= $loopend) {
-            $weekday = date('N', $loopstart);
-            $dateday = date('Y-m-d', $loopstart);
-            if (isset($slots[$weekday]) && !in_array($dateday, $days_blocked)) {
-                foreach ($slots[$weekday] as $valid  => $slot_infos) {
-                    $valid_array = explode('-', $valid);
-                    $valid_from = $valid_array[0];
-                    $valid_to = $valid_array[1];
-                    $starttime = $slot_infos['start'];
-                    $start_parts = explode(':', $starttime);
-                    $end_parts = explode(':', $slot_infos['end']);
-                    $timestamp = strtotime('+' . $start_parts[0] . ' hours, + ' . $start_parts[1] . ' minutes', $loopstart);
-                    $timestamp_end = strtotime('+' . $end_parts[0] . ' hours, + ' . $end_parts[1] . ' minutes', $loopstart);
-                    if (!in_array($timestamp, $timeslots_booked)) {
-                        if (($valid_from != 'unlimited' && $valid_to != 'unlimited' && $loopstart >= $valid_from && $loopstart <= $valid_to)
-                            || ($valid_from != 'unlimited' && $valid_to == 'unlimited' && $loopstart >= $valid_from)
-                            || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $loopstart <= $valid_to)
-                            || ($valid_from == 'unlimited' && $valid_to == 'unlimited')
-                        ) {
-                            $seat_availability[$timestamp] = $timestamp_end;
-                        }
-                    }
-                }
-            }
-            $loopstart = strtotime("+1 day", $loopstart);
-        }
-        ksort($seat_availability);
-
-        // Für Ausgabe Timestamp zwei Ebenen (Tag / Zeit) machen
-        foreach ($seat_availability as $timestamp => $timestamp_end) {
-            if ($showPast == false && $timestamp_end <= current_time('timestamp')) {
-                continue;
-            }
-            $availability[date('Y-m-d', $timestamp)][] = date('H:i', $timestamp) . '-' . date('H:i', $timestamp_end);
-        }
-
-        return $availability;
+        $room = (int) get_post_meta($seat, 'rrze-rsvp-seat-room', true);
+        $result = RoomSlots::available($room, $start, $end, $showPast, null, (int) $seat);
+        return array_map('array_keys', $result['slots']);
     }
 
     /**
@@ -1064,6 +842,7 @@ class Functions
     public static function getRoomSchedule($room_id, $with_duration = false, ?int $referenceTime = null)
     {
         $schedule = [];
+        $flexible = RoomSlots::rule((int) $room_id) !== null;
         $room_timeslots = get_post_meta($room_id, 'rrze-rsvp-room-timeslots', true);
         if (is_array($room_timeslots)) {
             foreach ($room_timeslots as $week) {
@@ -1085,7 +864,9 @@ class Functions
                                     || ($valid_from == 'unlimited' && $valid_to != 'unlimited' && $now <= $valid_to)
                                     || ($valid_from == 'unlimited' && $valid_to == 'unlimited')
                                 ) {
-                                    $schedule[$day][$week['rrze-rsvp-room-starttime']] = $week['rrze-rsvp-room-endtime'];
+                                    $start = $week['rrze-rsvp-room-starttime'];
+                                    $end = $week['rrze-rsvp-room-endtime'];
+                                    $schedule[$day][$start] = $flexible ? max($schedule[$day][$start] ?? '', $end) : $end;
                                 }
                             }
                         }

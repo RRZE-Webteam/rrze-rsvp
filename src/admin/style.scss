@@ -91,6 +91,10 @@ div.cmb2-id-rrze-rsvp-booking-start {
 	}
 }
 
+#rrze-rsvp-room-timeslots_meta .cmb-row[hidden] {
+    display: none !important;
+}
+
 // Scope the enhanced layout to initialized rows; CMB2 remains usable without JS.
 #rrze-rsvp-room-timeslots_repeat .rsvp-timeslot {
 	> .inside {

@@ -8,7 +8,7 @@
 use RRZE\RSVP\Blocks\{BookingBlock, Context, Editor};
 use RRZE\RSVP\Courses\{Model, PostTypes};
 use RRZE\RSVP\Shortcodes\Bookings;
-use RRZE\RSVP\Settings;
+use RRZE\RSVP\{Functions, ICS, RoomSlots, Settings};
 
 if (!defined('WP_CLI') || !WP_CLI) {
     throw new RuntimeException('Run this integration test through WP-CLI.');
@@ -52,10 +52,11 @@ function blockFixture(string $type, string $title, array $extra = []): int
     $ids[] = $id;
     return $id;
 }
-/** @param mixed $return Existing mail override. @return bool Stop transport, including admin notifications. */
-function blockInterceptMail($return): bool
+/** @param mixed $return Existing mail override. @param array $mail Outgoing message. @return bool Capture mail locally. */
+function blockInterceptMail($return, array $mail): bool
 {
     $GLOBALS['mails']++;
+    $GLOBALS['blockTestMessages'][] = $mail['message'];
     return true;
 }
 /** Result captured before a redirect or wp_die can terminate the integration process. */
@@ -98,7 +99,7 @@ function blockAjax(Bookings $adapter, string $method, array $input): string
     }
     throw new RuntimeException('Expected AJAX termination.');
 }
-add_filter('pre_wp_mail', 'blockInterceptMail');
+add_filter('pre_wp_mail', 'blockInterceptMail', 10, 2);
 add_filter('wp_redirect', 'blockRedirect', -100);
 add_filter('wp_die_handler', 'blockDieHandler');
 add_filter('wp_die_ajax_handler', 'blockDieHandler');
@@ -240,7 +241,144 @@ try {
     $sent = $mails;
     blockSubmit($adapter, $input);
     blockCheck((int) wp_count_posts('booking')->publish === $before + 1 && $mails === $sent, 'Repeated submission created duplicate booking/mail');
-    WP_CLI::success('Block integration passed: real readers, mixed/duplicate IDs, bound submission, tampering, receipt isolation, retry, intercepted mail.');
+    // Reuse the real form, AJAX entry point, booking writer and receipt with an independent flexible room.
+    $_GET = $_POST = $_REQUEST = [];
+    foreach ([RoomSlots::ENABLED => 'on', RoomSlots::STEP => 20, RoomSlots::MIN => 20, RoomSlots::MAX => 80] as $key => $value) {
+        update_post_meta($other, $key, $value);
+    }
+    $flexInput = array_merge($ajaxInput, $mixed->fields(), ['room' => $other, 'seat' => $foreignSeat, 'time' => '09:20']);
+    $choices = json_decode(blockAjax($adapter, 'ajaxUpdateForm', $flexInput + ['rsvp_duration' => '60']), true);
+    foreach ([20, 40, 60, 80] as $minutes) {
+        blockCheck(str_contains($choices['duration'], 'value="' . $minutes . '"'), 'Day lacks a valid flexible duration');
+    }
+    blockCheck(str_contains($choices['time'], '09:20 – 10:20') && str_contains($choices['seat'], 'checked'), 'One-hour slot and selected seat');
+    $_GET = ['room_id' => $other, 'seat_id' => $foreignSeat, 'timeslot' => '09:20', 'bookingdate' => $tomorrow];
+    $deepLink = $adapter->shortcodeBooking(['room' => $other]);
+    blockCheck(str_contains($deepLink, 'value="20" selected') && str_contains($deepLink, '09:20 – 09:40')
+        && str_contains($deepLink, 'value="' . $foreignSeat . '" name="rsvp_seat"'), 'Room link preselects minimum duration, start and seat');
+    $_GET = [];
+    $post = array_merge($input, $mixed->fields(), [
+        'rrze_rsvp_post_nonce_field' => wp_create_nonce($mixed->action() . ':submit'),
+        'rsvp_room' => $other, 'rsvp_seat' => $foreignSeat, 'rsvp_time' => '09:20', 'rsvp_duration' => '60',
+        'rsvp_email' => 'flexible-test@example.invalid',
+    ]);
+    foreach (['', '30', '100'] as $invalid) {
+        $url = blockSubmit($adapter, array_replace($post, ['rsvp_duration' => $invalid]));
+        blockCheck(!str_contains($url, 'rsvp_receipt='), 'Invalid duration created a booking');
+    }
+    $url = blockSubmit($adapter, array_replace($post, ['rsvp_email' => $input['rsvp_email']]));
+    blockCheck(!str_contains($url, 'rsvp_receipt='), 'An existing longer booking for this guest must exclude an enclosed booking on another seat');
+    $GLOBALS['blockTestMessages'] = [];
+    $url = blockSubmit($adapter, $post);
+    parse_str((string) wp_parse_url($url, PHP_URL_QUERY), $flexReceipt);
+    $flexId = (int) ($flexReceipt['id'] ?? 0);
+    blockCheck($flexId > 0, 'Could not book one hour');
+    $ids[] = $flexId;
+    $details = Functions::getBooking($flexId);
+    blockCheck($details['start'] === strtotime("$tomorrow 09:20 UTC") && $details['end'] === strtotime("$tomorrow 10:20 UTC"),
+        'Stored timestamps must reflect the selected hour');
+    $_GET = $flexReceipt;
+    $_POST = [];
+    blockCheck(str_contains($adapter->renderBlock($mixed), $details['time']), 'Receipt shows the selected interval');
+    blockCheck(str_contains(html_entity_decode(implode(' ', $GLOBALS['blockTestMessages'])), $details['time']),
+        'Booking email shows the selected interval');
+    $details['booking_mode'] = 'reservation';
+    $ics = ICS::generate($details, 'fixture.ics');
+    blockCheck(str_contains($ics, 'DTEND;TZID=Europe/Berlin:' . str_replace('-', '', $tomorrow) . 'T102000'), 'ICS ends at the selected time');
+    $matrix = Functions::getRoomOccupancyDays($other, new DateTimeImmutable($tomorrow, wp_timezone()))->current();
+    blockCheck($matrix[$foreignSeat] === ['09:00 - 09:20' => 'available', '09:20 - 10:20' => 'confirmed', '10:20 - 12:00' => 'available'],
+        'Display divides the opening at actual booking boundaries');
+    $_GET = $_POST = $_REQUEST = [];
+    wp_set_current_user((int) $admins[0]);
+    (new RRZE\RSVP\Actions())->onLoaded();
+    // Under WP-CLI the plugin loads after init. Attach the same CMB2 saver as the booking editor.
+    CMB2_Bootstrap_2110::initiate()->include_cmb();
+    (new RRZE\RSVP\Metaboxes())->booking();
+    $box = cmb2_get_metabox('rrze-rsvp-booking-details');
+    $hook = new CMB2_Hookup($box);
+    add_action('save_post', [$hook, 'save_post'], 10, 2);
+    $draft = blockFixture('booking', 'Synthetic manual reservation', ['post_status' => 'draft']);
+    $adminDate = gmdate('d.m.Y', strtotime($tomorrow));
+    $_POST = $_REQUEST = [
+        $box->nonce() => wp_create_nonce($box->nonce()), 'rrze-rsvp-booking-seat' => $foreignSeat,
+        'rrze-rsvp-booking-start' => ['date' => $adminDate, 'time' => '09:40'],
+        'rrze-rsvp-booking-end' => ['date' => $adminDate, 'time' => '12:00'],
+        'rsvp_duration' => '40', 'rrze-rsvp-booking-status' => 'confirmed',
+        'rrze-rsvp-booking-guest-firstname' => 'Synthetic', 'rrze-rsvp-booking-guest-lastname' => 'Manual',
+        'rrze-rsvp-booking-guest-email' => 'manual-test@example.invalid',
+    ];
+    try {
+        wp_update_post(['ID' => $draft, 'post_status' => 'publish']);
+        throw new RuntimeException('The admin editor accepted an overlapping booking.');
+    } catch (BlockResponse $rejection) {
+        blockCheck(get_post_status($draft) === 'draft', 'Rejected manual booking was published');
+    }
+    $_POST['rrze-rsvp-booking-start']['time'] = '10:20';
+    wp_update_post(['ID' => $draft, 'post_status' => 'publish']);
+    blockCheck((int) get_post_meta($draft, 'rrze-rsvp-booking-end', true) === strtotime("$tomorrow 11:00 UTC")
+        && get_post_meta($draft, 'rrze-rsvp-booking-flexible', true) === '1', 'Manual booking must use the authoritative end and policy');
+    $_POST = $_REQUEST = [];
+    $protected = Functions::getTimeslotBlockingBookings($other);
+    $openings = get_post_meta($other, 'rrze-rsvp-room-timeslots', true);
+    blockCheck(!Functions::getBookingsNotCoveredByTimeslots($openings, $protected), 'Flexible bookings are covered by their opening');
+    $openings[0]['rrze-rsvp-room-starttime'] = '09:40';
+    blockCheck(count(Functions::getBookingsNotCoveredByTimeslots($openings, $protected)) === 1,
+        'The room editor protects the full reserved interval');
+    $_POST = [RoomSlots::ENABLED => 'on', RoomSlots::MIN => '30', RoomSlots::MAX => '80', RoomSlots::STEP => '20'];
+    try {
+        wp_update_post(['ID' => $other]);
+        throw new RuntimeException('Server accepted a duration not divisible by the interval.');
+    } catch (BlockResponse $rejection) {
+        blockCheck(get_post_meta($other, RoomSlots::MIN, true) === '20', 'Invalid settings changed the stored rule');
+    }
+    $_POST = $_REQUEST = [];
+    update_post_meta($other, 'rrze-rsvp-room-bookingmode', 'consultation');
+    $consultation = json_decode(blockAjax($adapter, 'ajaxUpdateForm', [
+        'nonce' => wp_create_nonce('rsvp-ajax-nonce'), 'date' => $tomorrow, 'room' => $other, 'rsvp_duration' => 20,
+    ]), true);
+    blockCheck(isset($consultation['duration']) && !isset($consultation['seat']), 'Flexible consultations choose their seat automatically');
+    update_post_meta($other, 'rrze-rsvp-room-bookingmode', 'check-only');
+    blockCheck(RoomSlots::rule($other) === null, 'On-site-only rooms keep fixed times');
+    update_post_meta($other, 'rrze-rsvp-room-bookingmode', 'reservation');
+    $display = RRZE\RSVP\PublicDisplay::snapshot($other, 'occupancy_nextavailable', new DateTimeImmutable("$tomorrow 10:50", wp_timezone()), 0);
+    blockCheck($display['start'] === '11:00' && $display['end'] === '11:20', 'Next available display uses a full bookable duration on the grid');
+    delete_post_meta($other, RoomSlots::ENABLED);
+    blockCheck(!Functions::getRoomAvailability($other, $tomorrow, $tomorrow), 'Switching back to fixed duration still respects a partial booking');
+    // Pin the site's local clock to its morning half-day, so this works at any test run time.
+    $zone = (int) gmdate('G') < 12 ? 'UTC' : 'Etc/GMT+12';
+    $siteZone = /** @return string Site timezone for this on-site scenario. */
+        static fn() => $zone;
+    add_filter('pre_option_timezone_string', $siteZone);
+    try {
+        $now = current_time('timestamp');
+        $today = gmdate('Y-m-d', $now);
+        $grid = intdiv($now, 1200) * 1200;
+        $starts = gmdate('H:i', $grid);
+        update_post_meta($other, RoomSlots::ENABLED, 'on');
+        update_post_meta($other, 'rrze-rsvp-room-instant-check-in', 'on');
+        update_post_meta($other, 'rrze-rsvp-room-timeslots', [[
+            'rrze-rsvp-room-weekday' => [gmdate('N', $now)],
+            'rrze-rsvp-room-starttime' => '00:00', 'rrze-rsvp-room-endtime' => '23:59',
+        ]]);
+        $_GET = ['room_id' => $other, 'seat_id' => $foreignSeat, 'timeslot' => $starts,
+            'bookingdate' => $today, 'instant' => '1', 'nonce' => wp_create_nonce('rsvp-availability')];
+        $onsite = $adapter->shortcodeBooking(['room' => $other]);
+        blockCheck(str_contains($onsite, $starts . ' – ' . gmdate('H:i', $grid + 2400)),
+            'On-site form states the end of a 40-minute booking before submission');
+        $legacyInput = array_diff_key($post, $mixed->fields());
+        $url = blockSubmit($adapter, array_replace($legacyInput, ['rrze_rsvp_post_nonce_field' => wp_create_nonce('post_nonce'),
+            'rsvp_date' => $today, 'rsvp_time' => $starts, 'rsvp_duration' => 40, 'rsvp_instant' => 1]));
+        parse_str((string) wp_parse_url($url, PHP_URL_QUERY), $onsiteResult);
+        $onsiteId = (int) ($onsiteResult['id'] ?? 0);
+        blockCheck($onsiteId > 0, 'On-site booking failed');
+        $ids[] = $onsiteId;
+        blockCheck(get_post_meta($onsiteId, 'rrze-rsvp-booking-status', true) === 'checked-in'
+            && (int) get_post_meta($onsiteId, 'rrze-rsvp-booking-end', true) === $grid + 2400,
+            'On-site booking must check in immediately and end at the displayed time');
+    } finally {
+        remove_filter('pre_option_timezone_string', $siteZone);
+    }
+    WP_CLI::success('Block integration passed, including flexible room forms, legacy links, manual reservations, protected schedules, receipts, mail, ICS and occupancy.');
 } finally {
     remove_filter('wp_redirect', 'blockRedirect', -100);
     remove_filter('wp_die_handler', 'blockDieHandler');

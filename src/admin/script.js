@@ -3,7 +3,13 @@
  */
 "use strict";
 
-jQuery(document).ready(function ($) {
+jQuery(document).ready(
+/**
+ * Attach room editor, manual reservation and booking-list controls.
+ * @param {JQueryStatic} $ WordPress jQuery instance.
+ * @returns {void}
+ */
+function initializeAdmin($) {
     var DATE_FORMAT = rrze_rsvp_admin.dateformat,
         TEXT_CANCEL = rrze_rsvp_admin.text_cancel,
         TEXT_DELETE_PERMANENTLY =
@@ -141,44 +147,37 @@ jQuery(document).ready(function ($) {
 
     starttime.attr("disabled", "disabled");
 
-    seat.change(function () {
-        startdate.val("");
+    let slotRequest;
+    /** @returns {void} Clear dependent controls and discard outstanding replies for a previous seat or date. */
+    function clearSlotOptions() {
+        if (slotRequest) slotRequest.abort();
         starttime.val("");
-        enddate.val("");
         endtime.val("");
-        jQuery("div.select_timeslot_container").remove();
-    });
+        details.find(".select_timeslot_container").remove();
+    }
 
-    startdate.change(function () {
+    /** @param {JQuery.Event} event Date or duration change. @returns {void} Reload valid times for this seat. */
+    function loadSlotOptions(event) {
+        const duration = event.target.name === 'rsvp_duration' ? event.target.value : '';
+        clearSlotOptions();
         enddate.val(startdate.val());
-        starttime.val("");
-        endtime.val("");
-        if (seat.val() == "" || startdate.val() == "") {
-            alert(rrze_rsvp_admin.alert_no_seat_date);
-            startdate.val("");
-            enddate.val("");
-        } else {
-            jQuery("div.select_timeslot_container").remove();
-            jQuery.post(
-                API_AJAXURL,
-                {
-                    //POST request
-                    action: "ShowTimeslots", //action
-                    seat: seat.val(), //data
-                    date: startdate.val(), //data
-                },
-                function (result) {
-                    //callback
-                    // console.log(result);
-                    if (result != false) {
-                        jQuery("input#rrze-rsvp-booking-start_time").after(
-                            result
-                        );
-                    }
-                }
-            );
-        }
+        if (!seat.val() || !startdate.val()) return;
+        slotRequest = $.post(API_AJAXURL, {
+            action: 'ShowTimeslots', seat: seat.val(), date: startdate.val(),
+            booking_id: $('#post_ID').val() || '', rsvp_duration: duration
+        }).done(/** @param {string} html Current slot controls. @returns {void} */ function showSlotOptions(html) {
+            starttime.after(html);
+            if (duration) details.find('[name="rsvp_duration"]').trigger('focus');
+        });
+    }
+
+    seat.on('change', /** @returns {void} Reset the date when the seat changes. */ function changeBookingSeat() {
+        startdate.val('');
+        enddate.val('');
+        clearSlotOptions();
     });
+    startdate.on('change', loadSlotOptions);
+    details.on('change', '[name="rsvp_duration"]', loadSlotOptions);
 
     $("div.cmb2-id-rrze-rsvp-booking-start").on(
         "change",

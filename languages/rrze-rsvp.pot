@@ -2614,7 +2614,7 @@ msgid "Timeslots"
 msgstr ""
 
 #: includes/Metaboxes.php:248
-msgid "Add a time slot for each specific date or weekly schedule. Each time slot can be booked separately."
+msgid "Add a time slot for each specific date or weekly schedule. Each booking must fit within one time slot."
 msgstr ""
 
 #: includes/Metaboxes.php:250
@@ -4140,4 +4140,66 @@ msgstr[1] ""
 
 #: includes/templates/admin/seat-generator.php:137
 msgid "Change settings"
+msgstr ""
+
+#: includes/Actions.php:834
+#: includes/Metaboxes.php:247
+msgid "Flexible booking duration"
+msgstr ""
+
+#: includes/Metaboxes.php:248
+msgid "Use each time slot as an opening window in which guests choose their booking duration."
+msgstr ""
+
+#: includes/Metaboxes.php:252
+msgid "Minimum duration (minutes)"
+msgstr ""
+
+#: includes/Metaboxes.php:253
+msgid "Maximum duration (minutes)"
+msgstr ""
+
+#: includes/Metaboxes.php:254
+msgid "Interval (minutes)"
+msgstr ""
+
+#: includes/RoomSlots.php:37
+msgid "Enter a positive whole number of minutes."
+msgstr ""
+
+#: includes/RoomSlots.php:39
+#: includes/Main.php:300
+msgid "Enter a multiple of the interval."
+msgstr ""
+
+#: includes/RoomSlots.php:43
+#: includes/Main.php:301
+msgid "Maximum duration must be at least the minimum duration."
+msgstr ""
+
+#: includes/RoomSlots.php:253
+#: includes/Shortcodes/Bookings.php:440
+#: includes/Shortcodes/Bookings.php:471
+msgid "Booking duration"
+msgstr ""
+
+#: includes/RoomSlots.php:254
+msgid "Choose a duration"
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:1370
+msgid "Choose a duration to see start times."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:479
+msgid "Choose a day and duration to see available start times."
+msgstr ""
+
+#: includes/RoomSlots.php:257
+#, php-format
+msgid "%d min"
+msgstr ""
+
+#: includes/Actions.php:765
+msgid "The selected reservation is unavailable."
 msgstr ""

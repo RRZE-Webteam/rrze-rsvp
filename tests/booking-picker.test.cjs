@@ -142,7 +142,7 @@ test('a newly chosen date wins over a later month response, with no default auto
     }
 );
 
-const { revealTimeChoice } = require('../src/shortcode/time-options');
+const { revealTimeChoice, clearDependentChoices } = require('../src/shortcode/time-options');
 
 /**
  * Simulate a bounded time list independently of page scroll or server rendering.
@@ -192,5 +192,21 @@ test('visible choices retain their scroll position, and small lists are unaffect
             /** @returns {null} A short list has no scrolling ancestor. */
             closest() { return null; },
         });
+    }
+);
+
+test('changing duration clears the previous time and seat, preserving the chosen day',
+    /** @returns {void} Verify downstream choices for all steps in a flexible picker. */
+    function flexibleDependencies() {
+        for (const [field, expected] of [
+            ['rsvp_date', ['rsvp_duration', 'rsvp_time', 'rsvp_seat']],
+            ['rsvp_duration', ['rsvp_time', 'rsvp_seat']],
+            ['rsvp_time', ['rsvp_seat']],
+            ['rsvp_seat', []],
+        ]) {
+            const cleared = [];
+            clearDependentChoices(field, cleared.push.bind(cleared));
+            assert.deepEqual(cleared, expected);
+        }
     }
 );

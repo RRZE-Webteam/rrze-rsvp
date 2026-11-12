@@ -14,6 +14,9 @@ class Actions
 
     protected $options;
 
+    /** @var array<int,array> Manual booking writes awaiting CMB2 metadata persistence. */
+    private array $manualReservations = [];
+
 	public function __construct()
 	{
 		$this->email = new Email;
@@ -22,6 +25,10 @@ class Actions
 		$this->options = (object) $this->settings->getOptions();
 	}
 
+    /**
+     * Register room and booking lifecycle hooks, including the post-save lock release.
+     * @return void
+     */
 	public function onLoaded()
 	{
 		add_action('admin_init', [$this, 'handleActions']);
@@ -38,6 +45,7 @@ class Actions
 		add_action('admin_init', [$this, 'bulkActionsHandlerSubmitted']);
 		add_action('admin_notices', [$this, 'bulkActionsHandlerAdminNotice']);
 		add_action('pre_post_update', [$this, 'preBookingUpdate']);
+        add_action('wp_after_insert_post', [$this, 'finishManualReservation']);
 		// add_action('pre_post_update', [$this, 'preBookingUpdate'], 10, 2);
 		add_action('pre_post_update', [$this, 'prePostUpdate'], 10, 2);
 		add_action('transition_post_status', [$this, 'transitionBookingStatus'], 10, 3);
@@ -676,12 +684,11 @@ class Actions
 		}
 	}
 
-	/**
-	 * Validate legacy booking updates without imposing seat rules on courses.
-	 *
-	 * @param int $postId Booking post ID.
-	 * @return void
-	 */
+    /**
+     * Validate manual seat reservations before CMB2 writes their metadata.
+     * @param int $postId Booking or other post being saved.
+     * @return void Reject conflicting reservations or protected deletions.
+     */
 	public function preBookingUpdate($postId)
 	{
 		if (Functions::isCourseBooking((int) $postId)) {
@@ -693,132 +700,105 @@ class Actions
 			return;
 		}
 
-		$errorMessage = '';
+        $box = function_exists('cmb2_get_metabox') ? cmb2_get_metabox('rrze-rsvp-booking-details') : null;
+        if ($box && isset($_POST[$box->nonce()]) && wp_verify_nonce($_POST[$box->nonce()], $box->nonce())) {
+            $this->validateManualReservation((int) $postId);
+        }
+        if ($post->post_status === 'publish' && (!empty($_REQUEST['trash']) || !empty($_REQUEST['delete']))
+            && !Functions::canDeleteBooking((int) $postId)) {
+            wp_die(esc_html__('This item cannot be deleted.', 'rrze-rsvp'), esc_html__('Update Error', 'rrze-rsvp'), ['back_link' => true]);
+        }
+    }
 
-		if ($post->post_status != 'publish') {
-			$errorMessage = $this->isSeatAvailable();
-		} else {
-			$trash = isset($_REQUEST['trash']) ? $_REQUEST['trash'] : '';
-			$delete = isset($_REQUEST['delete']) ? $_REQUEST['delete'] : '';
+    /**
+     * Hold the same site/day lock as the public form until CMB2 has persisted all reserving fields.
+     * Existing reservations can keep their original duration after the room policy changes.
+     * @param int $id Edited booking ID.
+     * @return void Report a field conflict before the post is updated.
+     */
+    private function validateManualReservation(int $id): void
+    {
+        $seat = absint($_POST['rrze-rsvp-booking-seat'] ?? 0);
+        $room = (int) get_post_meta($seat, 'rrze-rsvp-seat-room', true);
+        $start = wp_unslash($_POST['rrze-rsvp-booking-start'] ?? []);
+        $end = wp_unslash($_POST['rrze-rsvp-booking-end'] ?? []);
+        $day = $start['date'] ?? '';
+        $time = $start['time'] ?? '';
+        $date = is_string($day) ? \DateTimeImmutable::createFromFormat('!d.m.Y', $day) : false;
+        if (!$date || $date->format('d.m.Y') !== $day || !is_string($time) || !Functions::validateTime($time, 'H:i')
+            || get_post_type($seat) !== 'seat' || get_post_status($seat) !== 'publish' || get_post_status($room) !== 'publish') {
+            wp_die(esc_html__('Invalid or missing booking data.', 'rrze-rsvp'), '', ['back_link' => true]);
+        }
+        $date = $date->format('Y-m-d');
+        $stamp = strtotime("$date $time UTC");
+        $originalEnd = (int) get_post_meta($id, 'rrze-rsvp-booking-end', true);
+        $same = $originalEnd && $seat === (int) get_post_meta($id, 'rrze-rsvp-booking-seat', true)
+            && $stamp === (int) get_post_meta($id, 'rrze-rsvp-booking-start', true)
+            && ($end['date'] ?? '') === $day && ($end['time'] ?? '') === gmdate('H:i', $originalEnd);
+        $oldStatus = get_post_meta($id, 'rrze-rsvp-booking-status', true);
+        $status = sanitize_key($_POST['rrze-rsvp-booking-status'] ?? $oldStatus);
+        $email = Functions::crypt(sanitize_email(wp_unslash($_POST['rrze-rsvp-booking-guest-email'] ?? '')));
+        if ($same && $status === $oldStatus && $email === get_post_meta($id, 'rrze-rsvp-booking-guest-email', true)) {
+            return;
+        }
+        $lock = RoomReservations::lock($date);
+        if (!$lock) {
+            wp_die(esc_html__('The booking could not be saved. Please try again.', 'rrze-rsvp'), '', ['back_link' => true]);
+        }
+        $rule = RoomSlots::rule($room);
+        $reserves = in_array($status, Functions::SEAT_RESERVING_STATUSES, true);
+        $retain = $same && in_array($oldStatus, Functions::SEAT_RESERVING_STATUSES, true);
+        $valid = $rule || empty($_POST['rsvp_duration']);
+        if ($retain || ($same && !$reserves)) {
+            $until = gmdate('H:i', $originalEnd);
+        } else {
+            $duration = $rule ? RoomSlots::minutes($_POST['rsvp_duration'] ?? '') : null;
+            $choices = RoomSlots::available($room, $date, $date, !$rule, $duration, exclude: $id, onlyStart: $time);
+            $until = RoomSlots::end($choices['slots'][$date] ?? [], $time, $seat);
+            if ($rule) {
+                $days = max(0, (int) get_post_meta($room, 'rrze-rsvp-room-days-in-advance', true));
+                $valid = $date <= current_datetime()->modify('+' . $days . ' days')->format('Y-m-d');
+            }
+        }
+        if (!$until || !$valid || ($reserves && RoomReservations::guestBusy($email, $stamp, strtotime("$date $until UTC"), $id))) {
+            RoomReservations::unlock($lock);
+            wp_die(esc_html__('The selected reservation is unavailable.', 'rrze-rsvp'), '', ['back_link' => true]);
+        }
+        $_POST['rrze-rsvp-booking-end'] = ['date' => $day, 'time' => $until];
+        $this->manualReservations[$id] = ['lock' => $lock, 'flexible' => (bool) $rule, 'changed' => !$same];
+    }
 
-			//$requestStatus = isset($_REQUEST['rrze-rsvp-booking-status']) ? $_REQUEST['rrze-rsvp-booking-status'] : '';
-			$requestSeat = isset($_REQUEST['rrze-rsvp-booking-seat']) ? $_REQUEST['rrze-rsvp-booking-seat'] : '';
-
-			//$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
-			$seat = get_post_meta($postId, 'rrze-rsvp-booking-seat', true);
-
-			$isArchive = Functions::isBookingArchived($postId);
-			$canDelete = Functions::canDeleteBooking($postId);
-
-			if ($trash || $delete) {
-                if (!$canDelete) {
-                    $errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
+    /**
+     * Release the writer after all save_post handlers have persisted booking metadata.
+     * @param int $id Saved post ID.
+     * @return void Record the policy used to protect this booking's actual times.
+     */
+    public function finishManualReservation(int $id): void
+    {
+        if (!isset($this->manualReservations[$id])) {
+            return;
+        }
+        $write = $this->manualReservations[$id];
+        unset($this->manualReservations[$id]);
+        try {
+            if ($write['changed']) {
+                if ($write['flexible']) {
+                    update_post_meta($id, 'rrze-rsvp-booking-flexible', 1);
+                } else {
+                    delete_post_meta($id, 'rrze-rsvp-booking-flexible');
                 }
             }
-//			} elseif (
-//				$isArchive
-//				|| ($requestSeat != $seat)
-//			) {
-//				$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
-//			}
-		}
+        } finally {
+            RoomReservations::unlock($write['lock']);
+        }
+    }
 
-		if ($errorMessage) {
-			wp_die(
-				$errorMessage,
-				__('Update Error', 'rrze-rsvp'),
-				['back_link' => true]
-			);
-		}
-	}
-
-	// public function preBookingUpdate($post_id, $post_data) {
-	// 	if ($post_data['post_type'] != 'booking') {
-	// 		return;
-	// 	}
-
-	// 	$errorMessage = $this->isSeatAvailable();
-
-	// 	if (!$errorMessage) {
-	// 		$trash = isset($_REQUEST['trash']) ? $_REQUEST['trash'] : '';
-	// 		$delete = isset($_REQUEST['delete']) ? $_REQUEST['delete'] : '';
-
-	// 		//$requestStatus = isset($_REQUEST['rrze-rsvp-booking-status']) ? $_REQUEST['rrze-rsvp-booking-status'] : '';
-	// 		$requestSeat = isset($_REQUEST['rrze-rsvp-booking-seat']) ? $_REQUEST['rrze-rsvp-booking-seat'] : '';
-
-	// 		//$status = get_post_meta($postId, 'rrze-rsvp-booking-status', true);
-	// 		$seat = get_post_meta($post_id, 'rrze-rsvp-booking-seat', true);
-
-	// 		$isArchive = Functions::isBookingArchived($post_id);
-	// 		$canDelete = Functions::canDeleteBooking($post_id);
-
-	// 		if ($trash || $delete) {
-	// 			if (!$canDelete) {
-	// 				$errorMessage = __('This item cannot be deleted.', 'rrze-rsvp');
-	// 			}
-	// 		} elseif ( $isArchive  || ($requestSeat != $seat) ) {
-	// 			$errorMessage = __('This item cannot be updated.', 'rrze-rsvp');
-	// 		}			
-	// 	}
-
-	// 	if ($errorMessage) {
-	// 		wp_die(
-	// 			$errorMessage,
-	// 			__('Update Error', 'rrze-rsvp'),
-	// 			['back_link' => true]
-	// 		);
-	// 	}
-	// }
-
-	protected function isSeatAvailable()
-	{
-		$errorMessage = '';
-		$seatId = isset($_REQUEST['rrze-rsvp-booking-seat']) ? $_REQUEST['rrze-rsvp-booking-seat'] : '';
-		$bookingStart = isset($_REQUEST['rrze-rsvp-booking-start']) ? $_REQUEST['rrze-rsvp-booking-start'] : '';
-		$bookingStart = is_array($bookingStart) ? $bookingStart['date'] . ' ' . $bookingStart['time'] : '';
-		$bookingEnd = isset($_REQUEST['rrze-rsvp-booking-end']) ? $_REQUEST['rrze-rsvp-booking-end'] : '';
-		$bookingEnd = is_array($bookingEnd) ? $bookingEnd['date'] . ' ' . $bookingEnd['time'] : '';
-
-		$args = [
-			'fields' => 'ids',
-			'post_type' => 'booking',
-			'post_status' => 'publish',
-			'nopaging' => true,
-			'meta_query' => [
-				[
-					'key' => 'rrze-rsvp-booking-seat',
-					'value' => $seatId,
-				],
-				[
-					'key' => 'rrze-rsvp-booking-status',
-					'value' => Functions::SEAT_RESERVING_STATUSES,
-					'compare' => 'IN'
-				],
-				[
-					'key' => 'rrze-rsvp-booking-start',
-					'value' => [strtotime($bookingStart), strtotime($bookingEnd)],
-					'compare' => 'BETWEEN',
-					'type' => 'numeric'
-				],
-			],
-		];
-		$query = new \WP_Query($args);
-
-		if ($query->have_posts()) {
-			$errorMessage = __('Seat unavailable.', 'rrze-rsvp');
-			wp_reset_postdata();
-		}
-
-		return $errorMessage;
-	}
-
-
-	/*
-	*  prePostUpdate() prevents a seat or a room if it is used in a booking
-	* 		a) to be deleted 
-	* 		b) to be set to draft, private or future (= scheduled to be published in a future date)
-	* 		c) to be password protected 
-    */
+    /**
+     * Protect room schedules and resources used in reservations while validating room duration settings.
+     * @param int $post_id Room or seat ID.
+     * @param array $post_data Proposed WordPress post fields.
+     * @return void Reject updates that would invalidate protected bookings.
+     */
 	public function prePostUpdate($post_id, $post_data)
 	{
 		global $wpdb;
@@ -848,6 +828,12 @@ class Actions
 		}
 
 		if ($post_data['post_type'] == 'room') {
+            if (isset($_POST[RoomSlots::ENABLED]) && ($_POST['rrze-rsvp-room-bookingmode'] ?? '') !== 'check-only') {
+                $errors = RoomSlots::errors(wp_unslash($_POST));
+                if ($errors) {
+                    wp_die(esc_html(implode(' ', array_unique($errors))), esc_html__('Flexible booking duration', 'rrze-rsvp'), ['back_link' => true]);
+                }
+            }
 			$oldTimeslots = get_post_meta($post_id, 'rrze-rsvp-room-timeslots', true);
 			$newTimeslots = isset($_POST['rrze-rsvp-room-timeslots']) && is_array($_POST['rrze-rsvp-room-timeslots'])
 				? wp_unslash($_POST['rrze-rsvp-room-timeslots'])

@@ -8,6 +8,8 @@ define('ABSPATH', dirname(__DIR__) . '/');
 
 $testTimeslots = [];
 $testClosedDays = '';
+$roomMeta = [];
+$bookingMeta = [];
 
 /**
  * Supply isolated legacy metadata for the real availability implementation.
@@ -19,12 +21,12 @@ $testClosedDays = '';
  */
 function get_post_meta($postId, $key = '', $single = false)
 {
-    global $testTimeslots, $testClosedDays;
+    global $testTimeslots, $testClosedDays, $roomMeta, $bookingMeta;
     return match ($key) {
         'rrze-rsvp-seat-room' => 77,
         'rrze-rsvp-room-timeslots' => $testTimeslots,
         'rrze-rsvp-room-days-closed' => $testClosedDays,
-        default => '',
+        default => $bookingMeta[$postId][$key] ?? $roomMeta[$key] ?? '',
     };
 }
 
@@ -36,9 +38,26 @@ function get_post_meta($postId, $key = '', $single = false)
  */
 function get_posts(array $args): array
 {
-    return [];
+    global $bookingMeta;
+    if ($args['post_type'] === 'seat') {
+        return [101, 102];
+    }
+    return array_map(/** @param int $id Booking fixture. @return object WP post stub. */ static fn(int $id) => (object) ['ID' => $id], array_keys($bookingMeta));
 }
 
+/** @param string $format Requested format. @return int Mock site time seven minutes into the first interval. */
+function current_time($format): int
+{
+    return strtotime('2026-11-03 09:07 UTC');
+}
+
+/** @param string $label Source string. @param string $domain Translation domain. @return string Test label. */
+function __($label, $domain): string
+{
+    return $label;
+}
+
+require_once dirname(__DIR__) . '/includes/RoomSlots.php';
 require_once dirname(__DIR__) . '/includes/Functions.php';
 
 use RRZE\RSVP\Functions;
@@ -88,5 +107,40 @@ assertAvailability(
     Functions::getSeatAvailability(101, '2026-11-01', '2026-11-17'),
     'Closed days must still override either schedule type'
 );
+
+// The clock is 09:07. A reservation from 10:00 to 11:00 splits the first device's opening.
+use RRZE\RSVP\RoomSlots;
+$roomMeta = [RoomSlots::ENABLED => 'on', RoomSlots::STEP => '20', RoomSlots::MIN => '20', RoomSlots::MAX => '80'];
+$testClosedDays = '';
+$testTimeslots[0]['rrze-rsvp-room-endtime'] = '12:00';
+$day = '2026-11-03';
+$bookingMeta = [501 => [
+    'rrze-rsvp-booking-start' => strtotime("$day 10:00 UTC"),
+    'rrze-rsvp-booking-end' => strtotime("$day 11:00 UTC"),
+    'rrze-rsvp-booking-seat' => 101,
+]];
+$slots = RoomSlots::available(77, $day, $day, false, 40)['slots'][$day];
+assertAvailability([102], $slots['09:40-10:20'], 'Partial overlaps only remove the occupied device');
+assertAvailability([101, 102], $slots['11:00-11:40'], 'An adjacent reservation may start on the release boundary');
+assertAvailability([], $slots['09:00-09:40'] ?? [], 'Ordinary bookings cannot start in the past');
+$instant = RoomSlots::available(77, $day, $day, false, 40, 101, true);
+assertAvailability(['09:00-09:40' => [101]], $instant['slots'][$day], 'On-site check-in starts at the current grid point');
+assertAvailability([60], [$instant['longest']], 'Pinned check-in cannot extend into the next booking');
+assertAvailability([], RoomSlots::available(77, $day, $day, false, 30)['slots'], 'A submitted off-grid duration is rejected');
+assertAvailability([], RoomSlots::available(77, $day, $day, false, 100)['slots'], 'The maximum is enforced');
+assertAvailability([RoomSlots::MIN, RoomSlots::MAX], array_keys(RoomSlots::errors(array_merge($roomMeta, [
+    RoomSlots::MIN => 30, RoomSlots::MAX => 90,
+]))), 'Both incompatible boundaries identify their fields');
+$testTimeslots[0]['rrze-rsvp-room-starttime'] = '08:10';
+$testTimeslots[0]['rrze-rsvp-room-endtime'] = '10:10';
+$testTimeslots[] = array_replace($testTimeslots[0], ['rrze-rsvp-room-starttime' => '10:10', 'rrze-rsvp-room-endtime' => '12:10']);
+$slots = RoomSlots::available(77, $day, $day, true, 40)['slots'][$day];
+assertAvailability([101, 102], $slots['08:30-09:10'], 'The grid starts at the opening time');
+assertAvailability([], $slots['09:50-10:30'] ?? [], 'A booking cannot straddle adjacent openings');
+unset($roomMeta[RoomSlots::ENABLED]);
+assertAvailability([102], Functions::getRoomAvailability(77, $day, $day)[$day]['08:10-10:10'], 'A partial reservation blocks the fixed window after switching back');
+$roomMeta = [RoomSlots::ENABLED => 'on', RoomSlots::STEP => 30, RoomSlots::MIN => 30, RoomSlots::MAX => 240];
+$testTimeslots = [array_replace($testTimeslots[0], ['rrze-rsvp-room-starttime' => '08:00', 'rrze-rsvp-room-endtime' => '16:00'])];
+assertAvailability([102], RoomSlots::available(77, $day, $day, true, 210)['slots'][$day]['09:00-12:30'], 'Three and a half hours occupy a single device');
 
 echo "Timeslot compatibility checks passed.\n";
