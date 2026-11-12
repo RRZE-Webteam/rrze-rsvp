@@ -17,6 +17,18 @@ final class Model
     public const STATUS_META = 'rrze-rsvp-booking-status';
     public const ACTIVE_STATUSES = ['booked', 'customer-confirmed', 'confirmed'];
 
+    /**
+     * Decide whether an offer may be shown and booked through public forms.
+     *
+     * @param string $postStatus WordPress publication status.
+     * @param string $postPassword Stored WordPress post password.
+     * @return bool Whether anonymous visitors may access the offer.
+     */
+    public static function isPublicOffer(string $postStatus, string $postPassword): bool
+    {
+        return $postStatus === 'publish' && $postPassword === '';
+    }
+
     /** @return array Default settings for a newly created course. */
     public static function defaults(): array
     {

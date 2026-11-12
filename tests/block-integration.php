@@ -127,6 +127,23 @@ try {
     $GLOBALS['wp_query']->queried_object_id = $page;
     $_GET = $_POST = $_REQUEST = [];
     wp_set_current_user(0);
+    wp_update_post(['ID' => $course, 'post_password' => 'fixture-only']);
+    $frontend = new \RRZE\RSVP\Courses\Frontend();
+    $request = new WP_REST_Request();
+    $request->set_param('id', $course);
+    $request->set_param('occurrenceId', $dateId);
+    $listing = $frontend->occurrences($request);
+    $submission = $frontend->book($request);
+    blockCheck(is_wp_error($listing) && $listing->get_error_data()['status'] === 404
+        && is_wp_error($submission) && $submission->get_error_data()['status'] === 404,
+        'Public course endpoints must treat a protected course as unavailable.');
+    foreach ([$frontend->render(['courseId' => $course]), BookingBlock::render(['mode' => 'course', 'resourceId' => $course])] as $hiddenOffer) {
+        blockCheck(!str_contains($hiddenOffer, 'Synthetic editor course') && !str_contains($hiddenOffer, 'Synthetic campus')
+            && !str_contains($hiddenOffer, '<form'), 'Both booking blocks must hide protected course details and registration.');
+    }
+    wp_update_post(['ID' => $course, 'post_password' => '']);
+    blockCheck(count($frontend->occurrences($request)->get_data()['occurrences']) === 1,
+        'Removing the password restores the published occurrence.');
     $attrs = ['mode' => 'seat', 'resourceId' => $room, 'instanceId' => 'f340e368-3e85-4567-a456-426614174000'];
     $first = Context::create($attrs, $page);
     $second = Context::create($attrs, $page);

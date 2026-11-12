@@ -1091,7 +1091,7 @@ class Bookings extends Shortcodes
                 ],
                 [
                     'key' => 'rrze-rsvp-booking-status',
-                    'value' => ['booked', 'customer-confirmed', 'confirmed', 'checked-in'],
+                    'value' => Functions::SEAT_RESERVING_STATUSES,
                     'compare' => 'IN',
                 ],
                 [
@@ -1162,7 +1162,7 @@ class Bookings extends Shortcodes
                 ],
                 [
                     'key' => 'rrze-rsvp-booking-status',
-                    'value'   => ['booked', 'customer-confirmed', 'confirmed', 'checked-in'],
+                    'value'   => Functions::SEAT_RESERVING_STATUSES,
                     'compare' => 'IN'
                 ],
                 [

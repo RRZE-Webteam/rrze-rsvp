@@ -885,7 +885,7 @@ class BookingService
         if (!$this->supportsTransactions()) {
             return 'unsupported';
         }
-        if ($course['post_status'] !== 'publish' || $date['post_status'] !== 'publish') {
+        if (!$course['is_public'] || $date['post_status'] !== 'publish') {
             return 'unpublished';
         }
         if ($date['state'] !== 'open') {

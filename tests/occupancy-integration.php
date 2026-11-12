@@ -47,6 +47,22 @@ try {
     }
     $room = occupancyFixture('room', ['rrze-rsvp-room-timeslots' => $rules], $ids);
     $seat = occupancyFixture('seat', ['rrze-rsvp-seat-room' => $room], $ids);
+    $hold = occupancyFixture('booking', [
+        'rrze-rsvp-booking-seat' => $seat,
+        'rrze-rsvp-booking-start' => strtotime("$day 06:00 UTC"),
+        'rrze-rsvp-booking-end' => strtotime("$day 07:00 UTC"),
+        'rrze-rsvp-booking-status' => 'booked',
+    ], $ids);
+    foreach (['booked' => false, 'customer-confirmed' => false, 'confirmed' => false,
+        'checked-in' => false, 'checked-out' => true, 'cancelled' => true] as $status => $shouldBeFree) {
+        update_post_meta($hold, 'rrze-rsvp-booking-status', $status);
+        $roomSlots = Functions::getRoomAvailability($room, $day, $day);
+        $seatSlots = Functions::getSeatAvailability($seat, $day, $day);
+        if (in_array($seat, $roomSlots[$day]['06:00-07:00'] ?? [], true) !== $shouldBeFree
+            || in_array('06:00-07:00', $seatSlots[$day] ?? [], true) !== $shouldBeFree) {
+            throw new RuntimeException("Room and seat pickers must agree on availability for $status.");
+        }
+    }
     $otherSeat = occupancyFixture('seat', ['rrze-rsvp-seat-room' => $room], $ids);
     $statuses = ['booked', 'customer-confirmed', 'checked-in', 'confirmed', 'confirmed', 'confirmed', 'confirmed'];
     $bookingIds = [];

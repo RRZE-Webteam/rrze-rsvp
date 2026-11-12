@@ -2,7 +2,7 @@
 
 /**
  * Captured-mail and token-page integration tests using disposable local WordPress fixtures.
- * Run: wp --skip-plugins --skip-themes --url=SITE eval-file tests/course-notifications-integration.php
+ * Run: wp --skip-plugins --skip-themes --url=SITE eval-file --use-include tests/course-notifications-integration.php
  * Every wp_mail call is intercepted before transmission; fixtures are removed in finally.
  */
 declare(strict_types=1);

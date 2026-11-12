@@ -37,7 +37,7 @@ final class Resources
         $post = get_post($id);
         return in_array($mode, self::MODES, true) && $post instanceof WP_Post
             && $post->post_type === self::postType($mode)
-            && (!$published || ($post->post_status === 'publish' && $post->post_password === ''))
+            && (!$published || Model::isPublicOffer($post->post_status, $post->post_password))
             && !in_array($post->post_status, ['trash', 'auto-draft'], true)
             && ($mode === 'course' || in_array(get_post_meta($id, 'rrze-rsvp-room-bookingmode', true), self::roomModes($mode), true));
     }

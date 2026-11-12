@@ -3,7 +3,7 @@
 /*
 Plugin Name:        RRZE RSVP
 Plugin URI:         https://github.com/RRZE-Webteam/rrze-rsvp
-Version:            2.11.8
+Version:            2.12.0
 Description:        FAU Reservation Tool
 Author:             RRZE-Webteam
 Author URI:         https://blogs.fau.de/webworking/
@@ -41,12 +41,15 @@ add_action('plugins_loaded', __NAMESPACE__ . '\loaded');
 add_action('init', fn() => load_plugin_textdomain('rrze-rsvp', false, dirname(plugin_basename(__FILE__)) . '/languages'));
 
 /**
- * Activation callback function.
+ * Initialize site roles and register post types before flushing rewrite rules.
+ *
+ * @return void
  */
 function activation()
 {
     Users::addRoleCaps();
-    Users::createBookingRole();
+    Courses\PostTypes::register();
+    (new Courses\Module())->upgradeRoles();
 
     $cpt = new CPT;
     $cpt->activation();

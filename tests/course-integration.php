@@ -3,7 +3,7 @@
 /**
  * Exercise course guards and legacy integration against disposable database rows.
  *
- * Run: wp --skip-plugins --skip-themes --url=SITE eval-file tests/course-integration.php
+ * Run: wp --skip-plugins --skip-themes --url=SITE eval-file --use-include tests/course-integration.php
  * Queries for legacy cleanup are restricted to this test's own booking IDs.
  */
 declare(strict_types=1);

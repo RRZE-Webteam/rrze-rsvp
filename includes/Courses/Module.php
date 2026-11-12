@@ -37,21 +37,31 @@ final class Module
     }
 
     /**
-     * Upgrade site capabilities and repair roles recreated after reactivation.
+     * Grant course rights once per site and when RSVP recreates its booking role.
      *
      * @return void
      */
     public function upgradeRoles(): void
     {
+        $needsMigration = (int) get_option(self::VERSION_OPTION, 0) < self::VERSION;
+        $needsBookingRole = get_role(Users::BOOKING_ROLE) === null;
+        if (!$needsMigration && !$needsBookingRole) {
+            return;
+        }
+
         $type = get_post_type_object(Model::COURSE_TYPE);
         if (!$type) {
             return;
         }
 
-        Users::createBookingRole();
-        // Network-activated plugins do not receive a per-site activation hook.
-        $capabilities = array_merge(array_values((array) Capabilities::getCptCaps('booking')), array_values((array) $type->cap));
-        foreach (['administrator', 'editor', Users::BOOKING_ROLE] as $roleName) {
+        $capabilities = array_values((array) $type->cap);
+        if ($needsBookingRole) {
+            Users::createBookingRole();
+            // A fresh network site may never have run the plugin's activation hook.
+            $capabilities = array_merge($capabilities, array_values((array) Capabilities::getCptCaps('booking')));
+        }
+        $roleNames = $needsMigration ? ['administrator', 'editor', Users::BOOKING_ROLE] : [Users::BOOKING_ROLE];
+        foreach ($roleNames as $roleName) {
             $role = get_role($roleName);
             if (!$role) {
                 continue;
@@ -65,7 +75,7 @@ final class Module
                 }
             }
         }
-        if ((int) get_option(self::VERSION_OPTION, 0) < self::VERSION) {
+        if ($needsMigration) {
             update_option(self::VERSION_OPTION, self::VERSION, false);
         }
     }

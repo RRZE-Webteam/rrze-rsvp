@@ -94,6 +94,7 @@ class Repository
         $settings['retention_days'] = max(1, (int) $settings['retention_days']);
         return ['id' => $id, 'title' => $post['post_title'], 'description' => $post['post_content'],
             'post_status' => $post['post_status'], 'settings' => $settings,
+            'is_public' => Model::isPublicOffer($post['post_status'], $post['post_password']),
             'published_at' => strtotime($post['post_date_gmt'] . ' UTC') ?: 0];
     }
 

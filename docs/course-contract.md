@@ -7,7 +7,7 @@ All classes below use `RRZE\RSVP\Courses`. Root owns existing RSVP classes and b
 `Model::COURSE_TYPE = rsvp_course`, `Model::DATE_TYPE = rsvp_course_date` (internal child post, `post_parent` is course ID), `Model::BOOKING_DATE_META = rrze-rsvp-booking-course-date`, `Model::BOOKING_COURSE_META = rrze-rsvp-booking-course`, `Model::COURSE_SETTINGS_META = rrze-rsvp-course-settings`, `Model::OCCURRENCE_META = rrze-rsvp-course-occurrence`, `Model::BOOKING_DATA_META = rrze-rsvp-course-booking-data`.
 
 `new Repository()`:
-- `getCourse(int): array|WP_Error`: id, title, description, post_status, settings {access: sso_or_email|sso, auto_confirm: bool, retention_days: int, allowed_email_domains: string[]}, published_at (UTC).
+- `getCourse(int): array|WP_Error`: id, title, description, post_status, is_public (published without a password), settings {access: sso_or_email|sso, auto_confirm: bool, retention_days: int, allowed_email_domains: string[]}, published_at (UTC).
 - `getOccurrence(int): array|WP_Error`: id, course_id, start, end, room_id, location (display snapshot), capacity, registration_start (0 means course publication), registration_end (0 means start), state (open|cancelled), post_status. All times are true UTC epoch seconds.
 - `getOccurrences(int $courseId, bool $futureOnly = false): array`: occurrence DTOs ordered by start, then ID.
 - `getBooking(int): array|WP_Error`: private admin DTO, id, type=course, course_id, occurrence_id, status, start/end (UTC), course_title, location, room_id, guest_firstname/lastname/email, notes, created_at, expires_at, cancel_reason, settings snapshot, ics_uid, locale, post_status, booking_date_timestamp (alias of created_at). Never return this DTO from a public REST endpoint.
@@ -83,9 +83,10 @@ msgfmt --check languages/rrze-rsvp-de_DE.po -o /tmp/rrze-rsvp-de_DE.mo
 The following commands require a disposable local WordPress test website with InnoDB and an administrator with user ID 1. Use its own URL. They bootstrap this plugin explicitly to avoid unrelated plugin startup dependencies, intercept mail, and clean up their tagged fixtures. Legacy maintenance is restricted to test IDs.
 
 ```sh
-wp --skip-plugins --skip-themes --url=SITE eval-file tests/course-core-integration.php
-wp --skip-plugins --skip-themes --url=SITE eval-file tests/course-integration.php
-wp --skip-plugins --skip-themes --url=SITE eval-file tests/course-notifications-integration.php
+wp --skip-plugins --skip-themes --url=SITE eval-file --use-include tests/course-core-integration.php
+wp --skip-plugins --skip-themes --url=SITE eval-file --use-include tests/course-integration.php
+wp --skip-plugins --skip-themes --url=SITE eval-file --use-include tests/course-notifications-integration.php
+wp --skip-plugins --skip-themes --url=SITE eval-file --use-include tests/course-notifications-race.php
 ```
 
 For a real two-process race, run `course-core-integration.php setup`, retain the returned course and occurrence IDs, then launch `worker OCCURRENCE_ID one` and `worker OCCURRENCE_ID two` concurrently using the same WP command prefix. The workers register the integration guards and deliberately overlap transactions. Expect one successful active booking and one `course_full` result. Finish with `cleanup COURSE_ID`.

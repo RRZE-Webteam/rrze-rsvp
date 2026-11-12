@@ -16,13 +16,11 @@ class Functions
         'confirmed',
     ];
 
-    private const TIMESLOT_BLOCKING_BOOKING_STATUSES = [
-        'booked',
-        'customer-confirmed',
-        'confirmed',
-        'checked-in',
-        'checked-out',
-    ];
+    /** Room and seat reservations that prevent another booking for the same slot. */
+    public const SEAT_RESERVING_STATUSES = [...self::CANCELLABLE_BOOKING_STATUSES, 'checked-in'];
+
+    /** Checked-out bookings also protect the historical schedule. */
+    private const TIMESLOT_BLOCKING_BOOKING_STATUSES = [...self::SEAT_RESERVING_STATUSES, 'checked-out'];
 
     public static function formatDateGMT($timestamp)
     {
@@ -830,7 +828,7 @@ class Functions
                     ],
                     [
                         'key' => 'rrze-rsvp-booking-status',
-                        'value'   => ['confirmed', 'checked-in'],
+                        'value'   => self::SEAT_RESERVING_STATUSES,
                         'compare' => 'IN'
                     ],
                     [
@@ -959,7 +957,7 @@ class Functions
                 ],
                 [
                     'key' => 'rrze-rsvp-booking-status',
-                    'value'   => ['booked', 'confirmed', 'checked-in'],
+                    'value'   => self::SEAT_RESERVING_STATUSES,
                     'compare' => 'IN'
                 ],
                 [

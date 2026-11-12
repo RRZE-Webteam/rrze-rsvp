@@ -53,8 +53,8 @@ The local integration tests intercept `wp_mail` before transmission. They create
 tagged disposable fixtures and clean up in `finally`:
 
 ```sh
-wp --skip-plugins --skip-themes --url=SITE eval-file tests/course-notifications-integration.php
-wp --skip-plugins --skip-themes --url=SITE eval-file tests/course-notifications-race.php
+wp --skip-plugins --skip-themes --url=SITE eval-file --use-include tests/course-notifications-integration.php
+wp --skip-plugins --skip-themes --url=SITE eval-file --use-include tests/course-notifications-race.php
 ```
 
 Generate complete synthetic HTML previews without sending mail or creating

@@ -791,7 +791,7 @@ class Actions
 				],
 				[
 					'key' => 'rrze-rsvp-booking-status',
-					'value' => ['booked', 'confirmed', 'checked-in'],
+					'value' => Functions::SEAT_RESERVING_STATUSES,
 					'compare' => 'IN'
 				],
 				[

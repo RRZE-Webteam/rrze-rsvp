@@ -3,7 +3,7 @@
 /**
  * Disposable real-database course tests.
  *
- * Run with: wp --skip-plugins --skip-themes --url=SITE eval-file tests/course-core-integration.php
+ * Run with: wp --skip-plugins --skip-themes --url=SITE eval-file --use-include tests/course-core-integration.php
  * Additional modes: setup, worker OCCURRENCE_ID IDENTITY, cleanup COURSE_ID.
  * No email is transmitted; fixtures are removed by the default suite's finally block.
  */
@@ -274,6 +274,13 @@ try {
     $fixture = courseTestFixture($service);
     $courseId = $fixture['course_id'];
     $dateId = $fixture['occurrence_id'];
+    // A public form opened before a visibility change must not reserve a place afterwards.
+    wp_update_post(['ID' => $courseId, 'post_password' => 'fixture-only']);
+    $hidden = $service->book($dateId, courseTestPerson('hidden'), 'protected-course-request', true);
+    courseTestAssert(is_wp_error($hidden) && $hidden->get_error_code() === 'course_unpublished'
+        && $repository->getBookingsForOccurrence($dateId) === [] && !$courseTestEvents,
+        'A protected course must reject a new booking under the transaction lock without creating a hold or notification.');
+    wp_update_post(['ID' => $courseId, 'post_password' => '']);
     courseTestSuccess($service->saveCourseSettings($courseId, ['auto_confirm' => true]));
     for ($i = 0; $i < 14; $i++) {
         courseTestSuccess($service->book($dateId, courseTestPerson('confirmed-' . $i), 'request-confirmed-' . $i, true));

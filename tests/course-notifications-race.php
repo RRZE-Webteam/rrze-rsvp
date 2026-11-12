@@ -2,7 +2,7 @@
 
 /**
  * Deterministic delivery-order and real advisory-lock tests with disposable fixtures.
- * Run: wp --skip-plugins --skip-themes --url=SITE eval-file tests/course-notifications-race.php
+ * Run: wp --skip-plugins --skip-themes --url=SITE eval-file --use-include tests/course-notifications-race.php
  * All mail is captured locally before transmission, including recursive service events.
  */
 declare(strict_types=1);

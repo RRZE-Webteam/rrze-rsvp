@@ -92,7 +92,7 @@ use RRZE\RSVP\Courses\Frontend;
 /** Fixture readers; direct database behavior belongs to the core integration suite. */
 class FrontendRepository extends Repository
 {
-    public array $course = ['id' => 12, 'post_status' => 'publish', 'settings' => ['access' => 'sso_or_email']];
+    public array $course = ['id' => 12, 'post_status' => 'publish', 'is_public' => true, 'settings' => ['access' => 'sso_or_email']];
     public array $dates;
 
     /** Create one public, one draft and one started date. */
@@ -170,8 +170,10 @@ frontendAssert($date['free'] === 2 && $date['message'] === '2 places available',
 frontendAssert($response->headers['Cache-Control'] === 'no-store, private', 'Availability must never be cached.');
 frontendAssert(strpos($date['label'], '2026-10-25, 02:30 – 03:30') !== false, 'UTC times across the DST boundary use the site timezone.');
 $repository->course['post_status'] = 'draft';
+$repository->course['is_public'] = false;
 frontendAssert($frontend->occurrences($request) instanceof WP_Error, 'Draft courses cannot leak occurrence details.');
 $repository->course['post_status'] = 'publish';
+$repository->course['is_public'] = true;
 foreach (['full', 'closed', 'cancelled', 'unsupported', 'unpublished'] as $reason) {
     $service->reason = $reason;
     frontendAssert(!$frontend->occurrences($request)->data['occurrences'][0]['bookable'], 'Unavailable reasons remain unbookable.');

@@ -72,12 +72,16 @@ namespace {
         moduleAssert($role->has_cap('edit_rsvp_courses') && $role->has_cap('edit_bookings'), 'Existing roles need course and booking rights.');
     }
     moduleAssert(!get_role('editor')->has_cap('read_customer_phone'), 'Course upgrade must preserve the legacy phone restriction.');
+    unset(get_role('editor')->caps['edit_others_bookings'], get_role('booking')->caps['edit_rsvp_courses']);
     $writes = get_role('editor')->writes;
     $module->upgradeRoles();
     moduleAssert(get_role('editor')->writes === $writes, 'Normal initialization must not rewrite existing capabilities.');
+    moduleAssert(!get_role('editor')->has_cap('edit_others_bookings') && !get_role('booking')->has_cap('edit_rsvp_courses'),
+        'Revoked booking and course rights must stay revoked after init.');
     unset($moduleRoles[1]['booking']);
     $module->upgradeRoles();
     moduleAssert(get_role('booking')->has_cap('edit_rsvp_courses'), 'Recreated booking role needs course rights even at the current version.');
+    moduleAssert(!get_role('editor')->has_cap('edit_others_bookings'), 'Recreating the booking role must preserve editor customization.');
     $module->initializeSite((object) ['blog_id' => 2]);
     moduleAssert($moduleSite === 1, 'New-site initialization must restore the current website.');
     moduleAssert($moduleRoles[2]['editor']->has_cap('edit_bookings') && $moduleRoles[2]['administrator']->has_cap('edit_rsvp_courses'), 'Network activation must equip new-site editors and administrators.');

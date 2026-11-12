@@ -178,7 +178,7 @@ class Frontend
     public function occurrences(WP_REST_Request $request)
     {
         $course = $this->repository->getCourse((int) $request->get_param('id'));
-        if (is_wp_error($course) || $course['post_status'] !== 'publish') {
+        if (is_wp_error($course) || !$course['is_public']) {
             return $this->notFound();
         }
         $rows = [];
@@ -207,7 +207,7 @@ class Frontend
             return $this->notFound();
         }
         $course = $this->repository->getCourse($date['course_id']);
-        if (is_wp_error($course) || $course['post_status'] !== 'publish' || $date['post_status'] !== 'publish') {
+        if (is_wp_error($course) || !$course['is_public'] || $date['post_status'] !== 'publish') {
             return $this->notFound();
         }
         $input = $request->get_param('participant');
@@ -267,7 +267,7 @@ class Frontend
     public function render(array $attributes): string
     {
         $course = $this->repository->getCourse(absint($attributes['courseId'] ?? 0));
-        if (is_wp_error($course) || $course['post_status'] !== 'publish') {
+        if (is_wp_error($course) || !$course['is_public']) {
             return '<p class="rrze-rsvp-course-unavailable">' . esc_html__('This course is currently unavailable.', 'rrze-rsvp') . '</p>';
         }
         $this->noCache();

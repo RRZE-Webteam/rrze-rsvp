@@ -2,7 +2,7 @@
 # This file is distributed under the GNU General Public License Version 3.
 msgid ""
 msgstr ""
-"Project-Id-Version: RRZE RSVP 2.11.8\n"
+"Project-Id-Version: RRZE RSVP 2.12.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rrze-rsvp\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
