@@ -76,6 +76,9 @@ class Settings
 
     protected $optionsPage;
 
+    /** @var Access\Admin|null Request-local room permission editor and submission result. */
+    protected ?Access\Admin $roomAccessAdmin = null;
+
     /**
      * Variablen Werte zuweisen.
      * @param string $pluginFile [description]
@@ -100,6 +103,8 @@ class Settings
      */
     public function onLoaded()
     {
+        $this->roomAccessAdmin = new Access\Admin();
+        $this->roomAccessAdmin->onLoaded();
         add_action('admin_init', [$this, 'adminInit']);
         add_action('admin_menu', [$this, 'adminMenu']);
         add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
@@ -111,11 +116,20 @@ class Settings
     }
 
     /**
-     * Einstellungsbereiche einstellen.
+     * Build the settings tabs, including room permissions only when enabled.
+     *
+     * @return void
      */
     protected function setSections()
     {
         $this->settingsSections = getSections();
+        if (Access\RoomAccess::isEnabled()) {
+            array_splice($this->settingsSections, 1, 0, [[
+                'id' => 'room_access',
+                'title' => __('Booking permissions', 'rrze-rsvp'),
+                'custom' => true,
+            ]]);
+        }
     }
 
     /**
@@ -230,16 +244,22 @@ class Settings
     }
 
     /**
-     * Sanitize-Callback für die Optionen.
-     * @return mixed
+     * Sanitize known settings without accepting arbitrary or sensitive option keys.
+     *
+     * @param mixed $options Submitted settings array.
+     * @return array Existing settings merged with validated known fields.
      */
     public function sanitizeOptions($options)
     {
-        if (!$options) {
-            return $options;
+        if (!is_array($options)) {
+            return $this->options;
         }
 
+        $knownOptions = $this->defaultOptions();
         foreach ($options as $key => $value) {
+            if (!array_key_exists($key, $knownOptions)) {
+                continue;
+            }
             $this->options[$key] = $value;
             $sanitizeCallback = $this->getSanitizeCallback($key);
             if ($sanitizeCallback) {
@@ -305,7 +325,7 @@ class Settings
     }
 
     /**
-     * Render the active settings form and name the reset action explicitly.
+     * Render the active form, keeping room email lists outside the options API.
      *
      * @return void
      */
@@ -313,6 +333,11 @@ class Settings
     {
         foreach ($this->settingsSections as $section) {
             if ($this->settingsPrefix . $section['id'] != $this->currentTab) {
+                continue;
+            }
+            if ($section['id'] === 'room_access') {
+                $this->roomAccessAdmin ??= new Access\Admin();
+                $this->roomAccessAdmin->render();
                 continue;
             }
             switch ($this->currentTab) {
@@ -361,6 +386,9 @@ class Settings
         $fieldSections = [];
         // Hinzufügen von Einstellungsbereichen
         foreach ($this->settingsSections as $section) {
+            if (!empty($section['custom'])) {
+                continue;
+            }
             if (isset($section['desc']) && !empty($section['desc'])) {
                 $section['desc'] = '<div class="inside">' . $section['desc'] . '</div>';
                 /** @return void Render the section description supplied by the settings definition. */
@@ -449,6 +477,9 @@ class Settings
 
         // Registrieren der Einstellungen
         foreach ($this->settingsSections as $section) {
+            if (!empty($section['custom'])) {
+                continue;
+            }
             register_setting($this->settingsPrefix . $section['id'], $this->optionName, [$this, 'sanitizeOptions']);
         }
     }

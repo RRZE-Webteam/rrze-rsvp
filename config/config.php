@@ -84,6 +84,17 @@ function sanitize_natint_field($input)
 }
 
 /**
+ * Accept only the explicit checkbox value for room permission enforcement.
+ *
+ * @param mixed $input Submitted checkbox value.
+ * @return string Canonical on/off setting.
+ */
+function sanitizeRoomAccessEnabled($input): string
+{
+    return $input === 'on' ? 'on' : 'off';
+}
+
+/**
  * Provide localized defaults for room booking, notifications and related settings.
  *
  * @return array<string, mixed> Default values before saved site settings are applied.
@@ -103,6 +114,7 @@ function defaultOptions()
     }
 
     return [
+        'room_access_enabled' => 'off',
         'single_room_availability_table' => 'yes_link',
         'contact_tracking_note' => '<h3>' . esc_html__('Requests for booking data', 'rrze-rsvp') . '</h3><p>'
             . esc_html__('Exports of booking data are managed centrally in this network. Contact the network administration and specify the room and time period you need.', 'rrze-rsvp') . '</p>',
@@ -210,7 +222,7 @@ function getSections()
                     'title' => __('What will be reset?', 'rrze-rsvp'),
                     'desc' => __('General, email, QR-code and LDAP settings will be reset. Your custom email texts, QR-code instructions and LDAP connection details will be removed.', 'rrze-rsvp'),
                     'fields' => ['reset_settings'],
-                    'notice' => __('Rooms, seats, courses and bookings, including their individual settings, will be kept. This action cannot be undone; copy any settings you want to keep before continuing.', 'rrze-rsvp'),
+                    'notice' => __('Rooms, seats, courses and bookings, including their individual settings, will be kept. Booking permission lists will be kept, but their enforcement will be disabled. This action cannot be undone; copy any settings you want to keep before continuing.', 'rrze-rsvp'),
                 ],
             ],
         ],
@@ -319,6 +331,14 @@ function getFields()
 
     return [
         'general' => [
+            [
+                'name' => 'room_access_enabled',
+                'label' => __('Manage booking permissions', 'rrze-rsvp'),
+                'desc' => __('Enable the Booking permissions tab to assign allowed email addresses to rooms. Rooms without a list remain bookable under their existing rules. Disabling this option keeps the lists but stops enforcing them.', 'rrze-rsvp'),
+                'type' => 'checkbox',
+                'default' => $defaults['room_access_enabled'],
+                'sanitize_callback' => __NAMESPACE__ . '\\sanitizeRoomAccessEnabled',
+            ],
             [
                 'name' => 'single_room_availability_table',
                 'label' => __('Availability on room pages', 'rrze-rsvp'),

@@ -4203,3 +4203,115 @@ msgstr ""
 #: includes/Actions.php:765
 msgid "The selected reservation is unavailable."
 msgstr ""
+
+#: config/config.php:336
+msgid "Manage booking permissions"
+msgstr ""
+
+#: includes/Access/Admin.php:105
+#: includes/Settings.php:129
+msgid "Booking permissions"
+msgstr ""
+
+#: config/config.php:337
+msgid "Enable the Booking permissions tab to assign allowed email addresses to rooms. Rooms without a list remain bookable under their existing rules. Disabling this option keeps the lists but stops enforcing them."
+msgstr ""
+
+#: config/config.php:225
+msgid "Rooms, seats, courses and bookings, including their individual settings, will be kept. Booking permission lists will be kept, but their enforcement will be disabled. This action cannot be undone; copy any settings you want to keep before continuing."
+msgstr ""
+
+#: includes/Access/Admin.php:62
+#: includes/Access/Admin.php:101
+msgid "You cannot manage booking permissions."
+msgstr ""
+
+#: includes/Access/Admin.php:67
+#: includes/Access/Admin.php:146
+msgid "Select a room on this website."
+msgstr ""
+
+#: includes/Access/Admin.php:71
+msgid "The form has expired. Reload the page and try again."
+msgstr ""
+
+#: includes/Access/Admin.php:74
+#: includes/Access/Admin.php:81
+msgid "Enter one valid email address per line."
+msgstr ""
+
+#: includes/Access/Admin.php:106
+msgid "Assign allowed email addresses to a room. For rooms with a list, only the email address supplied by SSO or LDAP can be used to book."
+msgstr ""
+
+#: includes/Access/Admin.php:107
+msgid "Rooms without a list remain bookable under their existing rules. These lists apply to public room booking forms, not to manual bookings or course registrations."
+msgstr ""
+
+#: includes/Access/Admin.php:110
+msgid "Booking permissions saved."
+msgstr ""
+
+#: includes/Access/Admin.php:124
+msgid "Create a room before assigning booking permissions."
+msgstr ""
+
+#: includes/Access/Admin.php:139
+msgid "Select room"
+msgstr ""
+
+#: includes/Access/Admin.php:152
+msgid "The stored permission list cannot be read. Its restriction remains active. Restore the encryption key or contact the website administrator before editing it."
+msgstr ""
+
+#: includes/Access/Admin.php:158
+msgid "Enable SSO or LDAP for this room before adding allowed email addresses. An existing list keeps the room restricted until login is configured or the list is explicitly cleared."
+msgstr ""
+
+#: includes/Access/Admin.php:159
+msgid "Edit room login settings"
+msgstr ""
+
+#: includes/Access/Admin.php:172
+msgid "Allowed email addresses"
+msgstr ""
+
+#: includes/Access/Admin.php:175
+msgid "Enter one email address per line. Duplicates and surrounding spaces are removed. Saving an empty list removes the restriction and makes the room bookable under its existing rules."
+msgstr ""
+
+#: includes/Access/Admin.php:177
+msgid "Save booking permissions"
+msgstr ""
+
+#: includes/Access/RoomAccess.php:59
+msgid "Enter valid email addresses. No changes were saved."
+msgstr ""
+
+#: includes/Access/RoomAccess.php:118
+msgid "Sign in with the required SSO or LDAP account to book this room."
+msgstr ""
+
+#: includes/Access/RoomAccess.php:121
+msgid "Your account is not authorized to book this room."
+msgstr ""
+
+#: includes/Access/RoomAccess.php:272
+msgid "Select an existing room on this website."
+msgstr ""
+
+#: includes/Access/RoomAccess.php:283
+msgid "This room needs SSO or configured LDAP authentication before access can be restricted."
+msgstr ""
+
+#: includes/Access/RoomAccess.php:289
+msgid "Room access could not be verified. Ask an administrator to check the encryption configuration and stored list."
+msgstr ""
+
+#: includes/Access/RoomAccess.php:295
+msgid "The room-access list could not be saved. Reload the page and try again."
+msgstr ""
+
+#: includes/Shortcodes/Bookings.php:212
+msgid "This room cannot currently be booked by you. Please contact the room administrator."
+msgstr ""

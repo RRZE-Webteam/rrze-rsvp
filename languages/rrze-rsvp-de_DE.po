@@ -4666,3 +4666,84 @@ msgstr "%d Min."
 
 msgid "The selected reservation is unavailable."
 msgstr "Die gewählte Reservierung ist nicht verfügbar."
+
+msgid "Manage booking permissions"
+msgstr "Buchungsberechtigungen verwalten"
+
+msgid "Booking permissions"
+msgstr "Buchungsberechtigungen"
+
+msgid "Enable the Booking permissions tab to assign allowed email addresses to rooms. Rooms without a list remain bookable under their existing rules. Disabling this option keeps the lists but stops enforcing them."
+msgstr "Aktiviert den Reiter „Buchungsberechtigungen“, in dem Sie Räumen erlaubte E-Mail-Adressen zuweisen können. Räume ohne Liste bleiben nach ihren bisherigen Regeln buchbar. Beim Deaktivieren bleiben die Listen erhalten, werden aber nicht mehr geprüft."
+
+msgid "Rooms, seats, courses and bookings, including their individual settings, will be kept. Booking permission lists will be kept, but their enforcement will be disabled. This action cannot be undone; copy any settings you want to keep before continuing."
+msgstr "Räume, Plätze, Kurse und Buchungen einschließlich ihrer individuellen Einstellungen bleiben erhalten. Listen mit Buchungsberechtigungen bleiben ebenfalls erhalten, werden aber nicht mehr geprüft. Dieser Vorgang kann nicht rückgängig gemacht werden. Sichern Sie Einstellungen, die Sie behalten möchten, bevor Sie fortfahren."
+
+msgid "You cannot manage booking permissions."
+msgstr "Sie können keine Buchungsberechtigungen verwalten."
+
+msgid "Select a room on this website."
+msgstr "Wählen Sie einen Raum auf dieser Website aus."
+
+msgid "The form has expired. Reload the page and try again."
+msgstr "Das Formular ist abgelaufen. Laden Sie die Seite neu und versuchen Sie es erneut."
+
+msgid "Enter one valid email address per line."
+msgstr "Geben Sie pro Zeile eine gültige E-Mail-Adresse ein."
+
+msgid "Assign allowed email addresses to a room. For rooms with a list, only the email address supplied by SSO or LDAP can be used to book."
+msgstr "Weisen Sie einem Raum erlaubte E-Mail-Adressen zu. Bei Räumen mit einer Liste wird ausschließlich die bei der SSO- oder LDAP-Anmeldung übermittelte E-Mail-Adresse für die Buchungsberechtigung verwendet."
+
+msgid "Rooms without a list remain bookable under their existing rules. These lists apply to public room booking forms, not to manual bookings or course registrations."
+msgstr "Räume ohne Liste bleiben nach ihren bisherigen Regeln buchbar. Die Listen gelten für öffentliche Raumbuchungsformulare. Manuelle Buchungen und Kursanmeldungen sind davon ausgenommen."
+
+msgid "Booking permissions saved."
+msgstr "Buchungsberechtigungen gespeichert."
+
+msgid "Create a room before assigning booking permissions."
+msgstr "Erstellen Sie einen Raum, bevor Sie Buchungsberechtigungen zuweisen."
+
+msgid "Select room"
+msgstr "Raum auswählen"
+
+msgid "The stored permission list cannot be read. Its restriction remains active. Restore the encryption key or contact the website administrator before editing it."
+msgstr "Die gespeicherte Berechtigungsliste kann nicht gelesen werden. Ihre Einschränkung bleibt aktiv. Stellen Sie den Verschlüsselungsschlüssel wieder her oder wenden Sie sich an die Website-Administration, bevor Sie die Liste bearbeiten."
+
+msgid "Enable SSO or LDAP for this room before adding allowed email addresses. An existing list keeps the room restricted until login is configured or the list is explicitly cleared."
+msgstr "Aktivieren Sie SSO oder LDAP für diesen Raum, bevor Sie erlaubte E-Mail-Adressen hinzufügen. Eine vorhandene Liste schränkt den Raum weiter ein, bis die Anmeldung eingerichtet oder die Liste ausdrücklich geleert wurde."
+
+msgid "Edit room login settings"
+msgstr "Login-Einstellungen des Raums bearbeiten"
+
+msgid "Allowed email addresses"
+msgstr "Erlaubte E-Mail-Adressen"
+
+msgid "Enter one email address per line. Duplicates and surrounding spaces are removed. Saving an empty list removes the restriction and makes the room bookable under its existing rules."
+msgstr "Geben Sie pro Zeile eine E-Mail-Adresse ein. Doppelte Einträge und Leerzeichen am Anfang und Ende werden entfernt. Wenn Sie eine leere Liste speichern, wird die Einschränkung aufgehoben und der Raum ist nach seinen bisherigen Regeln buchbar."
+
+msgid "Save booking permissions"
+msgstr "Buchungsberechtigungen speichern"
+
+msgid "Enter valid email addresses. No changes were saved."
+msgstr "Geben Sie gültige E-Mail-Adressen ein. Es wurden keine Änderungen gespeichert."
+
+msgid "Sign in with the required SSO or LDAP account to book this room."
+msgstr "Melden Sie sich mit dem erforderlichen SSO- oder LDAP-Konto an, um diesen Raum zu buchen."
+
+msgid "Your account is not authorized to book this room."
+msgstr "Ihr Konto ist nicht berechtigt, diesen Raum zu buchen."
+
+msgid "Select an existing room on this website."
+msgstr "Wählen Sie einen vorhandenen Raum auf dieser Website aus."
+
+msgid "This room needs SSO or configured LDAP authentication before access can be restricted."
+msgstr "Für diesen Raum muss SSO oder eine eingerichtete LDAP-Anmeldung aktiviert sein, bevor der Zugriff eingeschränkt werden kann."
+
+msgid "Room access could not be verified. Ask an administrator to check the encryption configuration and stored list."
+msgstr "Die Buchungsberechtigung konnte nicht geprüft werden. Bitten Sie die Administration, die Verschlüsselungskonfiguration und die gespeicherte Liste zu prüfen."
+
+msgid "The room-access list could not be saved. Reload the page and try again."
+msgstr "Die Liste mit Buchungsberechtigungen konnte nicht gespeichert werden. Laden Sie die Seite neu und versuchen Sie es erneut."
+
+msgid "This room cannot currently be booked by you. Please contact the room administrator."
+msgstr "Sie können diesen Raum derzeit nicht buchen. Bitte wenden Sie sich an die Raumverwaltung."

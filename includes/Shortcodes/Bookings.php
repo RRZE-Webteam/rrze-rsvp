@@ -3,6 +3,7 @@
 namespace RRZE\RSVP\Shortcodes;
 
 use RRZE\RSVP\{Email, Functions, RoomReservations, RoomSlots, Template, TransientData};
+use RRZE\RSVP\Access\RoomAccess;
 use RRZE\RSVP\Auth\{IdM, LDAP};
 use RRZE\RSVP\Blocks\Context;
 
@@ -183,6 +184,51 @@ class Bookings extends Shortcodes
         }
     }
 
+    /**
+     * Resolve a verified identity without trusting form values or WordPress roles.
+     *
+     * @param IdM $idm Current SSO adapter; its identity takes precedence over LDAP.
+     * @param LDAP $ldap Current directory adapter.
+     * @return array{source: string, email: string}|null Server-authenticated identity.
+     */
+    private function roomIdentity(IdM $idm, LDAP $ldap): ?array
+    {
+        if ($idm->isAuthenticated()) {
+            return ['source' => 'sso', 'email' => (string) ($idm->getCustomerData()['customer_email'] ?? '')];
+        }
+        if ($ldap->isAuthenticated()) {
+            return ['source' => 'ldap', 'email' => (string) ($ldap->getCustomerData()['customer_email'] ?? '')];
+        }
+        return null;
+    }
+
+    /**
+     * Explain a denied booking without revealing the access list or storage details.
+     *
+     * @return string Escaped, translated public message.
+     */
+    private function roomAccessMessage(): string
+    {
+        return esc_html__('This room cannot currently be booked by you. Please contact the room administrator.', 'rrze-rsvp');
+    }
+
+    /**
+     * Protect dependent controls using the same identity rules as the final POST.
+     *
+     * @param int $room Requested room ID.
+     * @return void Stop unauthorized requests before generating form fragments.
+     */
+    private function authorizeAjaxRoom(int $room): void
+    {
+        if (!RoomAccess::isEnabled()) {
+            return;
+        }
+        $identity = $this->roomIdentity(new IdM(), new LDAP());
+        if (is_wp_error(RoomAccess::authorize($room, $identity))) {
+            wp_die($this->roomAccessMessage(), '', ['response' => 403]);
+        }
+    }
+
     /** @param int $room Room ID. @return string Authoritative final bookable date. */
     private function bookingEnd(int $room): string
     {
@@ -324,6 +370,10 @@ class Bookings extends Shortcodes
             if ($output = ($this->renderContext ? $this->blockAuthForm($idm, $ssoRequired, $ldapRequired) : $this->authForm($ssoRequired, $ldapRequired))) {
                 return $output;
             }
+        }
+
+        if (is_wp_error(RoomAccess::authorize($input_room, $this->roomIdentity($idm, $ldap)))) {
+            return '<div class="rrze-rsvp"><p role="alert">' . $this->roomAccessMessage() . '</p></div>';
         }
 
         $output = '';
@@ -853,7 +903,11 @@ class Bookings extends Shortcodes
         return $this->template->getContent('shortcode/booking-booked', $data);
     }
 
-    /** @return void Validate and process one room booking, then return to its originating form. */
+    /**
+     * Validate the room, verified identity and allowlist before creating a booking.
+     *
+     * @return void Reject unauthorized submissions or return to the originating form.
+     */
     public function bookingSubmitted()
     {
         if (!isset($_POST['rrze_rsvp_post_nonce_field'])) {
@@ -876,6 +930,7 @@ class Bookings extends Shortcodes
 
         array_walk_recursive(
             $_POST,
+            /** @param mixed $value Submitted scalar to trim and strip tags from. @return void */
             function (&$value) {
                 if (is_string($value)) {
                     $value = wp_strip_all_tags(trim($value));
@@ -913,6 +968,10 @@ class Bookings extends Shortcodes
             wp_die(esc_html__('Invalid or missing booking data.', 'rrze-rsvp'), '', ['response' => 403]);
         }
         $room_id = $booking_room;
+        $identity = $this->roomIdentity($idm, $ldap);
+        if (is_wp_error(RoomAccess::authorize($room_id, $identity))) {
+            wp_die($this->roomAccessMessage(), '', ['response' => 403]);
+        }
 
         if ($idm->isAuthenticated()) {
             if ($idm->isAuthenticated()) {
@@ -1079,9 +1138,12 @@ class Bookings extends Shortcodes
             $meta['rrze-rsvp-booking-guest-phone'] = $booking_phone;
         }
         $booking_id = RoomReservations::create($room_id, $booking_seat, $booking_date, $booking_start,
-            $duration, $booking_instant, $meta);
+            $duration, $booking_instant, $meta, $identity);
         if (is_wp_error($booking_id)) {
             $code = $booking_id->get_error_code();
+            if (str_starts_with($code, 'room_access_')) {
+                wp_die($this->roomAccessMessage(), '', ['response' => 403]);
+            }
             $parameters = ['nonce' => $this->nonce];
             $suffix = $this->nonce;
             if ($code === 'seat_unavailable') {
@@ -1278,6 +1340,7 @@ class Bookings extends Shortcodes
         check_ajax_referer('rsvp-ajax-nonce', 'nonce');
         $roomID = absint($_POST['room'] ?? 0);
         $context = $this->ajaxContext($roomID);
+        $this->authorizeAjaxRoom($roomID);
         $period = sanitize_text_field(wp_unslash($_POST['month'] ?? ''));
         $direction = sanitize_text_field(wp_unslash($_POST['direction'] ?? ''));
         $end = $context ? $this->bookingEnd($roomID) : sanitize_text_field(wp_unslash($_POST['end'] ?? ''));
@@ -1303,6 +1366,7 @@ class Bookings extends Shortcodes
         check_ajax_referer('rsvp-ajax-nonce', 'nonce');
         $roomID = absint($_POST['room'] ?? 0);
         $context = $this->ajaxContext($roomID);
+        $this->authorizeAjaxRoom($roomID);
         $date = sanitize_text_field(wp_unslash($_POST['date'] ?? ''));
         $time = sanitize_text_field(wp_unslash($_POST['time'] ?? ''));
         $seat = absint($_POST['seat'] ?? 0);

@@ -20,6 +20,14 @@ namespace RRZE\RSVP\Shortcodes {
     /** No initialization is needed to exercise the renderer in isolation. */
     class Shortcodes {}
 }
+namespace RRZE\RSVP\Access {
+    /** Keep the existing anonymous picker suite focused on unrestricted rooms. */
+    final class RoomAccess
+    {
+        /** @return bool The optional permission feature is disabled in these fixtures. */
+        public static function isEnabled(): bool { return false; }
+    }
+}
 namespace {
     define('ABSPATH', dirname(__DIR__) . '/');
     /** @param string $text Message. @param string $domain Domain. @return string Untranslated message. */

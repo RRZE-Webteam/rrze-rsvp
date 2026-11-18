@@ -48,6 +48,16 @@ Nachdem Sie den korrekten Betrieb des RRZE-SSO-Plugins überprüft haben, könne
 
 Das Plugin unterstützt auch die Anmeldung über LDAP. Mit dieser Option ist es möglich, den Zugriff auf die Reservierungsseite nur für Personen zu autorisieren, die einen Zugang zu Ihrem Active Directory haben.
 
+## Buchungsberechtigungen für Räume
+
+Unter **Einstellungen → RRZE RSVP → Allgemeine Einstellungen** können Administratoren
+die Verwaltung der Buchungsberechtigungen aktivieren. Im neuen Reiter lassen sich
+erlaubte E-Mail-Adressen pro Raum hinterlegen. Eingeschränkte Räume setzen SSO oder
+LDAP voraus; Räume ohne Liste bleiben nach ihren bisherigen Regeln buchbar.
+
+Einrichtung, Verschlüsselung und Schlüsselwechsel beschreibt
+[Buchungsberechtigungen](docs/room-access.md).
+
 ## Kontaktverfolgung
 
 SEIT 30.07.2022 IST DIE KONTAKTVERFOLGUNG DEAKTIVIERT (CORONA_MODE == false und das Plugin rrze-rsvp-network ist deaktiviert):

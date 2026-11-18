@@ -2,6 +2,8 @@
 
 namespace RRZE\RSVP;
 
+use RRZE\RSVP\Access\RoomAccess;
+
 defined('ABSPATH') || exit;
 
 /** Serialize room reservation writers on the site-local booking day. */
@@ -16,10 +18,11 @@ final class RoomReservations
      * @param int|null $duration Submitted flexible duration, or null for a fixed reservation.
      * @param bool $instant Request to book the running grid interval.
      * @param array $meta Validated booking status and encrypted guest details.
+     * @param array{source: string, email: string}|null $identity Server-verified SSO/LDAP identity, never POST data.
      * @return int|\WP_Error Published booking ID or a booking-form error code.
      */
     public static function create(int $room, int $seat, string $date, string $time, ?int $duration,
-        bool $instant, array $meta): int|\WP_Error
+        bool $instant, array $meta, ?array $identity = null): int|\WP_Error
     {
         $lock = self::lock($date);
         if (!$lock) {
@@ -48,6 +51,11 @@ final class RoomReservations
             $meta['rrze-rsvp-booking-end'] = $end;
             if ($rule) {
                 $meta['rrze-rsvp-booking-flexible'] = 1;
+            }
+            // Re-read current access immediately before writing; a displayed form is not a grant.
+            $access = RoomAccess::authorize($room, $identity);
+            if (is_wp_error($access)) {
+                return $access;
             }
             // A partial write must never appear as a published reservation.
             $id = wp_insert_post(wp_slash(['post_type' => 'booking', 'post_status' => 'draft', 'meta_input' => $meta]), true);
