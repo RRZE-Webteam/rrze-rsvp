@@ -31,8 +31,10 @@
             "php tests/blocks.php",
             "php tests/ldap-session.php",
             "php tests/room-access-storage.php",
+            "php tests/room-access-departments.php",
             "php tests/room-access-admin.php",
-            "php tests/room-access-bookings.php"
+            "php tests/room-access-bookings.php",
+            "php tests/booking-department.php"
         ]
     },
     "extra": {

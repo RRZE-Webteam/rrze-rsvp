@@ -9,6 +9,8 @@ namespace RRZE\RSVP\Access {
         public static bool $enabled = true;
         public static ?\Closure $decision = null;
         public static array $calls = [];
+        public static ?array $department = null;
+        public static int $resolved = 0;
 
         /** @return bool Whether policy enforcement is enabled in this fixture. */
         public static function isEnabled(): bool { return self::$enabled; }
@@ -18,6 +20,39 @@ namespace RRZE\RSVP\Access {
         {
             self::$calls[] = [$room, $identity];
             return self::$enabled && self::$decision ? (self::$decision)($room, $identity) : true;
+        }
+
+        /**
+         * @param int $room Room ID.
+         * @param array|null $identity Verified profile.
+         * @return array|\WP_Error One final authorization and assignment decision.
+         */
+        public static function resolve(int $room, ?array $identity): array|\WP_Error
+        {
+            self::$resolved++;
+            $access = self::authorize($room, $identity);
+            return $access instanceof \WP_Error ? $access : ['department' => self::$enabled ? self::$department : null];
+        }
+    }
+
+    /** Snapshot persistence boundary used to verify the public writer's atomic publication ordering. */
+    final class BookingDepartment
+    {
+        public const META_KEY = '_rrze_rsvp_booking_department';
+        public static bool $fail = false;
+        public static array $snapshots = [];
+
+        /**
+         * @param int $id New booking.
+         * @param int $room Authorized room.
+         * @param array|null $department Resolved snapshot.
+         * @return true|\WP_Error Persisted assignment or simulated failure.
+         */
+        public static function saveNew(int $id, int $room, ?array $department): true|\WP_Error
+        {
+            if (self::$fail) return new \WP_Error('booking_department_save_failed');
+            if ($department !== null) self::$snapshots[$id] = ['room' => $room, 'department' => $department];
+            return true;
         }
     }
 }
@@ -268,10 +303,26 @@ namespace {
         $GLOBALS['room_access_meta'][$id] = array_map('strval', $post['meta_input']);
         return $id;
     }
-    /** @param array $post Publication data. @param bool $error Error flag. @return int Existing ID. */
-    function wp_update_post(array $post, bool $error = false): int { return $post['ID']; }
-    /** @param int $id Post ID. @param bool $force Permanent deletion flag. @return void Fixture rollback. */
-    function wp_delete_post(int $id, bool $force = false): void { unset($GLOBALS['room_access_meta'][$id]); }
+    /**
+     * @param array $post Publication data.
+     * @param bool $error Error flag.
+     * @return int Existing ID.
+     */
+    function wp_update_post(array $post, bool $error = false): int
+    {
+        $GLOBALS['room_access_publications'][] = $post;
+        return $post['ID'];
+    }
+    /**
+     * @param int $id Post ID.
+     * @param bool $force Permanent deletion flag.
+     * @return void Fixture rollback.
+     */
+    function wp_delete_post(int $id, bool $force = false): void
+    {
+        $GLOBALS['room_access_deletions'][] = $id;
+        unset($GLOBALS['room_access_meta'][$id]);
+    }
     /** @return DateTimeImmutable Fixed local date. */
     function current_datetime(): DateTimeImmutable { return new DateTimeImmutable('2026-11-18 12:00:00 UTC'); }
     /** @param string $format Date format or timestamp. @return int|string Fixed fixture clock. */

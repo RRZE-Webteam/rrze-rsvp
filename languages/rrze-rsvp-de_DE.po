@@ -4747,3 +4747,160 @@ msgstr "Die Liste mit Buchungsberechtigungen konnte nicht gespeichert werden. La
 
 msgid "This room cannot currently be booked by you. Please contact the room administrator."
 msgstr "Sie können diesen Raum derzeit nicht buchen. Bitte wenden Sie sich an die Raumverwaltung."
+
+msgid "The same email address has different departments. Assign only one department per address."
+msgstr "Derselben E-Mail-Adresse sind unterschiedliche Abteilungen zugeordnet. Wählen Sie pro Adresse nur eine Abteilung aus."
+
+msgid "Room permissions"
+msgstr "Raumberechtigungen"
+
+msgid "Departments"
+msgstr "Abteilungen"
+
+msgid "Department"
+msgstr "Abteilung"
+
+msgid "No department"
+msgstr "Keine Abteilung"
+
+msgid "Remove"
+msgstr "Entfernen"
+
+msgid "No addresses assigned. This room has no additional restriction."
+msgstr "Es sind keine Adressen eingetragen. Für diesen Raum gilt keine zusätzliche Einschränkung."
+
+msgid "Add email addresses"
+msgstr "E-Mail-Adressen hinzufügen"
+
+msgid "One email address per line"
+msgstr "Eine E-Mail-Adresse pro Zeile"
+
+msgid "Department for new addresses"
+msgstr "Abteilung für neue Adressen"
+
+msgid "The selected department applies only to new addresses. Addresses already in the table keep their assignment when pasted again. Departments are optional and are not shown publicly."
+msgstr "Die gewählte Abteilung gilt nur für neue Adressen. Bereits vorhandene Adressen behalten beim erneuten Einfügen ihre Zuordnung. Abteilungen sind optional und werden nicht öffentlich angezeigt."
+
+msgid "To remove the restriction, select Remove for every address and leave the new-address field empty. The room will then be bookable under its existing rules."
+msgstr "Um die Einschränkung aufzuheben, markieren Sie bei jeder Adresse „Entfernen“ und lassen Sie das Feld für neue Adressen leer. Nach dem Speichern ist der Raum nach seinen bisherigen Regeln buchbar."
+
+#. translators: %s: Department name.
+msgid "%s (archived)"
+msgstr "%s (archiviert)"
+
+msgid "Unavailable department"
+msgstr "Nicht verfügbare Abteilung"
+
+msgid "The submitted table is incomplete. No changes were saved. Reload the page and try again."
+msgstr "Die übermittelte Tabelle ist unvollständig. Es wurden keine Änderungen gespeichert. Laden Sie die Seite neu und versuchen Sie es erneut."
+
+msgid "This permission list changed while you were editing it. Reload the page before saving again."
+msgstr "Diese Berechtigungsliste wurde während Ihrer Bearbeitung geändert. Laden Sie die Seite neu, bevor Sie erneut speichern."
+
+msgid "The department at booking could not be saved."
+msgstr "Die Abteilung zum Buchungszeitpunkt konnte nicht gespeichert werden."
+
+msgid "The department recorded at booking cannot be read. Restore the encryption key or contact the website administrator."
+msgstr "Die zum Buchungszeitpunkt gespeicherte Abteilung kann nicht gelesen werden. Stellen Sie den Verschlüsselungsschlüssel wieder her oder wenden Sie sich an die Website-Administration."
+
+msgid "Department at booking"
+msgstr "Abteilung bei Buchung"
+
+msgid "No department was recorded when this booking was created."
+msgstr "Beim Anlegen dieser Buchung wurde keine Abteilung erfasst."
+
+msgid "This is the department at the time of booking. Later changes to booking permissions or department names do not change this record."
+msgstr "Dies ist die Abteilung zum Buchungszeitpunkt. Spätere Änderungen an Buchungsberechtigungen oder Abteilungsnamen verändern diesen Eintrag nicht."
+
+msgid "Select a valid department action."
+msgstr "Wählen Sie eine gültige Aktion für die Abteilung aus."
+
+msgid "Enter a department name."
+msgstr "Geben Sie einen Abteilungsnamen ein."
+
+msgid "Departments are optional internal labels for allowed email addresses. Archived departments remain visible on existing assignments but cannot be assigned to new addresses."
+msgstr "Abteilungen sind optionale interne Zuordnungen für erlaubte E-Mail-Adressen. Archivierte Abteilungen bleiben bei bestehenden Zuordnungen sichtbar, können aber keinen neuen Adressen zugewiesen werden."
+
+msgid "Department saved."
+msgstr "Abteilung gespeichert."
+
+msgid "New department"
+msgstr "Neue Abteilung"
+
+msgid "Add department"
+msgstr "Abteilung hinzufügen"
+
+msgid "No departments have been created."
+msgstr "Es wurden noch keine Abteilungen angelegt."
+
+msgid "Actions"
+msgstr "Aktionen"
+
+msgid "Department name"
+msgstr "Abteilungsname"
+
+msgid "Rename"
+msgstr "Umbenennen"
+
+msgid "Archived"
+msgstr "Archiviert"
+
+msgid "Active"
+msgstr "Aktiv"
+
+msgid "Reactivate"
+msgstr "Reaktivieren"
+
+msgid "Archive"
+msgstr "Archivieren"
+
+msgid "The departments changed in another request. Reload the page and try again."
+msgstr "Die Abteilungen wurden zwischenzeitlich geändert. Laden Sie die Seite neu und versuchen Sie es erneut."
+
+msgid "Enter a plain-text department name with no more than 200 characters."
+msgstr "Geben Sie einen Abteilungsnamen ohne Formatierung mit höchstens 200 Zeichen ein."
+
+msgid "A department with this name already exists, including archived departments."
+msgstr "Eine Abteilung mit diesem Namen ist bereits vorhanden. Dies gilt auch für archivierte Abteilungen."
+
+msgid "The selected department does not exist on this website."
+msgstr "Die gewählte Abteilung ist auf dieser Website nicht vorhanden."
+
+msgid "The department catalog could not be read or saved. No replacement catalog was created."
+msgstr "Der Abteilungskatalog konnte nicht gelesen oder gespeichert werden. Es wurde kein Ersatzkatalog angelegt."
+
+msgid "Enter valid email addresses with at most one department per address."
+msgstr "Geben Sie gültige E-Mail-Adressen mit höchstens einer Abteilung pro Adresse ein."
+
+msgid "Select an existing department on this website."
+msgstr "Wählen Sie eine vorhandene Abteilung auf dieser Website aus."
+
+msgid "Archived departments can only be retained on their existing email assignments."
+msgstr "Archivierte Abteilungen können nur bei ihren bestehenden E-Mail-Zuordnungen beibehalten werden."
+
+msgid "The room-access list changed in another request. Reload the page before saving."
+msgstr "Die Berechtigungsliste des Raums wurde zwischenzeitlich geändert. Laden Sie die Seite vor dem Speichern neu."
+
+msgid "The assigned department could not be verified. Ask an administrator to check the department catalog."
+msgstr "Die zugeordnete Abteilung konnte nicht geprüft werden. Bitten Sie die Administration, den Abteilungskatalog zu prüfen."
+
+msgid "RSVP settings"
+msgstr "RSVP-Einstellungen"
+
+msgid "Manage bookings, access and notifications for your website."
+msgstr "Buchungen, Berechtigungen und Benachrichtigungen für Ihre Website verwalten."
+
+msgid "Choose a room above to view and edit its booking permissions."
+msgstr "Wählen Sie oben einen Raum, um seine Buchungsberechtigungen anzuzeigen und zu bearbeiten."
+
+msgid "Create a department, then assign it to email addresses in the room permissions."
+msgstr "Legen Sie eine Abteilung an und ordnen Sie ihr anschließend E-Mail-Adressen unter Raumberechtigungen zu."
+
+msgid "General"
+msgstr "Allgemein"
+
+msgid "Permissions"
+msgstr "Berechtigungen"
+
+msgid "QR codes"
+msgstr "QR-Codes"

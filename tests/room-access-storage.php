@@ -4,6 +4,7 @@
 declare(strict_types=1);
 
 use RRZE\RSVP\Access\EncryptionKey;
+use RRZE\RSVP\Access\DepartmentCatalog;
 use RRZE\RSVP\Access\RoomAccess;
 use RRZE\RSVP\Access\RoomAccessCipher;
 
@@ -22,27 +23,110 @@ final class WP_Error
     }
 }
 
+/** Models the catalog's exact-value SQL replacement without a real database. */
+final class AccessTestDatabase
+{
+    public string $last_error = '';
+    public string $options = 'wp_options';
+
+    /**
+     * Retains prepared query parameters for deterministic fixture execution.
+     *
+     * @param string $query SQL containing placeholders.
+     * @param mixed ...$arguments Parameters bound by production storage code.
+     * @return array{query: string, arguments: array<mixed>} Prepared fixture operation.
+     */
+    public function prepare(string $query, mixed ...$arguments): array
+    {
+        return ['query' => $query, 'arguments' => $arguments];
+    }
+
+    /**
+     * Applies only the catalog compare-and-swap query against synthetic raw values.
+     *
+     * @param array{query: string, arguments: array<mixed>} $prepared Prepared operation.
+     * @return int|false One changed row, zero conflict, or an injected DB failure.
+     */
+    public function query(array $prepared): int|false
+    {
+        if (!empty($GLOBALS['accessInput']['failCatalogWrite'])) {
+            $this->last_error = 'Synthetic catalog write failure.';
+            return false;
+        }
+        if (!str_contains($prepared['query'], 'BINARY option_value = BINARY')) {
+            throw new RuntimeException('Unexpected department fixture SQL.');
+        }
+        [, $next, $autoload, $name, $previous] = $prepared['arguments'];
+        $observed = $GLOBALS['accessState']['options'][$name] ?? null;
+        if (!empty($GLOBALS['accessInput']['catalogConflict']) || maybe_serialize($observed) !== $previous) {
+            return 0;
+        }
+        $GLOBALS['accessState']['options'][$name] = unserialize($next, ['allowed_classes' => false]);
+        $GLOBALS['accessState']['autoload'][$name] = $autoload !== 'no';
+        return 1;
+    }
+}
+
 /** @return string Translation-free fixture text. */
 function __(string $message, string $domain = 'default'): string
 {
     return $message;
 }
 
-/** @return mixed The fixture option, or its supplied default. */
+/**
+ * Reads a synthetic option and supports deterministic catalog read failures.
+ *
+ * @param string $name Current-site option name.
+ * @param mixed $default Value returned for an absent option.
+ * @return mixed Stored fixture value or its supplied default.
+ */
 function get_option(string $name, mixed $default = false): mixed
 {
+    if ($name === 'rrze_rsvp_department_catalog' && !empty($GLOBALS['accessInput']['failCatalogRead'])) {
+        $GLOBALS['wpdb']->last_error = 'Synthetic catalog read failure.';
+        return $default;
+    }
     return $GLOBALS['accessState']['options'][$name] ?? $default;
 }
 
-/** @return bool Whether a non-autoloading context option was inserted. */
+/**
+ * Inserts a synthetic site option without replacing an existing record.
+ *
+ * @param string $name Current-site option name.
+ * @param mixed $value Complete new option value.
+ * @param string $deprecated Unused WordPress compatibility argument.
+ * @param bool $autoload Requested option autoload state.
+ * @return bool Whether the option was inserted.
+ */
 function add_option(string $name, mixed $value, string $deprecated = '', bool $autoload = true): bool
 {
+    if ($name === 'rrze_rsvp_department_catalog' && !empty($GLOBALS['accessInput']['failCatalogWrite'])) {
+        $GLOBALS['wpdb']->last_error = 'Synthetic catalog write failure.';
+        return false;
+    }
     if (array_key_exists($name, $GLOBALS['accessState']['options'])) {
         return false;
     }
     $GLOBALS['accessState']['options'][$name] = $value;
     $GLOBALS['accessState']['autoload'][$name] = $autoload;
     return true;
+}
+
+/** @return string WordPress-equivalent serialization of catalog option arrays. */
+function maybe_serialize(mixed $value): string
+{
+    return is_array($value) || is_object($value) ? serialize($value) : (string) $value;
+}
+
+/** @return string Random UUIDv4 for synthetic departments. */
+function wp_generate_uuid4(): string
+{
+    $bytes = random_bytes(16);
+    $bytes[6] = chr((ord($bytes[6]) & 15) | 64);
+    $bytes[8] = chr((ord($bytes[8]) & 63) | 128);
+    $hex = bin2hex($bytes);
+    return substr($hex, 0, 8) . '-' . substr($hex, 8, 4) . '-' . substr($hex, 12, 4) . '-'
+        . substr($hex, 16, 4) . '-' . substr($hex, 20);
 }
 
 /** @return object|null A post within the selected fixture site's post table. */
@@ -140,7 +224,7 @@ function accessFixture(array $input): array
     $GLOBALS['accessInput'] = $input;
     $GLOBALS['accessSaltCalls'] = 0;
     $GLOBALS['accessMetaCache'] = [];
-    $GLOBALS['wpdb'] = (object) ['last_error' => ''];
+    $GLOBALS['wpdb'] = new AccessTestDatabase();
     $GLOBALS['accessState'] = $input['state'] ?? accessDefaultState();
     $constants = $input['constants'] ?? ['AUTH_KEY' => str_repeat('K', 64), 'AUTH_SALT' => str_repeat('S', 64)];
     foreach ($constants as $name => $value) {
@@ -149,6 +233,7 @@ function accessFixture(array $input): array
     require_once dirname(__DIR__) . '/includes/Access/EncryptionKey.php';
     require_once dirname(__DIR__) . '/includes/Access/RoomAccessCipher.php';
     require_once dirname(__DIR__) . '/includes/Access/RoomAccess.php';
+    require_once dirname(__DIR__) . '/includes/Access/DepartmentCatalog.php';
 
     $results = [];
     foreach ($input['operations'] as $operation) {
@@ -157,6 +242,18 @@ function accessFixture(array $input): array
             $result = match ($operation['action']) {
                 'save' => RoomAccess::save($room, $operation['emails']),
                 'read' => RoomAccess::read($room),
+                'read_entries' => RoomAccess::readEntries($room),
+                'save_entries' => RoomAccess::saveEntries($room, $operation['entries'], $operation['revision'] ?? null),
+                'resolve' => RoomAccess::resolve($room, $operation['identity'] ?? null),
+                'revision' => RoomAccess::revision($room),
+                'context' => RoomAccess::siteContext(),
+                'catalog_read' => DepartmentCatalog::read(),
+                'catalog_create' => DepartmentCatalog::create(isset($operation['name_base64'])
+                    ? base64_decode($operation['name_base64'], true) : $operation['name']),
+                'catalog_rename' => DepartmentCatalog::rename($operation['id'], $operation['name']),
+                'catalog_archive' => DepartmentCatalog::setArchived($operation['id'], $operation['archived']),
+                'legacy_encrypt' => accessLegacyCiphertext($operation['emails'], $operation['context'], $room),
+                'key_separation' => accessKeySeparation($operation['context']),
                 'authorize' => RoomAccess::authorize($room, $operation['identity'] ?? null),
                 'enabled' => RoomAccess::isEnabled(),
                 'encrypt' => (new RoomAccessCipher($operation['context'], $room))->encrypt($operation['emails']),
@@ -172,6 +269,40 @@ function accessFixture(array $input): array
         }
     }
     return ['results' => $results, 'state' => $GLOBALS['accessState'], 'saltCalls' => $GLOBALS['accessSaltCalls']];
+}
+
+/**
+ * Generates a frozen-format version-one record independently from the new writer.
+ *
+ * @param list<string> $emails Original version-one plaintext list.
+ * @param string $context Existing fixture site context.
+ * @param int $roomId Expected room ID.
+ * @return string Authenticated legacy ciphertext for migration compatibility tests.
+ */
+function accessLegacyCiphertext(array $emails, string $context, int $roomId): string
+{
+    $key = EncryptionKey::forWriting();
+    $id = $key->identifier($context);
+    $nonce = random_bytes(SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
+    $ciphertext = sodium_crypto_aead_xchacha20poly1305_ietf_encrypt(json_encode($emails, JSON_THROW_ON_ERROR),
+        json_encode(['rrze-rsvp:room-access', 1, $key->source, $id, $context, $roomId, RoomAccess::META_KEY], JSON_THROW_ON_ERROR),
+        $nonce, $key->forStorage($context));
+    return RoomAccessCipher::PREFIX . json_encode(['version' => 1, 'key_source' => $key->source,
+        'key_id' => $id, 'nonce' => base64_encode($nonce), 'ciphertext' => base64_encode($ciphertext)], JSON_THROW_ON_ERROR);
+}
+
+/**
+ * Compares key purposes without returning any binary secret to the test runner.
+ *
+ * @param string $context Existing fixture site context.
+ * @return array{keys_differ: bool, identifiers_differ: bool, snapshot_bytes: int} Public results.
+ */
+function accessKeySeparation(string $context): array
+{
+    $key = EncryptionKey::forWriting();
+    return ['keys_differ' => $key->forStorage($context) !== $key->forBookingDepartment($context),
+        'identifiers_differ' => $key->identifier($context) !== $key->bookingDepartmentIdentifier($context),
+        'snapshot_bytes' => strlen($key->forBookingDepartment($context))];
 }
 
 /**
@@ -264,6 +395,10 @@ if (($argv[1] ?? '') === '--fixture') {
     exit;
 }
 
+if (defined('RRZE_RSVP_ROOM_ACCESS_TEST_BOOTSTRAP_ONLY')) {
+    return;
+}
+
 $metaKey = '_rrze_rsvp_room_access';
 $contextKey = 'rrze_rsvp_room_access_context';
 $appointmentName = 'RRZE_APPOINTMENT_ENCRYPTION_KEY';
@@ -325,7 +460,7 @@ $invalid = accessRun(['state' => $noServer, 'operations' => [['action' => 'autho
 accessAssert($invalid['results'][0]['error'] === 'room_access_login_required', 'LDAP without a server must not authorize.');
 
 $envelope = json_decode(substr($stored, strlen($prefix)), true, 8, JSON_THROW_ON_ERROR);
-foreach ([['version' => 2], ['key_source' => 'appointment'], ['key_id' => str_repeat('0', 32)],
+foreach ([['version' => 3], ['key_source' => 'appointment'], ['key_id' => str_repeat('0', 32)],
     ['nonce' => base64_encode(str_repeat('N', 24))], ['ciphertext' => base64_encode(str_repeat('C', 30))],
     ['nonce' => '!'], ['extra' => 'unexpected']] as $change) {
     $tampered = $base['state'];

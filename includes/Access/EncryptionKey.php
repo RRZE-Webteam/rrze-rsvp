@@ -114,6 +114,28 @@ final class EncryptionKey
         return bin2hex(hash_hkdf('sha256', $this->material, 16, 'rrze-rsvp:room-access:key-id:v1:' . $this->source, $siteContext));
     }
 
+    /**
+     * Derives a separate key for immutable department snapshots on new bookings.
+     *
+     * @param string $siteContext Existing persistent non-secret site identifier.
+     * @return string Binary 256-bit snapshot key; never persist or log it.
+     */
+    public function forBookingDepartment(string $siteContext): string
+    {
+        return hash_hkdf('sha256', $this->material, 32, 'rrze-rsvp:booking-department:storage:v1:' . $this->source, $siteContext);
+    }
+
+    /**
+     * Derives the snapshot format's public identifier independently of its key.
+     *
+     * @param string $siteContext Existing persistent non-secret site identifier.
+     * @return string Lowercase hexadecimal key identifier for booking snapshots.
+     */
+    public function bookingDepartmentIdentifier(string $siteContext): string
+    {
+        return bin2hex(hash_hkdf('sha256', $this->material, 16, 'rrze-rsvp:booking-department:key-id:v1:' . $this->source, $siteContext));
+    }
+
     /** @return array{source: string} Public debug information without key material. */
     public function __debugInfo(): array
     {

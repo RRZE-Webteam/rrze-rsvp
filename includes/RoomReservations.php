@@ -2,7 +2,7 @@
 
 namespace RRZE\RSVP;
 
-use RRZE\RSVP\Access\RoomAccess;
+use RRZE\RSVP\Access\{BookingDepartment, RoomAccess};
 
 defined('ABSPATH') || exit;
 
@@ -10,7 +10,7 @@ defined('ABSPATH') || exit;
 final class RoomReservations
 {
     /**
-     * Recheck availability under the day lock and publish one complete reservation.
+     * Recheck access and availability, freeze its department, then publish one complete reservation.
      * @param int $room Published room ID.
      * @param int $seat Verified seat belonging to the room.
      * @param string $date ISO local date.
@@ -29,6 +29,8 @@ final class RoomReservations
             return new \WP_Error('save_error');
         }
         try {
+            // The protected snapshot is derived only from the final access decision.
+            unset($meta[BookingDepartment::META_KEY]);
             $rule = RoomSlots::rule($room);
             if (($rule !== null) !== ($duration !== null)
                 || ($rule && $instant && !RoomSlots::instantAllowed($room))) {
@@ -53,7 +55,7 @@ final class RoomReservations
                 $meta['rrze-rsvp-booking-flexible'] = 1;
             }
             // Re-read current access immediately before writing; a displayed form is not a grant.
-            $access = RoomAccess::authorize($room, $identity);
+            $access = RoomAccess::resolve($room, $identity);
             if (is_wp_error($access)) {
                 return $access;
             }
@@ -68,6 +70,10 @@ final class RoomReservations
                     wp_delete_post($id, true);
                     return new \WP_Error('save_error');
                 }
+            }
+            if (is_wp_error(BookingDepartment::saveNew((int) $id, $room, $access['department']))) {
+                wp_delete_post($id, true);
+                return new \WP_Error('save_error');
             }
             $published = wp_update_post(['ID' => $id, 'post_status' => 'publish'], true);
             if (!$published || is_wp_error($published)) {

@@ -6,7 +6,7 @@ require __DIR__ . '/fixtures/room-access-bookings.php';
 require dirname(__DIR__) . '/includes/RoomReservations.php';
 require dirname(__DIR__) . '/includes/Shortcodes/Bookings.php';
 
-use RRZE\RSVP\Access\RoomAccess;
+use RRZE\RSVP\Access\{BookingDepartment, RoomAccess};
 use RRZE\RSVP\Auth\{IdM, LDAP};
 use RRZE\RSVP\Blocks\Context;
 use RRZE\RSVP\{Email, Functions, RoomAccessSettingsFixture, RoomReservations, RoomSlots};
@@ -38,6 +38,7 @@ function roomAccessReset(): void
     $GLOBALS['post'] = (object) ['ID' => 30];
     $GLOBALS['wpdb'] = new RoomAccessDatabaseFixture();
     $GLOBALS['room_access_inserts'] = [];
+    $GLOBALS['room_access_publications'] = $GLOBALS['room_access_deletions'] = [];
     $GLOBALS['room_access_meta'] = [10 => [
         'rrze-rsvp-room-bookingmode' => 'reservation', 'rrze-rsvp-room-sso-required' => 'on',
         'rrze-rsvp-room-auto-confirmation' => 'on', 'rrze-rsvp-room-days-in-advance' => 30,
@@ -50,6 +51,10 @@ function roomAccessReset(): void
     Email::$sent = 0;
     RoomAccess::$enabled = true;
     RoomAccess::$calls = [];
+    RoomAccess::$resolved = 0;
+    RoomAccess::$department = null;
+    BookingDepartment::$fail = false;
+    BookingDepartment::$snapshots = [];
     RoomAccess::$decision = /** @param int $room Room ID. @param array|null $identity Verified profile. @return true|WP_Error */
         static fn(int $room, ?array $identity): true|WP_Error => $room === 10
             && in_array($identity['source'] ?? '', ['sso', 'ldap'], true)
@@ -219,5 +224,43 @@ $result = RoomReservations::create(10, 20, '2026-11-19', '09:00', null, false,
     ['rrze-rsvp-booking-guest-email' => Functions::crypt('allowed@example.invalid')]);
 roomAccessCheck(is_wp_error($result) && !$GLOBALS['room_access_inserts'] && $GLOBALS['wpdb']->released === 1,
     'Calling the writer directly without a verified identity must not bypass access restrictions.');
+
+foreach ([false, true] as $block) {
+    roomAccessReset();
+    RoomAccess::$department = ['id' => 'c8585f41-29a7-482f-a427-b31c4b67503d', 'name' => 'Original Department'];
+    RoomSlots::$duringAvailability = /** @return void Change assignment before the final access decision. */
+        static function (): void {
+            RoomAccess::$department = ['id' => 'eb177c45-97bd-47d0-a5d5-76506e157ee7', 'name' => 'Final Department'];
+        };
+    $input = roomAccessInput($block);
+    $input['department'] = 'Forged Department';
+    $input[BookingDepartment::META_KEY] = 'Forged snapshot';
+    $response = roomAccessSubmit(roomAccessAdapter(), $input);
+    roomAccessCheck($response->status === 302 && RoomAccess::$resolved === 1
+        && BookingDepartment::$snapshots[101]['department'] === RoomAccess::$department,
+        'Both public forms must freeze the department from their single final access decision.');
+    roomAccessCheck(count($GLOBALS['room_access_publications']) === 1
+        && !isset($GLOBALS['room_access_inserts'][0]['meta_input'][BookingDepartment::META_KEY]),
+        'Posted department values must never become snapshot metadata.');
+
+    roomAccessReset();
+    RoomAccess::$department = ['id' => 'c8585f41-29a7-482f-a427-b31c4b67503d', 'name' => 'Original Department'];
+    BookingDepartment::$fail = true;
+    $response = roomAccessSubmit(roomAccessAdapter(), roomAccessInput($block));
+    roomAccessCheck($response->status === 302 && str_contains($response->body, 'save_error')
+        && $GLOBALS['room_access_deletions'] === [101] && !$GLOBALS['room_access_publications']
+        && !isset($GLOBALS['room_access_meta'][101]), 'A failed snapshot must roll back its draft before publication.');
+    roomAccessCheck(Email::$sent === 0 && !BookingDepartment::$snapshots,
+        'Snapshot failure must not send booking mail or retain an assignment.');
+}
+
+roomAccessReset();
+$result = RoomReservations::create(10, 20, '2026-11-19', '09:00', null, false,
+    ['rrze-rsvp-booking-guest-email' => Functions::crypt('allowed@example.invalid'),
+        BookingDepartment::META_KEY => 'Injected caller snapshot'],
+    ['source' => 'sso', 'email' => 'allowed@example.invalid']);
+roomAccessCheck(is_int($result) && !BookingDepartment::$snapshots
+    && !isset($GLOBALS['room_access_inserts'][0]['meta_input'][BookingDepartment::META_KEY]),
+    'No assignment must remain absent even when a direct caller supplies protected snapshot metadata.');
 
 echo "room-access-bookings: all checks passed\n";

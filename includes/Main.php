@@ -28,7 +28,7 @@ class Main
     }
 
     /**
-     * Register the legacy room functionality and the independent course module.
+     * Register room functionality, read-only department history and the course module.
      *
      * @return void
      */
@@ -45,6 +45,7 @@ class Main
         // CMB2
         $metaboxes = new Metaboxes;
         $metaboxes->onLoaded();
+        (new Access\BookingDepartmentAdmin())->onLoaded();
 
         // Tracking
         if (CORONA_MODE) {

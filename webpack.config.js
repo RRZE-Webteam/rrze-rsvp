@@ -10,6 +10,13 @@ const shortcode = path.join(__dirname, "src", "shortcode");
 const seat = path.join(__dirname, "src", "seat");
 const reload = path.join(__dirname, "src", "reload");
 
+/**
+ * Build the independent frontend and admin bundles, including settings-only CSS.
+ *
+ * @param {object} env Webpack environment arguments.
+ * @param {{mode?: string}} argv Command-line build options.
+ * @returns {import("webpack").Configuration} Asset build configuration.
+ */
 module.exports = (env, argv) => {
     /** @returns {boolean} Whether development source maps are needed. */
     function isDevelopment() {
@@ -19,6 +26,7 @@ module.exports = (env, argv) => {
         entry: {
             admin,
             menu,
+            settings: path.join(__dirname, "src", "settings"),
             shortcode,
             seat,
             reload,

@@ -295,31 +295,37 @@ class Settings
     }
 
     /**
-     * Einstellungsbereiche als Registerkarte anzeigen.
-     * Zeigt alle Beschriftungen der Einstellungsbereiche als Registerkarte an.
+     * Render link-based settings navigation with an accessible current-page marker.
+     *
+     * @return void
      */
     public function showTabs()
     {
-        $html = '<h1>' . $this->settingsMenu['title'] . '</h1>' . PHP_EOL;
-
         if (count($this->settingsSections) < 2) {
             return;
         }
-
-        $html .= '<h2 class="nav-tab-wrapper wp-clearfix">';
+        $icons = ['general' => 'admin-settings', 'room_access' => 'lock', 'email' => 'email',
+            'pdf' => 'media-document', 'ldap' => 'networking', 'reset' => 'backup'];
+        $shortLabels = ['general' => __('General', 'rrze-rsvp'), 'room_access' => __('Permissions', 'rrze-rsvp'),
+            'email' => __('Email', 'rrze-rsvp'), 'pdf' => __('QR codes', 'rrze-rsvp'),
+            'ldap' => 'LDAP', 'reset' => __('Reset', 'rrze-rsvp')];
+        $html = '<nav class="rrze-rsvp-settings-nav" aria-label="' . esc_attr(__('RSVP settings', 'rrze-rsvp')) . '">';
 
         foreach ($this->settingsSections as $section) {
-            $class = $this->settingsPrefix . $section['id'] == $this->currentTab ? 'nav-tab-active' : $this->defaultTab;
+            $active = $this->settingsPrefix . $section['id'] === $this->currentTab;
             $html .= sprintf(
-                '<a href="?page=%4$s&current-tab=%1$s" class="nav-tab %3$s" id="%1$s-tab">%2$s</a>',
+                '<a href="?page=%4$s&amp;current-tab=%1$s" class="rrze-rsvp-settings-nav-link%3$s" id="%1$s-tab"%5$s><span class="dashicons dashicons-%6$s" aria-hidden="true"></span><span class="rrze-rsvp-nav-label">%2$s</span><span class="rrze-rsvp-nav-short">%7$s</span></a>',
                 esc_attr($this->settingsPrefix . $section['id']),
-                $section['title'],
-                esc_attr($class),
-                $this->settingsMenu['menu_slug']
+                esc_html($section['title']),
+                $active ? ' is-active' : '',
+                esc_attr($this->settingsMenu['menu_slug']),
+                $active ? ' aria-current="page"' : '',
+                esc_attr($icons[$section['id']] ?? 'admin-generic'),
+                esc_html($shortLabels[$section['id']] ?? $section['title'])
             );
         }
 
-        $html .= '</h2>' . PHP_EOL;
+        $html .= '</nav>' . PHP_EOL;
 
         echo $html;
     }
@@ -351,11 +357,11 @@ class Settings
             }
 
 ?>
-            <div id="<?php echo $this->settingsPrefix . $section['id']; ?>">
+            <div id="<?php echo esc_attr($this->settingsPrefix . $section['id']); ?>" class="rrze-rsvp-settings-section">
                 <form method="post" action="options.php">
                     <?php settings_fields($this->settingsPrefix . $section['id']); ?>
                     <?php do_settings_sections($this->settingsPrefix . $section['id']); ?>
-                    <?php submit_button($btn_label, $btn_type); ?>
+                    <div class="rrze-rsvp-settings-actions"><?php submit_button($btn_label, $btn_type); ?></div>
                 </form>
             </div>
 <?php
@@ -370,9 +376,14 @@ class Settings
     public function pageOutput()
     {
         echo '<div class="wrap rrze-rsvp-settings">', PHP_EOL;
+        echo '<header class="rrze-rsvp-settings-header"><span class="rrze-rsvp-settings-mark dashicons dashicons-calendar-alt" aria-hidden="true"></span><div>';
+        echo '<h1>' . esc_html($this->settingsMenu['title']) . '</h1>';
+        echo '<p>' . esc_html__('Manage bookings, access and notifications for your website.', 'rrze-rsvp') . '</p></div></header>';
+        echo '<div class="rrze-rsvp-settings-layout">';
         $this->showTabs();
+        echo '<div class="rrze-rsvp-settings-content">';
         $this->showSections();
-        echo '</div>', PHP_EOL;
+        echo '</div></div></div>', PHP_EOL;
     }
 
     /**
@@ -515,11 +526,18 @@ class Settings
     }
 
     /**
-     * Enqueue Skripte und Style
+     * Load the settings stylesheet only on this plugin's settings screen.
+     *
+     * @param string $hookSuffix Current WordPress admin screen hook.
      * @return void
      */
-    public function adminEnqueueScripts()
+    public function adminEnqueueScripts($hookSuffix = '')
     {
+        if ($hookSuffix === $this->optionsPage) {
+            $path = dirname($this->pluginFile) . '/build/settings.css';
+            wp_enqueue_style('rrze-rsvp-settings', plugins_url('build/settings.css', $this->pluginFile), [],
+                is_file($path) ? (string) filemtime($path) : false);
+        }
         //        wp_register_script('wp-color-picker-settings', plugins_url('assets/js/wp-color-picker.js', plugin_basename($this->pluginFile)));
         wp_register_script('wp-media-settings', plugins_url('assets/js/wp-media.js', plugin_basename($this->pluginFile)));
     }

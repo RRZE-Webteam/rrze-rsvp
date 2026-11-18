@@ -54,6 +54,9 @@ Unter **Einstellungen → RRZE RSVP → Allgemeine Einstellungen** können Admin
 die Verwaltung der Buchungsberechtigungen aktivieren. Im neuen Reiter lassen sich
 erlaubte E-Mail-Adressen pro Raum hinterlegen. Eingeschränkte Räume setzen SSO oder
 LDAP voraus; Räume ohne Liste bleiben nach ihren bisherigen Regeln buchbar.
+Optional kann jeder Adresse eine Abteilung aus dem Website-Katalog zugewiesen
+werden. Neue öffentliche Raumbuchungen behalten die Abteilung zum Buchungszeitpunkt
+als verschlüsselten historischen Stand für spätere Auswertungen.
 
 Einrichtung, Verschlüsselung und Schlüsselwechsel beschreibt
 [Buchungsberechtigungen](docs/room-access.md).

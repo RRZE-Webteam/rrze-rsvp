@@ -4315,3 +4315,163 @@ msgstr ""
 #: includes/Shortcodes/Bookings.php:212
 msgid "This room cannot currently be booked by you. Please contact the room administrator."
 msgstr ""
+
+msgid "The same email address has different departments. Assign only one department per address."
+msgstr ""
+
+msgid "Room permissions"
+msgstr ""
+
+msgid "Departments"
+msgstr ""
+
+msgid "Department"
+msgstr ""
+
+msgid "No department"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "No addresses assigned. This room has no additional restriction."
+msgstr ""
+
+msgid "Add email addresses"
+msgstr ""
+
+msgid "One email address per line"
+msgstr ""
+
+msgid "Department for new addresses"
+msgstr ""
+
+msgid "The selected department applies only to new addresses. Addresses already in the table keep their assignment when pasted again. Departments are optional and are not shown publicly."
+msgstr ""
+
+msgid "To remove the restriction, select Remove for every address and leave the new-address field empty. The room will then be bookable under its existing rules."
+msgstr ""
+
+#. translators: %s: Department name.
+msgid "%s (archived)"
+msgstr ""
+
+msgid "Unavailable department"
+msgstr ""
+
+msgid "The submitted table is incomplete. No changes were saved. Reload the page and try again."
+msgstr ""
+
+msgid "This permission list changed while you were editing it. Reload the page before saving again."
+msgstr ""
+
+msgid "The department at booking could not be saved."
+msgstr ""
+
+msgid "The department recorded at booking cannot be read. Restore the encryption key or contact the website administrator."
+msgstr ""
+
+msgid "Department at booking"
+msgstr ""
+
+msgid "No department was recorded when this booking was created."
+msgstr ""
+
+msgid "This is the department at the time of booking. Later changes to booking permissions or department names do not change this record."
+msgstr ""
+
+msgid "Select a valid department action."
+msgstr ""
+
+msgid "Enter a department name."
+msgstr ""
+
+msgid "Departments are optional internal labels for allowed email addresses. Archived departments remain visible on existing assignments but cannot be assigned to new addresses."
+msgstr ""
+
+msgid "Department saved."
+msgstr ""
+
+msgid "New department"
+msgstr ""
+
+msgid "Add department"
+msgstr ""
+
+msgid "No departments have been created."
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Department name"
+msgstr ""
+
+msgid "Rename"
+msgstr ""
+
+msgid "Archived"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Reactivate"
+msgstr ""
+
+msgid "Archive"
+msgstr ""
+
+msgid "The departments changed in another request. Reload the page and try again."
+msgstr ""
+
+msgid "Enter a plain-text department name with no more than 200 characters."
+msgstr ""
+
+msgid "A department with this name already exists, including archived departments."
+msgstr ""
+
+msgid "The selected department does not exist on this website."
+msgstr ""
+
+msgid "The department catalog could not be read or saved. No replacement catalog was created."
+msgstr ""
+
+msgid "Enter valid email addresses with at most one department per address."
+msgstr ""
+
+msgid "Select an existing department on this website."
+msgstr ""
+
+msgid "Archived departments can only be retained on their existing email assignments."
+msgstr ""
+
+msgid "The room-access list changed in another request. Reload the page before saving."
+msgstr ""
+
+msgid "The assigned department could not be verified. Ask an administrator to check the department catalog."
+msgstr ""
+
+msgid "RSVP settings"
+msgstr ""
+
+msgid "Manage bookings, access and notifications for your website."
+msgstr ""
+
+msgid "Choose a room above to view and edit its booking permissions."
+msgstr ""
+
+msgid "Create a department, then assign it to email addresses in the room permissions."
+msgstr ""
+
+msgid "General"
+msgstr ""
+
+msgid "Permissions"
+msgstr ""
+
+msgid "QR codes"
+msgstr ""
+
+msgid "Reset"
+msgstr ""
