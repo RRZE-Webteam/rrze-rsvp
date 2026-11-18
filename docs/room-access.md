@@ -38,6 +38,15 @@ umbenennen, archivieren und reaktivieren. Eine Abteilung kann in mehreren Räume
 verwendet werden. Pro erlaubter Adresse und Raum ist höchstens eine Abteilung
 möglich; **Keine Abteilung** bleibt zulässig und verhindert keine Buchung.
 
+Fehlt eine Abteilung in **Abteilung für neue Adressen**, öffnen Sie direkt darunter
+**Neue Abteilung anlegen**. Geben Sie den Namen ein und klicken Sie auf
+**Anlegen und auswählen**. Die neue Abteilung wird im gemeinsamen Katalog angelegt
+und für die neuen Adressen ausgewählt. Eingegebene Adressen, Änderungen an bestehenden
+Zeilen und Entfernen-Markierungen bleiben erhalten, auch wenn sie noch unvollständig
+sind. Erst **Buchungsberechtigungen speichern** übernimmt diese Änderungen für den
+Raum. Bei einem ungültigen oder bereits vorhandenen Namen bleiben die Eingaben zur
+Korrektur erhalten. Die Bedienung funktioniert auch ohne JavaScript.
+
 Namen dürfen höchstens 200 Zeichen enthalten und müssen auch gegenüber archivierten
 Abteilungen eindeutig sein; Groß-/Kleinschreibung und überflüssige Leerzeichen
 erzeugen keine verschiedenen Namen. Die dauerhafte interne ID bleibt bei einer

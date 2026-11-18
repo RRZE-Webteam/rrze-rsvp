@@ -59,12 +59,15 @@ namespace RRZE\RSVP\Access {
         public static function read(): array|\WP_Error { return self::$records; }
         /**
          * @param string $name Proposed name.
-         * @return array|\WP_Error Created record or injected validation error.
+         * @return array|\WP_Error Created record added to the catalog double, or an injected error.
          */
         public static function create(string $name): array|\WP_Error
         {
             self::$calls[] = ['create', $name];
-            return self::$failure ?? ['id' => 'new-department', 'name' => $name, 'archived' => false];
+            if (self::$failure) return self::$failure;
+            $record = ['id' => 'new-department', 'name' => $name, 'archived' => false];
+            self::$records[] = $record;
+            return $record;
         }
         /**
          * @param string $id Stable UUID.
@@ -361,6 +364,7 @@ namespace {
         ['manage' => true, 'edit' => true, 'enabled' => 'on', 'request' => array_replace($request, ['expected_rows' => '2'])],
         ['manage' => true, 'edit' => true, 'enabled' => 'on', 'request' => array_replace($request, ['entries' => array_slice($request['entries'], 0, 1)])],
         ['manage' => true, 'edit' => true, 'enabled' => 'on', 'request' => array_replace($request, ['entries' => [], 'expected_rows' => '0'])],
+        ['manage' => true, 'edit' => true, 'enabled' => 'on', 'request' => array_replace($request, ['new_department_name' => ['injected']])],
     ] as $case) {
         $GLOBALS['access_manage'] = $case['manage'];
         $GLOBALS['access_edit'] = $case['edit'];
@@ -368,6 +372,12 @@ namespace {
         $before = count(RoomAccess::$calls);
         accessAdminAssert(is_wp_error((new Admin())->submit($case['request'])), 'Malformed or unauthorized payload is rejected.');
         accessAdminAssert(count(RoomAccess::$calls) === $before, 'Incomplete/unauthorized forms never reach storage.');
+        $beforeCatalog = count(DepartmentCatalog::$calls);
+        $creation = $case['request'] + ['new_department_name' => 'Physics'];
+        $creation['create_department'] = '1';
+        accessAdminAssert(is_wp_error((new Admin())->submit($creation)), 'Inline creation enforces the same capability, nonce, room and complete-form checks.');
+        accessAdminAssert(count(DepartmentCatalog::$calls) === $beforeCatalog && count(RoomAccess::$calls) === $before,
+            'Rejected inline creation changes neither departments nor room permissions.');
     }
     $GLOBALS['access_manage'] = $GLOBALS['access_edit'] = true;
     $GLOBALS['access_options']['general_room_access_enabled'] = 'on';
@@ -467,6 +477,65 @@ namespace {
     accessAdminAssert(str_contains($html, 'Department names must be unique.') && str_contains($html, '&lt;script&gt;Duplicate&lt;/script&gt;')
         && !str_contains($html, '<script>'), 'Catalog validation errors keep escaped name input request-local.');
     DepartmentCatalog::$failure = null;
+
+    unset($_GET['access-view']);
+    RoomAccess::$lists[7] = [
+        ['email' => 'existing@example.test', 'department_id' => 'active-id'],
+        ['email' => 'remove@example.test', 'department_id' => null],
+    ];
+    $stored = RoomAccess::$lists[7];
+    $before = count(RoomAccess::$calls);
+    $draft = accessAdminInput(['emails' => "draft@example.test\nunfinished", 'new_department_name' => 'Physics']);
+    $draft['entries'][0]['email'] = 'unfinished edit';
+    $draft['entries'][1]['remove'] = '1';
+    $_POST = $draft + ['rrze_rsvp_room_access_action' => 'save', 'create_department' => '1'];
+    $admin = new Admin();
+    $admin->handlePost();
+    $html = accessAdminHtml($admin);
+    accessAdminAssert(str_contains($html, 'Department created and selected.') && !str_contains($html, 'Booking permissions saved.'),
+        'Inline creation explicitly reports its separate catalog operation.');
+    accessAdminAssert(str_contains($html, 'value="new-department" selected>Physics</option>')
+        && str_contains($html, 'name="new_department_name" maxlength="200" value=""'),
+        'The new department is selected for bulk additions and its creation field is cleared.');
+    accessAdminAssert(str_contains($html, 'unfinished edit') && str_contains($html, "draft@example.test\nunfinished")
+        && str_contains($html, 'name="entries[1][remove]" value="1" checked')
+        && str_contains($html, 'name="revision" value="' . $draft['revision'] . '"'),
+        'Creation retains incomplete addresses, row edits, removal flags and the original revision.');
+    accessAdminAssert(RoomAccess::$lists[7] === $stored && count(RoomAccess::$calls) === $before,
+        'Creating a department never persists pending email edits or removes permissions.');
+
+    DepartmentCatalog::$failure = new WP_Error('department_duplicate', 'Department names must be unique.');
+    $_POST['new_department_name'] = '<script>Duplicate</script>';
+    $admin = new Admin();
+    $admin->handlePost();
+    $html = accessAdminHtml($admin);
+    accessAdminAssert(str_contains($html, 'Department names must be unique.') && str_contains($html, 'rrze-rsvp-inline-department" open')
+        && str_contains($html, '&lt;script&gt;Duplicate&lt;/script&gt;') && !str_contains($html, '<script>')
+        && str_contains($html, "draft@example.test\nunfinished"),
+        'Inline catalog errors reopen the editor and retain escaped input without losing the draft.');
+    accessAdminAssert(RoomAccess::$lists[7] === $stored && count(RoomAccess::$calls) === $before,
+        'Catalog failure leaves permission storage unchanged.');
+    DepartmentCatalog::$failure = null;
+
+    $beforeCatalog = count(DepartmentCatalog::$calls);
+    foreach ([['create_department' => ['1']], ['create_department' => 'unexpected'], ['revision' => 'stale']] as $invalid) {
+        $creation = array_replace(accessAdminInput(['new_department_name' => 'Physics', 'create_department' => '1']), $invalid);
+        accessAdminAssert(is_wp_error((new Admin())->submit($creation)), 'Malformed or stale creation is rejected.');
+    }
+    RoomAccess::$revisionSequence = [new WP_Error('unreadable', 'Unreadable revision'), 'after'];
+    accessAdminAssert(is_wp_error((new Admin())->submit(array_replace($draft, ['create_department' => '1']))),
+        'An unreadable permission list cannot be treated as an empty draft for creation.');
+    accessAdminAssert(count(DepartmentCatalog::$calls) === $beforeCatalog && count(RoomAccess::$calls) === $before,
+        'Malformed, stale and unreadable drafts never mutate either repository.');
+    accessAdminAssert((new Admin())->submit(accessAdminInput(['new_department_name' => 'Not yet created']))->get_error_code() === 'room_access_department_pending',
+        'Normal save does not silently discard a typed department name or create it implicitly.');
+    accessAdminAssert(count(DepartmentCatalog::$calls) === $beforeCatalog && count(RoomAccess::$calls) === $before,
+        'A pending name must be explicitly created or cleared.');
+    $save = accessAdminInput(['emails' => 'new@example.test', 'bulk_department' => 'new-department', 'new_department_name' => '']);
+    accessAdminAssert((new Admin())->submit($save) === true
+        && RoomAccess::$lists[7][2] === ['email' => 'new@example.test', 'department_id' => 'new-department']
+        && RoomAccess::$lists[7][0]['department_id'] === 'active-id',
+        'A later explicit save assigns the created department only to new addresses.');
 
     $_GET = [];
     $settings = new Settings(dirname(__DIR__) . '/rrze-rsvp.php');

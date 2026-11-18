@@ -4475,3 +4475,18 @@ msgstr ""
 
 msgid "Reset"
 msgstr ""
+
+msgid "Create and select the new department first, or clear its name before saving booking permissions."
+msgstr ""
+
+msgid "Department created and selected. Your email entries have been retained. Save the booking permissions to apply your changes."
+msgstr ""
+
+msgid "Create a new department"
+msgstr ""
+
+msgid "Missing a department? Create it here and select it for the new addresses. Your email entries will be retained; booking permissions are saved separately."
+msgstr ""
+
+msgid "Create and select"
+msgstr ""

@@ -211,6 +211,16 @@
         select, textarea { width: 100%; }
         .description { margin-top: 12px; }
     }
+    .rrze-rsvp-inline-department {
+        margin-block: 12px 16px;
+        padding: 12px 14px;
+        border: 1px solid var(--rsvp-border);
+        border-radius: 6px;
+        background: #f6f8fa;
+        summary { color: var(--rsvp-accent); }
+        p:last-child { margin-bottom: 0; }
+        input { max-inline-size: none; }
+    }
     .rrze-rsvp-settings-table {
         border: 0;
         box-shadow: none;

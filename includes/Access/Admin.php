@@ -15,6 +15,8 @@ final class Admin
     private int $submittedRoom = 0;
     /** @var array|null Complete input retained only for this error response. */
     private ?array $submittedInput = null;
+    /** @var bool Whether this request created a department without saving permissions. */
+    private bool $createdDepartment = false;
     /** @var DepartmentAdmin|null Request-local department controller. */
     private ?DepartmentAdmin $departments = null;
 
@@ -37,12 +39,15 @@ final class Admin
     }
 
     /**
-     * Validate a complete table and merge additions before a single atomic write.
+     * Validate the editor before either creating a department or saving permissions.
+     * Department creation retains the complete draft without writing any email addresses.
+     *
      * @param array<string,mixed> $request Unslashed editor submission.
      * @return true|WP_Error Safe save result without addresses in errors.
      */
     public function submit(#[\SensitiveParameter] array $request): true|WP_Error
     {
+        $this->createdDepartment = false;
         if (!current_user_can('manage_options') || !RoomAccess::isEnabled()) {
             return new WP_Error('room_access_admin_forbidden', __('You cannot manage booking permissions.', 'rrze-rsvp'), ['status' => 403]);
         }
@@ -62,17 +67,34 @@ final class Admin
             || !is_array($rows) || !array_is_list($rows) || count($rows) !== (int) $count
             || ($request['complete'] ?? null) !== '1'
             || !is_string($request['revision'] ?? null) || $request['revision'] === ''
-            || !is_string($request['emails'] ?? null) || !is_string($request['bulk_department'] ?? null)) return $this->incomplete();
+            || !is_string($request['emails'] ?? null) || !is_string($request['bulk_department'] ?? null)
+            || !is_string($request['new_department_name'] ?? '')
+            || (isset($request['create_department']) && $request['create_department'] !== '1')) return $this->incomplete();
         foreach ($rows as $row) {
             if (!is_array($row) || !is_string($row['email'] ?? null) || !is_string($row['department_id'] ?? null)
                 || (isset($row['remove']) && $row['remove'] !== '1')) return $this->incomplete();
         }
+        $createDepartment = ($request['create_department'] ?? '') === '1';
+        $newDepartmentName = $request['new_department_name'] ?? '';
         $this->submittedInput = ['entries' => $rows, 'emails' => $request['emails'],
-            'bulk_department' => $request['bulk_department'], 'revision' => $request['revision']];
+            'bulk_department' => $request['bulk_department'], 'revision' => $request['revision'],
+            'new_department_name' => $newDepartmentName, 'department_creation' => $createDepartment];
         $snapshot = $this->snapshot($roomId);
         if (is_wp_error($snapshot)) return $snapshot;
         if (!hash_equals($snapshot['revision'], $request['revision'])) return $this->conflict();
         if (count($snapshot['entries']) !== (int) $count) return $this->incomplete();
+        if ($createDepartment) {
+            $department = DepartmentCatalog::create($newDepartmentName);
+            if (is_wp_error($department)) return $department;
+            $this->submittedInput['bulk_department'] = $department['id'];
+            $this->submittedInput['new_department_name'] = '';
+            $this->submittedInput['department_creation'] = false;
+            $this->createdDepartment = true;
+            return true;
+        }
+        if (trim($newDepartmentName) !== '') {
+            return new WP_Error('room_access_department_pending', __('Create and select the new department first, or clear its name before saving booking permissions.', 'rrze-rsvp'), ['status' => 422]);
+        }
         $entries = [];
         foreach ($rows as $row) {
             if (($row['remove'] ?? '') === '1') continue;
@@ -122,7 +144,9 @@ final class Admin
         }
         echo '<div class="rrze-rsvp-settings-intro"><p>' . esc_html__('Assign allowed email addresses to a room. For rooms with a list, only the email address supplied by SSO or LDAP can be used to book.', 'rrze-rsvp') . '</p>';
         echo '<p class="description">' . esc_html__('Rooms without a list remain bookable under their existing rules. These lists apply to public room booking forms, not to manual bookings or course registrations.', 'rrze-rsvp') . '</p></div>';
-        if ($this->result === true) $this->notice(__('Booking permissions saved.', 'rrze-rsvp'), 'success');
+        if ($this->result === true) $this->notice($this->createdDepartment
+            ? __('Department created and selected. Your email entries have been retained. Save the booking permissions to apply your changes.', 'rrze-rsvp')
+            : __('Booking permissions saved.', 'rrze-rsvp'), 'success');
         elseif (is_wp_error($this->result)) $this->notice($this->result->get_error_message(), 'error');
         $roomId = $this->submittedRoom ?: $this->roomId($_GET['room_id'] ?? null);
         if (!$this->renderRoomSelector($roomId)) return;
@@ -148,10 +172,12 @@ final class Admin
             echo '<p><a href="' . esc_url(get_edit_post_link($roomId, 'raw')) . '">' . esc_html__('Edit room login settings', 'rrze-rsvp') . '</a></p>';
             if (!$snapshot['entries']) return;
         }
-        $input = is_wp_error($this->result) && $roomId === $this->submittedRoom ? $this->submittedInput : null;
+        $input = ($this->createdDepartment || is_wp_error($this->result)) && $roomId === $this->submittedRoom ? $this->submittedInput : null;
         $rows = $input['entries'] ?? $snapshot['entries'];
         $revision = $input['revision'] ?? $snapshot['revision'];
         echo '<form class="rrze-rsvp-access-editor" method="post" action="' . esc_url($this->editorUrl($roomId)) . '">';
+        // Enter in an ordinary editor field must keep the default save action, not create a department.
+        echo '<button type="submit" hidden>' . esc_html__('Save booking permissions', 'rrze-rsvp') . '</button>';
         echo '<input type="hidden" name="rrze_rsvp_room_access_action" value="save"><input type="hidden" name="room_id" value="' . esc_attr((string) $roomId) . '">';
         echo '<input type="hidden" name="revision" value="' . esc_attr($revision) . '"><input type="hidden" name="expected_rows" value="' . esc_attr((string) count($rows)) . '">';
         wp_nonce_field('rrze-rsvp-room-access-' . $roomId, 'rrze_rsvp_room_access_nonce');
@@ -174,6 +200,7 @@ final class Admin
         echo '<textarea id="rrze-rsvp-access-emails" name="emails" rows="6" cols="55" class="large-text code" spellcheck="false" autocomplete="off" aria-describedby="rrze-rsvp-access-help">'
             . esc_textarea($input['emails'] ?? '') . '</textarea></div><div><p><label for="access-bulk-department">' . esc_html__('Department for new addresses', 'rrze-rsvp') . '</label></p>';
         $this->departmentSelect('bulk_department', 'access-bulk-department', $input['bulk_department'] ?? '', $catalog, false);
+        $this->renderDepartmentCreation($input);
         echo '<p class="description" id="rrze-rsvp-access-help">' . esc_html__('The selected department applies only to new addresses. Addresses already in the table keep their assignment when pasted again. Departments are optional and are not shown publicly.', 'rrze-rsvp') . '</p></div></div></section>';
         echo '<div class="rrze-rsvp-settings-hint"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><p class="description">' . esc_html__('To remove the restriction, select Remove for every address and leave the new-address field empty. The room will then be bookable under its existing rules.', 'rrze-rsvp') . '</p></div>';
         // Must follow every data field to detect max_input_vars truncation.
@@ -181,6 +208,28 @@ final class Admin
         echo '<div class="rrze-rsvp-settings-actions">';
         submit_button(__('Save booking permissions', 'rrze-rsvp'));
         echo '</div></form>';
+    }
+
+    /**
+     * Offer native inline creation while retaining unfinished room edits across the POST.
+     *
+     * @param array|null $input Request-local draft after a failed save or department creation.
+     * @return void
+     */
+    private function renderDepartmentCreation(?array $input): void
+    {
+        $name = $input['new_department_name'] ?? '';
+        $open = !empty($input['department_creation']) || $name !== '';
+        echo '<details class="rrze-rsvp-inline-department"' . ($open ? ' open' : '') . '><summary>'
+            . esc_html__('Create a new department', 'rrze-rsvp') . '</summary>';
+        echo '<p class="description" id="access-new-department-help">'
+            . esc_html__('Missing a department? Create it here and select it for the new addresses. Your email entries will be retained; booking permissions are saved separately.', 'rrze-rsvp') . '</p>';
+        echo '<p><label for="access-new-department-name">' . esc_html__('Department name', 'rrze-rsvp') . '</label></p>';
+        echo '<input type="text" id="access-new-department-name" name="new_department_name" maxlength="200" value="' . esc_attr($name)
+            . '" aria-describedby="access-new-department-help">';
+        // Unfinished email fields must not prevent this separate catalog operation.
+        echo '<p><button type="submit" class="button" name="create_department" value="1" formnovalidate>'
+            . esc_html__('Create and select', 'rrze-rsvp') . '</button></p></details>';
     }
 
     /**

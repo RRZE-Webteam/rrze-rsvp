@@ -4904,3 +4904,18 @@ msgstr "Berechtigungen"
 
 msgid "QR codes"
 msgstr "QR-Codes"
+
+msgid "Create and select the new department first, or clear its name before saving booking permissions."
+msgstr "Legen Sie die neue Abteilung zuerst mit „Anlegen und auswählen“ an oder leeren Sie das Namensfeld, bevor Sie die Buchungsberechtigungen speichern."
+
+msgid "Department created and selected. Your email entries have been retained. Save the booking permissions to apply your changes."
+msgstr "Die Abteilung wurde angelegt und ausgewählt. Ihre E-Mail-Eingaben sind erhalten geblieben. Übernehmen Sie die Änderungen mit „Buchungsberechtigungen speichern“."
+
+msgid "Create a new department"
+msgstr "Neue Abteilung anlegen"
+
+msgid "Missing a department? Create it here and select it for the new addresses. Your email entries will be retained; booking permissions are saved separately."
+msgstr "Die gewünschte Abteilung fehlt? Legen Sie sie hier an und wählen Sie sie für die neuen Adressen aus. Ihre E-Mail-Eingaben bleiben erhalten; die Buchungsberechtigungen speichern Sie anschließend separat."
+
+msgid "Create and select"
+msgstr "Anlegen und auswählen"
