@@ -360,6 +360,10 @@ final class Notifications
             [$palette, $statusLabel] = EmailLayout::bookingStatus($status);
             $body = EmailLayout::wrap($body, $subject, $palette, $statusLabel);
             if ($calendarBooking !== null) {
+                // Public booking requests may not have loaded the WordPress filesystem helpers.
+                if (!function_exists('wp_tempnam')) {
+                    require_once ABSPATH . 'wp-admin/includes/file.php';
+                }
                 $temporary = wp_tempnam('rsvp-course.ics');
                 if (!$temporary) {
                     return false;

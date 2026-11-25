@@ -55,7 +55,8 @@ namespace RRZE\RSVP {
 }
 
 namespace {
-    define('ABSPATH', dirname(__DIR__) . '/');
+    define('ABSPATH', __DIR__ . '/fixtures/wordpress/');
+    $pluginRoot = dirname(__DIR__) . '/';
     /**
      * @param string $text Message.
      * @param string $domain Domain.
@@ -177,12 +178,13 @@ namespace {
         return new DOMXPath($dom);
     }
 
-    require ABSPATH . 'includes/Mail/EmailLayout.php';
-    require ABSPATH . 'includes/Mail/RoomMessage.php';
-    require ABSPATH . 'includes/Parser.php';
-    require ABSPATH . 'includes/Template.php';
-    require ABSPATH . 'includes/Email.php';
-    require ABSPATH . 'includes/Courses/Notifications.php';
+    require $pluginRoot . 'includes/Mail/EmailLayout.php';
+    require $pluginRoot . 'includes/Mail/RoomMessage.php';
+    require $pluginRoot . 'includes/Parser.php';
+    require $pluginRoot . 'includes/Template.php';
+    require $pluginRoot . 'includes/Email.php';
+    require $pluginRoot . 'includes/Courses/Calendar.php';
+    require $pluginRoot . 'includes/Courses/Notifications.php';
     require __DIR__ . '/fixtures/mail-data.php';
 
     use RRZE\RSVP\Mail\EmailLayout;
@@ -207,7 +209,7 @@ namespace {
     $GLOBALS['mail_imprint']->post_status = 'publish';
     $GLOBALS['mail_privacy'] = 'https://example.invalid/privacy/';
     mailExpect(str_contains(EmailLayout::wrap(''), '/impressum/') && str_contains(EmailLayout::wrap(''), '/privacy/'), 'Existing legal pages appear in the footer.');
-    $layout = file_get_contents(ABSPATH . 'build/email/layout.html');
+    $layout = file_get_contents($pluginRoot . 'build/email/layout.html');
     $valid = new ReflectionMethod(EmailLayout::class, 'hasRequiredLayoutMarkers');
     mailExpect($valid->invoke(null, $layout) && !$valid->invoke(null, str_replace('___RRZE_EMAIL_CONTENT___', '', $layout)), 'Incomplete build artifacts are rejected.');
     $fallback = (new ReflectionMethod(EmailLayout::class, 'getFallbackLayout'))->invoke(null);
@@ -261,7 +263,8 @@ namespace {
          * @return bool Captured.
          */
         public function send(string $to, string $subject, string $message, string $altMessage = '', string $attachment = ''): bool {
-            $this->messages[] = compact('to', 'subject', 'message', 'altMessage', 'attachment');
+            $calendar = is_file($attachment) ? file_get_contents($attachment) : '';
+            $this->messages[] = compact('to', 'subject', 'message', 'altMessage', 'attachment', 'calendar');
             return true;
         }
         /**
@@ -316,10 +319,17 @@ namespace {
     $capture = new RoomMailCapture();
     $notifications = new RRZE\RSVP\Courses\Notifications($capture, []);
     $deliver = new ReflectionMethod($notifications, 'deliver');
+    $booking = ['status' => 'confirmed', 'course_title' => 'Frontend course', 'location' => 'Room A',
+        'ics_uid' => 'frontend@example.invalid', 'start' => strtotime('2027-01-07 12:00 UTC'), 'end' => strtotime('2027-01-07 13:00 UTC')];
+    mailExpect(!function_exists('wp_tempnam'), 'Start the frontend confirmation with the WordPress filesystem helper unloaded.');
     mailExpect($deliver->invoke($notifications, 'guest@example.invalid', '<Course & test>', ['Intro &amp; details'],
         [['Manage & review', 'https://example.invalid/action?a=1&b=2']],
-        [['label' => 'Course', 'value' => '<Course &amp; test>', 'plain' => 'Course: <Course &amp; test>']], 'confirmed'), 'Structured course content renders through the shared transport boundary.');
+        [['label' => 'Course', 'value' => '<Course &amp; test>', 'plain' => 'Course: <Course &amp; test>']], 'confirmed', $booking),
+        'The participant confirmation with its calendar must reach the mail transport on a frontend request.');
     $course = $capture->messages[0];
+    mailExpect(str_ends_with($course['attachment'], '.ics') && str_contains($course['calendar'], "DTSTART:20270107T120000Z\r\n"),
+        'The transport can read the booked course date from the attached ICS file.');
+    mailExpect(!file_exists($course['attachment']), 'The temporary calendar is removed after delivery.');
     mailExpect(str_contains($course['message'], '&lt;Course &amp; test&gt;') && !str_contains($course['message'], '<Course'), 'Course details and subjects cannot introduce HTML.');
     mailExpect(str_contains($course['altMessage'], 'Course: <Course & test>')
         && str_contains($course['altMessage'], 'https://example.invalid/action?a=1&b=2')

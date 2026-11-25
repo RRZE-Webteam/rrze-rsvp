@@ -92,6 +92,24 @@ function courseMailAssert(bool $condition, string $message): void
 }
 
 /**
+ * Check both recipients of an automatically confirmed registration.
+ *
+ * @param array $messages Mail captured during this confirmation.
+ * @param string $participantEmail Registered participant address.
+ * @return void
+ */
+function courseMailAssertAutoConfirmation(array $messages, string $participantEmail): void
+{
+    $byRecipient = array_column($messages, null, 'to');
+    courseMailAssert(count($messages) === 2 && isset($byRecipient[$participantEmail], $byRecipient['organizers@example.invalid']),
+        'Automatic confirmation sends one message each to the participant and the organizer.');
+    courseMailAssert(str_contains($byRecipient[$participantEmail]['calendar'], 'METHOD:PUBLISH'),
+        'The participant receives the course calendar with the confirmation.');
+    courseMailAssert(empty($byRecipient['organizers@example.invalid']['attachments']),
+        'The separate organizer notice has no attachment.');
+}
+
+/**
  * @param array|WP_Error $result Service result.
  * @return array Successful result.
  */
@@ -214,12 +232,21 @@ try {
     courseMailSuccess($service->saveCourseSettings($courseMailCourse, array_merge(Model::defaults(), ['auto_confirm' => true])));
     $beforeSso = count($courseMailMessages);
     $sso = courseMailSuccess($service->book($date['id'], array_merge($person, ['email' => 'sso@example.invalid']), wp_generate_uuid4(), true));
-    courseMailAssert($sso['status'] === 'confirmed' && count($courseMailMessages) === $beforeSso + 2, 'Automatic SSO registration sends confirmation and organizer mail directly.');
-    courseMailAssert(str_contains($courseMailMessages[$beforeSso]['calendar'], 'METHOD:PUBLISH'), 'Automatic SSO confirmation attaches the same calendar format.');
+    courseMailAssert($sso['status'] === 'confirmed', 'SSO registration confirms participation immediately.');
+    courseMailAssertAutoConfirmation(array_slice($courseMailMessages, $beforeSso), 'sso@example.invalid');
+    $beforeGuest = count($courseMailMessages);
     $guest = courseMailSuccess($service->book($date['id'], array_merge($person, ['email' => 'automatic-guest@example.invalid']), wp_generate_uuid4()));
     $guestTokens = end($courseMailEvents)['tokens'];
+    courseMailAssert($guest['status'] === 'booked' && count($courseMailMessages) === $beforeGuest + 1,
+        'A guest registration sends exactly one verification message before confirmation.');
+    $verification = $courseMailMessages[$beforeGuest];
+    courseMailAssert($verification['to'] === 'automatic-guest@example.invalid' && empty($verification['attachments'])
+        && str_contains($verification['plain'], ActionPage::url('verify', $guest['id'], $guestTokens['verify'])),
+        'The guest receives the verification link before receiving a calendar.');
+    $beforeVerification = count($courseMailMessages);
     $autoVerified = courseMailSuccess($service->verify($guest['id'], $guestTokens['verify']));
     courseMailAssert($autoVerified['status'] === 'confirmed', 'Automatic guest confirmation follows email verification.');
+    courseMailAssertAutoConfirmation(array_slice($courseMailMessages, $beforeVerification), 'automatic-guest@example.invalid');
     foreach ($courseMailMessages as $mail) {
         courseMailAssert(str_contains($mail['subject'], '[RSVP MAIL TEST]'), 'Every subject, including organizer mail, must identify the course.');
     }
