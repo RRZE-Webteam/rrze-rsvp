@@ -28,7 +28,7 @@ class Main
     }
 
     /**
-     * Register room functionality, read-only department history and the course module.
+     * Register room functionality, department history, authorized exports and courses.
      *
      * @return void
      */
@@ -46,6 +46,7 @@ class Main
         $metaboxes = new Metaboxes;
         $metaboxes->onLoaded();
         (new Access\BookingDepartmentAdmin())->onLoaded();
+        (new Export\Admin())->onLoaded();
 
         // Tracking
         if (CORONA_MODE) {

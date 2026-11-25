@@ -76,7 +76,9 @@ Backend-Buchungen, Kursbuchungen und Buchungen ohne zugewiesene Abteilung erhalt
 keine automatische Zuordnung. Schlägt das Speichern einer erforderlichen
 Abteilungszuordnung fehl, wird die neue Buchung abgebrochen und keine Mail versandt.
 
-Der CSV-Download folgt in einem eigenen Schritt. Die derzeitige automatische
+Unter **RSVP → Export** können berechtigte Personen Buchungen mit den historischen
+Abteilungen herunterladen; Details beschreibt der [Buchungsexport](booking-export.md).
+Die derzeitige automatische
 Löschung von Raumbuchungen, deren Beginn mehr als vier Wochen zurückliegt, bleibt
 unverändert. Die benötigte Aufbewahrungsdauer muss deshalb vor Einführung von
 Semester- oder Jahresauswertungen geklärt werden. Gelöschte Buchungen lassen sich

@@ -61,6 +61,15 @@ als verschlüsselten historischen Stand für spätere Auswertungen.
 Einrichtung, Verschlüsselung und Schlüsselwechsel beschreibt
 [Buchungsberechtigungen](docs/room-access.md).
 
+## CSV-Export von Raumbuchungen
+
+Unter **RSVP → Export** lassen sich vorhandene Raumbuchungen nach Raum, Zeitraum
+und Status als CSV herunterladen. Namen und E-Mail-Adressen sind optional;
+Abteilungen werden bei aktivierter Berechtigungsverwaltung bedingt ergänzt und
+geben den gespeicherten Stand bei der Buchung wieder. Die automatische Löschung
+nach vier Wochen bleibt unverändert. Filter, Rechte und Dateiformat beschreibt
+der [Buchungsexport](docs/booking-export.md).
+
 ## Kontaktverfolgung
 
 SEIT 30.07.2022 IST DIE KONTAKTVERFOLGUNG DEAKTIVIERT (CORONA_MODE == false und das Plugin rrze-rsvp-network ist deaktiviert):

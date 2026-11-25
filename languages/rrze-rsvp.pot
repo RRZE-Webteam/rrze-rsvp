@@ -4490,3 +4490,135 @@ msgstr ""
 
 msgid "Create and select"
 msgstr ""
+
+#: includes/Export/Admin.php:32 includes/Export/Admin.php:109
+msgid "Booking export"
+msgstr ""
+
+#: includes/Export/Admin.php:33
+msgid "Export"
+msgstr ""
+
+#: includes/Export/Admin.php:63
+msgid "The download could not be started. Reload this page and try again."
+msgstr ""
+
+#: includes/Export/Admin.php:84
+msgid "The export form has expired. Reload the page and try again."
+msgstr ""
+
+#: includes/Export/Admin.php:89
+msgid "No accessible room bookings were found for these filters."
+msgstr ""
+
+#: includes/Export/Admin.php:110
+msgid "Download room bookings as a CSV file for your analysis."
+msgstr ""
+
+#: includes/Export/Admin.php:118
+msgid "Select bookings"
+msgstr ""
+
+#: includes/Export/Admin.php:119
+msgid "One row per room booking, including manual bookings. Courses, drafts and trashed bookings are excluded."
+msgstr ""
+
+#: includes/Export/Admin.php:122
+msgid "All rooms"
+msgstr ""
+
+#: includes/Export/Admin.php:128
+msgid "From"
+msgstr ""
+
+#: includes/Export/Admin.php:130
+msgid "Until"
+msgstr ""
+
+#: includes/Export/Admin.php:132
+msgid "Includes bookings starting on either selected date and every day in between. Times match the local times in booking administration."
+msgstr ""
+
+#: includes/Export/Admin.php:134
+msgid "All booking statuses"
+msgstr ""
+
+#: includes/Export/Admin.php:140
+msgid "Sort by"
+msgstr ""
+
+#: includes/Export/Admin.php:141
+msgid "Booking start"
+msgstr ""
+
+#: includes/Export/Admin.php:142
+msgid "Department, then booking start"
+msgstr ""
+
+#: includes/Export/Admin.php:148
+msgid "CSV contents"
+msgstr ""
+
+#: includes/Export/Admin.php:149
+msgid "Includes booking ID, room, seat, start, end, duration in minutes and status."
+msgstr ""
+
+#: includes/Export/Admin.php:150
+msgid "Include names and email addresses"
+msgstr ""
+
+#: includes/Export/Admin.php:152
+msgid "The department column is added when an exported booking has a recorded department or a represented room has current department assignments. Values reflect the department at booking; missing assignments stay blank."
+msgstr ""
+
+#: includes/Export/Admin.php:153
+msgid "Booking permissions are disabled. The CSV will not contain a department column."
+msgstr ""
+
+#: includes/Export/Admin.php:155
+msgid "Only existing bookings can be exported. Room bookings are automatically deleted after four weeks; cancelled bookings may be removed earlier. Deleted bookings cannot be recovered by the export."
+msgstr ""
+
+#: includes/Export/Admin.php:158
+msgid "Up to 10,000 bookings per file · UTF-8 · Semicolon-separated"
+msgstr ""
+
+#: includes/Export/BookingExport.php:72
+msgid "Department sorting requires enabled booking permissions. Select chronological sorting or enable booking permissions."
+msgstr ""
+
+#: includes/Export/BookingExport.php:114
+msgid "The export exceeds 10,000 bookings. Select a shorter period or a single room."
+msgstr ""
+
+#: includes/Export/BookingExport.php:163
+msgid "Booking ID"
+msgstr ""
+
+#: includes/Export/BookingExport.php:164
+msgid "Duration (minutes)"
+msgstr ""
+
+#: includes/Export/BookingExport.php:172
+msgid "Unknown"
+msgstr ""
+
+#: includes/Export/BookingExport.php:290
+msgid "The requested names or email addresses could not be decrypted. Restore the booking encryption key or export without personal fields."
+msgstr ""
+
+#: includes/Export/BookingExport.php:347
+msgid "Select a valid room, date range, status and sorting option. The start date must not be after the end date."
+msgstr ""
+
+#: includes/Export/BookingExport.php:353
+msgid "The booking data could not be read completely. No CSV was created. Please try again or contact the website administrator."
+msgstr ""
+
+#: includes/Export/BookingExport.php:359
+msgid "You are not allowed to export these bookings."
+msgstr ""
+
+#: includes/Export/CsvWriter.php:50
+msgid "The CSV could not be created completely. No file was downloaded."
+msgstr ""

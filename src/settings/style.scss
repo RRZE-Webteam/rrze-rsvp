@@ -198,6 +198,15 @@
         .rrze-rsvp-settings-bilingual tbody { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     .rrze-rsvp-settings-notice { margin-block-start: 16px; }
+    &.rrze-rsvp-export {
+        max-width: 1000px;
+        .rrze-rsvp-export-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 24px; margin-top: 20px; }
+        .rrze-rsvp-export-fields label { display: block; margin-bottom: 6px; font-weight: 600; }
+        .rrze-rsvp-export-fields select, input[type="date"] { box-sizing: border-box; width: 100%; max-width: none; min-width: 0; min-height: 40px; padding-inline: 10px; border: 1px solid #929eac; border-radius: 6px; font-size: 14px; }
+        .rrze-rsvp-export-wide { grid-column: 1 / -1; margin: 0; }
+        .rrze-rsvp-settings-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+        @media (max-width: 600px) { .rrze-rsvp-export-fields { grid-template-columns: minmax(0, 1fr); } }
+    }
     .rrze-rsvp-room-selector, .rrze-rsvp-inline-form { display: flex; align-items: end; gap: 12px; }
     .rrze-rsvp-room-selector > div, .rrze-rsvp-inline-form > div { flex: 1; min-width: 0; }
     .rrze-rsvp-room-selector label, .rrze-rsvp-inline-form label { display: block; margin-bottom: 8px; font-weight: 600; }
